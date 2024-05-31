@@ -11,7 +11,7 @@ fun NavGraphBuilder.homeNavigation(
 ) {
     composable(Screen.Home.route) {
         HomeScreen(
-            onCategorySelected = onCategorySelected,
+            showBottomNav = onCategorySelected,
             onNavigateToSearch = onNavigateToSearch
         )
     }

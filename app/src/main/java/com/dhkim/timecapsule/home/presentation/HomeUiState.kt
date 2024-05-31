@@ -13,5 +13,6 @@ data class HomeUiState(
     val isCompleted: Boolean = false,
     val query: String = "",
     val places: StateFlow<PagingData<Place>> = MutableStateFlow(PagingData.empty()),
-    val category: Category = Category.None
+    val category: Category = Category.None,
+    val selectedPlace: Place? = null
 )

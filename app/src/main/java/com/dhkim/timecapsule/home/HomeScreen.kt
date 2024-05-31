@@ -15,12 +15,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -32,6 +37,7 @@ import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
@@ -39,13 +45,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,7 +70,6 @@ import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.home.domain.Category
 import com.dhkim.timecapsule.home.presentation.HomeViewModel
 import com.dhkim.timecapsule.search.domain.Place
-import com.dhkim.timecapsule.search.presentation.Place
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -79,6 +88,7 @@ import com.naver.maps.map.compose.MarkerState
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberCameraPositionState
 import com.naver.maps.map.location.FusedLocationSource
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 
@@ -87,17 +97,25 @@ import retrofit2.HttpException
 @Composable
 fun HomeScreen(
     onNavigateToSearch: (Double, Double) -> Unit,
-    onCategorySelected: (Boolean) -> Unit,
+    showBottomNav: (Boolean) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val places = uiState.places.collectAsLazyPagingItems()
-    val peekHeight = if (uiState.category == Category.None) {
-        onCategorySelected(false)
+    var peekHeight = if (uiState.category == Category.None) {
         0.dp
     } else {
-        onCategorySelected(true)
-        180.dp
+        300.dp
+    }
+
+    if (uiState.selectedPlace != null) {
+        peekHeight = 0.dp
+    }
+
+    if (uiState.category == Category.None && uiState.selectedPlace == null) {
+        showBottomNav(true)
+    } else {
+        showBottomNav(false)
     }
     var currentLocation by remember {
         mutableStateOf(LatLng(37.572389, 126.9769117))
@@ -131,7 +149,6 @@ fun HomeScreen(
                 .addOnSuccessListener { location: Location? ->
                     // Got last known location. In some rare situations this can be null.
                     currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-
                     cameraPositionState.move(
                         CameraUpdate.toCameraPosition(CameraPosition(LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0), 15.0))
                     )
@@ -165,54 +182,188 @@ fun HomeScreen(
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
-
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    val sheetState = remember { SheetState(skipHiddenState = false, skipPartiallyExpanded = false) }
+    val scaffoldState = rememberBottomSheetScaffoldState(sheetState)
+    val paddingValues = WindowInsets.navigationBars.asPaddingValues()
+    val scope = rememberCoroutineScope()
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = peekHeight,
         sheetContent = {
             if (uiState.category != Category.None) {
-                PlaceList(places = places)
+                PlaceList(
+                    places = places,
+                    onPlaceClick = viewModel::selectPlace,
+                    onHide = {
+                        scope.launch {
+                            scaffoldState.bottomSheetState.hide()
+                        }
+                    }
+                )
             }
-        }
+        },
+        containerColor = colorResource(id = R.color.white)
     ) { padding ->
-        Map(
-            places = places,
-            locationSource = locationSource,
-            cameraPositionState = cameraPositionState,
-            mapProperties = mapProperties,
-            mapUiSettings = mapUiSettings
-        )
-
-        Column(modifier = Modifier.wrapContentWidth()) {
-            SearchBar(
-                query = uiState.query,
-                currentLocation = currentLocation,
-                showClose = uiState.category != Category.None,
-                onClose = viewModel::closeSearch,
-                onNavigateToSearch = onNavigateToSearch
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = paddingValues.calculateBottomPadding())
+        ) {
+            Map(
+                places = places,
+                locationSource = locationSource,
+                cameraPositionState = cameraPositionState,
+                mapProperties = mapProperties,
+                mapUiSettings = mapUiSettings
             )
 
-            LazyRow(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .padding(start = 10.dp)
-            ) {
-                items(Category.entries.filter { it != Category.None },
-                    key = {
-                        it.code
-                    }) {
-                    CategoryChip(category = it, isSelected = it == uiState.category) {
-                        viewModel.searchPlacesByCategory(
-                            category = it,
-                            lat = currentLocation.latitude.toString(),
-                            lng = currentLocation.longitude.toString()
-                        )
+            Column(modifier = Modifier.wrapContentWidth()) {
+                SearchBar(
+                    query = uiState.query,
+                    currentLocation = currentLocation,
+                    showClose = uiState.category != Category.None || uiState.selectedPlace != null,
+                    onClose = viewModel::closeSearch,
+                    onNavigateToSearch = onNavigateToSearch
+                )
+
+                LazyRow(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .padding(start = 10.dp)
+                ) {
+                    items(Category.entries.filter { it != Category.None },
+                        key = {
+                            it.code
+                        }) {
+                        CategoryChip(category = it, isSelected = it == uiState.category) {
+                            viewModel.searchPlacesByCategory(
+                                category = it,
+                                lat = currentLocation.latitude.toString(),
+                                lng = currentLocation.longitude.toString()
+                            )
+                        }
                     }
                 }
             }
+            uiState.selectedPlace?.let {
+                BottomPlace(
+                    place = it,
+                    modifier = Modifier
+                        .background(color = colorResource(id = R.color.white))
+                        .align(Alignment.BottomCenter)
+                ) {
+
+                }
+            }
         }
+    }
+}
+
+@Composable
+fun BottomPlace(place: Place, modifier: Modifier, onTimeCapsuleClick: (Place) -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    Row(modifier = modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .width(0.dp)
+                .weight(1f)
+                .padding(vertical = 5.dp)
+                .clickable {
+                    onTimeCapsuleClick(place)
+                }
+                .align(Alignment.CenterVertically),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = place.name,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                )
+                Text(
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    text = place.category,
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = place.distance,
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                )
+                Text(
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    text = place.address,
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                )
+            }
+            if (place.phone.isNotEmpty()) {
+                Text(
+                    text = place.phone,
+                    fontSize = 12.sp,
+                    color = colorResource(id = R.color.primary),
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .align(Alignment.CenterVertically)
+                .border(
+                    width = 2.dp,
+                    color = colorResource(id = R.color.primary),
+                    shape = RoundedCornerShape(10.dp)
+                )
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) {
+
+                }
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_time_primary),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .width(36.dp)
+                    .height(36.dp)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BottomPlacePreview() {
+    val place = Place(
+        id = "",
+        name = "스타벅스",
+        lat = "",
+        lng = "",
+        address = "인천시 미추홀구 주안동 인천시 미추홀구 주안동 인천시 미추홀구 주안동",
+        category = "카페",
+        distance = "300",
+        phone = "010-1234-1234",
+        url = "https://www.naver.com"
+    )
+    BottomPlace(place = place, modifier = Modifier) {
+
     }
 }
 
@@ -232,6 +383,8 @@ fun SearchBar(
     onClose: () -> Unit,
     onNavigateToSearch: (Double, Double) -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -259,7 +412,10 @@ fun SearchBar(
                 modifier = Modifier
                     .width(0.dp)
                     .weight(1f)
-                    .clickable {
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null
+                    ) {
                         onNavigateToSearch(currentLocation.latitude, currentLocation.longitude)
                     }
                     .align(Alignment.CenterVertically)
@@ -323,7 +479,7 @@ private fun CategoryChipPreview() {
 }
 
 @Composable
-fun PlaceList(places: LazyPagingItems<Place>) {
+fun PlaceList(places: LazyPagingItems<Place>, onPlaceClick: (Place) -> Unit, onHide: () -> Unit) {
     val state = places.loadState.refresh
     if (state is LoadState.Error) {
         if ((state.error) is HttpException) {
@@ -331,7 +487,9 @@ fun PlaceList(places: LazyPagingItems<Place>) {
         }
         Log.e("errr", "err")
     }
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth()
+    ) {
         items(
             count = places.itemCount,
             key = places.itemKey(key = {
@@ -341,8 +499,66 @@ fun PlaceList(places: LazyPagingItems<Place>) {
         ) { index ->
             val item = places[index]
             if (item != null) {
-                Place(place = item)
+                Place(place = item, onPlaceClick = onPlaceClick) {
+                    onHide()
+                }
             }
+        }
+    }
+}
+
+@Composable
+fun Place(place: Place, onPlaceClick: ((Place) -> Unit)? = null, onHide: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 5.dp)
+            .clickable {
+                onPlaceClick?.invoke(place)
+                onHide()
+            },
+        verticalArrangement = Arrangement.Center
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = place.name,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+            Text(
+                maxLines = 1,
+                text = place.category,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.Gray,
+                fontSize = 12.sp,
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = place.distance,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+            Text(
+                text = place.address,
+                color = Color.Gray,
+                fontSize = 12.sp
+            )
+        }
+        if (place.phone.isNotEmpty()) {
+            Text(
+                text = place.phone,
+                fontSize = 12.sp,
+                color = colorResource(id = R.color.primary),
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
         }
     }
 }

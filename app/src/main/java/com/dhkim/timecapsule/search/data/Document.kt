@@ -1,6 +1,8 @@
 package com.dhkim.timecapsule.search.data
 
 import com.dhkim.timecapsule.search.domain.Place
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 data class Document(
     val address_name: String,
@@ -17,13 +19,22 @@ data class Document(
     val y: String
 ) {
     fun toPlace(): Place {
+        val df = DecimalFormat("#.#").apply {
+            roundingMode = RoundingMode.UP
+        }
+        val distanceResult = if (distance.toDouble() < 1000) {
+            "${distance}m"
+        } else {
+            "${df.format(distance.toDouble() / 1000.0)}km"
+        }
+
         return Place(
             id = id,
             name = place_name,
             lat = y,
             lng = x,
             category = category_name,
-            distance = distance,
+            distance = distanceResult,
             phone = phone,
             url = place_url,
             address = road_address_name,

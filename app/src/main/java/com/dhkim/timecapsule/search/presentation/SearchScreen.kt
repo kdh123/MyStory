@@ -3,6 +3,7 @@
 package com.dhkim.timecapsule.search.presentation
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -159,7 +160,10 @@ fun Place(place: Place) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp),
+            .padding(vertical = 5.dp)
+            .clickable {
+
+            },
         verticalArrangement = Arrangement.Center
     ) {
         Row(
@@ -173,6 +177,7 @@ fun Place(place: Place) {
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Text(
+                maxLines = 1,
                 text = place.category,
                 overflow = TextOverflow.Ellipsis,
                 color = Color.Gray,
@@ -185,7 +190,7 @@ fun Place(place: Place) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${place.distance}m",
+                text = place.distance,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Text(
