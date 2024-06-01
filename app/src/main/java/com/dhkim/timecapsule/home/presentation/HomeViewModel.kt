@@ -90,7 +90,6 @@ class HomeViewModel @Inject constructor(
     fun closeSearch(selectPlace: Boolean) {
         _uiState.value = if (selectPlace) {
             _uiState.value.copy(
-                query = "",
                 places = MutableStateFlow(PagingData.empty()),
                 category = Category.None
             )

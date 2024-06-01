@@ -1,17 +1,12 @@
 package com.dhkim.timecapsule.main
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -108,16 +103,16 @@ fun MainScreen() {
             homeNavigation(
                 onCategorySelected = {
                     isCategorySelected = it
+                },
+                onNavigateToSearch = { lat, lng ->
+                    navController.navigate("search/$lat/$lng")
+                },
+                onInitSavedState = {
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("place", null)
                 }
-            ) { lat, lng ->
-                navController.navigate("search/$lat/$lng")
-                /*navController.navigate(
-                    SearchScreen(
-                        lat = "$lat",
-                        lng = "$lng"
-                    )
-                )*/
-            }
+            )
             timeCapsuleNavigation()
             searchNavigation {
                 navController.popBackStack()

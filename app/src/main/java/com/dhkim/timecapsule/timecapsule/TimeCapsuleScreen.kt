@@ -173,7 +173,7 @@ fun MyTimeCapsuleItem(timeCapsule: MyTimeCapsule) {
                 color = colorResource(id = R.color.primary)
             ),
             colors = CardDefaults.cardColors(Color.White),
-            elevation = CardDefaults.cardElevation(10.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
             onClick = {
 
             }

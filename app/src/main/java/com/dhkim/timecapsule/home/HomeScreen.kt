@@ -34,6 +34,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedCard
@@ -63,7 +64,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
@@ -81,6 +81,7 @@ import com.google.android.gms.location.LocationServices
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.CameraUpdate
+import com.naver.maps.map.LocationSource
 import com.naver.maps.map.compose.CameraPositionState
 import com.naver.maps.map.compose.ExperimentalNaverMapApi
 import com.naver.maps.map.compose.LocationTrackingMode
@@ -90,7 +91,7 @@ import com.naver.maps.map.compose.Marker
 import com.naver.maps.map.compose.MarkerState
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberCameraPositionState
-import com.naver.maps.map.location.FusedLocationSource
+import com.naver.maps.map.compose.rememberFusedLocationSource
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -102,10 +103,12 @@ fun HomeScreen(
     place: Place?,
     onNavigateToSearch: (Double, Double) -> Unit,
     showBottomNav: (Boolean) -> Unit,
+    onInitSavedState: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val places = uiState.places.collectAsLazyPagingItems()
+    val paddingValues = WindowInsets.navigationBars.asPaddingValues()
     var peekHeight = if (uiState.category == Category.None) {
         0.dp
     } else {
@@ -131,7 +134,7 @@ fun HomeScreen(
     val mapUiSettings by remember {
         mutableStateOf(
             MapUiSettings(
-                logoMargin = PaddingValues(bottom = 138.dp, end = 10.dp),
+                logoMargin = PaddingValues(bottom = 86.dp, end = 10.dp),
                 logoGravity = Gravity.BOTTOM or Gravity.END,
                 isLocationButtonEnabled = false
             )
@@ -196,25 +199,9 @@ fun HomeScreen(
         }
     }
 
-    /*val multiplePermission = rememberMultiplePermissionsState(
-        permissions = listOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-    )*/
-
-    val locationSource = object : FusedLocationSource(context) {
-        override fun hasPermissions(): Boolean {
-            return locationPermissionState.status.isGranted
-        }
-
-        override fun onPermissionRequest() {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-    }
+    val locationSource = rememberFusedLocationSource()
     val sheetState = remember { SheetState(skipHiddenState = false, skipPartiallyExpanded = false) }
     val scaffoldState = rememberBottomSheetScaffoldState(sheetState)
-    val paddingValues = WindowInsets.navigationBars.asPaddingValues()
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(scaffoldState) {
@@ -253,21 +240,61 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(bottom = paddingValues.calculateBottomPadding())
         ) {
-            Map(
-                uiState = uiState,
-                locationSource = locationSource,
-                cameraPositionState = cameraPositionState,
-                mapProperties = mapProperties,
-                mapUiSettings = mapUiSettings
-            )
+            Box(Modifier.fillMaxSize()) {
+                NaverMap(
+                    locationSource = locationSource,
+                    cameraPositionState = cameraPositionState,
+                    properties = mapProperties,
+                    uiSettings = mapUiSettings,
+                    modifier = Modifier.padding()
+                ) {
+                    if (uiState.selectedPlace != null) {
+                        Marker(
+                            state = MarkerState(
+                                position = LatLng(
+                                    uiState.selectedPlace!!.lat.toDouble(),
+                                    uiState.selectedPlace!!.lng.toDouble()
+                                )
+                            ),
+                            onClick = {
+                                true
+                            },
+                            captionText = uiState.selectedPlace?.name ?: ""
+                        )
+                    } else {
+                        uiState.places.collectAsLazyPagingItems().itemSnapshotList.items.forEach { place ->
+                            Marker(
+                                state = MarkerState(
+                                    position = LatLng(
+                                        place.lat.toDouble(),
+                                        place.lng.toDouble()
+                                    )
+                                ),
+                                onClick = {
+                                    true
+                                },
+                                captionText = place.name
+                            )
+                        }
+                    }
+                }
+            }
 
             Column(modifier = Modifier.wrapContentWidth()) {
                 SearchBar(
                     query = uiState.query,
-                    currentLocation = currentLocation,
+                    lat = currentLocation.latitude,
+                    lng = currentLocation.longitude,
                     showClose = uiState.category != Category.None || uiState.selectedPlace != null,
-                    onClose = viewModel::closeSearch,
-                    onNavigateToSearch = onNavigateToSearch
+                    onClose = remember(viewModel) {
+                        viewModel::closeSearch
+                    },
+                    onNavigateToSearch = remember {
+                        onNavigateToSearch
+                    },
+                    onInitSavedState = remember {
+                        onInitSavedState
+                    }
                 )
 
                 LazyRow(
@@ -421,66 +448,86 @@ private fun BottomPlacePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun SearchBarColorsPreview() {
-    SearchBar("관광명소", LatLng(34.4, 34.3), false, {}) { _, _ ->
-
-    }
+    SearchBar(
+        query = "관광명소",
+        lat = 34.4,
+        lng = 35.5,
+        showClose = false,
+        onClose = { _ -> },
+        onNavigateToSearch = { _, _ -> },
+        onInitSavedState = {}
+    )
 }
 
 @Composable
 fun SearchBar(
     query: String,
-    currentLocation: LatLng,
+    lat: Double,
+    lng: Double,
     showClose: Boolean,
     onClose: (Boolean) -> Unit,
-    onNavigateToSearch: (Double, Double) -> Unit
+    onNavigateToSearch: (Double, Double) -> Unit,
+    onInitSavedState: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
-    Row(
+    Card(
+        border = BorderStroke(
+            width = 1.dp,
+            color = colorResource(id = R.color.primary)
+        ),
+        colors = CardDefaults.cardColors(colorResource(id = R.color.white)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = 1.dp,
-                    color = colorResource(id = R.color.primary),
-                    shape = RoundedCornerShape(5.dp)
-                )
-                .background(color = colorResource(id = R.color.white))
-                .padding(10.dp)
-        ) {
-            Text(
-                text = query.ifEmpty { "추억을 남기려는 장소를 검색하세요" },
-                fontSize = 18.sp,
-                color = if (query.isEmpty()) {
-                    colorResource(id = R.color.gray)
-                } else {
-                    colorResource(id = R.color.black)
-                },
+        Row {
+            Row(
                 modifier = Modifier
-                    .width(0.dp)
-                    .weight(1f)
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null
-                    ) {
-                        onNavigateToSearch(currentLocation.latitude, currentLocation.longitude)
-                    }
-                    .align(Alignment.CenterVertically)
-            )
-            if (showClose) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_close_gray),
-                    contentDescription = null,
+                    .fillMaxWidth()
+                    .border(
+                        width = 1.dp,
+                        color = colorResource(id = R.color.primary),
+                        shape = RoundedCornerShape(5.dp)
+                    )
+                    .background(color = colorResource(id = R.color.white))
+                    .padding(10.dp)
+            ) {
+                Text(
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    text = query.ifEmpty { "추억을 남기려는 장소를 검색하세요" },
+                    fontSize = 16.sp,
+                    color = if (query.isEmpty()) {
+                        colorResource(id = R.color.gray)
+                    } else {
+                        colorResource(id = R.color.black)
+                    },
                     modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .clickable {
-                            onClose(false)
+                        .padding(vertical = 3.dp)
+                        .width(0.dp)
+                        .weight(1f)
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {
+                            onNavigateToSearch(lat, lng)
                         }
+                        .align(Alignment.CenterVertically)
                 )
+                if (showClose) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_close_gray),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .clickable {
+                                onInitSavedState()
+                                onClose(false)
+                            }
+                    )
+                }
             }
         }
     }
@@ -611,55 +658,6 @@ fun PlaceItem(place: Place, onPlaceClick: ((Place) -> Unit)? = null, onHide: () 
                 color = colorResource(id = R.color.primary),
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
-        }
-    }
-}
-
-@Composable
-fun Map(
-    uiState: HomeUiState,
-    locationSource: FusedLocationSource,
-    cameraPositionState: CameraPositionState,
-    mapProperties: MapProperties,
-    mapUiSettings: MapUiSettings,
-) {
-    Box(Modifier.fillMaxSize()) {
-        NaverMap(
-            locationSource = locationSource,
-            cameraPositionState = cameraPositionState,
-            properties = mapProperties,
-            uiSettings = mapUiSettings,
-            modifier = Modifier.padding()
-        ) {
-            if (uiState.selectedPlace != null) {
-                Marker(
-                    state = MarkerState(
-                        position = LatLng(
-                            uiState.selectedPlace.lat.toDouble(),
-                            uiState.selectedPlace.lng.toDouble()
-                        )
-                    ),
-                    onClick = {
-                        true
-                    },
-                    captionText = uiState.selectedPlace.name
-                )
-            } else {
-                uiState.places.collectAsLazyPagingItems().itemSnapshotList.items.forEach { place ->
-                    Marker(
-                        state = MarkerState(
-                            position = LatLng(
-                                place.lat.toDouble(),
-                                place.lng.toDouble()
-                            )
-                        ),
-                        onClick = {
-                            true
-                        },
-                        captionText = place.name
-                    )
-                }
-            }
         }
     }
 }
