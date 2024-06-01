@@ -21,8 +21,12 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +44,8 @@ import androidx.paging.compose.itemKey
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.search.domain.Place
 import com.naver.maps.geometry.LatLng
+import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 @Composable
@@ -47,7 +53,6 @@ fun SearchScreen(latLng: LatLng, onBack: (Place) -> Unit) {
     val viewModel = hiltViewModel<SearchViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchResult = uiState.places.collectAsLazyPagingItems()
-
     LaunchedEffect(latLng) {
         viewModel.setCurrentLocation(location = latLng)
     }
@@ -88,6 +93,9 @@ fun SearchScreenContentPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(query: String, onQuery: (String) -> Unit) {
+    val focusRequester = remember { FocusRequester() }
+    val scope = rememberCoroutineScope()
+
     TextField(
         value = query,
         onValueChange = {
@@ -102,8 +110,15 @@ fun SearchBar(query: String, onQuery: (String) -> Unit) {
             Text(text = "장소 검색")
         },
         singleLine = true,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
     )
+
+    scope.launch {
+        awaitFrame()
+        focusRequester.requestFocus()
+    }
 }
 
 @Composable
