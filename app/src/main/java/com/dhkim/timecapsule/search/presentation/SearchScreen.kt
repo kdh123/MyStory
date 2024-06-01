@@ -43,7 +43,7 @@ import com.naver.maps.geometry.LatLng
 import retrofit2.HttpException
 
 @Composable
-fun SearchScreen(latLng: LatLng) {
+fun SearchScreen(latLng: LatLng, onBack: (Place) -> Unit) {
     val viewModel = hiltViewModel<SearchViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchResult = uiState.places.collectAsLazyPagingItems()
@@ -65,7 +65,7 @@ fun SearchScreen(latLng: LatLng) {
                 )
             }
             if (searchResult.itemCount > 0) {
-                PlaceList(places = searchResult)
+                PlaceList(places = searchResult, onBack = onBack)
             } else {
                 if (!uiState.isLoading && uiState.query.isNotEmpty()) {
                     //Text(text = "검색 결과가 존재하지 않습니다.", modifier = Modifier.align(Alignment.Center))
@@ -82,7 +82,6 @@ fun SearchScreenContentPreview() {
         SearchBar(query = "") {
 
         }
-
     }
 }
 
@@ -108,7 +107,7 @@ fun SearchBar(query: String, onQuery: (String) -> Unit) {
 }
 
 @Composable
-fun PlaceList(places: LazyPagingItems<Place>) {
+fun PlaceList(places: LazyPagingItems<Place>, onBack: (Place) -> Unit) {
     val state = places.loadState.refresh
     if (state is LoadState.Error) {
         if ((state.error) is HttpException) {
@@ -126,7 +125,7 @@ fun PlaceList(places: LazyPagingItems<Place>) {
         ) { index ->
             val item = places[index]
             if (item != null) {
-                Place(place = item)
+                Place(place = item, onBack = onBack)
             }
         }
     }
@@ -156,13 +155,13 @@ private fun PlaceListPreview() {
 }
 
 @Composable
-fun Place(place: Place) {
+fun Place(place: Place, onBack: (Place) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
             .clickable {
-
+                onBack(place)
             },
         verticalArrangement = Arrangement.Center
     ) {
@@ -224,5 +223,7 @@ private fun PlacePreview() {
         phone = "010-1234-1234",
         url = "https://wwww.naver.com"
     )
-    Place(place = place)
+    Place(place = place) {
+
+    }
 }

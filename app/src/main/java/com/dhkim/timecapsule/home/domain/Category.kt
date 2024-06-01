@@ -20,6 +20,7 @@ HP8	병원
 PM9	약국*/
 
 enum class Category(val code: String, val type: String) {
+    Popular("Popular", "맛집"),
     Restaurant("FD6", "음식점"),
     Cafe("CE7", "카페"),
     Attraction("AT4", "관광명소"),

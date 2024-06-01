@@ -19,13 +19,13 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val searchRepository: SearchRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
     fun onAction(action: HomeAction) {
-        when(action) {
+        when (action) {
             is HomeAction.OnSearchPlacesByCategory -> {
                 with(action) {
                     searchPlacesByCategory(
@@ -57,16 +57,50 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun selectPlace(place: Place) {
-        _uiState.value = _uiState.value.copy(query = place.name, category = Category.None, selectedPlace = place)
+    fun searchPlacesByKeyword(query: String, lat: String, lng: String) {
+        viewModelScope.launch {
+            searchRepository.getPlaceByKeyword(
+                query = query,
+                lat = lat,
+                lng = lng
+            ).cachedIn(viewModelScope)
+                .collect {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        query = query,
+                        category = Category.Popular,
+                        places = flowOf(it).stateIn(viewModelScope),
+                        selectedPlace = null
+                    )
+                }
+        }
     }
 
-    fun closeSearch() {
-        _uiState.value = _uiState.value.copy(
-            query = "",
-            places = MutableStateFlow(PagingData.empty()),
-            category = Category.None,
-            selectedPlace = null
-        )
+    fun selectPlace(place: Place) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                query = place.name,
+                category = Category.None,
+                selectedPlace = place,
+                places = MutableStateFlow(PagingData.empty())
+            )
+        }
+    }
+
+    fun closeSearch(selectPlace: Boolean) {
+        _uiState.value = if (selectPlace) {
+            _uiState.value.copy(
+                query = "",
+                places = MutableStateFlow(PagingData.empty()),
+                category = Category.None
+            )
+        } else {
+            _uiState.value.copy(
+                query = "",
+                places = MutableStateFlow(PagingData.empty()),
+                category = Category.None,
+                selectedPlace = null
+            )
+        }
     }
 }

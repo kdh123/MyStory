@@ -47,6 +47,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,7 +68,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.timecapsule.R
+import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.home.domain.Category
+import com.dhkim.timecapsule.home.presentation.HomeUiState
 import com.dhkim.timecapsule.home.presentation.HomeViewModel
 import com.dhkim.timecapsule.search.domain.Place
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -96,6 +99,7 @@ import retrofit2.HttpException
 @OptIn(ExperimentalNaverMapApi::class)
 @Composable
 fun HomeScreen(
+    place: Place?,
     onNavigateToSearch: (Double, Double) -> Unit,
     showBottomNav: (Boolean) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
@@ -107,23 +111,21 @@ fun HomeScreen(
     } else {
         300.dp
     }
-
     if (uiState.selectedPlace != null) {
         peekHeight = 0.dp
     }
-
     if (uiState.category == Category.None && uiState.selectedPlace == null) {
         showBottomNav(true)
     } else {
         showBottomNav(false)
     }
     var currentLocation by remember {
-        mutableStateOf(LatLng(37.572389, 126.9769117))
+        mutableStateOf(Constants.defaultLocation)
     }
     val cameraPositionState = rememberCameraPositionState()
     val mapProperties by remember {
         mutableStateOf(
-            MapProperties(maxZoom = 20.0, minZoom = 5.0, locationTrackingMode = LocationTrackingMode.Follow)
+            MapProperties(maxZoom = 20.0, minZoom = 5.0, locationTrackingMode = LocationTrackingMode.NoFollow)
         )
     }
     val mapUiSettings by remember {
@@ -135,6 +137,37 @@ fun HomeScreen(
             )
         )
     }
+    LaunchedEffect(places.itemSnapshotList, uiState.selectedPlace, currentLocation) {
+        val latLng = when {
+            places.itemCount > 0 -> {
+                LatLng(places[0]?.lat?.toDouble() ?: 0.0, places[0]?.lng?.toDouble() ?: 0.0)
+            }
+
+            uiState.selectedPlace != null -> {
+                LatLng(uiState.selectedPlace!!.lat.toDouble(), uiState.selectedPlace!!.lng.toDouble())
+            }
+
+            else -> {
+                currentLocation
+            }
+        }
+
+        cameraPositionState.move(
+            CameraUpdate.toCameraPosition(
+                CameraPosition(
+                    latLng,
+                    15.0
+                )
+            )
+        )
+    }
+
+    LaunchedEffect(place) {
+        place?.let {
+            viewModel.selectPlace(it)
+        }
+    }
+
     val context = LocalContext.current
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
@@ -149,9 +182,6 @@ fun HomeScreen(
                 .addOnSuccessListener { location: Location? ->
                     // Got last known location. In some rare situations this can be null.
                     currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-                    cameraPositionState.move(
-                        CameraUpdate.toCameraPosition(CameraPosition(LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0), 15.0))
-                    )
                 }
         } else {
             // Handle permission denial
@@ -187,13 +217,26 @@ fun HomeScreen(
     val paddingValues = WindowInsets.navigationBars.asPaddingValues()
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(scaffoldState) {
+        snapshotFlow { scaffoldState.bottomSheetState.isVisible }.collect {
+            if (uiState.selectedPlace == null) {
+                if (it) {
+                    showBottomNav(false)
+                } else {
+                    viewModel.closeSearch(selectPlace = true)
+                    showBottomNav(true)
+                }
+            }
+        }
+    }
+
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = peekHeight,
         sheetContent = {
             if (uiState.category != Category.None) {
                 PlaceList(
-                    places = places,
+                    uiState = uiState,
                     onPlaceClick = viewModel::selectPlace,
                     onHide = {
                         scope.launch {
@@ -211,7 +254,7 @@ fun HomeScreen(
                 .padding(bottom = paddingValues.calculateBottomPadding())
         ) {
             Map(
-                places = places,
+                uiState = uiState,
                 locationSource = locationSource,
                 cameraPositionState = cameraPositionState,
                 mapProperties = mapProperties,
@@ -237,11 +280,19 @@ fun HomeScreen(
                             it.code
                         }) {
                         CategoryChip(category = it, isSelected = it == uiState.category) {
-                            viewModel.searchPlacesByCategory(
-                                category = it,
-                                lat = currentLocation.latitude.toString(),
-                                lng = currentLocation.longitude.toString()
-                            )
+                            if (it == Category.Popular) {
+                                viewModel.searchPlacesByKeyword(
+                                    query = Category.Popular.type,
+                                    lat = currentLocation.latitude.toString(),
+                                    lng = currentLocation.longitude.toString()
+                                )
+                            } else {
+                                viewModel.searchPlacesByCategory(
+                                    category = it,
+                                    lat = currentLocation.latitude.toString(),
+                                    lng = currentLocation.longitude.toString()
+                                )
+                            }
                         }
                     }
                 }
@@ -380,7 +431,7 @@ fun SearchBar(
     query: String,
     currentLocation: LatLng,
     showClose: Boolean,
-    onClose: () -> Unit,
+    onClose: (Boolean) -> Unit,
     onNavigateToSearch: (Double, Double) -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -427,7 +478,7 @@ fun SearchBar(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .clickable {
-                            onClose()
+                            onClose(false)
                         }
                 )
             }
@@ -479,7 +530,8 @@ private fun CategoryChipPreview() {
 }
 
 @Composable
-fun PlaceList(places: LazyPagingItems<Place>, onPlaceClick: (Place) -> Unit, onHide: () -> Unit) {
+fun PlaceList(uiState: HomeUiState, onPlaceClick: (Place) -> Unit, onHide: () -> Unit) {
+    val places = uiState.places.collectAsLazyPagingItems()
     val state = places.loadState.refresh
     if (state is LoadState.Error) {
         if ((state.error) is HttpException) {
@@ -499,7 +551,7 @@ fun PlaceList(places: LazyPagingItems<Place>, onPlaceClick: (Place) -> Unit, onH
         ) { index ->
             val item = places[index]
             if (item != null) {
-                Place(place = item, onPlaceClick = onPlaceClick) {
+                PlaceItem(place = item, onPlaceClick = onPlaceClick) {
                     onHide()
                 }
             }
@@ -508,7 +560,7 @@ fun PlaceList(places: LazyPagingItems<Place>, onPlaceClick: (Place) -> Unit, onH
 }
 
 @Composable
-fun Place(place: Place, onPlaceClick: ((Place) -> Unit)? = null, onHide: () -> Unit) {
+fun PlaceItem(place: Place, onPlaceClick: ((Place) -> Unit)? = null, onHide: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -565,7 +617,7 @@ fun Place(place: Place, onPlaceClick: ((Place) -> Unit)? = null, onHide: () -> U
 
 @Composable
 fun Map(
-    places: LazyPagingItems<Place>,
+    uiState: HomeUiState,
     locationSource: FusedLocationSource,
     cameraPositionState: CameraPositionState,
     mapProperties: MapProperties,
@@ -576,23 +628,38 @@ fun Map(
             locationSource = locationSource,
             cameraPositionState = cameraPositionState,
             properties = mapProperties,
-            uiSettings = mapUiSettings
+            uiSettings = mapUiSettings,
+            modifier = Modifier.padding()
         ) {
-            places.itemSnapshotList.items.forEach { place ->
+            if (uiState.selectedPlace != null) {
                 Marker(
                     state = MarkerState(
                         position = LatLng(
-                            place.lat.toDouble(),
-                            place.lng.toDouble()
+                            uiState.selectedPlace.lat.toDouble(),
+                            uiState.selectedPlace.lng.toDouble()
                         )
                     ),
                     onClick = {
                         true
                     },
-                    captionText = place.name
+                    captionText = uiState.selectedPlace.name
                 )
+            } else {
+                uiState.places.collectAsLazyPagingItems().itemSnapshotList.items.forEach { place ->
+                    Marker(
+                        state = MarkerState(
+                            position = LatLng(
+                                place.lat.toDouble(),
+                                place.lng.toDouble()
+                            )
+                        ),
+                        onClick = {
+                            true
+                        },
+                        captionText = place.name
+                    )
+                }
             }
-
         }
     }
 }

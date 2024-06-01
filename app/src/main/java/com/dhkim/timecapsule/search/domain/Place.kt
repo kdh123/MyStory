@@ -1,5 +1,7 @@
 package com.dhkim.timecapsule.search.domain
 
+import java.io.Serializable
+
 data class Place(
     val id: String,
     val name: String,
@@ -10,4 +12,4 @@ data class Place(
     val distance: String,
     val phone: String,
     val url: String
-)
+): Serializable

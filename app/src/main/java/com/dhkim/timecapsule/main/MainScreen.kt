@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -47,7 +48,7 @@ fun MainScreen() {
     }
     val isBottomNavShow = navController.currentBackStackEntryAsState().value?.destination?.route in listOf(Screen.Home.route, Screen.TimeCapsule.route)
             && isCategorySelected
-    val paddingValues = WindowInsets.navigationBars.asPaddingValues()
+
     Scaffold(
         bottomBar = {
             AnimatedVisibility(
@@ -98,7 +99,12 @@ fun MainScreen() {
             }
         }
     ) { innerPdding ->
-        NavHost(modifier = Modifier.fillMaxSize(), navController = navController, startDestination = "home") {
+        NavHost(
+            modifier = Modifier
+                .fillMaxSize(),
+            navController = navController,
+            startDestination = "home"
+        ) {
             homeNavigation(
                 onCategorySelected = {
                     isCategorySelected = it
@@ -113,7 +119,12 @@ fun MainScreen() {
                 )*/
             }
             timeCapsuleNavigation()
-            searchNavigation()
+            searchNavigation {
+                navController.popBackStack()
+                navController.currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("place", it)
+            }
         }
 
     }

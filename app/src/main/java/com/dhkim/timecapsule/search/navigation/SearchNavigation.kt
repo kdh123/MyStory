@@ -2,6 +2,7 @@ package com.dhkim.timecapsule.search.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.presentation.SearchScreen
 import com.naver.maps.geometry.LatLng
 /*import androidx.navigation.compose.composable
@@ -12,7 +13,7 @@ import com.dhkim.timecapsule.search.presentation.SearchScreen
 import com.naver.maps.geometry.LatLng*/
 import kotlinx.serialization.Serializable
 
-fun NavGraphBuilder.searchNavigation() {
+fun NavGraphBuilder.searchNavigation(onBack: (Place) -> Unit) {
     /*composable<SearchScreen> {
         val args = it.toRoute<SearchScreen>()
         SearchScreen(latLng = LatLng(args.lat.toDouble(), args.lng.toDouble()))
@@ -21,20 +22,8 @@ fun NavGraphBuilder.searchNavigation() {
         val lat = (backStackEntry.arguments?.getString("lat") ?: "0.0").toDouble()
         val lng = (backStackEntry.arguments?.getString("lng") ?: "0.0").toDouble()
 
-        SearchScreen(latLng = LatLng(lat, lng))
-
+        SearchScreen(latLng = LatLng(lat, lng), onBack = onBack)
     }
-
-    /*composable("diaryDetail/{diaryId}") { backStackEntry ->
-        val viewModel = backStackEntry.sharedViewModel<DiaryDetailViewModel>(navController = navController)
-
-        DiaryDetailScreen(
-            diaryId = backStackEntry.arguments?.getString("diaryId") ?: "",
-            viewModel = viewModel,
-            onNavigateToWrite = onNavigateToEdit,
-            onDelete = onCompleted
-        )
-    }*/
 }
 
 @Serializable
