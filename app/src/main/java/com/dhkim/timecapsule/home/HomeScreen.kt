@@ -4,9 +4,11 @@ package com.dhkim.timecapsule.home
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.location.Location
 import android.util.Log
 import android.view.Gravity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -22,6 +24,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,13 +37,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,7 +50,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -81,8 +82,6 @@ import com.google.android.gms.location.LocationServices
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.CameraUpdate
-import com.naver.maps.map.LocationSource
-import com.naver.maps.map.compose.CameraPositionState
 import com.naver.maps.map.compose.ExperimentalNaverMapApi
 import com.naver.maps.map.compose.LocationTrackingMode
 import com.naver.maps.map.compose.MapProperties
@@ -95,27 +94,26 @@ import com.naver.maps.map.compose.rememberFusedLocationSource
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalNaverMapApi::class)
 @Composable
 fun HomeScreen(
+    scaffoldState: BottomSheetScaffoldState,
     place: Place?,
     onNavigateToSearch: (Double, Double) -> Unit,
     showBottomNav: (Boolean) -> Unit,
     onInitSavedState: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val places = uiState.places.collectAsLazyPagingItems()
     val paddingValues = WindowInsets.navigationBars.asPaddingValues()
-    var peekHeight = if (uiState.category == Category.None) {
-        0.dp
-    } else {
+    var peekHeight = if (uiState.category != Category.None) {
         300.dp
-    }
-    if (uiState.selectedPlace != null) {
-        peekHeight = 0.dp
+    } else {
+        0.dp
     }
     if (uiState.category == Category.None && uiState.selectedPlace == null) {
         showBottomNav(true)
@@ -140,6 +138,15 @@ fun HomeScreen(
             )
         )
     }
+
+    BackHandler {
+        if (uiState.query.isNotEmpty()) {
+            viewModel.closeSearch(false)
+        } else {
+            (context as? Activity)?.finish()
+        }
+    }
+
     LaunchedEffect(places.itemSnapshotList, uiState.selectedPlace, currentLocation) {
         val latLng = when {
             places.itemCount > 0 -> {
@@ -171,7 +178,6 @@ fun HomeScreen(
         }
     }
 
-    val context = LocalContext.current
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
@@ -200,38 +206,21 @@ fun HomeScreen(
     }
 
     val locationSource = rememberFusedLocationSource()
-    val sheetState = remember { SheetState(skipHiddenState = false, skipPartiallyExpanded = false) }
-    val scaffoldState = rememberBottomSheetScaffoldState(sheetState)
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(scaffoldState) {
-        snapshotFlow { scaffoldState.bottomSheetState.isVisible }.collect {
-            if (uiState.selectedPlace == null) {
-                if (it) {
-                    showBottomNav(false)
-                } else {
-                    viewModel.closeSearch(selectPlace = true)
-                    showBottomNav(true)
-                }
-            }
-        }
-    }
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = peekHeight,
         sheetContent = {
-            if (uiState.category != Category.None) {
-                PlaceList(
-                    uiState = uiState,
-                    onPlaceClick = viewModel::selectPlace,
-                    onHide = {
-                        scope.launch {
-                            scaffoldState.bottomSheetState.hide()
-                        }
+            PlaceList(
+                uiState = uiState,
+                onPlaceClick = viewModel::selectPlace,
+                onHide = {
+                    scope.launch {
+                        scaffoldState.bottomSheetState.partialExpand()
                     }
-                )
-            }
+                    peekHeight = 0.dp
+                }
+            )
         },
         containerColor = colorResource(id = R.color.white)
     ) { padding ->
@@ -587,7 +576,7 @@ fun PlaceList(uiState: HomeUiState, onPlaceClick: (Place) -> Unit, onHide: () ->
         Log.e("errr", "err")
     }
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxHeight(0.9f)
     ) {
         items(
             count = places.itemCount,
