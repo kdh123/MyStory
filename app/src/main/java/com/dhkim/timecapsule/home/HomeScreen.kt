@@ -41,6 +41,7 @@ import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -141,6 +142,7 @@ fun HomeScreen(
 
     BackHandler {
         if (uiState.query.isNotEmpty()) {
+            onInitSavedState()
             viewModel.closeSearch(false)
         } else {
             (context as? Activity)?.finish()
@@ -246,6 +248,9 @@ fun HomeScreen(
                                 )
                             ),
                             onClick = {
+                                place?.let {
+                                    viewModel.selectPlace(place = it)
+                                }
                                 true
                             },
                             captionText = uiState.selectedPlace?.name ?: ""
@@ -260,6 +265,7 @@ fun HomeScreen(
                                     )
                                 ),
                                 onClick = {
+                                    viewModel.selectPlace(place = place)
                                     true
                                 },
                                 captionText = place.name
@@ -289,7 +295,7 @@ fun HomeScreen(
                 LazyRow(
                     modifier = Modifier
                         .wrapContentWidth()
-                        .padding(start = 10.dp)
+                        //.padding(start = 10.dp)
                 ) {
                     items(Category.entries.filter { it != Category.None },
                         key = {
@@ -540,22 +546,34 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
             .clip(
                 shape = RoundedCornerShape(10.dp)
             )
-            .padding(end = 10.dp, bottom = 5.dp),
+            .padding(start = 10.dp, bottom = 5.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 10.dp
         ),
     ) {
-        Text(
-            text = category.type,
+        Row(
             modifier = Modifier
-                .padding(horizontal = 10.dp, vertical = 3.dp)
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null
-                ) {
-                    onClick(category)
-                }
-        )
+                .padding(horizontal = 8.dp, vertical = 5.dp)
+        ) {
+            Icon(
+                tint = Color.Unspecified,
+                painter = painterResource(id = category.resId),
+                contentDescription = null,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+            Text(
+                text = category.type,
+                modifier = Modifier
+                    .padding(top = 3.dp, bottom = 3.dp, start = 3.dp)
+                    .align(Alignment.CenterVertically)
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null
+                    ) {
+                        onClick(category)
+                    }
+            )
+        }
     }
 }
 
