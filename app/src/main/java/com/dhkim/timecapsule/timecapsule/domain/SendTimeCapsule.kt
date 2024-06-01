@@ -8,7 +8,7 @@ data class SendTimeCapsule(
     val receiver: String,
     val lat: String,
     val lng: String,
-    val address: List<String>,
+    val address: String,
     val content: String,
     val checkLocation: Boolean
 )

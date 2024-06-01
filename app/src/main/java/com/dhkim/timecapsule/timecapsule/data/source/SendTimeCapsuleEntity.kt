@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.timecapsule.data
+package com.dhkim.timecapsule.timecapsule.data.source
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -13,7 +13,7 @@ data class SendTimeCapsuleEntity(
     @ColumnInfo(name = "receiver") val receiver: String,
     @ColumnInfo(name = "lat") val lat: String,
     @ColumnInfo(name = "lng") val lng: String,
-    @ColumnInfo(name = "address") val address: List<String>,
+    @ColumnInfo(name = "address") val address: String,
     @ColumnInfo(name = "content") val content: String,
     @ColumnInfo(name = "checkLocation") val checkLocation: Boolean
 ) {

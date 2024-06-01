@@ -1,9 +1,9 @@
 package com.dhkim.timecapsule.timecapsule.data.repository
 
-import com.dhkim.timecapsule.timecapsule.data.MyTimeCapsuleEntity
-import com.dhkim.timecapsule.timecapsule.data.ReceivedTimeCapsuleEntity
-import com.dhkim.timecapsule.timecapsule.data.SendTimeCapsuleEntity
-import com.dhkim.timecapsule.timecapsule.data.TimeCapsuleLocalDataSource
+import com.dhkim.timecapsule.timecapsule.data.source.MyTimeCapsuleEntity
+import com.dhkim.timecapsule.timecapsule.data.source.ReceivedTimeCapsuleEntity
+import com.dhkim.timecapsule.timecapsule.data.source.SendTimeCapsuleEntity
+import com.dhkim.timecapsule.timecapsule.data.source.TimeCapsuleLocalDataSource
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
@@ -46,7 +46,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         localDataSource.saveMyTimeCapsule(timeCapsule = entity)
     }
 
-    override suspend fun updateMyTimeCapsule(timeCapsule: MyTimeCapsule) {
+    override suspend fun editMyTimeCapsule(timeCapsule: MyTimeCapsule) {
         val entity = timeCapsule.run {
             MyTimeCapsuleEntity(
                 id, date, openDate, lat, lng, address, content, medias, checkLocation, isOpened
@@ -90,7 +90,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         localDataSource.saveSendTimeCapsule(timeCapsule = entity)
     }
 
-    override suspend fun updateSendTimeCapsule(timeCapsule: SendTimeCapsule) {
+    override suspend fun editSendTimeCapsule(timeCapsule: SendTimeCapsule) {
         val entity = timeCapsule.run {
             SendTimeCapsuleEntity(
                 id, date, openDate, receiver, lat, lng, address, content, checkLocation
@@ -104,7 +104,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         localDataSource.deleteSendTimeCapsule(id = id)
     }
 
-    override suspend fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>?> {
+    override suspend fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>> {
         return localDataSource.getReceivedAllTimeCapsule().map { timeCapsules ->
             timeCapsules?.map {
                 it.toReceivedTimeCapsule()

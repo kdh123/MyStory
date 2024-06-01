@@ -7,7 +7,7 @@ data class MyTimeCapsule(
     val openDate: String,
     val lat: String,
     val lng: String,
-    val address: List<String>,
+    val address: String,
     val content: String,
     val medias: List<String>,
     val checkLocation: Boolean,

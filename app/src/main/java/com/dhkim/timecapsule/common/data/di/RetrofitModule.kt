@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.search.data.di
+package com.dhkim.timecapsule.common.data.di
 
 import com.dhkim.timecapsule.BuildConfig
 import com.google.gson.Gson
@@ -12,7 +12,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module

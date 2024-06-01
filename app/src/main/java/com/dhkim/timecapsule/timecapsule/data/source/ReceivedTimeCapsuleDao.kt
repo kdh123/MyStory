@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.timecapsule.data
+package com.dhkim.timecapsule.timecapsule.data.source
 
 import androidx.room.Dao
 import androidx.room.Insert
