@@ -13,7 +13,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,30 +22,37 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.dhkim.camera.navigation.cameraNavigation
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.home.presentation.navigation.homeNavigation
 import com.dhkim.timecapsule.search.navigation.searchNavigation
+import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleNavigation
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
+    val context = LocalContext.current
     val scaffoldState = rememberBottomSheetScaffoldState()
     val navController = rememberNavController()
-    val items = listOf(Screen.Home, Screen.TimeCapsule)
+    val items = listOf(Screen.Home, Screen.AddTimeCapsule, Screen.TimeCapsule)
     var isCategorySelected by remember {
         mutableStateOf(true)
     }
-    val isBottomNavShow = navController.currentBackStackEntryAsState().value?.destination?.route in listOf(Screen.Home.route, Screen.TimeCapsule.route)
+    val isBottomNavShow = navController
+        .currentBackStackEntryAsState()
+        .value?.destination?.route in listOf(Screen.Home.route, Screen.TimeCapsule.route)
             && isCategorySelected
 
     Scaffold(
@@ -74,17 +80,6 @@ fun MainScreen() {
                                     Icon(painterResource(id = screen.selected), contentDescription = null, tint = Color.Unspecified)
                                 } else {
                                     Icon(painterResource(id = screen.unSelected), contentDescription = null, tint = Color.Unspecified)
-                                }
-                            },
-                            label = {
-                                if (isSelected) {
-                                    Text(
-                                        screen.title,
-                                        color = colorResource(id = R.color.primary),
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                } else {
-                                    Text(screen.title)
                                 }
                             },
                             selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
@@ -124,6 +119,18 @@ fun MainScreen() {
                 }
             )
             timeCapsuleNavigation()
+            addTimeCapsuleNavigation()
+
+            cameraNavigation(
+                folderName = context.getString(R.string.app_name),
+                onNext = { savedUrl ->
+                    val url = URLEncoder.encode(
+                        savedUrl,
+                        StandardCharsets.UTF_8.toString()
+                    )
+                    navController.navigate("addTimeCapsule/$url")
+                }
+            )
             searchNavigation {
                 navController.popBackStack()
                 navController.currentBackStackEntry
@@ -131,7 +138,6 @@ fun MainScreen() {
                     ?.set("place", it)
             }
         }
-
     }
 }
 
@@ -140,4 +146,5 @@ sealed class Screen(
 ) {
     object Home : Screen("홈", R.drawable.ic_home_primary, R.drawable.ic_home_black, "home")
     object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, "timeCapsule")
+    object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, "camera")
 }

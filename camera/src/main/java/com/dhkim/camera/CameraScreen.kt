@@ -58,10 +58,12 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+typealias savedUrl = String
+
 @Composable
-fun <T> CameraScreen(
+fun CameraScreen(
     folderName: String = "",
-    onNext : ((T) -> Unit)? = null,
+    onNext : ((savedUrl) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -92,6 +94,11 @@ fun <T> CameraScreen(
         } else {
             requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
+    }
+
+    if (uiState.isCompleted) {
+        onNext?.invoke(uiState.savedUrl)
+        return
     }
 
     Scaffold(
@@ -233,8 +240,6 @@ private suspend fun takePhoto(
         }
     )
 }
-
-typealias savedUrl = String
 
 private suspend fun saveBitmap(context: Context, bitmap: Bitmap, folderName: String): savedUrl {
     val imageName = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
