@@ -28,3 +28,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "TimeCapsule"
 include(":app")
+include(":camera")

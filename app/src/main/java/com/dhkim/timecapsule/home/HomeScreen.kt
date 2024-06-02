@@ -546,7 +546,13 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
             .clip(
                 shape = RoundedCornerShape(10.dp)
             )
-            .padding(start = 10.dp, bottom = 5.dp),
+            .padding(start = 10.dp, bottom = 5.dp)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) {
+                onClick(category)
+            },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 10.dp
         ),
@@ -566,12 +572,6 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
                 modifier = Modifier
                     .padding(top = 3.dp, bottom = 3.dp, start = 3.dp)
                     .align(Alignment.CenterVertically)
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null
-                    ) {
-                        onClick(category)
-                    }
             )
         }
     }

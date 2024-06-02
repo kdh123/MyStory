@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -77,9 +78,13 @@ fun MainScreen() {
                             },
                             label = {
                                 if (isSelected) {
-                                    Text(screen.route, color = colorResource(id = R.color.primary))
+                                    Text(
+                                        screen.title,
+                                        color = colorResource(id = R.color.primary),
+                                        fontWeight = FontWeight.Bold
+                                    )
                                 } else {
-                                    Text(screen.route)
+                                    Text(screen.title)
                                 }
                             },
                             selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
