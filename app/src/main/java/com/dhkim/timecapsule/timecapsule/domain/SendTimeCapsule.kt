@@ -11,4 +11,4 @@ data class SendTimeCapsule(
     val address: String,
     val content: String,
     val checkLocation: Boolean
-)
+): BaseTimeCapsule

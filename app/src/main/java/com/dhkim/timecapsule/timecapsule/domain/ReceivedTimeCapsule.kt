@@ -12,4 +12,4 @@ data class ReceivedTimeCapsule(
     val content: String,
     val checkLocation: Boolean,
     val isOpened: Boolean
-)
+): BaseTimeCapsule

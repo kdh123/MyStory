@@ -12,4 +12,4 @@ data class MyTimeCapsule(
     val medias: List<String>,
     val checkLocation: Boolean,
     val isOpened: Boolean
-)
+): BaseTimeCapsule
