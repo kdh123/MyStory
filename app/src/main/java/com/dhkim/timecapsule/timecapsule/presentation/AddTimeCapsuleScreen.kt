@@ -2,12 +2,12 @@
 
 package com.dhkim.timecapsule.timecapsule.presentation
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.ContentView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,33 +15,37 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults.textFieldColors
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -52,14 +56,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.R
+import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.timecapsule.domain.BaseTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
 import com.skydoves.landscapist.glide.GlideImage
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AddTimeCapsuleScreen(
     imageUrl: String,
@@ -75,6 +78,9 @@ fun AddTimeCapsuleScreen(
             context.contentResolver.takePersistableUriPermission(it, flag)
             viewModel.addImage(imageUrl = it.toString())
         }
+    }
+    var showDateDialog by remember {
+        mutableStateOf(false)
     }
 
     LaunchedEffect(true) {
@@ -125,6 +131,15 @@ fun AddTimeCapsuleScreen(
         }
     ) {
         Column {
+            if (showDateDialog) {
+                Calender(
+                    onSave = viewModel::setOpenDate,
+                    onDismiss = {
+                        showDateDialog = false
+                    }
+                )
+            }
+
             ContentsView(
                 content = uiState.content,
                 onType = viewModel::typing
@@ -149,9 +164,10 @@ fun AddTimeCapsuleScreen(
                 )
                 MenuItem(
                     resId = R.drawable.ic_calender_black,
-                    title = uiState.openDate.ifEmpty { "오픈 날짜" }
+                    title = uiState.openDate.ifEmpty { "오픈 날짜" },
+                    subTitle = "오픈 날짜는 오늘로부터 3개월 이후로 설정이 가능합니다."
                 ) {
-
+                    showDateDialog = true
                 }
                 Divider(
                     thickness = 1.dp,
@@ -180,6 +196,51 @@ fun AddTimeCapsuleScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Calender(
+    onSave: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val startDate = DateUtil.dateAfterMonths(3)
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = DateUtil.dateToMills(startDate),
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis >= DateUtil.dateToMills(startDate)
+            }
+        }
+    )
+
+    DatePickerDialog(
+        onDismissRequest = { onDismiss() },
+        confirmButton = {
+            Button(
+                onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        val date = DateUtil.millsToDate(it)
+                        onSave(date)
+                        onDismiss()
+                    }
+                }
+            ) {
+                Text(text = "확인")
+            }
+        },
+        dismissButton = {
+            Button(onClick = {
+                onDismiss()
+            }) {
+                Text(text = "취소")
+            }
+        }
+    ) {
+        DatePicker(
+            state = datePickerState
+        )
+    }
+}
 
 @Composable
 private fun SwitchMenuItem(
@@ -250,9 +311,8 @@ private fun SwitchMenuItemPreview() {
     }
 }
 
-
 @Composable
-private fun MenuItem(resId: Int, title: String, onClick: () -> Unit) {
+private fun MenuItem(resId: Int, title: String, subTitle: String = "", onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .padding(15.dp)
@@ -264,15 +324,25 @@ private fun MenuItem(resId: Int, title: String, onClick: () -> Unit) {
             modifier = Modifier
                 .align(Alignment.CenterVertically)
         )
-        Text(
-            text = title,
-            fontSize = 18.sp,
+        Column(
             modifier = Modifier
                 .width(0.dp)
                 .weight(1f)
                 .padding(start = 10.dp)
                 .align(Alignment.CenterVertically)
-        )
+        ) {
+            Text(
+                text = title,
+                fontSize = 18.sp
+            )
+            if (subTitle.isNotEmpty()) {
+                Text(
+                    text = subTitle,
+                    fontSize = 14.sp,
+                    color = colorResource(id = R.color.gray)
+                )
+            }
+        }
         Image(
             painter = painterResource(id = R.drawable.ic_right_primary),
             contentDescription = null,
@@ -325,7 +395,6 @@ private fun ImageListViewPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ImageView(imageUrl: String, onClick: () -> Unit) {
     OutlinedCard(
