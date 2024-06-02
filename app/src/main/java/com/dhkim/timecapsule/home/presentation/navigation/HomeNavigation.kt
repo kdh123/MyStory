@@ -12,8 +12,8 @@ import com.dhkim.timecapsule.search.domain.Place
 @OptIn(ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.homeNavigation(
     scaffoldState: BottomSheetScaffoldState,
-    onCategorySelected: (Boolean) -> Unit,
     onNavigateToSearch: (Double, Double) -> Unit,
+    onSelectPlace: (Place?) -> Unit,
     onInitSavedState: () -> Unit
 ) {
     composable(Screen.Home.route) {
@@ -24,11 +24,11 @@ fun NavGraphBuilder.homeNavigation(
             place = remember {
                 place
             },
-            showBottomNav = remember {
-                onCategorySelected
-            },
             onNavigateToSearch = remember {
                 onNavigateToSearch
+            },
+            onSelectPlace = remember {
+                onSelectPlace
             },
             onInitSavedState = remember {
                 onInitSavedState

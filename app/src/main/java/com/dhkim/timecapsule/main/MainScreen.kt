@@ -1,10 +1,13 @@
 package com.dhkim.timecapsule.main
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -14,6 +17,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,11 +33,15 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.dhkim.camera.CameraActivity
 import com.dhkim.camera.navigation.cameraNavigation
 import com.dhkim.timecapsule.R
+import com.dhkim.timecapsule.home.BottomPlace
 import com.dhkim.timecapsule.home.presentation.navigation.homeNavigation
+import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.navigation.searchNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleNavigation
@@ -44,16 +52,18 @@ import java.nio.charset.StandardCharsets
 @Composable
 fun MainScreen() {
     val context = LocalContext.current
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    val state = rememberStandardBottomSheetState(
+        skipHiddenState = false
+    )
+    val scaffoldState = rememberBottomSheetScaffoldState(state)
     val navController = rememberNavController()
     val items = listOf(Screen.Home, Screen.AddTimeCapsule, Screen.TimeCapsule)
-    var isCategorySelected by remember {
-        mutableStateOf(true)
-    }
     val isBottomNavShow = navController
         .currentBackStackEntryAsState()
         .value?.destination?.route in listOf(Screen.Home.route, Screen.TimeCapsule.route)
-            && isCategorySelected
+    var selectedPlace: Place? by remember {
+        mutableStateOf(null)
+    }
 
     Scaffold(
         bottomBar = {
@@ -62,37 +72,47 @@ fun MainScreen() {
                 enter = fadeIn() + slideIn { IntOffset(0, it.height) },
                 exit = fadeOut() + slideOut { IntOffset(0, it.height) }
             ) {
-                NavigationBar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight(align = Alignment.Bottom),
-                    containerColor = colorResource(id = R.color.white),
-                ) {
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val currentDestination = navBackStackEntry?.destination
+                if (selectedPlace == null) {
+                    NavigationBar(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(align = Alignment.Bottom),
+                        containerColor = colorResource(id = R.color.white),
+                    ) {
+                        val navBackStackEntry by navController.currentBackStackEntryAsState()
+                        val currentDestination = navBackStackEntry?.destination
 
-                    items.forEach { screen ->
-                        val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+                        items.forEach { screen ->
+                            val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
 
-                        NavigationBarItem(
-                            icon = {
-                                if (isSelected) {
-                                    Icon(painterResource(id = screen.selected), contentDescription = null, tint = Color.Unspecified)
-                                } else {
-                                    Icon(painterResource(id = screen.unSelected), contentDescription = null, tint = Color.Unspecified)
-                                }
-                            },
-                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                            onClick = {
-                                navController.navigate(screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                            NavigationBarItem(
+                                icon = {
+                                    if (isSelected) {
+                                        Icon(painterResource(id = screen.selected), contentDescription = null, tint = Color.Unspecified)
+                                    } else {
+                                        Icon(painterResource(id = screen.unSelected), contentDescription = null, tint = Color.Unspecified)
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
+                                },
+                                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                                onClick = {
+                                    navController.navigate(screen.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
+                    }
+                } else {
+                    BottomPlace(
+                        place = selectedPlace!!,
+                        modifier = Modifier
+                            .background(color = colorResource(id = R.color.white))
+                    ) {
+
                     }
                 }
             }
@@ -106,11 +126,11 @@ fun MainScreen() {
         ) {
             homeNavigation(
                 scaffoldState = scaffoldState,
-                onCategorySelected = {
-                    isCategorySelected = it
-                },
                 onNavigateToSearch = { lat, lng ->
                     navController.navigate("search/$lat/$lng")
+                },
+                onSelectPlace = { place ->
+                    selectedPlace = place
                 },
                 onInitSavedState = {
                     navController.currentBackStackEntry
@@ -120,7 +140,6 @@ fun MainScreen() {
             )
             timeCapsuleNavigation()
             addTimeCapsuleNavigation()
-
             cameraNavigation(
                 folderName = context.getString(R.string.app_name),
                 onNext = { savedUrl ->

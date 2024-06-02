@@ -102,7 +102,7 @@ fun HomeScreen(
     scaffoldState: BottomSheetScaffoldState,
     place: Place?,
     onNavigateToSearch: (Double, Double) -> Unit,
-    showBottomNav: (Boolean) -> Unit,
+    onSelectPlace: (Place?) -> Unit,
     onInitSavedState: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -115,11 +115,6 @@ fun HomeScreen(
         300.dp
     } else {
         0.dp
-    }
-    if (uiState.category == Category.None && uiState.selectedPlace == null) {
-        showBottomNav(true)
-    } else {
-        showBottomNav(false)
     }
     var currentLocation by remember {
         mutableStateOf(Constants.defaultLocation)
@@ -147,6 +142,10 @@ fun HomeScreen(
         } else {
             (context as? Activity)?.finish()
         }
+    }
+
+    LaunchedEffect(uiState.selectedPlace) {
+        onSelectPlace(uiState.selectedPlace)
     }
 
     LaunchedEffect(places.itemSnapshotList, uiState.selectedPlace, currentLocation) {
@@ -217,10 +216,10 @@ fun HomeScreen(
                 uiState = uiState,
                 onPlaceClick = viewModel::selectPlace,
                 onHide = {
-                    scope.launch {
-                        scaffoldState.bottomSheetState.partialExpand()
-                    }
                     peekHeight = 0.dp
+                    scope.launch {
+                        scaffoldState.bottomSheetState.hide()
+                    }
                 }
             )
         },
