@@ -1,7 +1,5 @@
 package com.dhkim.timecapsule.main
 
-import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -33,10 +31,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.dhkim.camera.CameraActivity
 import com.dhkim.camera.navigation.cameraNavigation
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.home.BottomPlace
@@ -45,8 +41,6 @@ import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.navigation.searchNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleNavigation
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -139,15 +133,22 @@ fun MainScreen() {
                 }
             )
             timeCapsuleNavigation()
-            addTimeCapsuleNavigation()
+            addTimeCapsuleNavigation(
+                onNavigateToCamera = {
+                    navController.navigate("camera")
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
             cameraNavigation(
                 folderName = context.getString(R.string.app_name),
-                onNext = { savedUrl ->
-                    val url = URLEncoder.encode(
-                        savedUrl,
-                        StandardCharsets.UTF_8.toString()
-                    )
-                    navController.navigate("addTimeCapsule/$url")
+                onNext = {
+                    imageUrl ->
+                    navController.popBackStack()
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("imageUrl", imageUrl)
                 }
             )
             searchNavigation {
@@ -165,5 +166,5 @@ sealed class Screen(
 ) {
     object Home : Screen("홈", R.drawable.ic_home_primary, R.drawable.ic_home_black, "home")
     object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, "timeCapsule")
-    object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, "camera")
+    object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, "addTimeCapsule")
 }

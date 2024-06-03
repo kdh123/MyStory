@@ -5,6 +5,7 @@ package com.dhkim.timecapsule.timecapsule.presentation
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,10 +21,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
@@ -36,12 +39,15 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults.textFieldColors
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,13 +67,23 @@ import com.dhkim.timecapsule.timecapsule.domain.BaseTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AddTimeCapsuleScreen(
     imageUrl: String,
+    onNavigateToCamera: () -> Unit,
+    onBack: () -> Unit,
     viewModel: AddTimeCapsuleViewModel = hiltViewModel()
 ) {
+    val scope = rememberCoroutineScope()
+    val state = rememberStandardBottomSheetState(
+        skipHiddenState = false
+    )
+    val scaffoldState = rememberBottomSheetScaffoldState(state)
+    var showBottomMenu = false
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val launcher = rememberLauncherForActivityResult(
@@ -83,11 +99,61 @@ fun AddTimeCapsuleScreen(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(true) {
-        viewModel.addImage(imageUrl)
+    BackHandler {
+        if (showBottomMenu) {
+            scope.launch {
+                scaffoldState.bottomSheetState.hide()
+                showBottomMenu = false
+            }
+        } else {
+            onBack()
+        }
     }
 
-    Scaffold(
+    LaunchedEffect(imageUrl) {
+        if (imageUrl.isNotEmpty()) {
+            viewModel.addImage(imageUrl)
+        }
+    }
+
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 0.dp,
+        sheetContent = {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+            ) {
+                BottomMenuItem(
+                    resId = R.drawable.ic_camera_graphic,
+                    title = "카메라",
+                    onClick = {
+                        scope.launch {
+                            scaffoldState.bottomSheetState.hide()
+                            showBottomMenu = false
+                            onNavigateToCamera()
+                        }
+                    }
+                )
+                BottomMenuItem(
+                    resId = R.drawable.ic_picture_graphic,
+                    title = "갤러리",
+                    onClick = {
+                        scope.launch {
+                            scaffoldState.bottomSheetState.hide()
+                            showBottomMenu = false
+                            launcher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        }
+                    }
+                )
+            }
+        },
         topBar = {
             Column {
                 Row(
@@ -139,24 +205,20 @@ fun AddTimeCapsuleScreen(
                     }
                 )
             }
-
             ContentsView(
                 content = uiState.content,
                 onType = viewModel::typing
             )
-
             ImageListView(
                 imageUrls = uiState.imageUrls,
                 modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
                 onSelectPicture = {
-                    launcher.launch(
-                        PickVisualMediaRequest(
-                            ActivityResultContracts.PickVisualMedia.ImageOnly
-                        )
-                    )
+                    scope.launch {
+                        scaffoldState.bottomSheetState.expand()
+                        showBottomMenu = true
+                    }
                 }
             )
-
             Column {
                 Divider(
                     thickness = 1.dp,
@@ -193,6 +255,39 @@ fun AddTimeCapsuleScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun BottomMenuItem(resId: Int, title: String, onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .padding(vertical = 10.dp)
+            .clickable {
+                onClick()
+            }
+    ) {
+        Image(
+            painter = painterResource(id = resId),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(bottom = 5.dp)
+                .width(56.dp)
+                .height(56.dp)
+        )
+        Text(
+            text = title,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BottomMenuItemPreview() {
+    BottomMenuItem(resId = R.drawable.ic_camera_graphic, title = "카메라") {
+
     }
 }
 
@@ -369,19 +464,27 @@ private fun ImageListView(
     modifier: Modifier = Modifier,
     onSelectPicture: () -> Unit
 ) {
-    LazyRow(
-        modifier = modifier
-    ) {
-        items(items = imageUrls, key = {
-            it
-        }) {
-            ImageView(imageUrl = it) {
+    if (imageUrls.isEmpty()) {
+        Box(modifier = modifier) {
+            ImageView(imageUrl = "") {
                 onSelectPicture()
             }
         }
-        item {
-            ImageView(imageUrl = "") {
-                onSelectPicture()
+    } else {
+        LazyRow(
+            modifier = modifier
+        ) {
+            items(items = imageUrls, key = {
+                it
+            }) {
+                ImageView(imageUrl = it) {
+                    onSelectPicture()
+                }
+            }
+            item {
+                ImageView(imageUrl = "") {
+                    onSelectPicture()
+                }
             }
         }
     }
@@ -461,7 +564,7 @@ private fun ContentsView(
 @Preview
 @Composable
 private fun ContentViewPreview() {
-    ContentsView(content = "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요") {
+    ContentsView(content = "안녕하세요안녕하세요안녕하세요안녕하세요") {
 
     }
 }
@@ -469,7 +572,11 @@ private fun ContentViewPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun AddTimeCapsuleScreenPreview() {
-    AddTimeCapsuleScreen(imageUrl = "imageUrl22")
+    AddTimeCapsuleScreen(
+        imageUrl = "imageUrl22",
+        onNavigateToCamera = {},
+        onBack = {}
+    )
 }
 
 sealed class TimeCapsuleType(val timeCapsule: BaseTimeCapsule) {

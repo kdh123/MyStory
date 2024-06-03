@@ -5,8 +5,6 @@ import androidx.navigation.compose.composable
 import com.dhkim.timecapsule.main.Screen
 import com.dhkim.timecapsule.timecapsule.TimeCapsuleScreen
 import com.dhkim.timecapsule.timecapsule.presentation.AddTimeCapsuleScreen
-import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 
 fun NavGraphBuilder.timeCapsuleNavigation() {
     composable(Screen.TimeCapsule.route) {
@@ -14,14 +12,17 @@ fun NavGraphBuilder.timeCapsuleNavigation() {
     }
 }
 
-fun NavGraphBuilder.addTimeCapsuleNavigation() {
-    composable("addTimeCapsule/{savedUrl}") { backStackEntry ->
-        val savedUrl = (backStackEntry.arguments?.getString("savedUrl") ?: "")
-        val url = URLDecoder.decode(
-            savedUrl,
-            StandardCharsets.UTF_8.toString()
-        )
+fun NavGraphBuilder.addTimeCapsuleNavigation(
+    onNavigateToCamera: () -> Unit,
+    onBack: () -> Unit
+) {
+    composable("addTimeCapsule") { backStackEntry ->
+        val imageUrl = backStackEntry.savedStateHandle.get<String>("imageUrl") ?: ""
 
-        AddTimeCapsuleScreen(url)
+        AddTimeCapsuleScreen(
+            imageUrl = imageUrl,
+            onNavigateToCamera = onNavigateToCamera,
+            onBack = onBack
+        )
     }
 }

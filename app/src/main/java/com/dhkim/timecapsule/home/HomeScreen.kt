@@ -134,6 +134,11 @@ fun HomeScreen(
             )
         )
     }
+    LaunchedEffect(peekHeight) {
+        if (peekHeight > 0.dp) {
+            scaffoldState.bottomSheetState.partialExpand()
+        }
+    }
 
     BackHandler {
         if (uiState.query.isNotEmpty()) {
