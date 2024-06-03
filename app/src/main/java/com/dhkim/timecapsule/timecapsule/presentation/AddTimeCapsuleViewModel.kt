@@ -2,6 +2,8 @@ package com.dhkim.timecapsule.timecapsule.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.timecapsule.common.CommonResult
+import com.dhkim.timecapsule.search.domain.SearchRepository
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
@@ -14,11 +16,28 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddTimeCapsuleViewModel @Inject constructor(
-    private val timeCapsuleRepository: TimeCapsuleRepository
+    private val timeCapsuleRepository: TimeCapsuleRepository,
+    private val searchRepository: SearchRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddTimeCapsuleUiState())
     val uiState = _uiState.asStateFlow()
+
+    fun searchAddress(lat: String, lng: String) {
+        viewModelScope.launch {
+            val result = searchRepository.getAddress(lat, lng)
+
+            when (result) {
+                is CommonResult.Success -> {
+                    _uiState.value = _uiState.value.copy(address = result.data?.address ?: "알 수 없음")
+                }
+
+                is CommonResult.Error -> {
+                    _uiState.value = _uiState.value.copy(address = "알 수 없음")
+                }
+            }
+        }
+    }
 
     fun addTimeCapsule(type: TimeCapsuleType) {
         viewModelScope.launch(Dispatchers.IO) {

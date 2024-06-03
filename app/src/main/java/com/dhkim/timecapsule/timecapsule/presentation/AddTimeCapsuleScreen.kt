@@ -1,9 +1,11 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 
 package com.dhkim.timecapsule.timecapsule.presentation
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.location.Location
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -51,6 +53,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -62,15 +65,22 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.R
+import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.timecapsule.domain.BaseTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
+import com.google.android.gms.location.LocationServices
+import com.naver.maps.geometry.LatLng
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "MissingPermission")
 @Composable
 fun AddTimeCapsuleScreen(
     imageUrl: String,
@@ -97,6 +107,36 @@ fun AddTimeCapsuleScreen(
     }
     var showDateDialog by remember {
         mutableStateOf(false)
+    }
+    var currentLocation by remember {
+        mutableStateOf(Constants.defaultLocation)
+    }
+    val fusedLocationClient = remember {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Permission granted
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    // Got last known location. In some rare situations this can be null.
+                    currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+                    viewModel.searchAddress("${currentLocation.latitude}", "${currentLocation.longitude}")
+                }
+        } else {
+            // Handle permission denial
+        }
+    }
+
+    LaunchedEffect(locationPermissionState) {
+        if (!locationPermissionState.status.isGranted && locationPermissionState.status.shouldShowRationale) {
+            // Show rationale if needed
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
     }
 
     BackHandler {
@@ -166,6 +206,9 @@ fun AddTimeCapsuleScreen(
                         contentDescription = null,
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
+                            .clickable {
+                                onBack()
+                            }
                     )
                     Box(
                         modifier = Modifier
@@ -220,6 +263,24 @@ fun AddTimeCapsuleScreen(
                 }
             )
             Column {
+                SwitchMenuItem(
+                    resId = R.drawable.ic_location_black,
+                    title = "위치 체크",
+                    subTitle = "오픈할 수 있는 위치를 지정합니다.",
+                    isChecked = uiState.checkLocation
+                ) {
+                    viewModel.setCheckLocation(isChecked = it)
+                }
+                if (uiState.checkLocation) {
+                    MenuItem(
+                        resId = -1,
+                        title = uiState.address.ifEmpty { "위치" },
+                        subTitle = "지정한 위치 근처에 있어야 오픈할 수 있습니다."
+                    ) {
+
+                    }
+                }
+
                 Divider(
                     thickness = 1.dp,
                     color = colorResource(id = R.color.light_gray)
@@ -230,28 +291,6 @@ fun AddTimeCapsuleScreen(
                     subTitle = "오픈 날짜는 오늘로부터 3개월 이후로 설정이 가능합니다."
                 ) {
                     showDateDialog = true
-                }
-                Divider(
-                    thickness = 1.dp,
-                    color = colorResource(id = R.color.light_gray)
-                )
-                MenuItem(
-                    resId = R.drawable.ic_map_black,
-                    title = uiState.address.ifEmpty { "위치" }
-                ) {
-
-                }
-                Divider(
-                    thickness = 1.dp,
-                    color = colorResource(id = R.color.light_gray)
-                )
-                SwitchMenuItem(
-                    resId = R.drawable.ic_location_black,
-                    title = "위치 체크",
-                    subTitle = "이 위치 근처에 있어야 타임캡슐을 오픈할 수 있습니다.",
-                    isChecked = uiState.checkLocation
-                ) {
-                    viewModel.setCheckLocation(isChecked = it)
                 }
             }
         }
@@ -414,10 +453,23 @@ private fun MenuItem(resId: Int, title: String, subTitle: String = "", onClick: 
             .fillMaxWidth()
     ) {
         Image(
-            painter = painterResource(id = resId),
+            painter = painterResource(
+                id = if (resId == -1) {
+                    R.drawable.ic_map_black
+                } else {
+                    resId
+                }
+            ),
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
+                .alpha(
+                    if (resId == -1) {
+                        0f
+                    } else {
+                        1f
+                    }
+                )
         )
         Column(
             modifier = Modifier

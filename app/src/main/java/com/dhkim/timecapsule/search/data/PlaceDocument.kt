@@ -4,7 +4,7 @@ import com.dhkim.timecapsule.search.domain.Place
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
-data class Document(
+data class PlaceDocument(
     val address_name: String,
     val category_group_code: String,
     val category_group_name: String,

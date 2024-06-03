@@ -18,7 +18,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RetrofitModule {
 
-    private const val SERVER_URL = "https://dapi.kakao.com/v2/local/search/"
+    private const val SERVER_URL = "https://dapi.kakao.com/v2/local/"
 
     @Provides
     @Singleton
