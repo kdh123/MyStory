@@ -15,11 +15,12 @@ data class SendTimeCapsuleEntity(
     @ColumnInfo(name = "lng") val lng: String,
     @ColumnInfo(name = "address") val address: String,
     @ColumnInfo(name = "content") val content: String,
-    @ColumnInfo(name = "checkLocation") val checkLocation: Boolean
+    @ColumnInfo(name = "checkLocation") val checkLocation: Boolean,
+    @ColumnInfo(name = "isChecked") val isChecked: Boolean
 ) {
     fun toSenderTimeCapsule(): SendTimeCapsule {
         return SendTimeCapsule(
-            id, date, openDate, receiver, lat, lng, address, content, checkLocation
+            id, date, openDate, receiver, lat, lng, address, content, checkLocation, isChecked
         )
     }
 }

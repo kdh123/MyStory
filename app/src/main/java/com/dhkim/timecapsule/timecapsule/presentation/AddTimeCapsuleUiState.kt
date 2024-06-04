@@ -11,5 +11,7 @@ data class AddTimeCapsuleUiState(
     val imageUrls: List<String> = listOf(),
     val openDate: String = "",
     val address: String = "",
-    val checkLocation: Boolean = false
+    val checkLocation: Boolean = false,
+    val isSend: Boolean = false,
+    val receiver: String = ""
 )

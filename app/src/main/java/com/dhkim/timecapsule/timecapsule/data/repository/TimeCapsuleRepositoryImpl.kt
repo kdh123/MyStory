@@ -83,7 +83,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun saveSendTimeCapsule(timeCapsule: SendTimeCapsule) {
         val entity = timeCapsule.run {
             SendTimeCapsuleEntity(
-                id, date, openDate, receiver, lat, lng, address, content, checkLocation
+                id, date, openDate, receiver, lat, lng, address, content, checkLocation, isChecked
             )
         }
 
@@ -93,7 +93,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun editSendTimeCapsule(timeCapsule: SendTimeCapsule) {
         val entity = timeCapsule.run {
             SendTimeCapsuleEntity(
-                id, date, openDate, receiver, lat, lng, address, content, checkLocation
+                id, date, openDate, receiver, lat, lng, address, content, checkLocation, isChecked
             )
         }
 

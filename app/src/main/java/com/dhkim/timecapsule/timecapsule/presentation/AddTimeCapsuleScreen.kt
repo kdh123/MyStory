@@ -7,6 +7,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.location.Location
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -19,16 +20,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -55,7 +60,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -92,6 +99,7 @@ fun AddTimeCapsuleScreen(
     val state = rememberStandardBottomSheetState(
         skipHiddenState = false
     )
+    val scrollState = rememberScrollState()
     val scaffoldState = rememberBottomSheetScaffoldState(state)
     var showBottomMenu = false
     val context = LocalContext.current
@@ -128,6 +136,29 @@ fun AddTimeCapsuleScreen(
                 }
         } else {
             // Handle permission denial
+        }
+    }
+    var contentHeight by remember {
+        mutableStateOf(0.dp)
+    }
+    var saveButtonHeight by remember {
+        mutableStateOf(0.dp)
+    }
+    val density = LocalDensity.current
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { type ->
+            when(type) {
+                is AddTimeCapsuleSideEffect.Message -> {
+                    Toast.makeText(context, type.message, Toast.LENGTH_LONG).show()
+                }
+
+                is AddTimeCapsuleSideEffect.Completed -> {
+                    if (type.isCompleted) {
+                        onBack()
+                    }
+                }
+            }
         }
     }
 
@@ -230,6 +261,7 @@ fun AddTimeCapsuleScreen(
                         contentDescription = null,
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
+                            .alpha(0f)
                     )
                 }
                 Divider(
@@ -239,61 +271,151 @@ fun AddTimeCapsuleScreen(
             }
         }
     ) {
-        Column {
-            if (showDateDialog) {
-                Calender(
-                    onSave = viewModel::setOpenDate,
-                    onDismiss = {
-                        showDateDialog = false
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .onGloballyPositioned {
+                    contentHeight = with(density) {
+                        it.size.height.toDp()
+                    }
+                }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(contentHeight - saveButtonHeight)
+                    .verticalScroll(scrollState)
+            ) {
+                if (showDateDialog) {
+                    Calender(
+                        onSave = viewModel::setOpenDate,
+                        onDismiss = {
+                            showDateDialog = false
+                        }
+                    )
+                }
+                ContentsView(
+                    content = uiState.content,
+                    onType = viewModel::typing
+                )
+                ImageListView(
+                    imageUrls = uiState.imageUrls,
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
+                    onSelectPicture = {
+                        scope.launch {
+                            viewModel.setSelectImageIndex(index = it)
+                            scaffoldState.bottomSheetState.expand()
+                            showBottomMenu = true
+                        }
                     }
                 )
-            }
-            ContentsView(
-                content = uiState.content,
-                onType = viewModel::typing
-            )
-            ImageListView(
-                imageUrls = uiState.imageUrls,
-                modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
-                onSelectPicture = {
-                    scope.launch {
-                        scaffoldState.bottomSheetState.expand()
-                        showBottomMenu = true
-                    }
-                }
-            )
-            Column {
-                SwitchMenuItem(
-                    resId = R.drawable.ic_location_black,
-                    title = "위치 체크",
-                    subTitle = "오픈할 수 있는 위치를 지정합니다.",
-                    isChecked = uiState.checkLocation
-                ) {
-                    viewModel.setCheckLocation(isChecked = it)
-                }
-                if (uiState.checkLocation) {
-                    MenuItem(
-                        resId = -1,
-                        title = uiState.address.ifEmpty { "위치" },
-                        subTitle = "지정한 위치 근처에 있어야 오픈할 수 있습니다."
+                Column {
+                    SwitchMenuItem(
+                        resId = R.drawable.ic_location_black,
+                        title = "위치 체크",
+                        subTitle = "오픈할 수 있는 위치를 지정합니다.",
+                        isChecked = uiState.checkLocation
                     ) {
+                        viewModel.setCheckLocation(isChecked = it)
+                    }
+                    if (uiState.checkLocation) {
+                        MenuItem(
+                            resId = -1,
+                            title = uiState.address.ifEmpty { "위치" },
+                            subTitle = "지정한 위치 근처에 있어야 오픈할 수 있습니다."
+                        ) {
 
+                        }
+                    }
+
+                    Divider(
+                        thickness = 1.dp,
+                        color = colorResource(id = R.color.light_gray)
+                    )
+                    MenuItem(
+                        resId = R.drawable.ic_calender_black,
+                        title = uiState.openDate.ifEmpty { "오픈 날짜" },
+                        subTitle = "오픈 날짜는 오늘로부터 3개월 이후로 설정이 가능합니다."
+                    ) {
+                        showDateDialog = true
+                    }
+
+                    Divider(
+                        thickness = 1.dp,
+                        color = colorResource(id = R.color.light_gray)
+                    )
+
+                    SwitchMenuItem(
+                        resId = R.drawable.ic_face_black,
+                        title = "친구에게 보내기",
+                        subTitle = "친구에게 타임캡슐을 보내보세요.",
+                        isChecked = uiState.isSend
+                    ) {
+                        viewModel.setCheckSend(isChecked = it)
+                        if (uiState.checkLocation) {
+                            scope.launch {
+                                scrollState.animateScrollTo(200)
+                            }
+                        }
+                    }
+                    if (uiState.isSend) {
+                        MenuItem(
+                            resId = -1,
+                            title = "친구 목록",
+                            subTitle = "친구를 선택해주세요."
+                        ) {
+
+                        }
                     }
                 }
+            }
 
-                Divider(
-                    thickness = 1.dp,
-                    color = colorResource(id = R.color.light_gray)
-                )
-                MenuItem(
-                    resId = R.drawable.ic_calender_black,
-                    title = uiState.openDate.ifEmpty { "오픈 날짜" },
-                    subTitle = "오픈 날짜는 오늘로부터 3개월 이후로 설정이 가능합니다."
-                ) {
-                    showDateDialog = true
-                }
+            SaveButton(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .onGloballyPositioned {
+                        saveButtonHeight = with(density) {
+                            it.size.height.toDp()
+                        }
+                    }
+            ) {
+                viewModel.saveTimeCapsule(lat = "${currentLocation.latitude}", lng = "${currentLocation.longitude}")
             }
         }
+    }
+}
+
+@Composable
+private fun SaveButton(modifier: Modifier, onClick: () -> Unit) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.primary)),
+        elevation = CardDefaults.cardElevation(20.dp),
+        shape = RoundedCornerShape(50.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
+        onClick = {
+            onClick()
+        }
+    ) {
+        Text(
+            text = "저장",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            modifier = Modifier
+                .padding(15.dp)
+                .align(Alignment.CenterHorizontally)
+
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SaveButtonPreview() {
+    SaveButton(Modifier) {
+
     }
 }
 
@@ -449,7 +571,8 @@ private fun SwitchMenuItemPreview() {
 private fun MenuItem(resId: Int, title: String, subTitle: String = "", onClick: () -> Unit) {
     Row(
         modifier = Modifier
-            .padding(15.dp)
+            .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 15.dp)
+            .wrapContentHeight()
             .fillMaxWidth()
     ) {
         Image(
@@ -514,28 +637,28 @@ private fun MenuItemPreview() {
 private fun ImageListView(
     imageUrls: List<String>,
     modifier: Modifier = Modifier,
-    onSelectPicture: () -> Unit
+    onSelectPicture: (Int) -> Unit
 ) {
     if (imageUrls.isEmpty()) {
         Box(modifier = modifier) {
             ImageView(imageUrl = "") {
-                onSelectPicture()
+                onSelectPicture(-1)
             }
         }
     } else {
         LazyRow(
             modifier = modifier
         ) {
-            items(items = imageUrls, key = {
-                it
-            }) {
-                ImageView(imageUrl = it) {
-                    onSelectPicture()
+            itemsIndexed(items = imageUrls, key = { index, key ->
+                key
+            }) { index, item ->
+                ImageView(imageUrl = item) {
+                    onSelectPicture(index)
                 }
             }
             item {
                 ImageView(imageUrl = "") {
-                    onSelectPicture()
+                    onSelectPicture(-1)
                 }
             }
         }
@@ -608,7 +731,9 @@ private fun ContentsView(
             ),
             value = content,
             onValueChange = onType,
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxSize()
         )
     }
 }
