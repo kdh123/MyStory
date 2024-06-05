@@ -1,6 +1,6 @@
 package com.dhkim.timecapsule.search.data.di
 
-import com.dhkim.timecapsule.search.data.SearchRepositoryImpl
+import com.dhkim.timecapsule.search.data.repository.SearchRepositoryImpl
 import com.dhkim.timecapsule.search.domain.SearchRepository
 import dagger.Binds
 import dagger.Module

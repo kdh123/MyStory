@@ -9,7 +9,9 @@ import com.dhkim.timecapsule.home.domain.Category
 import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.domain.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -23,6 +25,9 @@ class HomeViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val _sideEffect = MutableSharedFlow<HomeSideEffect>()
+    val sideEffect = _sideEffect.asSharedFlow()
 
     fun onAction(action: HomeAction) {
         when (action) {
@@ -53,6 +58,7 @@ class HomeViewModel @Inject constructor(
                         places = flowOf(it).stateIn(viewModelScope),
                         selectedPlace = null
                     )
+                    _sideEffect.emit(HomeSideEffect.BottomSheet(isHide = false))
                 }
         }
     }
@@ -72,6 +78,7 @@ class HomeViewModel @Inject constructor(
                         places = flowOf(it).stateIn(viewModelScope),
                         selectedPlace = null
                     )
+                    _sideEffect.emit(HomeSideEffect.BottomSheet(isHide = false))
                 }
         }
     }
@@ -84,6 +91,8 @@ class HomeViewModel @Inject constructor(
                 selectedPlace = place,
                 places = MutableStateFlow(PagingData.empty())
             )
+
+            _sideEffect.emit(HomeSideEffect.BottomSheet(isHide = true))
         }
     }
 
@@ -100,6 +109,10 @@ class HomeViewModel @Inject constructor(
                 category = Category.None,
                 selectedPlace = null
             )
+        }
+
+        viewModelScope.launch {
+            _sideEffect.emit(HomeSideEffect.BottomSheet(isHide = true))
         }
     }
 }

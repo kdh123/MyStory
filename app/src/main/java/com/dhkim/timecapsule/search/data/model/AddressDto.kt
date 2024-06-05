@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.search.model
+package com.dhkim.timecapsule.search.data.model
 
 import com.dhkim.timecapsule.search.domain.Address
 

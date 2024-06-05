@@ -1,8 +1,9 @@
-package com.dhkim.timecapsule.search.data
+package com.dhkim.timecapsule.search.data.repository
 
 import androidx.paging.PagingData
 import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.home.domain.Category
+import com.dhkim.timecapsule.search.data.dataSource.SearchRemoteDataSource
 import com.dhkim.timecapsule.search.domain.Address
 import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.domain.SearchRepository

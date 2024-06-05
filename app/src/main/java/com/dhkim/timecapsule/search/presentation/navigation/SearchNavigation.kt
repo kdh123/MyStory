@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.search.navigation
+package com.dhkim.timecapsule.search.presentation.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable

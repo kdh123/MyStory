@@ -1,7 +1,8 @@
-package com.dhkim.timecapsule.search.data
+package com.dhkim.timecapsule.search.data.dataSource
 
 import com.dhkim.timecapsule.BuildConfig
-import com.dhkim.timecapsule.search.model.AddressDto
+import com.dhkim.timecapsule.search.data.model.PlaceDto
+import com.dhkim.timecapsule.search.data.model.AddressDto
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header

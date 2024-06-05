@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.search.data
+package com.dhkim.timecapsule.search.data.model
 
 data class SameName(
     val keyword: String,

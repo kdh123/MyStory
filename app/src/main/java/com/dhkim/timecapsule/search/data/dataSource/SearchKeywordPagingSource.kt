@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.search.data
+package com.dhkim.timecapsule.search.data.dataSource
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState

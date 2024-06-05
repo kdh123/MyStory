@@ -38,7 +38,7 @@ import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.home.BottomPlace
 import com.dhkim.timecapsule.home.presentation.navigation.homeNavigation
 import com.dhkim.timecapsule.search.domain.Place
-import com.dhkim.timecapsule.search.navigation.searchNavigation
+import com.dhkim.timecapsule.search.presentation.navigation.searchNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleNavigation
 

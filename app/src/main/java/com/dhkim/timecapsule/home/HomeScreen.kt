@@ -72,6 +72,7 @@ import androidx.paging.compose.itemKey
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.home.domain.Category
+import com.dhkim.timecapsule.home.presentation.HomeSideEffect
 import com.dhkim.timecapsule.home.presentation.HomeUiState
 import com.dhkim.timecapsule.home.presentation.HomeViewModel
 import com.dhkim.timecapsule.search.domain.Place
@@ -111,7 +112,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val places = uiState.places.collectAsLazyPagingItems()
     val paddingValues = WindowInsets.navigationBars.asPaddingValues()
-    var peekHeight = if (uiState.category != Category.None) {
+    val peekHeight = if (uiState.category != Category.None) {
         300.dp
     } else {
         0.dp
@@ -134,9 +135,20 @@ fun HomeScreen(
             )
         )
     }
-    LaunchedEffect(peekHeight) {
-        if (peekHeight > 0.dp) {
-            scaffoldState.bottomSheetState.partialExpand()
+
+    LaunchedEffect(true) {
+        viewModel.sideEffect.collect { sideEffect ->
+            when(sideEffect) {
+                is HomeSideEffect.BottomSheet -> {
+                    scope.launch {
+                        if (sideEffect.isHide) {
+                            scaffoldState.bottomSheetState.hide()
+                        } else {
+                            scaffoldState.bottomSheetState.expand()
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -221,10 +233,10 @@ fun HomeScreen(
                 uiState = uiState,
                 onPlaceClick = viewModel::selectPlace,
                 onHide = {
-                    peekHeight = 0.dp
+                    /*peekHeight = 0.dp
                     scope.launch {
                         scaffoldState.bottomSheetState.hide()
-                    }
+                    }*/
                 }
             )
         },

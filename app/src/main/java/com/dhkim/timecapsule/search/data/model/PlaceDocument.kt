@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.search.data
+package com.dhkim.timecapsule.search.data.model
 
 import com.dhkim.timecapsule.search.domain.Place
 import java.math.RoundingMode
