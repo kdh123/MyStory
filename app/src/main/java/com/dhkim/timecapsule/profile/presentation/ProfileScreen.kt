@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -57,7 +56,7 @@ import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.composable.LoadingProgressBar
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     onBack: () -> Unit,
@@ -297,23 +296,25 @@ fun BottomSheetScreen(
                             .padding(10.dp)
                             .align(Alignment.CenterVertically)
                     )
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = colorResource(id = R.color.primary)
-                        ),
-                        elevation = CardDefaults.cardElevation(10.dp),
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically),
-                        onClick = {
-                            onAddFriend()
-                        }
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_person_add_white),
-                            contentDescription = null,
+                    if (!uiState.searchResult.isMe) {
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = colorResource(id = R.color.primary)
+                            ),
+                            elevation = CardDefaults.cardElevation(10.dp),
                             modifier = Modifier
-                                .padding(10.dp)
-                        )
+                                .align(Alignment.CenterVertically),
+                            onClick = {
+                                onAddFriend()
+                            }
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_person_add_white),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                            )
+                        }
                     }
                 }
             } else if (userId.isEmpty() && query.isNotEmpty()) {
@@ -372,7 +373,7 @@ fun FriendScreen(uiState: ProfileUiState) {
                 modifier = Modifier
                     .padding(10.dp)
             )
-            FriendItem(userId = "dh", isMe = true)
+            FriendItem(userId = uiState.user.id, isMe = true)
         }
         FriendList(friends = friends, title = "서로 승낙한 친구", modifier = Modifier.fillMaxWidth())
         FriendList(friends = requests, title = "내가 요청한 친구", modifier = Modifier.fillMaxSize())

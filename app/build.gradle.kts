@@ -36,7 +36,7 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String","API_KEY", localProperties["API_KEY"] as String)
+        buildConfigField("String", "API_KEY", localProperties["API_KEY"] as String)
     }
 
     buildTypes {
@@ -87,6 +87,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -119,4 +122,8 @@ dependencies {
     implementation(platform(libs.google.firebase.bom))
     implementation(libs.google.firebase.database.ktx)
     implementation(libs.google.firebase.analytics)
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences.core)
 }

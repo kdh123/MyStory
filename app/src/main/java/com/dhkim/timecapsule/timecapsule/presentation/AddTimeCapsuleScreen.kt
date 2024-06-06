@@ -148,7 +148,7 @@ fun AddTimeCapsuleScreen(
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { type ->
-            when(type) {
+            when (type) {
                 is AddTimeCapsuleSideEffect.Message -> {
                     Toast.makeText(context, type.message, Toast.LENGTH_LONG).show()
                 }
@@ -724,6 +724,9 @@ private fun ContentsView(
             .background(color = colorResource(id = R.color.white))
     ) {
         TextField(
+            label = {
+                Text(text = "내용을 입력해주세요.")
+            },
             colors = textFieldColors(
                 containerColor = colorResource(id = R.color.white),
                 focusedIndicatorColor = Color.Transparent,
@@ -732,7 +735,7 @@ private fun ContentsView(
             value = content,
             onValueChange = onType,
             modifier = Modifier
-                .padding(10.dp)
+                .padding(5.dp)
                 .fillMaxSize()
         )
     }

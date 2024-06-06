@@ -7,7 +7,7 @@ typealias UserId = String
 
 @IgnoreExtraProperties
 data class User(
-    val id: String = "dh",
+    val id: String = "",
     val profileImageUrl: String = "",
     val friends: List<Friend> = listOf(),
     val requests: List<UserId> = listOf()

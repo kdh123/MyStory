@@ -10,8 +10,25 @@ import org.junit.Assert.*
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class ExampleUnitTest {
+
+    fun containsSpecialCharacters(input: String): Boolean {
+        val specialCharactersPattern = Regex("[^a-zA-Z0-9 ]") // 알파벳, 숫자, 공백 제외한 모든 문자
+        return specialCharactersPattern.containsMatchIn(input)
+    }
+
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+        //assertEquals(4, 2 + 2)
+
+        val testStrings = listOf(
+            "HelloWorld123",
+            "Hello World_",
+            "NoSpecialChar",
+            "Special@Char#Test"
+        )
+
+        for (string in testStrings) {
+            println("Does \"$string\" contain special characters? ${containsSpecialCharacters(string)}")
+        }
     }
 }

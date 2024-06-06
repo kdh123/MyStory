@@ -1,8 +1,10 @@
 package com.dhkim.timecapsule.profile.presentation
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dhkim.timecapsule.profile.data.di.FirebaseModule
 import com.dhkim.timecapsule.profile.domain.Friend
+import com.dhkim.timecapsule.profile.domain.User
 import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -11,6 +13,7 @@ import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 typealias UserId = String
@@ -26,6 +29,11 @@ class ProfileViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            val myId = userRepository.getMyId()
+            _uiState.value = _uiState.value.copy(user = User().copy(id = myId))
+        }
+
         val userListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val data = dataSnapshot.value as? Map<*, *>
@@ -59,10 +67,13 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun searchUser() {
+        val myId = uiState.value.user.id
         val searchResult = uiState.value.searchResult
+
         database.child("users").child(searchResult.query).get().addOnSuccessListener { data ->
             data.value?.let {
-                _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = searchResult.query))
+                val isMe = searchResult.query == myId
+                _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = searchResult.query, isMe = isMe))
             } ?: kotlin.run {
                 _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = ""))
             }
@@ -73,10 +84,16 @@ class ProfileViewModel @Inject constructor(
 
     fun addFriend() {
         val searchUserId = _uiState.value.searchResult.userId
-        val friends = _uiState.value.user.friends.toMutableList().apply {
-            add(Friend(id = searchUserId, isPending = true))
+        val friendsIds = _uiState.value.user.friends.map { it.id }
+        val requests = _uiState.value.user.requests
+        if (friendsIds.contains(searchUserId) || requests.contains(searchUserId)) {
+
+        } else {
+            val friends = _uiState.value.user.friends.toMutableList().apply {
+                add(Friend(id = searchUserId, isPending = true))
+            }
+            val user = _uiState.value.user.copy(friends = friends)
+            userRepository.updateUser(user = user)
         }
-        val user = _uiState.value.user.copy(friends = friends)
-        userRepository.updateUser(user = user)
     }
 }
