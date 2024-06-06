@@ -7,10 +7,10 @@ typealias UserId = String
 
 @IgnoreExtraProperties
 data class User(
-    val id: String,
-    val profileImageUrl: String,
-    val friends: List<Friend>,
-    val requests: List<UserId>
+    val id: String = "dh",
+    val profileImageUrl: String = "",
+    val friends: List<Friend> = listOf(),
+    val requests: List<UserId> = listOf()
 ) {
     @Exclude
     fun toFriends(): Map<String, Any?> {

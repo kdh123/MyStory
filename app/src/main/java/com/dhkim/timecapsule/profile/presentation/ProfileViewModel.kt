@@ -3,7 +3,6 @@ package com.dhkim.timecapsule.profile.presentation
 import androidx.lifecycle.ViewModel
 import com.dhkim.timecapsule.profile.data.di.FirebaseModule
 import com.dhkim.timecapsule.profile.domain.Friend
-import com.dhkim.timecapsule.profile.domain.User
 import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -30,13 +29,20 @@ class ProfileViewModel @Inject constructor(
         val userListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val data = dataSnapshot.value as? Map<*, *>
-                val friends = (data?.get("kdh1234") as? Map<*, *>)?.get("friends") as? List<Map<*, *>> ?: listOf()
-                val requests = (data?.get("kdh1234") as? Map<*, *>)?.get("requests") as? List<String> ?: listOf()
+                val friends = (data?.get("dh") as? Map<*, *>)?.get("friends") as? List<Map<*, *>> ?: listOf()
+                val requests = (data?.get("dh") as? Map<*, *>)?.get("requests") as? List<String> ?: listOf()
                 val getFriends = friends.map {
                     Friend(it["id"] as String, it["pending"] as Boolean)
                 }
+                val currentUser = _uiState.value.user
 
-                _uiState.value = _uiState.value.copy(isLoading = false, friends = getFriends, requests = requests)
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    user = currentUser.copy(
+                        friends = getFriends,
+                        requests = requests
+                    )
+                )
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -65,14 +71,12 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateUser(id: String, profileImageUrl: String, friends: List<Friend>, requests: List<UserId>) {
-        val user = User(
-            id = id,
-            profileImageUrl = profileImageUrl,
-            friends = friends,
-            requests = requests
-        )
-
+    fun addFriend() {
+        val searchUserId = _uiState.value.searchResult.userId
+        val friends = _uiState.value.user.friends.toMutableList().apply {
+            add(Friend(id = searchUserId, isPending = true))
+        }
+        val user = _uiState.value.user.copy(friends = friends)
         userRepository.updateUser(user = user)
     }
 }

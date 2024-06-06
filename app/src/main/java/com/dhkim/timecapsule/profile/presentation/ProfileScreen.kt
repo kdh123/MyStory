@@ -98,6 +98,9 @@ fun ProfileScreen(
                 },
                 onQuery = remember(viewModel) {
                     viewModel::onQuery
+                },
+                onAddFriend = remember(viewModel) {
+                    viewModel::addFriend
                 }
             )
         },
@@ -216,7 +219,8 @@ fun AddFriend(modifier: Modifier = Modifier) {
 fun BottomSheetScreen(
     uiState: ProfileUiState,
     onQuery: (String) -> Unit,
-    onSearch: () -> Unit
+    onSearch: () -> Unit,
+    onAddFriend: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxHeight(0.9f)
@@ -293,7 +297,6 @@ fun BottomSheetScreen(
                             .padding(10.dp)
                             .align(Alignment.CenterVertically)
                     )
-
                     Card(
                         colors = CardDefaults.cardColors(
                             containerColor = colorResource(id = R.color.primary)
@@ -302,7 +305,7 @@ fun BottomSheetScreen(
                         modifier = Modifier
                             .align(Alignment.CenterVertically),
                         onClick = {
-                            onSearch()
+                            onAddFriend()
                         }
                     ) {
                         Image(
@@ -328,7 +331,7 @@ fun BottomSheetScreen(
 @Preview(showBackground = true)
 @Composable
 private fun SearchScreenPreview() {
-    BottomSheetScreen(ProfileUiState(), {}) {
+    BottomSheetScreen(ProfileUiState(), {}, {}) {
 
     }
 }
@@ -343,7 +346,7 @@ private fun ProfileScreenPreview() {
 
 @Composable
 fun RequestScreen(uiState: ProfileUiState) {
-    val requests = uiState.requests
+    val requests = uiState.user.requests
 
     if (requests.isNotEmpty()) {
         FriendList(
@@ -358,8 +361,8 @@ fun RequestScreen(uiState: ProfileUiState) {
 
 @Composable
 fun FriendScreen(uiState: ProfileUiState) {
-    val friends = uiState.friends.filter { !it.isPending }.map { it.id }
-    val requests = uiState.friends.filter { it.isPending }.map { it.id }
+    val friends = uiState.user.friends.filter { !it.isPending }.map { it.id }
+    val requests = uiState.user.friends.filter { it.isPending }.map { it.id }
 
     Column {
         Column {
@@ -369,7 +372,7 @@ fun FriendScreen(uiState: ProfileUiState) {
                 modifier = Modifier
                     .padding(10.dp)
             )
-            FriendItem(userId = "asitgox_", isMe = true)
+            FriendItem(userId = "dh", isMe = true)
         }
         FriendList(friends = friends, title = "서로 승낙한 친구", modifier = Modifier.fillMaxWidth())
         FriendList(friends = requests, title = "내가 요청한 친구", modifier = Modifier.fillMaxSize())
@@ -457,5 +460,5 @@ fun FriendItem(userId: String, isMe: Boolean = false) {
 @Composable
 private fun FriendItemPreview() {
 
-    FriendItem(userId = "kdh123")
+    FriendItem(userId = "dh")
 }

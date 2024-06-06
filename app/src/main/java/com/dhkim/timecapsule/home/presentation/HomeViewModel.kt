@@ -7,6 +7,8 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.dhkim.timecapsule.home.HomeAction
 import com.dhkim.timecapsule.home.domain.Category
+import com.dhkim.timecapsule.profile.domain.Friend
+import com.dhkim.timecapsule.profile.domain.User
 import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.domain.SearchRepository
 import com.google.firebase.database.DataSnapshot
@@ -62,15 +64,20 @@ class HomeViewModel @Inject constructor(
                 val data = dataSnapshot.value as? Map<*, *>
                 Log.e("user", "user22wer : ${data}")
 
-                val getData = data!!["kdh1234"] as? Map<*, *>
-                Log.e("user", "user2222rr : ${getData!!["id"]}")
-                Log.e("user", "user3333rr : ${getData!!["profileImageUrl"]}")
-                Log.e("user", "user4444rr : ${getData!!["friends"]}")
-                Log.e("user", "user4444rr : ${getData!!["requests"]}")
+                if (data != null) {
+                    val getData = data!!["dh"] as? Map<*, *>
+                    if (getData != null) {
+                        Log.e("user", "user2222rr : ${getData!!["id"]}")
+                        Log.e("user", "user3333rr : ${getData!!["profileImageUrl"]}")
+                        Log.e("user", "user4444rr : ${getData!!["friends"]}")
+                        Log.e("user", "user4444rr : ${getData!!["requests"]}")
 
-                val friends = getData["friends"] as? List<Map<*, *>>
-                val friend = friends?.get(0)?.get("id") ?: "No"
-                Log.e("friend", "freind : $friend")
+                        val friends = getData["friends"] as? List<Map<*, *>>
+                        val friend = friends?.get(0)?.get("id") ?: "No"
+                        Log.e("friend", "freind : $friend")
+                    }
+
+                }
 
 
 
@@ -83,16 +90,16 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        Firebase.database.getReference("users").addValueEventListener(postListener)
+        //Firebase.database.getReference("users").addValueEventListener(postListener)
 
-        /*val user = User(
-            id = "kdh1234",
+        val user = User(
+            id = "dh4",
             profileImageUrl = "aa",
             friends = listOf(Friend("weee2"), Friend("fff", false), Friend("gg")),
             requests = listOf("bbew", "ner", "zzz")
         )
 
-        database.child("users").child("kdh1234").setValue(user)*/
+        database.child("users").child("dh4").setValue(user)
 
         /*val key = "kdh1234"
         if (key == null) {
