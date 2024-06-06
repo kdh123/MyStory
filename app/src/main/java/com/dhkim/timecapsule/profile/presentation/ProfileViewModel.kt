@@ -19,7 +19,8 @@ typealias UserId = String
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    @FirebaseModule.UserFirebaseDatabase private val database: DatabaseReference
+    @FirebaseModule.FirebaseDatabase private val database: DatabaseReference,
+    @FirebaseModule.UserFirebaseDatabase private val userDatabase: DatabaseReference
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -32,7 +33,7 @@ class ProfileViewModel @Inject constructor(
                 val friends = (data?.get("kdh1234") as? Map<*, *>)?.get("friends") as? List<Map<*, *>> ?: listOf()
                 val requests = (data?.get("kdh1234") as? Map<*, *>)?.get("requests") as? List<String> ?: listOf()
                 val getFriends = friends.map {
-                    Friend(it["id"]!! as String, it["pending"]!! as Boolean)
+                    Friend(it["id"] as String, it["pending"] as Boolean)
                 }
 
                 _uiState.value = _uiState.value.copy(isLoading = false, friends = getFriends, requests = requests)
@@ -43,7 +44,25 @@ class ProfileViewModel @Inject constructor(
             }
         }
 
-        database.addValueEventListener(userListener)
+        userDatabase.addValueEventListener(userListener)
+    }
+
+    fun onQuery(query: String) {
+        val searchResult = _uiState.value.searchResult
+        _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(query = query))
+    }
+
+    fun searchUser() {
+        val searchResult = uiState.value.searchResult
+        database.child("users").child(searchResult.query).get().addOnSuccessListener { data ->
+            data.value?.let {
+                _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = searchResult.query))
+            } ?: kotlin.run {
+                _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = ""))
+            }
+        }.addOnFailureListener {
+            _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = ""))
+        }
     }
 
     fun updateUser(id: String, profileImageUrl: String, friends: List<Friend>, requests: List<UserId>) {

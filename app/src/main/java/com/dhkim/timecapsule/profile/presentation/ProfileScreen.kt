@@ -1,11 +1,16 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+
 package com.dhkim.timecapsule.profile.presentation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,11 +26,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
@@ -63,15 +70,36 @@ fun ProfileScreen(
         2
     })
     val state = rememberStandardBottomSheetState(
-        skipHiddenState = true
+        skipHiddenState = false
     )
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(state)
     val scope = rememberCoroutineScope()
+    var showBottomSheet = false
+
+    BackHandler {
+        if (showBottomSheet) {
+            scope.launch {
+                bottomSheetScaffoldState.bottomSheetState.hide()
+            }
+            showBottomSheet = false
+        } else {
+            onBack()
+        }
+    }
 
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
+        sheetPeekHeight = 0.dp,
         sheetContent = {
-
+            BottomSheetScreen(
+                uiState = uiState,
+                onSearch = remember(viewModel) {
+                    viewModel::searchUser
+                },
+                onQuery = remember(viewModel) {
+                    viewModel::onQuery
+                }
+            )
         },
         topBar = {
             Column {
@@ -101,14 +129,14 @@ fun ProfileScreen(
                             fontSize = 18.sp
                         )
                     }
-
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_friend_add_black),
-                        contentDescription = null,
+                    AddFriend(
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                             .clickable {
-
+                                scope.launch {
+                                    bottomSheetScaffoldState.bottomSheetState.expand()
+                                    showBottomSheet = true
+                                }
                             }
                     )
                 }
@@ -175,6 +203,135 @@ fun ProfileScreen(
     }
 }
 
+@Composable
+fun AddFriend(modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(id = R.drawable.ic_friend_add_black),
+        contentDescription = null,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun BottomSheetScreen(
+    uiState: ProfileUiState,
+    onQuery: (String) -> Unit,
+    onSearch: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxHeight(0.9f)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+                .height(56.dp)
+        ) {
+            OutlinedCard(
+                colors = CardDefaults.cardColors(
+                    containerColor = colorResource(id = R.color.white),
+                ),
+                border = BorderStroke(1.dp, color = colorResource(id = R.color.primary)),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 10.dp
+                ),
+                modifier = Modifier
+                    .padding(end = 10.dp)
+                    .width(0.dp)
+                    .weight(1f)
+                    .fillMaxHeight()
+            ) {
+                TextField(
+                    singleLine = true,
+                    label = {
+                        Text(text = "아이디 검색")
+                    },
+                    value = uiState.searchResult.query,
+                    onValueChange = {
+                        onQuery(it)
+                    },
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    colors = androidx.compose.material3.TextFieldDefaults.textFieldColors(
+                        containerColor = Color.White
+                    )
+                )
+            }
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = colorResource(id = R.color.primary)
+                ),
+                elevation = CardDefaults.cardElevation(10.dp),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .aspectRatio(1f),
+                onClick = {
+                    onSearch()
+                }
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_search_white),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxSize()
+                )
+            }
+        }
+
+        uiState.searchResult.run {
+            if (userId.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .padding(10.dp)
+                ) {
+                    Text(
+                        text = userId,
+                        modifier = Modifier
+                            .width(0.dp)
+                            .weight(1f)
+                            .padding(10.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = colorResource(id = R.color.primary)
+                        ),
+                        elevation = CardDefaults.cardElevation(10.dp),
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically),
+                        onClick = {
+                            onSearch()
+                        }
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_person_add_white),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(10.dp)
+                        )
+                    }
+                }
+            } else if (userId.isEmpty() && query.isNotEmpty()) {
+                Text(
+                    text = "사용자를 찾을 수 없습니다.",
+                    modifier = Modifier
+                        .padding(10.dp)
+                )
+            }
+        }
+    }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SearchScreenPreview() {
+    BottomSheetScreen(ProfileUiState(), {}) {
+
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -215,7 +372,7 @@ fun FriendList(friends: List<UserId>, title: String, modifier: Modifier = Modifi
     Column {
         Text(
             text = title,
-            fontWeight = FontWeight.Bold,
+            color = colorResource(id = R.color.gray),
             modifier = Modifier
                 .padding(10.dp)
         )
