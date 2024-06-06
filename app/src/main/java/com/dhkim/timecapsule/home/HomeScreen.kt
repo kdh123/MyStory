@@ -71,6 +71,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
+import com.dhkim.timecapsule.common.composable.LoadingProgressBar
 import com.dhkim.timecapsule.home.domain.Category
 import com.dhkim.timecapsule.home.presentation.HomeSideEffect
 import com.dhkim.timecapsule.home.presentation.HomeUiState
@@ -138,7 +139,7 @@ fun HomeScreen(
 
     LaunchedEffect(true) {
         viewModel.sideEffect.collect { sideEffect ->
-            when(sideEffect) {
+            when (sideEffect) {
                 is HomeSideEffect.BottomSheet -> {
                     scope.launch {
                         if (sideEffect.isHide) {
@@ -229,16 +230,24 @@ fun HomeScreen(
         scaffoldState = scaffoldState,
         sheetPeekHeight = peekHeight,
         sheetContent = {
-            PlaceList(
-                uiState = uiState,
-                onPlaceClick = viewModel::selectPlace,
-                onHide = {
-                    /*peekHeight = 0.dp
-                    scope.launch {
-                        scaffoldState.bottomSheetState.hide()
-                    }*/
+            if (places.itemCount == 0) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    LoadingProgressBar(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                    )
                 }
-            )
+            } else {
+                PlaceList(
+                    uiState = uiState,
+                    onPlaceClick = viewModel::selectPlace,
+                    onHide = {
+                    }
+                )
+            }
         },
         containerColor = colorResource(id = R.color.white)
     ) { padding ->
@@ -311,7 +320,7 @@ fun HomeScreen(
                 LazyRow(
                     modifier = Modifier
                         .wrapContentWidth()
-                        //.padding(start = 10.dp)
+                    //.padding(start = 10.dp)
                 ) {
                     items(Category.entries.filter { it != Category.None },
                         key = {

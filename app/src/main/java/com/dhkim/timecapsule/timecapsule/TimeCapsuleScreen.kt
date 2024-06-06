@@ -52,9 +52,9 @@ import kotlinx.coroutines.launch
 fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var currentTab by remember { mutableIntStateOf(0) }
-    val titles = listOf("My", "수신", "발신")
+    val titles = listOf("My", "수신",)
     val pagerState = rememberPagerState(pageCount = {
-        3
+        2
     })
     val scope = rememberCoroutineScope()
 
@@ -79,8 +79,7 @@ fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
                     icon = {
                         when (index) {
                             0 -> R.drawable.ic_my_black
-                            1 -> R.drawable.ic_box_black
-                            else -> R.drawable.ic_send_black
+                            else -> R.drawable.ic_box_black
                         }.let {
                             Icon(painter = painterResource(id = it), contentDescription = null)
                         }
