@@ -347,8 +347,8 @@ fun AddTimeCapsuleScreen(
 
                     SwitchMenuItem(
                         resId = R.drawable.ic_face_black,
-                        title = "친구에게 보내기",
-                        subTitle = "친구에게 타임캡슐을 보내보세요.",
+                        title = "친구와 공유하기",
+                        subTitle = "사진은 친구에게 공유되지 않습니다.",
                         isChecked = uiState.isSend
                     ) {
                         viewModel.setCheckSend(isChecked = it)
@@ -362,7 +362,7 @@ fun AddTimeCapsuleScreen(
                         MenuItem(
                             resId = -1,
                             title = "친구 목록",
-                            subTitle = "친구를 선택해주세요."
+                            subTitle = "서로 승낙한 친구에게만 공유할 수 있습니다. (최대 10명)"
                         ) {
 
                         }

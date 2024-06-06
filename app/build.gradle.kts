@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kapt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.parcelize)
+    alias(libs.plugins.google.service)
 }
 
 val localProperties = Properties().apply {
@@ -115,4 +116,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
+    implementation(platform(libs.google.firebase.bom))
+    implementation(libs.google.firebase.database.ktx)
+    implementation(libs.google.firebase.analytics)
 }

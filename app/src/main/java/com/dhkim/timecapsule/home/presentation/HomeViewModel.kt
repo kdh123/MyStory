@@ -1,5 +1,6 @@
 package com.dhkim.timecapsule.home.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -8,6 +9,12 @@ import com.dhkim.timecapsule.home.HomeAction
 import com.dhkim.timecapsule.home.domain.Category
 import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.domain.SearchRepository
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +29,9 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val searchRepository: SearchRepository
 ) : ViewModel() {
+
+    private lateinit var database: DatabaseReference
+
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
@@ -41,6 +51,63 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    init {
+        database = Firebase.database.reference
+
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                val data = dataSnapshot.value as? Map<*, *>
+                Log.e("user", "user22wer : ${data}")
+
+                val getData = data!!["kdh1234"] as? Map<*, *>
+                Log.e("user", "user2222rr : ${getData!!["id"]}")
+                Log.e("user", "user3333rr : ${getData!!["profileImageUrl"]}")
+                Log.e("user", "user4444rr : ${getData!!["friends"]}")
+                Log.e("user", "user4444rr : ${getData!!["requests"]}")
+
+                val friends = getData["friends"] as? List<Map<*, *>>
+                val friend = friends?.get(0)?.get("id") ?: "No"
+                Log.e("friend", "freind : $friend")
+
+
+
+                // ...
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+
+            }
+        }
+
+        Firebase.database.getReference("users").addValueEventListener(postListener)
+
+        /*val user = User(
+            id = "kdh1234",
+            profileImageUrl = "aa",
+            friends = listOf(Friend("weee2"), Friend("fff", false), Friend("gg")),
+            requests = listOf("bbew", "ner", "zzz")
+        )
+
+        database.child("users").child("kdh1234").setValue(user)*/
+
+        /*val key = "kdh1234"
+        if (key == null) {
+            Log.e("nono", "Couldn't get push key for posts")
+        } else {
+            //val post = Post(userId, username, title, body)
+            val postValues = user
+
+            val childUpdates = hashMapOf<String, Any>(
+                "/users/$key/friends" to postValues,
+                //"/user-posts/$userId/$key" to postValues,
+            )
+
+            database.updateChildren(childUpdates)
+        }*/
     }
 
     fun searchPlacesByCategory(category: Category, lat: String, lng: String) {

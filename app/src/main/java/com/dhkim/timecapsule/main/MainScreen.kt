@@ -37,6 +37,7 @@ import com.dhkim.camera.navigation.cameraNavigation
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.home.BottomPlace
 import com.dhkim.timecapsule.home.presentation.navigation.homeNavigation
+import com.dhkim.timecapsule.profile.presentation.navigation.profileNavigation
 import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.presentation.navigation.searchNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
@@ -51,10 +52,10 @@ fun MainScreen() {
     )
     val scaffoldState = rememberBottomSheetScaffoldState(state)
     val navController = rememberNavController()
-    val items = listOf(Screen.Home, Screen.AddTimeCapsule, Screen.TimeCapsule)
+    val items = listOf(Screen.Home, Screen.AddTimeCapsule, Screen.TimeCapsule, Screen.Profile)
     val isBottomNavShow = navController
         .currentBackStackEntryAsState()
-        .value?.destination?.route in listOf(Screen.Home.route, Screen.TimeCapsule.route)
+        .value?.destination?.route in listOf(Screen.Home.route, Screen.TimeCapsule.route, Screen.Profile.route)
     var selectedPlace: Place? by remember {
         mutableStateOf(null)
     }
@@ -143,8 +144,7 @@ fun MainScreen() {
             )
             cameraNavigation(
                 folderName = context.getString(R.string.app_name),
-                onNext = {
-                    imageUrl ->
+                onNext = { imageUrl ->
                     navController.popBackStack()
                     navController.currentBackStackEntry
                         ?.savedStateHandle
@@ -157,6 +157,9 @@ fun MainScreen() {
                     ?.savedStateHandle
                     ?.set("place", it)
             }
+            profileNavigation {
+                navController.popBackStack()
+            }
         }
     }
 }
@@ -165,6 +168,7 @@ sealed class Screen(
     val title: String, val selected: Int, val unSelected: Int, val route: String
 ) {
     object Home : Screen("홈", R.drawable.ic_home_primary, R.drawable.ic_home_black, "home")
-    object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, "timeCapsule")
     object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, "addTimeCapsule")
+    object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, "timeCapsule")
+    object Profile : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, "profile")
 }
