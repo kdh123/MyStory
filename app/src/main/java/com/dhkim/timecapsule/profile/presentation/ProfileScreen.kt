@@ -168,6 +168,7 @@ fun ProfileScreen(
                             RequestScreen(uiState = uiState)
                         }
                     }
+                    currentTab = pos
                 }
             }
         }
