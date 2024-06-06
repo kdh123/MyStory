@@ -122,7 +122,7 @@ fun ProfileScreen(
                             .align(Alignment.CenterVertically)
                     ) {
                         Text(
-                            text = "프로필",
+                            text = "친구",
                             modifier = Modifier
                                 .align(Alignment.Center),
                             fontWeight = FontWeight.Bold,
@@ -348,7 +348,7 @@ fun RequestScreen(uiState: ProfileUiState) {
     if (requests.isNotEmpty()) {
         FriendList(
             friends = requests,
-            title = "나에게 친구 요청한 사용자를 표시합니다.",
+            title = "나에게 친구 요청한 사용자를 노출합니다.",
             modifier = Modifier.fillMaxSize()
         )
     } else {
@@ -362,8 +362,17 @@ fun FriendScreen(uiState: ProfileUiState) {
     val requests = uiState.friends.filter { it.isPending }.map { it.id }
 
     Column {
+        Column {
+            Text(
+                text = "나",
+                color = colorResource(id = R.color.gray),
+                modifier = Modifier
+                    .padding(10.dp)
+            )
+            FriendItem(userId = "asitgox_", isMe = true)
+        }
         FriendList(friends = friends, title = "서로 승낙한 친구", modifier = Modifier.fillMaxWidth())
-        FriendList(friends = requests, title = "요청한 친구", modifier = Modifier.fillMaxSize())
+        FriendList(friends = requests, title = "내가 요청한 친구", modifier = Modifier.fillMaxSize())
     }
 }
 
@@ -399,7 +408,7 @@ fun FriendList(friends: List<UserId>, title: String, modifier: Modifier = Modifi
 }
 
 @Composable
-fun FriendItem(userId: String) {
+fun FriendItem(userId: String, isMe: Boolean = false) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -432,12 +441,14 @@ fun FriendItem(userId: String) {
 
             }
         ) {
-            Text(
-                text = "삭제",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(8.dp)
-            )
+            if (!isMe) {
+                Text(
+                    text = "삭제",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
         }
     }
 }
