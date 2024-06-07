@@ -1,5 +1,6 @@
 package com.dhkim.timecapsule
 
+import com.dhkim.timecapsule.common.DateUtil
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -30,5 +31,11 @@ class ExampleUnitTest {
         for (string in testStrings) {
             println("Does \"$string\" contain special characters? ${containsSpecialCharacters(string)}")
         }
+    }
+
+    @Test
+    fun `날짜 차이 테스트` () {
+        val gap = DateUtil.getDateGap("2024-06-4")
+        println("gap : $gap")
     }
 }

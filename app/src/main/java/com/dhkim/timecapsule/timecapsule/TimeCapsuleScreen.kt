@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.R
+import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleUiState
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleViewModel
@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var currentTab by remember { mutableIntStateOf(0) }
-    val titles = listOf("My", "수신",)
+    val titles = listOf("My", "수신")
     val pagerState = rememberPagerState(pageCount = {
         2
     })
@@ -106,7 +106,6 @@ fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
         HorizontalPager(state = pagerState) { pos ->
             when (pos) {
                 0 -> MyTimeCapsuleScreen(uiState = uiState)
-                1 -> MyTimeCapsuleScreen(uiState = uiState)
                 else -> MyTimeCapsuleScreen(uiState = uiState)
             }
         }
@@ -138,9 +137,10 @@ fun MyTimeCapsuleScreen(uiState: TimeCapsuleUiState) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTimeCapsuleItem(timeCapsule: MyTimeCapsule) {
+    val leftTime = DateUtil.getDateGap(newDate = timeCapsule.openDate)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -158,30 +158,27 @@ fun MyTimeCapsuleItem(timeCapsule: MyTimeCapsule) {
                 .align(Alignment.CenterVertically)
                 .padding(start = 5.dp)
         ) {
-            Text(
-                text = timeCapsule.openDate,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(text = timeCapsule.address)
-        }
-
-        Card(
-            border = BorderStroke(
-                width = 1.dp,
-                color = colorResource(id = R.color.primary)
-            ),
-            colors = CardDefaults.cardColors(Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-            onClick = {
-
+            if (leftTime <= 0) {
+                Text(
+                    text = "오픈 하기",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(id = R.color.primary)
+                )
+            } else {
+                Row {
+                    Text(
+                        text = "${leftTime}일 ",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "후에 오픈할 수 있습니다.",
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                    )
+                }
             }
-        ) {
-            Text(
-                text = "열기",
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(8.dp)
-            )
         }
     }
 }

@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 @SuppressLint("SimpleDateFormat")
 object DateUtil {
@@ -27,6 +30,24 @@ object DateUtil {
         }
 
         return realDate?.time ?: 0L
+    }
+
+    fun getDateGap(newDate: String): Long {
+        return try {
+            val afterDate = convertStringToDate(newDate)
+            TimeUnit.DAYS.convert(afterDate!!.time - Calendar.getInstance().time.time, TimeUnit.MILLISECONDS)
+        } catch (e: Exception) {
+            -1
+        }
+    }
+
+    fun convertStringToDate(strDate: String, pattern: String = "yyyy-MM-dd"): Date? {
+        val format = SimpleDateFormat(pattern, Locale.getDefault())
+        return try {
+            format.parse(strDate)
+        } catch (e: Exception) {
+            null
+        }
     }
 
     fun todayDate(): String {
