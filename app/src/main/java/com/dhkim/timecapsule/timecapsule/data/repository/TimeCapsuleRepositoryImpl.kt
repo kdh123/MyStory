@@ -1,9 +1,11 @@
 package com.dhkim.timecapsule.timecapsule.data.repository
 
-import com.dhkim.timecapsule.timecapsule.data.source.MyTimeCapsuleEntity
-import com.dhkim.timecapsule.timecapsule.data.source.ReceivedTimeCapsuleEntity
-import com.dhkim.timecapsule.timecapsule.data.source.SendTimeCapsuleEntity
-import com.dhkim.timecapsule.timecapsule.data.source.TimeCapsuleLocalDataSource
+import com.dhkim.timecapsule.common.CommonResult
+import com.dhkim.timecapsule.timecapsule.data.dataSource.local.MyTimeCapsuleEntity
+import com.dhkim.timecapsule.timecapsule.data.dataSource.local.ReceivedTimeCapsuleEntity
+import com.dhkim.timecapsule.timecapsule.data.dataSource.local.SendTimeCapsuleEntity
+import com.dhkim.timecapsule.timecapsule.data.dataSource.local.TimeCapsuleLocalDataSource
+import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.TimeCapsuleRemoteDataSource
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
@@ -12,9 +14,26 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+typealias isSuccessful = Boolean
+
 class TimeCapsuleRepositoryImpl @Inject constructor(
-    private val localDataSource: TimeCapsuleLocalDataSource
+    private val localDataSource: TimeCapsuleLocalDataSource,
+    private val remoteDataSource: TimeCapsuleRemoteDataSource
 ) : TimeCapsuleRepository {
+
+    override suspend fun sendTimeCapsule(
+        fcmToken: String,
+        friends: List<String>,
+        openDate: String,
+        content: String,
+        lat: String,
+        lng: String,
+        address: String
+    ): isSuccessful {
+        return remoteDataSource.sendTimeCapsule(
+            fcmToken, friends, openDate, content, lat, lng, address
+        ) is CommonResult.Success
+    }
 
     override suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>> {
         return localDataSource.getMyAllTimeCapsule().map { timeCapsules ->

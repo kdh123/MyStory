@@ -1,7 +1,9 @@
 package com.dhkim.timecapsule.timecapsule.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.timecapsule.timecapsule.data.repository.isSuccessful
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +44,23 @@ class TimeCapsuleViewModel @Inject constructor(
                 .collect {
                     _uiState.value = _uiState.value.copy(receivedTimeCapsules = it)
                 }
+        }
+    }
+
+    fun sendTimeCapsule(fcmToken: String,
+                        friends: List<String>,
+                        openDate: String,
+                        content: String,
+                        lat: String,
+                        lng: String,
+                        address: String
+    ) {
+        viewModelScope.launch {
+            val isSuccessful = timeCapsuleRepository.sendTimeCapsule(
+                fcmToken, friends, openDate, content, lat, lng, address
+            )
+
+            Log.e("tttt", "fcm : ${isSuccessful}")
         }
     }
 

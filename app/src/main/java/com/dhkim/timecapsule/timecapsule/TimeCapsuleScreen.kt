@@ -2,6 +2,8 @@ package com.dhkim.timecapsule.timecapsule
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -65,6 +68,25 @@ fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        Text(
+            color = Color.White,
+            text = "FCM",
+            fontSize = 24.sp,
+            modifier = Modifier
+                .padding(10.dp)
+                .background(color = colorResource(id = R.color.primary))
+                .clickable {
+                    viewModel.sendTimeCapsule(
+                        fcmToken = "e7UDvLQJSUi4V70vvHrsFq:APA91bFKk4CKVUbEaZdeWaac2RZ249rg-cUVz6M4sJgJXxC1PpaiPkVWzGprSFAxOu9kf9CeR-ET5jjUenZI3Uld9nWe5XR_g1QnLHFA58oQr9Wz03A2iU03iPEhO97HI0rQjB48FY0D",
+                        friends = listOf("dhkim"),
+                        openDate = "2024-09-10",
+                        content = "Hello World",
+                        lat = "23.233",
+                        lng = "23.4555",
+                        address = "서울시 강남구"
+                    )
+                })
+
         TabRow(
             selectedTabIndex = currentTab,
             indicator = { tabPositions ->

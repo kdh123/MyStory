@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.timecapsule.data.source
+package com.dhkim.timecapsule.timecapsule.data.dataSource.local
 
 import com.dhkim.timecapsule.common.data.room.AppDatabase
 import kotlinx.coroutines.flow.Flow

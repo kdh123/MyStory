@@ -37,11 +37,12 @@ constraintlayout = "2.1.4"
 firebase = "33.1.0"
 googleService = "4.4.2"
 dataStore = "1.0.0"
+fcm = "23.2.1"
 
 
 
 [libraries]
-
+google-firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "fcm" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "dataStore" }
 androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "dataStore" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "dataStore" }

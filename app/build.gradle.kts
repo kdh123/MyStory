@@ -36,7 +36,9 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "API_KEY", localProperties["API_KEY"] as String)
+        buildConfigField("String", "KAKAO_API_KEY", localProperties["KAKAO_API_KEY"] as String)
+        buildConfigField("String", "FCM_URL", localProperties["FCM_URL"] as String)
+        buildConfigField("String", "FCM_AUTHORIZATION", localProperties["FCM_AUTHORIZATION"] as String)
     }
 
     buildTypes {
@@ -126,4 +128,5 @@ dependencies {
     implementation(libs.androidx.datastore.core)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.google.firebase.messaging.ktx)
 }

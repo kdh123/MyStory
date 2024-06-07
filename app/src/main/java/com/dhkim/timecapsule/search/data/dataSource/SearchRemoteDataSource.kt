@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.dhkim.timecapsule.common.CommonResult
+import com.dhkim.timecapsule.common.data.di.RetrofitModule
 import com.dhkim.timecapsule.home.domain.Category
 import com.dhkim.timecapsule.search.domain.Address
 import com.dhkim.timecapsule.search.domain.Place
@@ -13,7 +14,7 @@ import retrofit2.Retrofit
 import javax.inject.Inject
 
 class SearchRemoteDataSource @Inject constructor(
-    private val api: Retrofit
+    @RetrofitModule.KakaoLocal private val api: Retrofit
 ) {
     private val service = api.create(SearchApi::class.java)
 
@@ -35,13 +36,11 @@ class SearchRemoteDataSource @Inject constructor(
             if (response.isSuccessful) {
                 CommonResult.Success(data = response.body()?.toAddress() ?: Address())
             } else {
-                val e = response.errorBody().toString()
                 CommonResult.Error(code = -1)
             }
         } catch (e: HttpException) {
             CommonResult.Error(e.code())
         } catch (e: Exception) {
-            val a = e.message
             CommonResult.Error(-1)
         }
     }

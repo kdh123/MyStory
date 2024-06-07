@@ -12,7 +12,7 @@ interface SearchApi {
 
     @GET("search/keyword")
     suspend fun getPlaceByKeyword(
-        @Header("Authorization") token: String = BuildConfig.API_KEY,
+        @Header("Authorization") token: String = BuildConfig.KAKAO_API_KEY,
         @Query("query") query: String,
         @Query("y") lat: String,
         @Query("x") lng: String,
@@ -23,7 +23,7 @@ interface SearchApi {
 
     @GET("search/category")
     suspend fun getPlaceByCategory(
-        @Header("Authorization") token: String = BuildConfig.API_KEY,
+        @Header("Authorization") token: String = BuildConfig.KAKAO_API_KEY,
         @Query("category_group_code") category: String,
         @Query("y") lat: String,
         @Query("x") lng: String,
@@ -34,7 +34,7 @@ interface SearchApi {
 
     @GET("geo/coord2regioncode.json")
     suspend fun getAddress(
-        @Header("Authorization") token: String = BuildConfig.API_KEY,
+        @Header("Authorization") token: String = BuildConfig.KAKAO_API_KEY,
         @Query("y") lat: String,
         @Query("x") lng: String
     ): Response<AddressDto>

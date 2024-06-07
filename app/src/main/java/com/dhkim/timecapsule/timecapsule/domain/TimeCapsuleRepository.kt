@@ -2,7 +2,19 @@ package com.dhkim.timecapsule.timecapsule.domain
 
 import kotlinx.coroutines.flow.Flow
 
+typealias isSuccessful = Boolean
+
 interface TimeCapsuleRepository {
+
+    suspend fun sendTimeCapsule(
+        fcmToken: String,
+        friends: List<String>,
+        openDate: String,
+        content: String,
+        lat: String,
+        lng: String,
+        address: String
+    ): isSuccessful
 
     suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>>
     suspend fun getMyTimeCapsule(id: String): MyTimeCapsule?

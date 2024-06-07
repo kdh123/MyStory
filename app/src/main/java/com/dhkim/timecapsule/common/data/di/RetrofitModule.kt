@@ -12,19 +12,41 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object RetrofitModule {
 
-    private const val SERVER_URL = "https://dapi.kakao.com/v2/local/"
+    private const val KAKAO_LOCAL_URL = "https://dapi.kakao.com/v2/local/"
+    private const val FCM_URL = BuildConfig.FCM_URL
 
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class KakaoLocal
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class Fcm
+
+    @KakaoLocal
     @Provides
     @Singleton
-    fun serverBuilder(client: OkHttpClient, gsonConverterFactory: GsonConverterFactory): Retrofit {
+    fun kakaoLocalServerBuilder(client: OkHttpClient, gsonConverterFactory: GsonConverterFactory): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(SERVER_URL)
+            .baseUrl(KAKAO_LOCAL_URL)
+            .client(client)
+            .addConverterFactory (gsonConverterFactory)
+            .build()
+    }
+
+    @Fcm
+    @Provides
+    @Singleton
+    fun fcmBuilder(client: OkHttpClient, gsonConverterFactory: GsonConverterFactory): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(FCM_URL)
             .client(client)
             .addConverterFactory (gsonConverterFactory)
             .build()
