@@ -73,7 +73,7 @@
             android:value="${NAVER_MAP_API_KEY}" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.TimeCapsule">
         </activity>

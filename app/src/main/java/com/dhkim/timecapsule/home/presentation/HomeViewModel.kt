@@ -92,16 +92,16 @@ class HomeViewModel @Inject constructor(
 
         //Firebase.database.getReference("users").addValueEventListener(postListener)
 
-        val user = User(
-            id = "dh4",
-            profileImageUrl = "aa",
-            friends = listOf(Friend("weee2"), Friend("fff", false), Friend("gg")),
-            requests = listOf("bbew", "ner", "zzz")
+        /*val user = User(
+            id = "dh3",
+            profileImageUrl = "uu",
+            friends = listOf(Friend("f1"), Friend("f2", false), Friend("f3")),
+            requests = listOf("hjh", "lolo", "xc")
         )
 
-        database.child("users").child("dh4").setValue(user)
+        database.child("users").child("dh").child("fcmToken").setValue("hieessff")*/
 
-        /*val key = "kdh1234"
+        /*val key = "dh3"
         if (key == null) {
             Log.e("nono", "Couldn't get push key for posts")
         } else {

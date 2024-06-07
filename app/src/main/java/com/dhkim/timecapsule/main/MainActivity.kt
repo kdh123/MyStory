@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule
+package com.dhkim.timecapsule.main
 
 import android.content.pm.PackageManager
 import android.os.Build
@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.dhkim.timecapsule.main.MainScreen
 import com.google.android.gms.tasks.OnCompleteListener
@@ -15,6 +16,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: MainViewModel by viewModels()
 
     // Declare the launcher at the top of your Activity/Fragment:
     private val requestPermissionLauncher = registerForActivityResult(
@@ -45,9 +48,11 @@ class MainActivity : ComponentActivity() {
             // Get new FCM registration token
             val token = task.result
 
+            viewModel.updateFcmToken(fcmToken = token)
             // Log and toast
 
             Log.e("fcm", "token $token")
+
         })
     }
 
