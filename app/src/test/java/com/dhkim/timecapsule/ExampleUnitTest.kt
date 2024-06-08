@@ -4,6 +4,7 @@ import com.dhkim.timecapsule.common.DateUtil
 import org.junit.Test
 
 import org.junit.Assert.*
+import kotlin.random.Random
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -37,5 +38,13 @@ class ExampleUnitTest {
     fun `날짜 차이 테스트` () {
         val gap = DateUtil.getDateGap("2024-06-4")
         println("gap : $gap")
+    }
+
+    @Test
+    fun `랜덤 테스트` () {
+        val random = (0..100_000_000_000).random()
+        repeat(100) {
+            println("random : ${(0..1_000_000_000).random()}")
+        }
     }
 }

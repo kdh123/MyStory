@@ -7,7 +7,7 @@ typealias isSuccessful = Boolean
 interface TimeCapsuleRepository {
 
     suspend fun sendTimeCapsule(
-        fcmToken: String,
+        myId: String,
         friends: List<String>,
         openDate: String,
         content: String,

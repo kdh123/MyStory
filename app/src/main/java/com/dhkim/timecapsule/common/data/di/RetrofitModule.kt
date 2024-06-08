@@ -20,6 +20,7 @@ import javax.inject.Singleton
 object RetrofitModule {
 
     private const val KAKAO_LOCAL_URL = "https://dapi.kakao.com/v2/local/"
+    private const val KAKAO_PUSH_URL = "https://kapi.kakao.com/v2/push/"
     private const val FCM_URL = BuildConfig.FCM_URL
 
     @Qualifier
@@ -28,7 +29,22 @@ object RetrofitModule {
 
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
+    annotation class KakaoPush
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
     annotation class Fcm
+
+    @KakaoPush
+    @Provides
+    @Singleton
+    fun kakaoPushServerBuilder(client: OkHttpClient, gsonConverterFactory: GsonConverterFactory): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(KAKAO_PUSH_URL)
+            .client(client)
+            .addConverterFactory (gsonConverterFactory)
+            .build()
+    }
 
     @KakaoLocal
     @Provides

@@ -13,9 +13,10 @@ import javax.inject.Inject
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 @AndroidEntryPoint
-class TimeCapsuleMessagingService @Inject constructor(
-    private val userRepository: UserRepository
-) : FirebaseMessagingService() {
+class TimeCapsuleMessagingService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var userRepository: UserRepository
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)

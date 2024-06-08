@@ -1,9 +1,8 @@
 package com.dhkim.timecapsule.timecapsule.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.timecapsule.timecapsule.data.repository.isSuccessful
+import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimeCapsuleViewModel @Inject constructor(
+    private val userRepository: UserRepository,
     private val timeCapsuleRepository: TimeCapsuleRepository
 ) : ViewModel() {
 
@@ -47,7 +47,7 @@ class TimeCapsuleViewModel @Inject constructor(
         }
     }
 
-    fun sendTimeCapsule(fcmToken: String,
+    fun sendTimeCapsule(
                         friends: List<String>,
                         openDate: String,
                         content: String,
@@ -56,11 +56,13 @@ class TimeCapsuleViewModel @Inject constructor(
                         address: String
     ) {
         viewModelScope.launch {
-            val isSuccessful = timeCapsuleRepository.sendTimeCapsule(
-                fcmToken, friends, openDate, content, lat, lng, address
+            val myId = userRepository.getMyId()
+            timeCapsuleRepository.sendTimeCapsule(
+                myId, friends, openDate, content, lat, lng, address
             )
 
-            Log.e("tttt", "fcm : ${isSuccessful}")
+
+            //userRepository.registerPush("e7UDvLQJSUi4V70vvHrsFq:APA91bFKk4CKVUbEaZdeWaac2RZ249rg-cUVz6M4sJgJXxC1PpaiPkVWzGprSFAxOu9kf9CeR-ET5jjUenZI3Uld9nWe5XR_g1QnLHFA58oQr9Wz03A2iU03iPEhO97HI0rQjB48FY0D")
         }
     }
 

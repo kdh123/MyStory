@@ -1,6 +1,5 @@
 package com.dhkim.timecapsule.timecapsule
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,10 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -77,13 +73,12 @@ fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
                 .background(color = colorResource(id = R.color.primary))
                 .clickable {
                     viewModel.sendTimeCapsule(
-                        fcmToken = "e7UDvLQJSUi4V70vvHrsFq:APA91bFKk4CKVUbEaZdeWaac2RZ249rg-cUVz6M4sJgJXxC1PpaiPkVWzGprSFAxOu9kf9CeR-ET5jjUenZI3Uld9nWe5XR_g1QnLHFA58oQr9Wz03A2iU03iPEhO97HI0rQjB48FY0D",
-                        friends = listOf("dhkim"),
+                        friends = listOf("8245"),
                         openDate = "2024-09-10",
-                        content = "Hello World",
+                        content = "마지막11",
                         lat = "23.233",
                         lng = "23.4555",
-                        address = "서울시 강남구"
+                        address = "부산시 동래구 온천동"
                     )
                 })
 

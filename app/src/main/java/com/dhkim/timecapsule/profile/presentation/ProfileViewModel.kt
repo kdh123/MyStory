@@ -13,6 +13,7 @@ import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -67,18 +68,18 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun searchUser() {
-        val myId = uiState.value.user.id
-        val searchResult = uiState.value.searchResult
+        viewModelScope.launch {
+            val myId = uiState.value.user.id
+            val searchResult = uiState.value.searchResult
 
-        database.child("users").child(searchResult.query).get().addOnSuccessListener { data ->
-            data.value?.let {
-                val isMe = searchResult.query == myId
-                _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = searchResult.query, isMe = isMe))
-            } ?: kotlin.run {
-                _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = ""))
+            userRepository.searchUser(searchResult.query).first()?.let { isExist ->
+                if (isExist) {
+                    val isMe = searchResult.query == myId
+                    _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = searchResult.query, isMe = isMe))
+                } else {
+                    _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = ""))
+                }
             }
-        }.addOnFailureListener {
-            _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(userId = ""))
         }
     }
 

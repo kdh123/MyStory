@@ -22,7 +22,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
 ) : TimeCapsuleRepository {
 
     override suspend fun sendTimeCapsule(
-        fcmToken: String,
+        myId: String,
         friends: List<String>,
         openDate: String,
         content: String,
@@ -31,7 +31,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         address: String
     ): isSuccessful {
         return remoteDataSource.sendTimeCapsule(
-            fcmToken, friends, openDate, content, lat, lng, address
+            myId, friends, openDate, content, lat, lng, address
         ) is CommonResult.Success
     }
 

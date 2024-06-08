@@ -1,8 +1,8 @@
 package com.dhkim.timecapsule.timecapsule.data.dataSource.remote
 
-import com.dhkim.timecapsule.BuildConfig
 import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.common.data.di.RetrofitModule
+import com.google.gson.Gson
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import javax.inject.Inject
@@ -10,13 +10,15 @@ import javax.inject.Inject
 typealias isSuccessful = Boolean
 
 class TimeCapsuleRemoteDataSource @Inject constructor(
-    @RetrofitModule.Fcm private val api: Retrofit
+    @RetrofitModule.Fcm private val api: Retrofit,
+    @RetrofitModule.KakaoPush private val pushApi: Retrofit
 ) {
 
     private val service = api.create(TimeCapsuleApi::class.java)
+    private val pushService = pushApi.create(TimeCapsuleApi::class.java)
 
     suspend fun sendTimeCapsule(
-        fcmToken: String,
+        myId: String,
         friends: List<String>,
         openDate: String,
         content: String,
@@ -24,29 +26,20 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
         lng: String,
         address: String
     ): CommonResult<isSuccessful> {
-        val friend = friends[0]
-        val sendTimeCapsuleData = SendTimeCapsuleData(
-            id = "${System.currentTimeMillis()}",
-            userId = friend,
-            openDate = openDate,
-            content = content,
-            lat = lat,
-            lng = lng,
-            address = address,
-            title = "${friend}님이 타임캡슐을 공유하였습니다.",
+        val data = CustomField(
+            sender = myId,
+            openDate, content, lat, lng, address
         )
-        val sendTImeCapsuleMessage = SendTimeCapsuleMessage(
-            token = fcmToken,
-            data = sendTimeCapsuleData
-        )
-        val sendTimeCapsuleDto = SendTimeCapsuleDto(
-            message = sendTImeCapsuleMessage
-        )
+        val gson = Gson()
+        val payload = PushMessage(FcmData(custom_field = data))
+
+        val friendsJson = gson.toJson(friends)
+        val payloadJson = gson.toJson(payload)
 
         return try {
-            val result = service.sendTimeCapsule(
-                url = BuildConfig.FCM_URL,
-                body = sendTimeCapsuleDto
+            val result = pushService.shareTimeCapsule(
+                toUserIds = friendsJson,
+                body = payloadJson
             )
 
             if (result.isSuccessful) {
@@ -61,3 +54,20 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
         }
     }
 }
+
+data class PushMessage(
+    val for_fcm: FcmData
+)
+
+data class FcmData(
+    val custom_field: CustomField
+)
+
+data class CustomField(
+    val sender: String,
+    val openDate: String,
+    val content: String,
+    val lat: String,
+    val lng: String,
+    val address: String
+)

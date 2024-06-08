@@ -37,6 +37,7 @@ android {
         }
 
         buildConfigField("String", "KAKAO_API_KEY", localProperties["KAKAO_API_KEY"] as String)
+        buildConfigField("String", "KAKAO_ADMIN_KEY", localProperties["KAKAO_ADMIN_KEY"] as String)
         buildConfigField("String", "FCM_URL", localProperties["FCM_URL"] as String)
         buildConfigField("String", "FCM_AUTHORIZATION", localProperties["FCM_AUTHORIZATION"] as String)
     }
