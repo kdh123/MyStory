@@ -56,13 +56,9 @@ class TimeCapsuleViewModel @Inject constructor(
                         address: String
     ) {
         viewModelScope.launch {
-            val myId = userRepository.getMyId()
-            timeCapsuleRepository.sendTimeCapsule(
-                myId, friends, openDate, content, lat, lng, address
+            timeCapsuleRepository.shareTimeCapsule(
+                friends, openDate, content, lat, lng, address
             )
-
-
-            //userRepository.registerPush("e7UDvLQJSUi4V70vvHrsFq:APA91bFKk4CKVUbEaZdeWaac2RZ249rg-cUVz6M4sJgJXxC1PpaiPkVWzGprSFAxOu9kf9CeR-ET5jjUenZI3Uld9nWe5XR_g1QnLHFA58oQr9Wz03A2iU03iPEhO97HI0rQjB48FY0D")
         }
     }
 

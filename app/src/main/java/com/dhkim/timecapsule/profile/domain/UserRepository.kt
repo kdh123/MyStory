@@ -14,6 +14,8 @@ interface UserRepository {
 
     suspend fun getFcmToken(): String
     suspend fun updateLocalFcmToken(fcmToken: String)
+    suspend fun getUuid(): String
+    suspend fun updateUuid(uuid: String)
     suspend fun updateRemoteFcmToken(fcmToken: String)
-    suspend fun registerPush(fcmToken: String): isSuccessful
+    suspend fun registerPush(uuid: String, fcmToken: String): isSuccessful
 }

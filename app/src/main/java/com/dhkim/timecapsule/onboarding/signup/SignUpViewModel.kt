@@ -2,11 +2,14 @@
 
 package com.dhkim.timecapsule.onboarding.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.timecapsule.profile.data.di.FirebaseModule
 import com.dhkim.timecapsule.profile.domain.UserRepository
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,12 +34,31 @@ class SignUpViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<SignUpSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
+    private var fcmToken = ""
+
+    init {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("fcm", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            fcmToken = task.result
+            Log.e("fcm", "token $fcmToken")
+        })
+    }
+
     fun onQuery(query: String) {
         _uiState.value = _uiState.value.copy(query = query)
     }
 
-    fun signUp(fcmToken: String) {
+    fun signUp() {
         viewModelScope.launch {
+            if (fcmToken.isEmpty()) {
+                _sideEffect.emit(SignUpSideEffect.Message(message = "로그인에 실패하였습니다."))
+                return@launch
+            }
+
             val userId = _uiState.value.query
 
             when {

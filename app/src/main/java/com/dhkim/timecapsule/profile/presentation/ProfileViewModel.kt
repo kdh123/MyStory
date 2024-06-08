@@ -37,9 +37,10 @@ class ProfileViewModel @Inject constructor(
 
         val userListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val myId = _uiState.value.user.id.ifEmpty { return }
                 val data = dataSnapshot.value as? Map<*, *>
-                val friends = (data?.get("dh") as? Map<*, *>)?.get("friends") as? List<Map<*, *>> ?: listOf()
-                val requests = (data?.get("dh") as? Map<*, *>)?.get("requests") as? List<String> ?: listOf()
+                val friends = (data?.get(myId) as? Map<*, *>)?.get("friends") as? List<Map<*, *>> ?: listOf()
+                val requests = (data?.get(myId) as? Map<*, *>)?.get("requests") as? List<String> ?: listOf()
                 val getFriends = friends.map {
                     Friend(it["id"] as String, it["pending"] as Boolean)
                 }

@@ -25,13 +25,20 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signUp(userId: String, fcmToken: String): isSuccessful {
-        val registerResult = remoteDataSource.registerPush(fcmToken)
+        val uuid = (0..10_000_000_000).random().toString()
+        val registerResult = remoteDataSource.registerPush(uuid, fcmToken)
 
         return when (registerResult) {
             is CommonResult.Success -> {
-                val isSuccessful = remoteDataSource.updateFcmToken(userId, fcmToken).catch { }.firstOrNull() ?: false
+                val user = User(id = userId, uuid = uuid)
+                val isSuccessful = remoteDataSource.updateUser(user).catch { }.firstOrNull() ?: false
+
                 if (isSuccessful) {
-                    localDataSource.updateUserId(userId = userId)
+                    localDataSource.run {
+                        updateUserId(userId = userId)
+                        updateUuid(uuid = uuid)
+                        updateFcmToken(fcmToken = fcmToken)
+                    }
                     true
                 } else {
                     false
@@ -75,6 +82,14 @@ class UserRepositoryImpl @Inject constructor(
         localDataSource.updateFcmToken(fcmToken = fcmToken)
     }
 
+    override suspend fun getUuid(): String {
+        return localDataSource.getUuid()
+    }
+
+    override suspend fun updateUuid(uuid: String) {
+        localDataSource.updateUuid(uuid)
+    }
+
     override suspend fun updateRemoteFcmToken(fcmToken: String) {
         val userId = getMyId()
         remoteDataSource.updateFcmToken(userId, fcmToken).catch { }
@@ -87,7 +102,7 @@ class UserRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun registerPush(fcmToken: String): isSuccessful {
-        return remoteDataSource.registerPush(fcmToken) is CommonResult.Success
+    override suspend fun registerPush(uuid: String, fcmToken: String): isSuccessful {
+        return remoteDataSource.registerPush(uuid, fcmToken) is CommonResult.Success
     }
 }

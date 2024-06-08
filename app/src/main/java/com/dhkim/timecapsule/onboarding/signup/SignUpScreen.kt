@@ -4,7 +4,6 @@ package com.dhkim.timecapsule.onboarding.signup
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,9 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -40,8 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.main.MainActivity
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.composable.LoadingProgressBar
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,9 +44,6 @@ fun SignUpScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var fcmToken by remember {
-        mutableStateOf("")
-    }
 
     LaunchedEffect(true) {
         viewModel.sideEffect.collect { sideEffect ->
@@ -69,24 +60,6 @@ fun SignUpScreen(
                 }
             }
         }
-    }
-
-    LaunchedEffect(true) {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("fcm", "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-
-            // Get new FCM registration token
-            //val token = task.result
-            fcmToken = task.result
-
-            // Log and toast
-
-            Log.e("fcm", "token $fcmToken")
-
-        })
     }
 
     Box(
@@ -149,13 +122,7 @@ fun SignUpScreen(
                 .padding(15.dp)
                 .align(Alignment.BottomCenter)
                 .clickable {
-                    if (fcmToken.isNotEmpty()) {
-                        viewModel.signUp(fcmToken)
-                    } else {
-                        Toast
-                            .makeText(context, "로그인에 실패하였습니다.", Toast.LENGTH_LONG)
-                            .show()
-                    }
+                    viewModel.signUp()
                 }
         )
 

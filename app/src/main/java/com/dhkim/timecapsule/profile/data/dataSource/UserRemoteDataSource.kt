@@ -1,6 +1,5 @@
 package com.dhkim.timecapsule.profile.data.dataSource
 
-import android.util.Log
 import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.common.data.di.RetrofitModule
 import com.dhkim.timecapsule.profile.data.di.FirebaseModule
@@ -40,13 +39,20 @@ class UserRemoteDataSource @Inject constructor(
         }
     }
 
-    fun updateUser(user: User) {
-        database.child("users").child(user.id).setValue(user)
+    fun updateUser(user: User): Flow<isSuccessful> {
+        return callbackFlow {
+            database.child("users").child(user.id).setValue(user).addOnSuccessListener {
+                trySend(true)
+            }.addOnFailureListener {
+                trySend(false)
+            }
+            awaitClose()
+        }
     }
 
-    fun updateFcmToken(userId: String, fcmToken: String): Flow<isSuccessful> {
+    fun updateFcmToken(userId: String, uuid: String): Flow<isSuccessful> {
         return callbackFlow {
-            database.child("users").child(userId).child("fcmToken").setValue(fcmToken)
+            database.child("users").child(userId).child("uuid").setValue(uuid)
                 .addOnSuccessListener {
                     trySend(true)
                 }
@@ -57,11 +63,10 @@ class UserRemoteDataSource @Inject constructor(
         }
     }
 
-    suspend fun registerPush(fcmToken: String): CommonResult<Int> {
+    suspend fun registerPush(uuid: String, fcmToken: String): CommonResult<Int> {
         return try {
             val deviceId = UUID.randomUUID().toString()
-            Log.e("deviceId", "id : $deviceId")
-            pushService.registerPush(uuid = "8245", deviceId = deviceId, pushToken = fcmToken).run {
+            pushService.registerPush(uuid = uuid, deviceId = deviceId, pushToken = fcmToken).run {
                 if (isSuccessful) {
                     CommonResult.Success(body() ?: -1)
                 } else {

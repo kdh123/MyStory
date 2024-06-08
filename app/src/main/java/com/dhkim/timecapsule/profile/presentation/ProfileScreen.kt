@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -356,7 +357,13 @@ fun RequestScreen(uiState: ProfileUiState) {
             modifier = Modifier.fillMaxSize()
         )
     } else {
-        Text(text = "요청 받은 친구가 없습니다.")
+        Text(
+            text = "요청 받은 친구가 없습니다.",
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxSize(),
+            textAlign = TextAlign.Center
+        )
     }
 }
 

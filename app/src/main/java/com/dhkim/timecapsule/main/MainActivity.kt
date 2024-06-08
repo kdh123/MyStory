@@ -9,7 +9,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import com.dhkim.timecapsule.main.MainScreen
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,7 +51,6 @@ class MainActivity : ComponentActivity() {
             // Log and toast
 
             Log.e("fcm", "token $token")
-
         })
     }
 
