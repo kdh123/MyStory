@@ -26,7 +26,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +41,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Switch
@@ -48,6 +51,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults.textFieldColors
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,6 +70,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -77,6 +83,7 @@ import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.timecapsule.domain.BaseTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
+import com.dhkim.timecapsule.timecapsule.domain.SharedFriend
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -99,6 +106,9 @@ fun AddTimeCapsuleScreen(
     val state = rememberStandardBottomSheetState(
         skipHiddenState = false
     )
+    val sharedFriendsBottomSheetState = rememberModalBottomSheetState()
+    var showSharedFriendsBottomSheet by remember { mutableStateOf(false) }
+
     val scrollState = rememberScrollState()
     val scaffoldState = rememberBottomSheetScaffoldState(state)
     var showBottomMenu = false
@@ -271,6 +281,21 @@ fun AddTimeCapsuleScreen(
             }
         }
     ) {
+        if (showSharedFriendsBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showSharedFriendsBottomSheet = false
+                },
+                sheetState = sharedFriendsBottomSheetState
+            ) {
+                SharedFriendList(
+                    modifier = Modifier.padding(bottom = 50.dp),
+                    sharedFriends = uiState.sharedFriends,
+                    onClickCheckBox = viewModel::checkSharedFriend
+                )
+            }
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -349,7 +374,7 @@ fun AddTimeCapsuleScreen(
                         resId = R.drawable.ic_face_black,
                         title = "친구와 공유하기",
                         subTitle = "사진은 친구에게 공유되지 않습니다.",
-                        isChecked = uiState.isSend
+                        isChecked = uiState.isShare
                     ) {
                         viewModel.setCheckSend(isChecked = it)
                         if (uiState.checkLocation) {
@@ -358,13 +383,15 @@ fun AddTimeCapsuleScreen(
                             }
                         }
                     }
-                    if (uiState.isSend) {
+                    if (uiState.isShare) {
                         MenuItem(
                             resId = -1,
                             title = "친구 목록",
                             subTitle = "서로 승낙한 친구에게만 공유할 수 있습니다. (최대 10명)"
                         ) {
-
+                            scope.launch {
+                                showSharedFriendsBottomSheet = true
+                            }
                         }
                     }
                 }
@@ -382,6 +409,89 @@ fun AddTimeCapsuleScreen(
                 viewModel.saveTimeCapsule(lat = "${currentLocation.latitude}", lng = "${currentLocation.longitude}")
             }
         }
+    }
+}
+
+@Composable
+private fun SharedFriendList(
+    modifier: Modifier = Modifier,
+    sharedFriends: List<SharedFriend>,
+    onClickCheckBox: (String) -> Unit
+) {
+    if (sharedFriends.isNotEmpty()) {
+        LazyColumn(
+            modifier = modifier
+        ) {
+            items(
+                items = sharedFriends,
+                key = {
+                    it.userId
+                }
+            ) {
+                SharedFriendItem(
+                    sharedFriend = it,
+                    onClickCheckBox = onClickCheckBox
+                )
+            }
+        }
+    } else {
+        Text(
+            textAlign = TextAlign.Center,
+            text = "친구가 존재하지 않습니다.",
+            modifier = modifier
+                .padding(bottom = 50.dp)
+                .fillMaxWidth()
+        )
+    }
+}
+
+
+@Composable
+private fun SharedFriendItem(
+    sharedFriend: SharedFriend,
+    onClickCheckBox: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+        Image(
+            painter = if (sharedFriend.isChecked) {
+                painterResource(id = R.drawable.ic_check_primary)
+            } else {
+                painterResource(id = R.drawable.ic_check_gray)
+            },
+            contentDescription = null,
+            modifier = Modifier
+                .padding(end = 10.dp)
+                .align(Alignment.CenterVertically)
+                .clickable {
+                    onClickCheckBox(sharedFriend.userId)
+                }
+        )
+
+        Text(
+            textAlign = TextAlign.Center,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            text = sharedFriend.userId,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SharedFriendItemPreview() {
+    val sharedFriend = SharedFriend(
+        userId = "hihi",
+        isChecked = true,
+        uuid = "12345"
+    )
+    SharedFriendItem(sharedFriend) {
+
     }
 }
 

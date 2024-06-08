@@ -16,7 +16,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.run {
                 if (getFcmToken().isEmpty()) {
-                    registerPush(getUuid(), fcmToken)
+                    registerPush(getMyUuid(), fcmToken)
                 }
             }
         }

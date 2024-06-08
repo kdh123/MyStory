@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.profile.data.di
+package com.dhkim.timecapsule.common.data.di
 
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database

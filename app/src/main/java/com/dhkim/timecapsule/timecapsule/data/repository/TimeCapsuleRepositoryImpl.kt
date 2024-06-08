@@ -60,7 +60,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun saveMyTimeCapsule(timeCapsule: MyTimeCapsule) {
         val entity = timeCapsule.run {
             MyTimeCapsuleEntity(
-                id, date, openDate, lat, lng, address, content, medias, checkLocation, isOpened
+                id, date, openDate, lat, lng, address, content, medias, checkLocation, isOpened, sharedFriends
             )
         }
 
@@ -70,7 +70,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun editMyTimeCapsule(timeCapsule: MyTimeCapsule) {
         val entity = timeCapsule.run {
             MyTimeCapsuleEntity(
-                id, date, openDate, lat, lng, address, content, medias, checkLocation, isOpened
+                id, date, openDate, lat, lng, address, content, medias, checkLocation, isOpened, sharedFriends
             )
         }
 
@@ -104,7 +104,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun saveSendTimeCapsule(timeCapsule: SendTimeCapsule) {
         val entity = timeCapsule.run {
             SendTimeCapsuleEntity(
-                id, date, openDate, receiver, lat, lng, address, content, checkLocation, isChecked
+                id, date, openDate, sharedFriends, lat, lng, address, content, checkLocation, isChecked
             )
         }
 
@@ -114,7 +114,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun editSendTimeCapsule(timeCapsule: SendTimeCapsule) {
         val entity = timeCapsule.run {
             SendTimeCapsuleEntity(
-                id, date, openDate, receiver, lat, lng, address, content, checkLocation, isChecked
+                id, date, openDate, sharedFriends, lat, lng, address, content, checkLocation, isChecked
             )
         }
 

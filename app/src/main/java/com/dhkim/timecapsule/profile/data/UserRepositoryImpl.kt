@@ -20,6 +20,10 @@ class UserRepositoryImpl @Inject constructor(
     private val remoteDataSource: UserRemoteDataSource
 ) : UserRepository {
 
+    override suspend fun getMyInfo(): Flow<User> {
+        return remoteDataSource.getMyInfo(myId = localDataSource.getUserId())
+    }
+
     override suspend fun getMyId(): String {
         return localDataSource.getUserId()
     }
@@ -74,6 +78,14 @@ class UserRepositoryImpl @Inject constructor(
         return flowOf(isExist)
     }
 
+    override suspend fun addFriends(userId: String): Flow<isSuccessful> {
+        return remoteDataSource.addFriend(myId = getMyId(), myUuid = getMyUuid(), userId = userId)
+    }
+
+    override suspend fun addRequests(userId: String): Flow<isSuccessful> {
+        return remoteDataSource.addRequest(myId = getMyId(), userId = userId)
+    }
+
     override suspend fun getFcmToken(): String {
         return localDataSource.getFcmToken()
     }
@@ -82,7 +94,7 @@ class UserRepositoryImpl @Inject constructor(
         localDataSource.updateFcmToken(fcmToken = fcmToken)
     }
 
-    override suspend fun getUuid(): String {
+    override suspend fun getMyUuid(): String {
         return localDataSource.getUuid()
     }
 

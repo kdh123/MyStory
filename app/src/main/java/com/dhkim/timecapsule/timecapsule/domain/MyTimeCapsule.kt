@@ -1,5 +1,6 @@
 package com.dhkim.timecapsule.timecapsule.domain
 
+import com.dhkim.timecapsule.profile.domain.UserId
 
 data class MyTimeCapsule(
     val id: String,
@@ -11,5 +12,6 @@ data class MyTimeCapsule(
     val content: String,
     val medias: List<String>,
     val checkLocation: Boolean,
-    val isOpened: Boolean
+    val isOpened: Boolean,
+    val sharedFriends: List<UserId>
 ): BaseTimeCapsule

@@ -1,6 +1,7 @@
 package com.dhkim.timecapsule.timecapsule.presentation
 
 import androidx.compose.runtime.Stable
+import com.dhkim.timecapsule.timecapsule.domain.SharedFriend
 
 @Stable
 data class AddTimeCapsuleUiState(
@@ -12,6 +13,6 @@ data class AddTimeCapsuleUiState(
     val openDate: String = "",
     val address: String = "",
     val checkLocation: Boolean = false,
-    val isSend: Boolean = false,
-    val receiver: String = ""
+    val isShare: Boolean = false,
+    val sharedFriends: List<SharedFriend> = listOf()
 )

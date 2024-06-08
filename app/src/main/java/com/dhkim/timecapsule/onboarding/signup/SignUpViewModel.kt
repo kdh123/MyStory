@@ -5,10 +5,8 @@ package com.dhkim.timecapsule.onboarding.signup
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.timecapsule.profile.data.di.FirebaseModule
 import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,8 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    @FirebaseModule.FirebaseDatabase private val database: DatabaseReference,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignUpUiState())
@@ -103,7 +100,7 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    fun containsSpecialCharacters(input: String): Boolean {
+    private fun containsSpecialCharacters(input: String): Boolean {
         val specialCharactersPattern = Regex("[^a-zA-Z0-9 ]") // 알파벳, 숫자, 공백 제외한 모든 문자
         return specialCharactersPattern.containsMatchIn(input)
     }

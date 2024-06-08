@@ -352,7 +352,7 @@ fun RequestScreen(uiState: ProfileUiState) {
 
     if (requests.isNotEmpty()) {
         FriendList(
-            friends = requests,
+            friends = requests.map { it.id },
             title = "나에게 친구 요청한 사용자를 노출합니다.",
             modifier = Modifier.fillMaxSize()
         )

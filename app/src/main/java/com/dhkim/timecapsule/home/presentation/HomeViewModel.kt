@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.dhkim.timecapsule.home.HomeAction
 import com.dhkim.timecapsule.home.domain.Category
 import com.dhkim.timecapsule.profile.domain.Friend
 import com.dhkim.timecapsule.profile.domain.User
+import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.domain.SearchRepository
 import com.google.firebase.database.DataSnapshot
@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -29,7 +31,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val searchRepository: SearchRepository
+    private val searchRepository: SearchRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private lateinit var database: DatabaseReference
@@ -41,21 +44,16 @@ class HomeViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<HomeSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    fun onAction(action: HomeAction) {
-        when (action) {
-            is HomeAction.OnSearchPlacesByCategory -> {
-                with(action) {
-                    searchPlacesByCategory(
-                        category = category,
-                        lat = lat,
-                        lng = lng
-                    )
-                }
-            }
-        }
-    }
 
     init {
+        /*viewModelScope.launch {
+            userRepository.getMyInfo().catch {  }
+                .collect {
+                    val a = it
+                    Log.e("user", "user33 : $it")
+                }
+        }*/
+
         database = Firebase.database.reference
 
         val postListener = object : ValueEventListener {
@@ -65,21 +63,18 @@ class HomeViewModel @Inject constructor(
                 Log.e("user", "user22wer : ${data}")
 
                 if (data != null) {
-                    val getData = data!!["dh"] as? Map<*, *>
+                    val getData = data["uuuuooo"] as? Map<*, *>
                     if (getData != null) {
-                        Log.e("user", "user2222rr : ${getData!!["id"]}")
-                        Log.e("user", "user3333rr : ${getData!!["profileImageUrl"]}")
-                        Log.e("user", "user4444rr : ${getData!!["friends"]}")
-                        Log.e("user", "user4444rr : ${getData!!["requests"]}")
+                        Log.e("user", "user2222rr : ${getData["id"]}")
+                        Log.e("user", "user3333rr : ${getData["profileImageUrl"]}")
+                        Log.e("user", "user4444rr : ${getData["friends"]}")
+                        Log.e("user", "user4444rr : ${getData["requests"]}")
 
                         val friends = getData["friends"] as? List<Map<*, *>>
                         val friend = friends?.get(0)?.get("id") ?: "No"
                         Log.e("friend", "freind : $friend")
                     }
-
                 }
-
-
 
                 // ...
             }
@@ -90,16 +85,28 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        //Firebase.database.getReference("users").addValueEventListener(postListener)
+        //Firebase.database.getReference("users").child("uuuuooo").addValueEventListener(postListener)
 
-        /*val user = User(
+        val user = User(
             id = "dh3",
             profileImageUrl = "uu",
-            friends = listOf(Friend("f1"), Friend("f2", false), Friend("f3")),
-            requests = listOf("hjh", "lolo", "xc")
+            friends = listOf(Friend("f1"), Friend("f2"), Friend("f3")),
+            requests = listOf(Friend("f1"), Friend("f2"), Friend("f3"))
         )
 
-        database.child("users").child("dh").child("fcmToken").setValue("hieessff")*/
+        viewModelScope.launch {
+            userRepository.addFriends(userId = "qwer1234").catch {  }.firstOrNull()
+        }
+
+
+        /*database
+            .child("users").child("dh4")
+            .child("friends").child("friend1").setValue(Friend(id = "id2", uuid = "uid23"))
+
+            database
+            .child("users").child("dh4")
+            .child("friends").child("friend1").setValue(null)
+            */
 
         /*val key = "dh3"
         if (key == null) {

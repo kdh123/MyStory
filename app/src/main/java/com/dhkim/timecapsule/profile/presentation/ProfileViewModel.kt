@@ -2,17 +2,14 @@ package com.dhkim.timecapsule.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.timecapsule.profile.data.di.FirebaseModule
-import com.dhkim.timecapsule.profile.domain.Friend
+import com.dhkim.timecapsule.common.data.di.FirebaseModule
 import com.dhkim.timecapsule.profile.domain.User
 import com.dhkim.timecapsule.profile.domain.UserRepository
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,32 +32,17 @@ class ProfileViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(user = User().copy(id = myId))
         }
 
-        val userListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val myId = _uiState.value.user.id.ifEmpty { return }
-                val data = dataSnapshot.value as? Map<*, *>
-                val friends = (data?.get(myId) as? Map<*, *>)?.get("friends") as? List<Map<*, *>> ?: listOf()
-                val requests = (data?.get(myId) as? Map<*, *>)?.get("requests") as? List<String> ?: listOf()
-                val getFriends = friends.map {
-                    Friend(it["id"] as String, it["pending"] as Boolean)
+        viewModelScope.launch {
+            userRepository.getMyInfo()
+                .catch {  }
+                .collect {
+                    if (it.id.isNotEmpty()) {
+                        _uiState.value = _uiState.value.copy(isLoading = false, user = it)
+                    } else {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                    }
                 }
-                val currentUser = _uiState.value.user
-
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    user = currentUser.copy(
-                        friends = getFriends,
-                        requests = requests
-                    )
-                )
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                _uiState.value = _uiState.value.copy(isLoading = false)
-            }
         }
-
-        userDatabase.addValueEventListener(userListener)
     }
 
     fun onQuery(query: String) {
@@ -85,17 +67,21 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun addFriend() {
-        val searchUserId = _uiState.value.searchResult.userId
-        val friendsIds = _uiState.value.user.friends.map { it.id }
-        val requests = _uiState.value.user.requests
-        if (friendsIds.contains(searchUserId) || requests.contains(searchUserId)) {
+        viewModelScope.launch {
+            val searchUserId = _uiState.value.searchResult.userId
+            val friendsIds = _uiState.value.user.friends.map { it.id }
+            val requestIds = _uiState.value.user.requests.map { it.id }
 
-        } else {
-            val friends = _uiState.value.user.friends.toMutableList().apply {
-                add(Friend(id = searchUserId, isPending = true))
+            if (friendsIds.contains(searchUserId) || requestIds.contains(searchUserId)) {
+
+            } else {
+                userRepository.addFriends(searchUserId).catch { }
+                    .collect { isSuccessful ->
+                        if (!isSuccessful) {
+
+                        }
+                    }
             }
-            val user = _uiState.value.user.copy(friends = friends)
-            userRepository.updateUser(user = user)
         }
     }
 }

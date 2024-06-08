@@ -7,10 +7,11 @@ data class User(
     val uuid: String = "",
     val profileImageUrl: String = "",
     val friends: List<Friend> = listOf(),
-    val requests: List<UserId> = listOf()
+    val requests: List<Friend> = listOf()
 )
 
 data class Friend(
     val id: String = "",
+    val uuid: String = "",
     val isPending: Boolean = true
 )

@@ -213,7 +213,8 @@ private fun MyTimeCapsulePreview() {
         content = "내 타임캡슐",
         medias = listOf(),
         checkLocation = true,
-        isOpened = false
+        isOpened = false,
+        sharedFriends = listOf()
     )
 
     MyTimeCapsuleItem(timeCapsule = timeCapsule)

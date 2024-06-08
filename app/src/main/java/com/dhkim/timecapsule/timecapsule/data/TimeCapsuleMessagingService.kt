@@ -41,7 +41,7 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
 
         CoroutineScope(Dispatchers.IO).launch {
             userRepository.run {
-                val isSuccessful = registerPush(uuid = getUuid(), fcmToken = token)
+                val isSuccessful = registerPush(uuid = getMyUuid(), fcmToken = token)
                 if (isSuccessful) {
                     updateLocalFcmToken(fcmToken = token)
                 } else {
