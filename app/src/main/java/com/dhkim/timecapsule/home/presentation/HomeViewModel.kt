@@ -94,9 +94,9 @@ class HomeViewModel @Inject constructor(
             requests = listOf(Friend("f1"), Friend("f2"), Friend("f3"))
         )
 
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             userRepository.addFriends(userId = "qwer1234").catch {  }.firstOrNull()
-        }
+        }*/
 
 
         /*database

@@ -8,18 +8,18 @@ import retrofit2.Retrofit
 import javax.inject.Inject
 
 typealias isSuccessful = Boolean
+typealias Uuid = String
 
 class TimeCapsuleRemoteDataSource @Inject constructor(
     @RetrofitModule.Fcm private val api: Retrofit,
     @RetrofitModule.KakaoPush private val pushApi: Retrofit
 ) {
 
-    private val service = api.create(TimeCapsuleApi::class.java)
     private val pushService = pushApi.create(TimeCapsuleApi::class.java)
 
-    suspend fun sendTimeCapsule(
+    suspend fun shareTimeCapsule(
         myId: String,
-        friends: List<String>,
+        sharedFriends: List<Uuid>,
         openDate: String,
         content: String,
         lat: String,
@@ -33,7 +33,7 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
         val gson = Gson()
         val payload = PushMessage(FcmData(custom_field = data))
 
-        val friendsJson = gson.toJson(friends)
+        val friendsJson = gson.toJson(sharedFriends)
         val payloadJson = gson.toJson(payload)
 
         return try {

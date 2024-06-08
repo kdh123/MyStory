@@ -15,9 +15,9 @@ class MainViewModel @Inject constructor(
     fun updateFcmToken(fcmToken: String) {
         viewModelScope.launch {
             userRepository.run {
-                if (getFcmToken().isEmpty()) {
+                /*if (getFcmToken().isEmpty()) {
                     registerPush(getMyUuid(), fcmToken)
-                }
+                }*/
             }
         }
     }

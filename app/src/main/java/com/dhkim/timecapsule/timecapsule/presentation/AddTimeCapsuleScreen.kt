@@ -384,10 +384,20 @@ fun AddTimeCapsuleScreen(
                         }
                     }
                     if (uiState.isShare) {
+                        val title = StringBuilder()
+                        val checkedSharedFriends = uiState.sharedFriends.filter { it.isChecked }
+                        checkedSharedFriends.forEachIndexed { index, item ->
+                            if (index < checkedSharedFriends.size - 1) {
+                                title.append("${item.userId}, ")
+                            } else {
+                                title.append(item.userId)
+                            }
+                        }
+
                         MenuItem(
                             resId = -1,
-                            title = "친구 목록",
-                            subTitle = "서로 승낙한 친구에게만 공유할 수 있습니다. (최대 10명)"
+                            title = title.toString().ifEmpty { title.append("친구 목록").toString() },
+                            subTitle = "서로 승낙한 친구에게만 공유할 수 있습니다."
                         ) {
                             scope.launch {
                                 showSharedFriendsBottomSheet = true
@@ -455,6 +465,9 @@ private fun SharedFriendItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
+            .clickable {
+                onClickCheckBox(sharedFriend.userId)
+            }
     ) {
         Image(
             painter = if (sharedFriend.isChecked) {
@@ -466,12 +479,10 @@ private fun SharedFriendItem(
             modifier = Modifier
                 .padding(end = 10.dp)
                 .align(Alignment.CenterVertically)
-                .clickable {
-                    onClickCheckBox(sharedFriend.userId)
-                }
         )
 
         Text(
+            fontSize = 16.sp,
             textAlign = TextAlign.Center,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
@@ -713,7 +724,9 @@ private fun MenuItem(resId: Int, title: String, subTitle: String = "", onClick: 
         ) {
             Text(
                 text = title,
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             if (subTitle.isNotEmpty()) {
                 Text(

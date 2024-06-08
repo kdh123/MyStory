@@ -104,11 +104,24 @@ class AddTimeCapsuleViewModel @Inject constructor(
                             content = content,
                             checkLocation = checkLocation,
                             isOpened = false,
-                            sharedFriends = sharedFriends.map { it.userId }
+                            sharedFriends = sharedFriends.filter { it.isChecked }.map { it.userId }
                         )
 
-                        timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = timeCapsule)
-                        _sideEffect.emit(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
+                        val isSuccessful = timeCapsuleRepository.shareTimeCapsule(
+                            sharedFriends = sharedFriends.filter { it.isChecked }.map { it.uuid },
+                            openDate = openDate,
+                            content = content,
+                            lat = lat,
+                            lng = lng,
+                            address = address
+                        )
+
+                        if (isSuccessful) {
+                            timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = timeCapsule)
+                            _sideEffect.emit(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
+                        } else {
+                            _sideEffect.emit(AddTimeCapsuleSideEffect.Message(message = "저장에 실패하였습니다."))
+                        }
                     }
                 }
             }

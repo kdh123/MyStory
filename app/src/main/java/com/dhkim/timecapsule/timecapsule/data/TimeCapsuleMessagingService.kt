@@ -39,7 +39,7 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
-        CoroutineScope(Dispatchers.IO).launch {
+        /*CoroutineScope(Dispatchers.IO).launch {
             userRepository.run {
                 val isSuccessful = registerPush(uuid = getMyUuid(), fcmToken = token)
                 if (isSuccessful) {
@@ -48,6 +48,6 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
                     updateLocalFcmToken(fcmToken = "")
                 }
             }
-        }
+        }*/
     }
 }

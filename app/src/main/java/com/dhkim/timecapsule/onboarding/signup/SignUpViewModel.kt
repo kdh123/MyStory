@@ -77,7 +77,7 @@ class SignUpViewModel @Inject constructor(
                     userRepository.searchUser(query).flatMapConcat { isExist ->
                         if (isExist != null) {
                             if (isExist) {
-                                _uiState.value = _uiState.value.copy(errorMessage = "이미 존재하는 아이디입니다.")
+                                _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = "이미 존재하는 아이디입니다.")
                                 flowOf(false)
                             } else {
                                 flowOf(userRepository.signUp(userId = query, fcmToken))

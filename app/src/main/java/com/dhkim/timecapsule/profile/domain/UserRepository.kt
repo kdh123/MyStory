@@ -15,6 +15,7 @@ interface UserRepository {
 
     suspend fun addFriends(userId: String): Flow<isSuccessful>
     suspend fun addRequests(userId: String): Flow<isSuccessful>
+    suspend fun acceptFriend(userId: String, userUuid: String): Flow<isSuccessful>
 
     suspend fun getFcmToken(): String
     suspend fun updateLocalFcmToken(fcmToken: String)

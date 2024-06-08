@@ -64,24 +64,6 @@ fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            color = Color.White,
-            text = "FCM",
-            fontSize = 24.sp,
-            modifier = Modifier
-                .padding(10.dp)
-                .background(color = colorResource(id = R.color.primary))
-                .clickable {
-                    viewModel.sendTimeCapsule(
-                        friends = listOf("8245"),
-                        openDate = "2024-09-10",
-                        content = "마지막11",
-                        lat = "23.233",
-                        lng = "23.4555",
-                        address = "부산시 동래구 온천동"
-                    )
-                })
-
         TabRow(
             selectedTabIndex = currentTab,
             indicator = { tabPositions ->
@@ -183,17 +165,32 @@ fun MyTimeCapsuleItem(timeCapsule: MyTimeCapsule) {
                     color = colorResource(id = R.color.primary)
                 )
             } else {
-                Row {
-                    Text(
-                        text = "${leftTime}일 ",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = "후에 오픈할 수 있습니다.",
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                    )
+                Column {
+                    Row {
+                        Text(
+                            text = "${leftTime}일 ",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = "후에 오픈할 수 있습니다.",
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+                    if(timeCapsule.sharedFriends.isNotEmpty()) {
+                        val count = timeCapsule.sharedFriends.size
+                        val sharedText = if (count == 1) {
+                            "${timeCapsule.sharedFriends[0]}에게 공유하였습니다."
+                        } else {
+                            "${timeCapsule.sharedFriends[0]} 외 ${count - 1}명에게 공유하였습니다."
+                        }
+                        Text(
+                            text = sharedText,
+                            fontSize = 14.sp,
+                            color = colorResource(id = R.color.gray)
+                        )
+                    }
                 }
             }
         }

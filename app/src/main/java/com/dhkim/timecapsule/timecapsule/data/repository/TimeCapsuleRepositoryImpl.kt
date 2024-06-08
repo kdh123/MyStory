@@ -7,6 +7,7 @@ import com.dhkim.timecapsule.timecapsule.data.dataSource.local.ReceivedTimeCapsu
 import com.dhkim.timecapsule.timecapsule.data.dataSource.local.SendTimeCapsuleEntity
 import com.dhkim.timecapsule.timecapsule.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.TimeCapsuleRemoteDataSource
+import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.Uuid
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
@@ -24,7 +25,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
 ) : TimeCapsuleRepository {
 
     override suspend fun shareTimeCapsule(
-        friends: List<String>,
+        sharedFriends: List<Uuid>,
         openDate: String,
         content: String,
         lat: String,
@@ -32,8 +33,8 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         address: String
     ): isSuccessful {
         val myId = userRepository.getMyId()
-        return remoteDataSource.sendTimeCapsule(
-            myId, friends, openDate, content, lat, lng, address
+        return remoteDataSource.shareTimeCapsule(
+            myId, sharedFriends, openDate, content, lat, lng, address
         ) is CommonResult.Success
     }
 

@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.dhkim.timecapsule.profile.presentation
 
@@ -55,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.composable.LoadingProgressBar
+import com.dhkim.timecapsule.profile.domain.Friend
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -192,11 +193,15 @@ fun ProfileScreen(
                 HorizontalPager(state = pagerState) { pos ->
                     when (pos) {
                         0 -> {
-                            FriendScreen(uiState = uiState)
+                            FriendScreen(uiState = uiState, onClick = remember(viewModel) {
+                                viewModel::onDeleteFriend
+                            })
                         }
 
                         else -> {
-                            RequestScreen(uiState = uiState)
+                            RequestScreen(uiState = uiState, onClick = remember(viewModel) {
+                                viewModel::acceptFriend
+                            })
                         }
                     }
                     currentTab = pos
@@ -347,13 +352,13 @@ private fun ProfileScreenPreview() {
 }
 
 @Composable
-fun RequestScreen(uiState: ProfileUiState) {
+fun RequestScreen(uiState: ProfileUiState, onClick: (Friend) -> Unit) {
     val requests = uiState.user.requests
-
     if (requests.isNotEmpty()) {
-        FriendList(
-            friends = requests.map { it.id },
+        RequestList(
+            friends = requests,
             title = "나에게 친구 요청한 사용자를 노출합니다.",
+            onClick = onClick,
             modifier = Modifier.fillMaxSize()
         )
     } else {
@@ -368,7 +373,7 @@ fun RequestScreen(uiState: ProfileUiState) {
 }
 
 @Composable
-fun FriendScreen(uiState: ProfileUiState) {
+fun FriendScreen(uiState: ProfileUiState, onClick: () -> Unit) {
     val friends = uiState.user.friends.filter { !it.isPending }.map { it.id }
     val requests = uiState.user.friends.filter { it.isPending }.map { it.id }
 
@@ -380,15 +385,69 @@ fun FriendScreen(uiState: ProfileUiState) {
                 modifier = Modifier
                     .padding(10.dp)
             )
-            FriendItem(userId = uiState.user.id, isMe = true)
+            FriendItem(userId = uiState.user.id, buttonText = "삭제", isMe = true, onClick = onClick)
         }
-        FriendList(friends = friends, title = "서로 승낙한 친구", modifier = Modifier.fillMaxWidth())
-        FriendList(friends = requests, title = "내가 요청한 친구", modifier = Modifier.fillMaxSize())
+        FriendList(
+            friends = friends,
+            title = "서로 승낙한 친구",
+            buttonText = "삭제",
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onClick
+        )
+        FriendList(
+            friends = requests,
+            title = "내가 요청한 친구",
+            buttonText = "삭제",
+            modifier = Modifier.fillMaxSize(),
+            onClick = onClick
+        )
     }
 }
 
 @Composable
-fun FriendList(friends: List<UserId>, title: String, modifier: Modifier = Modifier) {
+fun RequestList(
+    friends: List<Friend>,
+    title: String,
+    onClick: (Friend) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column {
+        Text(
+            text = title,
+            color = colorResource(id = R.color.gray),
+            modifier = Modifier
+                .padding(10.dp)
+        )
+        LazyColumn(modifier = modifier) {
+            itemsIndexed(
+                items = friends, key = { _, item ->
+                    item.id
+                }
+            ) { index, item ->
+                if (index == friends.size - 1) {
+                    RequestItem(friend = item, onClick = onClick)
+                } else {
+                    RequestItem(friend = item, onClick = onClick)
+                    Divider(
+                        color = colorResource(id = R.color.light_gray),
+                        modifier = Modifier
+                            .height(1.dp)
+                            .fillMaxWidth()
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FriendList(
+    friends: List<UserId>,
+    title: String,
+    buttonText: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column {
         Text(
             text = title,
@@ -403,9 +462,9 @@ fun FriendList(friends: List<UserId>, title: String, modifier: Modifier = Modifi
                 }
             ) { index, item ->
                 if (index == friends.size - 1) {
-                    FriendItem(userId = item)
+                    FriendItem(userId = item, buttonText = buttonText, onClick = onClick)
                 } else {
-                    FriendItem(userId = item)
+                    FriendItem(userId = item, buttonText = buttonText, onClick = onClick)
                     Divider(
                         color = colorResource(id = R.color.light_gray),
                         modifier = Modifier
@@ -419,7 +478,52 @@ fun FriendList(friends: List<UserId>, title: String, modifier: Modifier = Modifi
 }
 
 @Composable
-fun FriendItem(userId: String, isMe: Boolean = false) {
+fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+        Image(
+            painter = painterResource(id = R.mipmap.ic_box),
+            contentDescription = null,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+        Text(
+            text = friend.id,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .width(0.dp)
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+                .padding(start = 5.dp)
+        )
+
+        Card(
+            border = BorderStroke(
+                width = 1.dp,
+                color = colorResource(id = R.color.primary)
+            ),
+            colors = CardDefaults.cardColors(colorResource(id = R.color.primary)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 20.dp),
+            onClick = {
+                onClick(friend)
+            }
+        ) {
+            Text(
+                text = "승낙",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(8.dp)
+            )
+
+        }
+    }
+}
+
+@Composable
+fun FriendItem(userId: String, buttonText: String, isMe: Boolean = false, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -454,7 +558,7 @@ fun FriendItem(userId: String, isMe: Boolean = false) {
         ) {
             if (!isMe) {
                 Text(
-                    text = "삭제",
+                    text = buttonText,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(8.dp)
@@ -468,5 +572,7 @@ fun FriendItem(userId: String, isMe: Boolean = false) {
 @Composable
 private fun FriendItemPreview() {
 
-    FriendItem(userId = "dh")
+    FriendItem(userId = "dh", buttonText = "삭제") {
+
+    }
 }

@@ -1,5 +1,6 @@
 package com.dhkim.timecapsule.timecapsule.domain
 
+import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.Uuid
 import kotlinx.coroutines.flow.Flow
 
 typealias isSuccessful = Boolean
@@ -7,7 +8,7 @@ typealias isSuccessful = Boolean
 interface TimeCapsuleRepository {
 
     suspend fun shareTimeCapsule(
-        friends: List<String>,
+        sharedFriends: List<Uuid>,
         openDate: String,
         content: String,
         lat: String,

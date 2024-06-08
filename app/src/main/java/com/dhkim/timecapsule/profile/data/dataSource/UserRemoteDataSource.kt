@@ -44,7 +44,7 @@ class UserRemoteDataSource @Inject constructor(
                         Friend(
                             id = data["id"] as? String ?: "",
                             uuid = data["uuid"] as? String ?: "",
-                            isPending = data["isPending"] as? Boolean ?: true,
+                            isPending = data["pending"] as? Boolean ?: true,
                         )
                     } ?: listOf()
 
@@ -54,7 +54,7 @@ class UserRemoteDataSource @Inject constructor(
                         Friend(
                             id = data["id"] as? String ?: "",
                             uuid = data["uuid"] as? String ?: "",
-                            isPending = data["isPending"] as? Boolean ?: true,
+                            isPending = data["pending"] as? Boolean ?: true,
                         )
                     } ?: listOf()
 
@@ -109,6 +109,25 @@ class UserRemoteDataSource @Inject constructor(
         }
     }
 
+    fun acceptFriend(myId: String, myUuid: String, userId: String, userUuid: String): Flow<isSuccessful> {
+        return callbackFlow {
+            val childUpdates = hashMapOf<String, Any?>(
+                "/users/$myId/requests/$userId" to null,
+                "/users/$myId/friends/$userId" to Friend(id = userId, uuid = userUuid, isPending = false),
+                "/users/$userId/friends/$myId" to Friend(id = myId, uuid = myUuid, isPending = false)
+            )
+
+            database.updateChildren(childUpdates)
+                .addOnSuccessListener {
+                    trySend(true)
+                }.addOnFailureListener {
+                    trySend(false)
+                }
+
+            awaitClose()
+        }
+    }
+
     fun addFriend(myId: String, myUuid: String, userId: String): Flow<isSuccessful> {
         return callbackFlow {
             val childUpdates = hashMapOf<String, Any>(
@@ -155,6 +174,7 @@ class UserRemoteDataSource @Inject constructor(
     suspend fun registerPush(uuid: String, fcmToken: String): CommonResult<Int> {
         return try {
             val deviceId = UUID.randomUUID().toString()
+            Log.e("register", "uuid: $uuid, deviceId: $deviceId, fcmToken: $fcmToken")
             pushService.registerPush(uuid = uuid, deviceId = deviceId, pushToken = fcmToken).run {
                 if (isSuccessful) {
                     CommonResult.Success(body() ?: -1)

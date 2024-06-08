@@ -2,10 +2,9 @@ package com.dhkim.timecapsule.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.timecapsule.common.data.di.FirebaseModule
+import com.dhkim.timecapsule.profile.domain.Friend
 import com.dhkim.timecapsule.profile.domain.User
 import com.dhkim.timecapsule.profile.domain.UserRepository
-import com.google.firebase.database.DatabaseReference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,9 +17,7 @@ typealias UserId = String
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    @FirebaseModule.FirebaseDatabase private val database: DatabaseReference,
-    @FirebaseModule.UserFirebaseDatabase private val userDatabase: DatabaseReference
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -48,6 +45,21 @@ class ProfileViewModel @Inject constructor(
     fun onQuery(query: String) {
         val searchResult = _uiState.value.searchResult
         _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(query = query))
+    }
+
+    fun onDeleteFriend() {
+        viewModelScope.launch {
+
+        }
+    }
+
+    fun acceptFriend(friend: Friend) {
+        viewModelScope.launch {
+            userRepository.acceptFriend(friend.id, friend.uuid).catch { }
+                .collect {
+
+                }
+        }
     }
 
     fun searchUser() {

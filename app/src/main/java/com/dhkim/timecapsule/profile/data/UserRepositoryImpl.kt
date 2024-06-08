@@ -86,6 +86,13 @@ class UserRepositoryImpl @Inject constructor(
         return remoteDataSource.addRequest(myId = getMyId(), userId = userId)
     }
 
+    override suspend fun acceptFriend(userId: String, userUuid: String): Flow<isSuccessful> {
+        val myId = getMyId()
+        val myUuid = getMyUuid()
+
+        return remoteDataSource.acceptFriend(myId, myUuid, userId, userUuid)
+    }
+
     override suspend fun getFcmToken(): String {
         return localDataSource.getFcmToken()
     }
