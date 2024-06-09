@@ -101,6 +101,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation(libs.android.joda)
+    implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.animation)
     implementation(libs.compose.navigation)
     implementation(libs.compose.glide)
     implementation(libs.compose.hilt.navigation)

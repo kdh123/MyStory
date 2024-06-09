@@ -19,6 +19,12 @@ class ExampleUnitTest {
     }
 
     @Test
+    fun isAfterTodayTest() {
+        val b = DateUtil.isAfter(strDate = "2024-06-09")
+        println("sss : $b")
+    }
+
+    @Test
     fun addition_isCorrect() {
         //assertEquals(4, 2 + 2)
 

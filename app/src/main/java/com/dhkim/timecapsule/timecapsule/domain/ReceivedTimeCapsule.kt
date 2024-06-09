@@ -1,6 +1,5 @@
 package com.dhkim.timecapsule.timecapsule.domain
 
-
 data class ReceivedTimeCapsule(
     val id: String,
     val date: String,
@@ -12,4 +11,23 @@ data class ReceivedTimeCapsule(
     val content: String,
     val checkLocation: Boolean,
     val isOpened: Boolean
-): BaseTimeCapsule
+): BaseTimeCapsule {
+
+    fun toTimeCapsule(): TimeCapsule {
+        return TimeCapsule(
+            id = id,
+            date = date,
+            openDate = openDate,
+            lat = lat,
+            lng = lng,
+            address = address,
+            content = content,
+            medias = listOf(),
+            checkLocation = checkLocation,
+            isOpened = isOpened,
+            sharedFriends = listOf(),
+            isReceived = true,
+            sender = sender
+        )
+    }
+}

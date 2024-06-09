@@ -107,7 +107,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
                             sharedFriends = sharedFriends.filter { it.isChecked }.map { it.userId }
                         )
 
-                        if (sharedFriends.isEmpty()) {
+                        if (sharedFriends.none { it.isChecked }) {
                             timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = timeCapsule)
                             _sideEffect.emit(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
                         } else {

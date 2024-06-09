@@ -50,6 +50,13 @@ object DateUtil {
         }
     }
 
+    fun isAfter(strDate: String): Boolean {
+        val today = convertStringToDate(todayDate())
+        val date = convertStringToDate(strDate)
+
+        return (today?.after(date) ?: false) || strDate == todayDate()
+    }
+
     fun todayDate(): String {
         val calendar: Calendar = Calendar.getInstance()
         return sdf.format(calendar.time)

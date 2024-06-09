@@ -8,6 +8,7 @@ import androidx.compose.animation.slideOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -133,7 +134,7 @@ fun MainScreen() {
                         ?.set("place", null)
                 }
             )
-            timeCapsuleNavigation()
+            timeCapsuleNavigation(modifier = Modifier.padding(bottom = innerPdding.calculateBottomPadding()))
             addTimeCapsuleNavigation(
                 onNavigateToCamera = {
                     navController.navigate("camera")

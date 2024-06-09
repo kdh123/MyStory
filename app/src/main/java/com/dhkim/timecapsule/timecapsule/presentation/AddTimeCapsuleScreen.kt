@@ -68,6 +68,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -103,6 +104,7 @@ fun AddTimeCapsuleScreen(
     onBack: () -> Unit,
     viewModel: AddTimeCapsuleViewModel = hiltViewModel()
 ) {
+    val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val state = rememberStandardBottomSheetState(
         skipHiddenState = false
@@ -332,6 +334,7 @@ fun AddTimeCapsuleScreen(
                     onSelectPicture = {
                         scope.launch {
                             viewModel.setSelectImageIndex(index = it)
+                            focusManager.clearFocus()
                             scaffoldState.bottomSheetState.expand()
                             showBottomMenu = true
                         }
@@ -585,10 +588,11 @@ fun Calender(
     val startDate = DateUtil.dateAfterMonths(3)
 
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = DateUtil.dateToMills(startDate),
+        initialSelectedDateMillis = DateUtil.dateToMills(DateUtil.todayDate()),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis >= DateUtil.dateToMills(startDate)
+                return utcTimeMillis >= DateUtil.dateToMills(DateUtil.todayDate())
+                //return utcTimeMillis >= DateUtil.dateToMills(startDate)
             }
         }
     )

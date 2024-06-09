@@ -1,15 +1,13 @@
 package com.dhkim.timecapsule.timecapsule.presentation
 
 import androidx.compose.runtime.Stable
-import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
-import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
-import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
+import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 
 @Stable
 data class TimeCapsuleUiState(
     val isLoading: Boolean = false,
     val isCompleted: Boolean = false,
-    val myTimeCapsules: List<MyTimeCapsule> = listOf(),
-    val sendTimeCapsules: List<SendTimeCapsule> = listOf(),
-    val receivedTimeCapsules: List<ReceivedTimeCapsule> = listOf(),
+    val openedTimeCapsules: List<TimeCapsule> = listOf(),
+    val unOpenedMyTimeCapsules: List<TimeCapsule> = listOf(),
+    val unOpenedReceivedTimeCapsules: List<TimeCapsule> = listOf(),
 )

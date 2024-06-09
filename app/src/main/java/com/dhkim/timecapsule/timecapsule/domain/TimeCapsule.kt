@@ -1,8 +1,6 @@
 package com.dhkim.timecapsule.timecapsule.domain
 
-import com.dhkim.timecapsule.profile.domain.UserId
-
-data class MyTimeCapsule(
+data class TimeCapsule(
     val id: String,
     val date: String,
     val openDate: String,
@@ -13,24 +11,28 @@ data class MyTimeCapsule(
     val medias: List<String>,
     val checkLocation: Boolean,
     val isOpened: Boolean,
-    val sharedFriends: List<UserId>
-) : BaseTimeCapsule {
+    val sharedFriends: List<String>,
+    val isReceived: Boolean,
+    val sender: String
+) {
+    fun toMyTimeCapsule(): MyTimeCapsule {
+        return MyTimeCapsule(
+            id, date, openDate, lat, lng, address, content, medias, checkLocation, isOpened, sharedFriends
+        )
+    }
 
-    fun toTimeCapsule(): TimeCapsule {
-        return TimeCapsule(
+    fun toReceivedCapsule(): ReceivedTimeCapsule {
+        return ReceivedTimeCapsule(
             id = id,
             date = date,
             openDate = openDate,
+            sender = sender,
             lat = lat,
             lng = lng,
             address = address,
             content = content,
-            medias = medias,
             checkLocation = checkLocation,
-            isOpened = isOpened,
-            sharedFriends = sharedFriends,
-            isReceived = false,
-            sender = ""
+            isOpened = isOpened
         )
     }
 }

@@ -2,13 +2,18 @@ package com.dhkim.timecapsule.timecapsule.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.profile.domain.UserRepository
+import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,40 +26,51 @@ class TimeCapsuleViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TimeCapsuleUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _sideEffect = MutableSharedFlow<TimeCapsuleSideEffect>()
+    val sideEffect = _sideEffect.asSharedFlow()
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             timeCapsuleRepository.getMyAllTimeCapsule()
-                .catch { }
-                .collect {
-                    _uiState.value = _uiState.value.copy(myTimeCapsules = it)
-                }
-        }
+                .zip(timeCapsuleRepository.getReceivedAllTimeCapsule()) { myTimeCapsules, receivedTimeCapsules ->
+                    myTimeCapsules.map { it.toTimeCapsule() } + receivedTimeCapsules.map { it.toTimeCapsule() }
+                }.catch { }
+                .collect { timeCapsules ->
+                    val unOpenedMyTimeCapsules = timeCapsules
+                        .filter { !it.isReceived && !it.isOpened }
+                    val unOpenedReceivedTimeCapsules = timeCapsules
+                        .filter { it.isReceived && !it.isOpened }
+                    val openedTimeCapsules = timeCapsules
+                        .filter { (!it.isOpened && DateUtil.isAfter(strDate = it.openDate)) || it.isOpened }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            timeCapsuleRepository.getSendAllTimeCapsule()
-                .catch { }
-                .collect {
-                    _uiState.value = _uiState.value.copy(sendTimeCapsules = it)
-                }
-        }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            timeCapsuleRepository.getReceivedAllTimeCapsule()
-                .catch { }
-                .collect {
-                    _uiState.value = _uiState.value.copy(receivedTimeCapsules = it)
+                    _uiState.value = _uiState.value.copy(
+                        unOpenedMyTimeCapsules = unOpenedMyTimeCapsules,
+                        unOpenedReceivedTimeCapsules = unOpenedReceivedTimeCapsules,
+                        openedTimeCapsules = openedTimeCapsules
+                    )
                 }
         }
     }
 
-    fun sendTimeCapsule(
-                        friends: List<String>,
-                        openDate: String,
-                        content: String,
-                        lat: String,
-                        lng: String,
-                        address: String,
-                        checkLocation: Boolean
+    fun openTimeCapsule(timeCapsule: TimeCapsule) {
+        viewModelScope.launch {
+            if (timeCapsule.isReceived) {
+                timeCapsuleRepository.updateReceivedTimeCapsule(timeCapsule.toReceivedCapsule().copy(isOpened = true))
+            } else {
+                timeCapsuleRepository.editMyTimeCapsule(timeCapsule.toMyTimeCapsule().copy(isOpened = true))
+            }
+        }
+    }
+
+    fun shareTimeCapsule(
+        friends: List<String>,
+        openDate: String,
+        content: String,
+        lat: String,
+        lng: String,
+        address: String,
+        checkLocation: Boolean
     ) {
         viewModelScope.launch {
             timeCapsuleRepository.shareTimeCapsule(

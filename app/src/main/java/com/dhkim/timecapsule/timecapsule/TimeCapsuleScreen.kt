@@ -1,8 +1,11 @@
 package com.dhkim.timecapsule.timecapsule
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,62 +14,65 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.BuildConfig
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.DateUtil
-import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
-import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
+import com.dhkim.timecapsule.common.composable.drawAnimatedBorder
+import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleUiState
-import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleViewModel
-import kotlinx.coroutines.launch
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
-fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var currentTab by remember { mutableIntStateOf(0) }
-    val titles = listOf("My", "수신")
-    val pagerState = rememberPagerState(pageCount = {
-        2
-    })
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect { page ->
-            currentTab = page
-        }
+fun TimeCapsuleScreen(
+    uiState: TimeCapsuleUiState,
+    modifier: Modifier = Modifier,
+    openTimeCapsule: (TimeCapsule) -> Unit,
+    shareTimeCapsule: (
+        friends: List<String>,
+        openDate: String,
+        content: String,
+        lat: String,
+        lng: String,
+        address: String,
+        checkLocation: Boolean
+    ) -> Unit,
+) {
+    var myTabSelect by remember {
+        mutableStateOf(true)
+    }
+    var receivedTabSelect by remember {
+        mutableStateOf(false)
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        if (BuildConfig.DEBUG) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        if (false && BuildConfig.DEBUG) {
             Text(
                 color = Color.White,
                 text = "FCM",
@@ -75,92 +81,302 @@ fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
                     .padding(10.dp)
                     .background(color = colorResource(id = R.color.primary))
                     .clickable {
-                        viewModel.sendTimeCapsule(
-                            friends = listOf("3176197071"),
-                            openDate = "2024-09-10",
-                            content = "마지막11",
-                            lat = "23.233",
-                            lng = "23.4555",
-                            address = "부산시 동래구 온천동",
-                            checkLocation = true
+                        shareTimeCapsule(
+                            listOf("3176197071"),
+                            "2024-09-10",
+                            "마지막11",
+                            "23.233",
+                            "23.4555",
+                            "부산시 동래구 온천동",
+                            true
                         )
                     })
         }
 
-        TabRow(
-            selectedTabIndex = currentTab,
-            indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
-                    modifier = Modifier.tabIndicatorOffset(tabPositions[currentTab]),
-                    color = colorResource(id = R.color.primary)
-                )
-            }
-        ) {
-            titles.forEachIndexed { index, title ->
-                Tab(
-                    icon = {
-                        when (index) {
-                            0 -> R.drawable.ic_my_black
-                            else -> R.drawable.ic_box_black
-                        }.let {
-                            Icon(painter = painterResource(id = it), contentDescription = null)
-                        }
-                    },
-                    selectedContentColor = colorResource(id = R.color.primary),
-                    unselectedContentColor = colorResource(id = R.color.black),
-                    selected = currentTab == index,
-                    onClick = {
-                        currentTab = index
-                        scope.launch {
-                            pagerState.scrollToPage(currentTab)
-                        }
-                    },
-                    text = {
-                        if (currentTab == index) {
-                            Text(text = title, fontWeight = FontWeight.Bold)
-                        } else {
-                            Text(text = title)
-                        }
-                    },
-                )
+        if (uiState.openedTimeCapsules.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                items(items = uiState.openedTimeCapsules, key = {
+                    it.id
+                }) {
+                    if (it.isOpened) {
+                        OpenedBox(
+                            timeCapsule = it,
+                            onClick = openTimeCapsule
+                        )
+                    } else {
+                        OpenableBox(
+                            timeCapsule = it,
+                            onClick = openTimeCapsule
+                        )
+                    }
+                }
             }
         }
-        HorizontalPager(state = pagerState) { pos ->
-            when (pos) {
-                0 -> MyTimeCapsuleScreen(uiState = uiState)
-                else -> ReceivedTimeCapsuleScreen(uiState = uiState)
-            }
+
+        Row(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+        ) {
+            TabBox(
+                isSelected = myTabSelect,
+                title = "나",
+                modifier = Modifier
+                    .width(0.dp)
+                    .weight(1f)
+                    .padding(end = 10.dp),
+                onClick = {
+                    myTabSelect = it
+                    receivedTabSelect = !it
+                }
+            )
+
+            TabBox(
+                isSelected = receivedTabSelect,
+                title = "수신",
+                modifier = Modifier
+                    .width(0.dp)
+                    .weight(1f),
+                onClick = {
+                    receivedTabSelect = it
+                    myTabSelect = !it
+                }
+            )
+        }
+
+        if (myTabSelect) {
+            MyTimeCapsuleScreen(uiState = uiState)
+        } else {
+            ReceivedTimeCapsuleScreen(uiState = uiState)
         }
     }
 }
 
 @Composable
-fun ReceivedTimeCapsuleScreen(uiState: TimeCapsuleUiState) {
-    val timeCapsules = uiState.receivedTimeCapsules
+fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
+    Box(
+        modifier = Modifier
+            .clickable {
+                onClick(timeCapsule)
+            }
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .border(
+                    width = 7.dp,
+                    shape = CircleShape,
+                    color = colorResource(id = R.color.primary)
+                )
+                .padding(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(7.dp)
+                    .clip(CircleShape)
+                    .background(color = colorResource(id = R.color.white))
+            ) {
+                if (timeCapsule.medias.isNotEmpty()) {
+                    GlideImage(
+                        imageModel = timeCapsule.medias[0],
+                        placeHolder = R.mipmap.ic_box,
+                        previewPlaceholder = R.mipmap.ic_box,
+                        error = R.mipmap.ic_box
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.mipmap.ic_box),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(10.dp)
+                    )
+                }
+            }
+        }
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .padding(12.dp)
+                .clip(CircleShape)
+                .background(color = colorResource(id = R.color.white))
+                .align(Alignment.BottomEnd)
+
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_check_primary),
+                contentDescription = null,
+                modifier = Modifier
+                    .width(30.dp)
+                    .height(30.dp)
+                    .border(
+                        width = 1.dp,
+                        shape = CircleShape,
+                        color = Color.Black
+                    )
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OpenedBoxPreview() {
+    val timeCapsule = TimeCapsule(
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        listOf(),
+        false,
+        true,
+        listOf(),
+        false,
+        ""
+    )
+
+    OpenedBox(timeCapsule) {
+
+    }
+}
+
+@Composable
+fun OpenableBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
+    Box(
+        modifier = Modifier
+            .padding(10.dp)
+            .drawAnimatedBorder(
+                strokeWidth = 7.dp,
+                shape = CircleShape,
+                durationMillis = 2000
+            )
+            .padding(8.dp)
+            .clip(CircleShape)
+            .clickable {
+                onClick(timeCapsule)
+            }
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(7.dp)
+                .clip(CircleShape)
+                .background(color = colorResource(id = R.color.white))
+        ) {
+            Image(
+                painter = painterResource(id = R.mipmap.ic_box),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(10.dp)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OpenableBoxPreview() {
+    OpenableBox(
+        timeCapsule = TimeCapsule(
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            listOf(),
+            false,
+            false,
+            listOf(),
+            false,
+            ""
+        ),
+        onClick = { _ ->
+
+        }
+    )
+}
+
+@Preview
+@Composable
+private fun OpenedBoxListPreview() {
+
+}
+
+@Composable
+fun OpenedBoxList(uiState: TimeCapsuleUiState) {
+
+}
+
+@Composable
+fun TabBox(isSelected: Boolean, title: String, modifier: Modifier = Modifier, onClick: (Boolean) -> Unit) {
+    val fontWeight = if (isSelected) {
+        FontWeight.Bold
+    } else {
+        FontWeight.Normal
+    }
+
+    val fontColor = if (isSelected) {
+        Color.White
+    } else {
+        colorResource(id = R.color.black)
+    }
+
+    val background = if (isSelected) {
+        colorResource(id = R.color.primary)
+    } else {
+        colorResource(id = R.color.light_gray)
+    }
+
+    Text(
+        textAlign = TextAlign.Center,
+        fontWeight = fontWeight,
+        color = fontColor,
+        text = title,
+        modifier = modifier
+            .clip(RoundedCornerShape(15.dp))
+            .background(background)
+            .clickable {
+                onClick(!isSelected)
+            }
+            .padding(vertical = 10.dp),
+    )
+}
+
+@Composable
+fun ReceivedTimeCapsuleScreen(uiState: TimeCapsuleUiState) {
+    val timeCapsules = uiState.unOpenedReceivedTimeCapsules
+
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
         itemsIndexed(
             items = timeCapsules, key = { _, item ->
                 item.id
             }
         ) { index, item ->
-            if (index == timeCapsules.size - 1) {
-                ReceivedTimeCapsuleItem(timeCapsule = item)
-            } else {
-                ReceivedTimeCapsuleItem(timeCapsule = item)
-                Divider(
-                    color = colorResource(id = R.color.light_gray),
-                    modifier = Modifier
-                        .height(1.dp)
-                        .fillMaxWidth()
-                )
+            if (DateUtil.getDateGap(newDate = item.openDate) > 0) {
+                if (index == timeCapsules.size - 1) {
+                    ReceivedTimeCapsuleItem(timeCapsule = item)
+                } else {
+                    ReceivedTimeCapsuleItem(timeCapsule = item)
+                    Divider(
+                        color = colorResource(id = R.color.light_gray),
+                        modifier = Modifier
+                            .height(1.dp)
+                            .fillMaxWidth()
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun ReceivedTimeCapsuleItem(timeCapsule: ReceivedTimeCapsule) {
+fun ReceivedTimeCapsuleItem(timeCapsule: TimeCapsule) {
     val leftTime = DateUtil.getDateGap(newDate = timeCapsule.openDate)
 
     Row(
@@ -217,31 +433,33 @@ fun ReceivedTimeCapsuleItem(timeCapsule: ReceivedTimeCapsule) {
 
 @Composable
 fun MyTimeCapsuleScreen(uiState: TimeCapsuleUiState) {
-    val timeCapsules = uiState.myTimeCapsules
+    val unOpenedTimeCapsules = uiState.unOpenedMyTimeCapsules
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
         itemsIndexed(
-            items = timeCapsules, key = { _, item ->
+            items = unOpenedTimeCapsules, key = { _, item ->
                 item.id
             }
         ) { index, item ->
-            if (index == timeCapsules.size - 1) {
-                MyTimeCapsuleItem(timeCapsule = item)
-            } else {
-                MyTimeCapsuleItem(timeCapsule = item)
-                Divider(
-                    color = colorResource(id = R.color.light_gray),
-                    modifier = Modifier
-                        .height(1.dp)
-                        .fillMaxWidth()
-                )
+            if (DateUtil.getDateGap(newDate = item.openDate) > 0) {
+                if (index == unOpenedTimeCapsules.size - 1) {
+                    TimeCapsuleItem(timeCapsule = item)
+                } else {
+                    TimeCapsuleItem(timeCapsule = item)
+                    Divider(
+                        color = colorResource(id = R.color.light_gray),
+                        modifier = Modifier
+                            .height(1.dp)
+                            .fillMaxWidth()
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun MyTimeCapsuleItem(timeCapsule: MyTimeCapsule) {
+fun TimeCapsuleItem(timeCapsule: TimeCapsule) {
     val leftTime = DateUtil.getDateGap(newDate = timeCapsule.openDate)
 
     Row(
@@ -307,7 +525,7 @@ fun MyTimeCapsuleItem(timeCapsule: MyTimeCapsule) {
 @Preview(showBackground = true)
 @Composable
 private fun MyTimeCapsulePreview() {
-    val timeCapsule = MyTimeCapsule(
+    val timeCapsule = TimeCapsule(
         id = "id1",
         date = "2024-06-01",
         openDate = "2024-10-15",
@@ -318,14 +536,18 @@ private fun MyTimeCapsulePreview() {
         medias = listOf(),
         checkLocation = true,
         isOpened = false,
-        sharedFriends = listOf()
+        sharedFriends = listOf(),
+        isReceived = false,
+        sender = ""
     )
 
-    MyTimeCapsuleItem(timeCapsule = timeCapsule)
+    TimeCapsuleItem(timeCapsule = timeCapsule)
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun TimeCapsuleScreenPreview() {
-    TimeCapsuleScreen()
+    TimeCapsuleScreen(TimeCapsuleUiState(), modifier = Modifier, {}) { _, _, _, _, _, _, _ ->
+
+    }
 }
