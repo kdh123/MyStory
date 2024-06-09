@@ -146,6 +146,25 @@ class UserRemoteDataSource @Inject constructor(
         }
     }
 
+    fun deleteFriend(myId: String, userId: String): Flow<isSuccessful> {
+        return callbackFlow {
+            val childUpdates = hashMapOf<String, Any?>(
+                "/users/$myId/friends/$userId" to null,
+                "/users/$userId/friends/$myId" to null,
+            )
+
+            database.updateChildren(childUpdates)
+                .addOnSuccessListener {
+                    trySend(true)
+                }.addOnFailureListener {
+                    trySend(false)
+                }
+
+            awaitClose()
+        }
+    }
+
+
     fun addRequest(myId: String, userId: String): Flow<isSuccessful> {
         return callbackFlow {
             database

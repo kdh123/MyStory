@@ -49,7 +49,7 @@ fun SignUpScreen(
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is SignUpSideEffect.Message -> {
-                    Toast.makeText(context, sideEffect.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
                 }
 
                 is SignUpSideEffect.Completed -> {

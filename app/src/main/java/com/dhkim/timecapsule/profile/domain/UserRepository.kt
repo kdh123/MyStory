@@ -13,7 +13,8 @@ interface UserRepository {
     fun updateUser(user: User)
     suspend fun searchUser(userId: String): Flow<isExist?>
 
-    suspend fun addFriends(userId: String): Flow<isSuccessful>
+    suspend fun addFriend(userId: String): Flow<isSuccessful>
+    suspend fun deleteFriend(userId: String): Flow<isSuccessful>
     suspend fun addRequests(userId: String): Flow<isSuccessful>
     suspend fun acceptFriend(userId: String, userUuid: String): Flow<isSuccessful>
 

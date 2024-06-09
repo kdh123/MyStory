@@ -12,6 +12,6 @@ data class ProfileUiState(
 
 data class SearchResult(
     val query: String = "",
-    val userId: String = "",
+    val userId: String?= "",
     val isMe: Boolean = false
 )

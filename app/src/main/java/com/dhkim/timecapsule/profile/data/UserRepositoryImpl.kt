@@ -78,8 +78,12 @@ class UserRepositoryImpl @Inject constructor(
         return flowOf(isExist)
     }
 
-    override suspend fun addFriends(userId: String): Flow<isSuccessful> {
+    override suspend fun addFriend(userId: String): Flow<isSuccessful> {
         return remoteDataSource.addFriend(myId = getMyId(), myUuid = getMyUuid(), userId = userId)
+    }
+
+    override suspend fun deleteFriend(userId: String): Flow<isSuccessful> {
+        return remoteDataSource.deleteFriend(myId = getMyId(), userId = userId)
     }
 
     override suspend fun addRequests(userId: String): Flow<isSuccessful> {

@@ -160,7 +160,7 @@ fun AddTimeCapsuleScreen(
         viewModel.sideEffect.collect { type ->
             when (type) {
                 is AddTimeCapsuleSideEffect.Message -> {
-                    Toast.makeText(context, type.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, type.message, Toast.LENGTH_SHORT).show()
                 }
 
                 is AddTimeCapsuleSideEffect.Completed -> {
