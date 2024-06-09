@@ -40,9 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dhkim.timecapsule.BuildConfig
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
+import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleUiState
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleViewModel
 import kotlinx.coroutines.launch
@@ -64,6 +66,27 @@ fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        if (BuildConfig.DEBUG) {
+            Text(
+                color = Color.White,
+                text = "FCM",
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .background(color = colorResource(id = R.color.primary))
+                    .clickable {
+                        viewModel.sendTimeCapsule(
+                            friends = listOf("3176197071"),
+                            openDate = "2024-09-10",
+                            content = "마지막11",
+                            lat = "23.233",
+                            lng = "23.4555",
+                            address = "부산시 동래구 온천동",
+                            checkLocation = true
+                        )
+                    })
+        }
+
         TabRow(
             selectedTabIndex = currentTab,
             indicator = { tabPositions ->
@@ -105,7 +128,88 @@ fun TimeCapsuleScreen(viewModel: TimeCapsuleViewModel = hiltViewModel()) {
         HorizontalPager(state = pagerState) { pos ->
             when (pos) {
                 0 -> MyTimeCapsuleScreen(uiState = uiState)
-                else -> MyTimeCapsuleScreen(uiState = uiState)
+                else -> ReceivedTimeCapsuleScreen(uiState = uiState)
+            }
+        }
+    }
+}
+
+@Composable
+fun ReceivedTimeCapsuleScreen(uiState: TimeCapsuleUiState) {
+    val timeCapsules = uiState.receivedTimeCapsules
+
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        itemsIndexed(
+            items = timeCapsules, key = { _, item ->
+                item.id
+            }
+        ) { index, item ->
+            if (index == timeCapsules.size - 1) {
+                ReceivedTimeCapsuleItem(timeCapsule = item)
+            } else {
+                ReceivedTimeCapsuleItem(timeCapsule = item)
+                Divider(
+                    color = colorResource(id = R.color.light_gray),
+                    modifier = Modifier
+                        .height(1.dp)
+                        .fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ReceivedTimeCapsuleItem(timeCapsule: ReceivedTimeCapsule) {
+    val leftTime = DateUtil.getDateGap(newDate = timeCapsule.openDate)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+        Image(
+            painter = painterResource(id = R.mipmap.ic_box),
+            contentDescription = null,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+        Column(
+            modifier = Modifier
+                .width(0.dp)
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+                .padding(start = 5.dp)
+        ) {
+            if (leftTime <= 0) {
+                Text(
+                    text = "오픈 하기",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(id = R.color.primary)
+                )
+            } else {
+                Column {
+                    Row {
+                        Text(
+                            text = "${leftTime}일 ",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = "후에 오픈할 수 있습니다.",
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+                    Text(
+                        text = "${timeCapsule.sender}님에 의해 공유되었습니다.",
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .clickable {
+
+                            }
+                    )
+                }
             }
         }
     }
@@ -178,17 +282,20 @@ fun MyTimeCapsuleItem(timeCapsule: MyTimeCapsule) {
                                 .align(Alignment.CenterVertically)
                         )
                     }
-                    if(timeCapsule.sharedFriends.isNotEmpty()) {
+                    if (timeCapsule.sharedFriends.isNotEmpty()) {
                         val count = timeCapsule.sharedFriends.size
                         val sharedText = if (count == 1) {
-                            "${timeCapsule.sharedFriends[0]}에게 공유하였습니다."
+                            "${timeCapsule.sharedFriends[0]}님에게 공유하였습니다."
                         } else {
-                            "${timeCapsule.sharedFriends[0]} 외 ${count - 1}명에게 공유하였습니다."
+                            "${timeCapsule.sharedFriends[0]}님 외 ${count - 1}명에게 공유하였습니다."
                         }
                         Text(
                             text = sharedText,
                             fontSize = 14.sp,
-                            color = colorResource(id = R.color.gray)
+                            modifier = Modifier
+                                .clickable {
+
+                                }
                         )
                     }
                 }

@@ -24,11 +24,12 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
         content: String,
         lat: String,
         lng: String,
-        address: String
+        address: String,
+        checkLocation: Boolean
     ): CommonResult<isSuccessful> {
         val data = CustomField(
             sender = myId,
-            openDate, content, lat, lng, address
+            openDate, content, lat, lng, address, checkLocation
         )
         val gson = Gson()
         val payload = PushMessage(FcmData(custom_field = data))
@@ -69,5 +70,6 @@ data class CustomField(
     val content: String,
     val lat: String,
     val lng: String,
-    val address: String
+    val address: String,
+    val checkLocation: Boolean
 )

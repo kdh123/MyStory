@@ -11,6 +11,8 @@ data class AddTimeCapsuleUiState(
     val content: String = "",
     val imageUrls: List<String> = listOf(),
     val openDate: String = "",
+    val lat: String = "",
+    val lng: String ="",
     val address: String = "",
     val checkLocation: Boolean = false,
     val isShare: Boolean = false,

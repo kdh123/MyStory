@@ -7,6 +7,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.location.Location
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -118,8 +119,10 @@ fun AddTimeCapsuleScreen(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
         uri?.let {
-            val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            context.contentResolver.takePersistableUriPermission(it, flag)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                context.contentResolver.takePersistableUriPermission(it, flag)
+            }
             viewModel.addImage(imageUrl = it.toString())
         }
     }
@@ -416,7 +419,7 @@ fun AddTimeCapsuleScreen(
                         }
                     }
             ) {
-                viewModel.saveTimeCapsule(lat = "${currentLocation.latitude}", lng = "${currentLocation.longitude}")
+                viewModel.saveTimeCapsule()
             }
         }
     }

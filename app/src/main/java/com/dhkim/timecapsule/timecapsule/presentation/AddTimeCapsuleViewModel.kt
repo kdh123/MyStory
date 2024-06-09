@@ -62,17 +62,17 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
             when (result) {
                 is CommonResult.Success -> {
-                    _uiState.value = _uiState.value.copy(address = result.data?.address ?: "알 수 없음")
+                    _uiState.value = _uiState.value.copy(lat = lat, lng = lng, address = result.data?.address ?: "알 수 없음")
                 }
 
                 is CommonResult.Error -> {
-                    _uiState.value = _uiState.value.copy(address = "알 수 없음")
+                    _uiState.value = _uiState.value.copy(lat = lat, lng = lng, address = "알 수 없음")
                 }
             }
         }
     }
 
-    fun saveTimeCapsule(lat: String, lng: String) {
+    fun saveTimeCapsule() {
         viewModelScope.launch(Dispatchers.IO) {
             with(_uiState.value) {
                 when {
@@ -107,20 +107,26 @@ class AddTimeCapsuleViewModel @Inject constructor(
                             sharedFriends = sharedFriends.filter { it.isChecked }.map { it.userId }
                         )
 
-                        val isSuccessful = timeCapsuleRepository.shareTimeCapsule(
-                            sharedFriends = sharedFriends.filter { it.isChecked }.map { it.uuid },
-                            openDate = openDate,
-                            content = content,
-                            lat = lat,
-                            lng = lng,
-                            address = address
-                        )
-
-                        if (isSuccessful) {
+                        if (sharedFriends.isEmpty()) {
                             timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = timeCapsule)
                             _sideEffect.emit(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
                         } else {
-                            _sideEffect.emit(AddTimeCapsuleSideEffect.Message(message = "저장에 실패하였습니다."))
+                            val isSuccessful = timeCapsuleRepository.shareTimeCapsule(
+                                sharedFriends = sharedFriends.filter { it.isChecked }.map { it.uuid },
+                                openDate = openDate,
+                                content = content,
+                                lat = lat,
+                                lng = lng,
+                                address = address,
+                                checkLocation = checkLocation
+                            )
+
+                            if (isSuccessful) {
+                                timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = timeCapsule)
+                                _sideEffect.emit(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
+                            } else {
+                                _sideEffect.emit(AddTimeCapsuleSideEffect.Message(message = "저장에 실패하였습니다."))
+                            }
                         }
                     }
                 }

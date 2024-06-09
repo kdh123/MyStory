@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
             MainScreen()
         }
 
-        askNotificationPermission()
+        askPermission()
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -50,14 +50,18 @@ class MainActivity : ComponentActivity() {
         })
     }
 
-    private fun askNotificationPermission() {
+    private fun askPermission() {
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.POST_NOTIFICATIONS
             )
         } else {
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
         }
 
         permissions.forEach { permission ->

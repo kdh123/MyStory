@@ -53,11 +53,12 @@ class TimeCapsuleViewModel @Inject constructor(
                         content: String,
                         lat: String,
                         lng: String,
-                        address: String
+                        address: String,
+                        checkLocation: Boolean
     ) {
         viewModelScope.launch {
             timeCapsuleRepository.shareTimeCapsule(
-                friends, openDate, content, lat, lng, address
+                friends, openDate, content, lat, lng, address, checkLocation
             )
         }
     }

@@ -13,7 +13,8 @@ interface TimeCapsuleRepository {
         content: String,
         lat: String,
         lng: String,
-        address: String
+        address: String,
+        checkLocation: Boolean
     ): isSuccessful
 
     suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>>

@@ -30,11 +30,12 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         content: String,
         lat: String,
         lng: String,
-        address: String
+        address: String,
+        checkLocation: Boolean
     ): isSuccessful {
         val myId = userRepository.getMyId()
         return remoteDataSource.shareTimeCapsule(
-            myId, sharedFriends, openDate, content, lat, lng, address
+            myId, sharedFriends, openDate, content, lat, lng, address, checkLocation
         ) is CommonResult.Success
     }
 
