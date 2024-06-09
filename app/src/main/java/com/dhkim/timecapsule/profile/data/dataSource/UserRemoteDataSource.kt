@@ -151,6 +151,7 @@ class UserRemoteDataSource @Inject constructor(
             val childUpdates = hashMapOf<String, Any?>(
                 "/users/$myId/friends/$userId" to null,
                 "/users/$userId/friends/$myId" to null,
+                "/users/$userId/requests/$myId" to null,
             )
 
             database.updateChildren(childUpdates)

@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -85,6 +86,7 @@ fun ProfileScreen(
     var selectedDeleteUserId by remember {
         mutableStateOf("")
     }
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(true) {
         viewModel.sideEffect.collect { sideEffect ->
@@ -101,6 +103,10 @@ fun ProfileScreen(
 
                 is ProfileSideEffect.ShowBottomSheet -> {
                     bottomSheetScaffoldState.bottomSheetState.hide()
+                }
+
+                is ProfileSideEffect.ShowKeyboard -> {
+                    focusManager.clearFocus()
                 }
             }
         }
@@ -143,6 +149,9 @@ fun ProfileScreen(
                 },
                 onAddFriend = remember(viewModel) {
                     viewModel::addFriend
+                },
+                onDeleteClick = {
+                    selectedDeleteUserId = it
                 }
             )
         },
@@ -269,8 +278,21 @@ fun BottomSheetScreen(
     uiState: ProfileUiState,
     onQuery: (String) -> Unit,
     onSearch: () -> Unit,
-    onAddFriend: () -> Unit
+    onAddFriend: () -> Unit,
+    onDeleteClick: (userId: String) -> Unit
 ) {
+    val userId = uiState.searchResult.userId
+    val friendsIds = uiState.user.friends.map { it.id }
+    val requestIds = uiState.user.requests.map { it.id }
+
+    val isMyFriend = if (friendsIds.contains(userId)
+        || requestIds.contains(userId)
+    ) {
+        true
+    } else {
+        false
+    }
+
     Column(
         modifier = Modifier.fillMaxHeight(0.9f)
     ) {
@@ -364,11 +386,19 @@ fun BottomSheetScreen(
                             modifier = Modifier
                                 .align(Alignment.CenterVertically),
                             onClick = {
-                                onAddFriend()
+                                if (isMyFriend) {
+                                    onDeleteClick(userId)
+                                } else {
+                                    onAddFriend()
+                                }
                             }
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.ic_person_add_white),
+                                painter = if (isMyFriend) {
+                                    painterResource(id = R.drawable.ic_delete_white)
+                                } else {
+                                    painterResource(id = R.drawable.ic_person_add_white)
+                                },
                                 contentDescription = null,
                                 modifier = Modifier
                                     .padding(10.dp)
@@ -379,13 +409,12 @@ fun BottomSheetScreen(
             }
         }
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun SearchScreenPreview() {
-    BottomSheetScreen(ProfileUiState(), {}, {}) {
+    BottomSheetScreen(ProfileUiState(), {}, {}, {}) {
 
     }
 }
@@ -558,13 +587,13 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
                 onClick(friend)
             }
         ) {
-            Text(
-                text = "승낙",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(8.dp)
+            Image(
+                painter =
+                painterResource(id = R.drawable.ic_person_add_white),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(10.dp)
             )
-
         }
     }
 }
@@ -604,11 +633,12 @@ fun FriendItem(userId: String, buttonText: String, isMe: Boolean = false, onDele
             }
         ) {
             if (!isMe) {
-                Text(
-                    text = buttonText,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(8.dp)
+                Image(
+                    painter =
+                    painterResource(id = R.drawable.ic_delete_white),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(10.dp)
                 )
             }
         }

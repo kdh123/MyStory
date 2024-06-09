@@ -2,7 +2,6 @@ package com.dhkim.timecapsule.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.timecapsule.profile.data.dataSource.isSuccessful
 import com.dhkim.timecapsule.profile.domain.Friend
 import com.dhkim.timecapsule.profile.domain.User
 import com.dhkim.timecapsule.profile.domain.UserRepository
@@ -52,6 +51,24 @@ class ProfileViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(query = query))
     }
 
+    fun addFriend() {
+        viewModelScope.launch {
+            val searchUserId = _uiState.value.searchResult.userId ?: ""
+
+            userRepository.addFriend(searchUserId)
+                .catch {
+                    _sideEffect.emit(ProfileSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+                }
+                .collect { isSuccessful ->
+                    if (isSuccessful) {
+                        _sideEffect.emit(ProfileSideEffect.ShowKeyboard(show = false))
+                    } else {
+                        _sideEffect.emit(ProfileSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+                    }
+                }
+        }
+    }
+
     fun deleteFriend(userId: String) {
         viewModelScope.launch {
             userRepository.deleteFriend(userId = userId)
@@ -60,6 +77,7 @@ class ProfileViewModel @Inject constructor(
                     _sideEffect.emit(ProfileSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
                 }.collect { isSuccessful ->
                     if (isSuccessful) {
+                        _sideEffect.emit(ProfileSideEffect.ShowKeyboard(show = false))
                         _sideEffect.emit(ProfileSideEffect.ShowDialog(show = false))
                     } else {
                         _sideEffect.emit(ProfileSideEffect.ShowDialog(show = false))
@@ -112,31 +130,6 @@ class ProfileViewModel @Inject constructor(
                         _sideEffect.emit(ProfileSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
                     }
                 }
-        }
-    }
-
-    fun addFriend() {
-        viewModelScope.launch {
-            val searchUserId = _uiState.value.searchResult.userId ?: ""
-            val friendsIds = _uiState.value.user.friends.map { it.id }
-            val requestIds = _uiState.value.user.requests.map { it.id }
-
-            if (friendsIds.contains(searchUserId) || requestIds.contains(searchUserId)) {
-
-            } else {
-                userRepository.addFriend(searchUserId)
-                    .catch {
-                        _sideEffect.emit(ProfileSideEffect.Message(message = "친구 추가에 실패하였습니다."))
-                    }
-                    .collect { isSuccessful ->
-                        if (isSuccessful) {
-                            _uiState.value = _uiState.value.copy(searchResult = SearchResult(query = "", userId = ""))
-                            _sideEffect.emit(ProfileSideEffect.ShowBottomSheet(show = false))
-                        } else {
-                            _sideEffect.emit(ProfileSideEffect.Message(message = "친구 추가에 실패하였습니다."))
-                        }
-                    }
-            }
         }
     }
 }
