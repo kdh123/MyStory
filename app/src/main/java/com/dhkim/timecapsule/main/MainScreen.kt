@@ -42,6 +42,7 @@ import com.dhkim.timecapsule.profile.presentation.navigation.profileNavigation
 import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.presentation.navigation.searchNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
+import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleNavigation
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,7 +135,16 @@ fun MainScreen() {
                         ?.set("place", null)
                 }
             )
-            timeCapsuleNavigation(modifier = Modifier.padding(bottom = innerPdding.calculateBottomPadding()))
+            timeCapsuleDetailNavigation()
+            timeCapsuleNavigation(
+                onNavigateToDetail = { id, isReceived ->
+                    navController.navigate("timeCapsuleDetail/$id/${isReceived}")
+                },
+                modifier = Modifier
+                    .padding(
+                        bottom = innerPdding.calculateBottomPadding()
+                    )
+            )
             addTimeCapsuleNavigation(
                 onNavigateToCamera = {
                     navController.navigate("camera")

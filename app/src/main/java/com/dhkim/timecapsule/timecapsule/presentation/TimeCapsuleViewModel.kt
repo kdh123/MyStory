@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.zip
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,7 +32,7 @@ class TimeCapsuleViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             timeCapsuleRepository.getMyAllTimeCapsule()
-                .zip(timeCapsuleRepository.getReceivedAllTimeCapsule()) { myTimeCapsules, receivedTimeCapsules ->
+                .combine(timeCapsuleRepository.getReceivedAllTimeCapsule()) { myTimeCapsules, receivedTimeCapsules ->
                     myTimeCapsules.map { it.toTimeCapsule() } + receivedTimeCapsules.map { it.toTimeCapsule() }
                 }.catch { }
                 .collect { timeCapsules ->
@@ -41,8 +41,7 @@ class TimeCapsuleViewModel @Inject constructor(
                     val unOpenedReceivedTimeCapsules = timeCapsules
                         .filter { it.isReceived && !it.isOpened }
                     val openedTimeCapsules = timeCapsules
-                        .filter { (!it.isOpened && DateUtil.isAfter(strDate = it.openDate)) || it.isOpened }
-
+                        .filter { (!it.isOpened && DateUtil.isAfter(strDate = it.openDate))} + timeCapsules.filter { it.isOpened }
 
                     _uiState.value = _uiState.value.copy(
                         unOpenedMyTimeCapsules = unOpenedMyTimeCapsules,
@@ -54,12 +53,14 @@ class TimeCapsuleViewModel @Inject constructor(
     }
 
     fun openTimeCapsule(timeCapsule: TimeCapsule) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (timeCapsule.isReceived) {
                 timeCapsuleRepository.updateReceivedTimeCapsule(timeCapsule.toReceivedCapsule().copy(isOpened = true))
             } else {
                 timeCapsuleRepository.editMyTimeCapsule(timeCapsule.toMyTimeCapsule().copy(isOpened = true))
             }
+
+            _sideEffect.emit(TimeCapsuleSideEffect.NavigateToDetail(timeCapsule.id, timeCapsule.isReceived))
         }
     }
 

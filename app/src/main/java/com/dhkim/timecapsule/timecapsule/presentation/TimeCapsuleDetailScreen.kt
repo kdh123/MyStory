@@ -8,12 +8,13 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun TimeCapsuleDetailScreen(
-    imageUrl: String = ""
+    id: String,
+    isReceived: Boolean
 ) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(text = "Detail Screen!")
+        Text(text = "Detail Screen! $id, $isReceived")
     }
 }

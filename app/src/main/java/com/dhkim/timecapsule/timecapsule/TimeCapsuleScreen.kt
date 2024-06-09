@@ -1,6 +1,6 @@
 package com.dhkim.timecapsule.timecapsule
 
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,14 +44,17 @@ import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.common.composable.drawAnimatedBorder
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
+import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleUiState
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun TimeCapsuleScreen(
     uiState: TimeCapsuleUiState,
+    sideEffect: TimeCapsuleSideEffect,
     modifier: Modifier = Modifier,
     openTimeCapsule: (TimeCapsule) -> Unit,
+    onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     shareTimeCapsule: (
         friends: List<String>,
         openDate: String,
@@ -61,12 +65,28 @@ fun TimeCapsuleScreen(
         checkLocation: Boolean
     ) -> Unit,
 ) {
+    val context = LocalContext.current
     var myTabSelect by remember {
         mutableStateOf(true)
     }
     var receivedTabSelect by remember {
         mutableStateOf(false)
     }
+
+    LaunchedEffect(sideEffect) {
+        when (sideEffect) {
+            is TimeCapsuleSideEffect.None -> {}
+
+            is TimeCapsuleSideEffect.Message -> {
+                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+            }
+
+            is TimeCapsuleSideEffect.NavigateToDetail -> {
+                onNavigateToDetail(sideEffect.id, sideEffect.isReceived)
+            }
+        }
+    }
+
 
     Column(
         modifier = modifier
@@ -96,6 +116,7 @@ fun TimeCapsuleScreen(
         if (uiState.openedTimeCapsules.isNotEmpty()) {
             LazyRow(
                 modifier = Modifier
+                    .padding(vertical = 10.dp)
                     .fillMaxWidth()
             ) {
                 items(items = uiState.openedTimeCapsules, key = {
@@ -118,7 +139,7 @@ fun TimeCapsuleScreen(
 
         Row(
             modifier = Modifier
-                .padding(10.dp)
+                .padding(horizontal = 10.dp)
                 .fillMaxWidth()
         ) {
             TabBox(
@@ -165,7 +186,7 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
     ) {
         Box(
             modifier = Modifier
-                .padding(10.dp)
+                .padding(start = 10.dp)
                 .border(
                     width = 7.dp,
                     shape = CircleShape,
@@ -175,23 +196,28 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
         ) {
             Box(
                 modifier = Modifier
-                    .padding(7.dp)
                     .clip(CircleShape)
                     .background(color = colorResource(id = R.color.white))
             ) {
                 if (timeCapsule.medias.isNotEmpty()) {
                     GlideImage(
                         imageModel = timeCapsule.medias[0],
-                        placeHolder = R.mipmap.ic_box,
+                        placeHolder = painterResource(R.mipmap.ic_box),
                         previewPlaceholder = R.mipmap.ic_box,
-                        error = R.mipmap.ic_box
+                        error = painterResource(id = R.mipmap.ic_box),
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .width(78.dp)
+                            .height(78.dp)
                     )
                 } else {
                     Image(
                         painter = painterResource(id = R.mipmap.ic_box),
                         contentDescription = null,
                         modifier = Modifier
-                            .padding(10.dp)
+                            .clip(CircleShape)
+                            .width(78.dp)
+                            .height(78.dp)
                     )
                 }
             }
@@ -199,7 +225,6 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
 
         Box(
             modifier = Modifier
-                .padding(12.dp)
                 .clip(CircleShape)
                 .background(color = colorResource(id = R.color.white))
                 .align(Alignment.BottomEnd)
@@ -249,14 +274,12 @@ private fun OpenedBoxPreview() {
 fun OpenableBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
     Box(
         modifier = Modifier
-            .padding(10.dp)
+            .padding(start = 10.dp)
             .drawAnimatedBorder(
                 strokeWidth = 7.dp,
                 shape = CircleShape,
                 durationMillis = 2000
             )
-            .padding(8.dp)
-            .clip(CircleShape)
             .clickable {
                 onClick(timeCapsule)
             }
@@ -265,6 +288,8 @@ fun OpenableBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
             modifier = Modifier
                 .padding(7.dp)
                 .clip(CircleShape)
+                .width(78.dp)
+                .height(78.dp)
                 .background(color = colorResource(id = R.color.white))
         ) {
             Image(
@@ -272,6 +297,7 @@ fun OpenableBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
                 contentDescription = null,
                 modifier = Modifier
                     .padding(10.dp)
+                    .align(Alignment.Center)
             )
         }
     }
@@ -547,7 +573,7 @@ private fun MyTimeCapsulePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun TimeCapsuleScreenPreview() {
-    TimeCapsuleScreen(TimeCapsuleUiState(), modifier = Modifier, {}) { _, _, _, _, _, _, _ ->
+    TimeCapsuleScreen(TimeCapsuleUiState(), TimeCapsuleSideEffect.None, modifier = Modifier, {}, {_, _ ->}) { _, _, _, _, _, _, _ ->
 
     }
 }

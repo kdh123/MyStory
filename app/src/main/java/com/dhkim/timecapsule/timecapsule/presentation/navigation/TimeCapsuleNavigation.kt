@@ -1,6 +1,7 @@
 package com.dhkim.timecapsule.timecapsule.presentation.navigation
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,7 +14,10 @@ import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleDetailScreen
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleViewModel
 
-fun NavGraphBuilder.timeCapsuleNavigation(modifier: Modifier = Modifier) {
+fun NavGraphBuilder.timeCapsuleNavigation(
+    onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
     composable(Screen.TimeCapsule.route) {
         val viewModel = hiltViewModel<TimeCapsuleViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -21,20 +25,21 @@ fun NavGraphBuilder.timeCapsuleNavigation(modifier: Modifier = Modifier) {
 
         TimeCapsuleScreen(
             uiState = uiState,
+            sideEffect = sideEffect,
             modifier = modifier,
             shareTimeCapsule = viewModel::shareTimeCapsule,
-            openTimeCapsule = viewModel::openTimeCapsule
+            openTimeCapsule = viewModel::openTimeCapsule,
+            onNavigateToDetail = onNavigateToDetail
         )
     }
 }
 
-fun NavGraphBuilder.timeCapsuleDetailNavigation(
-    onBack: () -> Unit,
-) {
-    composable("addTimeCapsule") { backStackEntry ->
-        val imageUrl = backStackEntry.savedStateHandle.get<String>("imageUrl") ?: ""
+fun NavGraphBuilder.timeCapsuleDetailNavigation() {
+    composable("timeCapsuleDetail/{id}/{isReceived}") { backStackEntry ->
+        val id = backStackEntry.arguments?.getString("id") ?: ""
+        val isReceived = (backStackEntry.arguments?.getString("isReceived") ?: "false").toBoolean()
 
-        TimeCapsuleDetailScreen(imageUrl)
+        TimeCapsuleDetailScreen(id, isReceived)
     }
 }
 
