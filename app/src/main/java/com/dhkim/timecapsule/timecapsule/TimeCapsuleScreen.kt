@@ -188,7 +188,7 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
             modifier = Modifier
                 .padding(start = 10.dp)
                 .border(
-                    width = 7.dp,
+                    width = 5.dp,
                     shape = CircleShape,
                     color = colorResource(id = R.color.primary)
                 )
@@ -239,7 +239,7 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
                     .border(
                         width = 1.dp,
                         shape = CircleShape,
-                        color = Color.Black
+                        color = Color.White
                     )
             )
         }
@@ -276,7 +276,7 @@ fun OpenableBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
         modifier = Modifier
             .padding(start = 10.dp)
             .drawAnimatedBorder(
-                strokeWidth = 7.dp,
+                strokeWidth = 5.dp,
                 shape = CircleShape,
                 durationMillis = 2000
             )

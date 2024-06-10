@@ -1,22 +1,33 @@
+@file:OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+
 package com.dhkim.timecapsule.timecapsule.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.profile.domain.UserId
 import com.dhkim.timecapsule.profile.domain.UserRepository
+import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.domain.SearchRepository
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SharedFriend
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,6 +46,8 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
     private var selectImageIndex = -1
 
+    private val query = MutableStateFlow("")
+
     init {
         viewModelScope.launch {
             userRepository.getMyInfo().catch { }
@@ -49,6 +62,40 @@ class AddTimeCapsuleViewModel @Inject constructor(
                         }
                     _uiState.value = _uiState.value.copy(sharedFriends = sharedFriends)
                 }
+        }
+
+        viewModelScope.launch {
+            query.debounce(1000L).flatMapLatest {
+                searchRepository.getPlaceByKeyword(
+                    query = it
+                )
+            }.cachedIn(viewModelScope)
+                .catch { }
+                .collectLatest { result ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        placeResult = flowOf(result).stateIn(viewModelScope)
+                    )
+                }
+        }
+    }
+
+    fun onQuery(s: String) {
+        query.value = s
+        _uiState.value = _uiState.value.copy(
+            isLoading = true,
+            placeQuery = s
+        )
+    }
+
+    fun onPlaceClick(place: Place) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                lat = place.lat,
+                lng = place.lng,
+                address = place.name
+            )
+            _sideEffect.emit(AddTimeCapsuleSideEffect.ShowPlaceBottomSheet(show = false))
         }
     }
 

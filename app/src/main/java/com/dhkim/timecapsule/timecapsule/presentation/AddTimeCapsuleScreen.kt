@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -128,6 +129,9 @@ fun AddTimeCapsuleScreen(
             viewModel.addImage(imageUrl = it.toString())
         }
     }
+    var showLocationBottomSheet by remember {
+        mutableStateOf(false)
+    }
     var showDateDialog by remember {
         mutableStateOf(false)
     }
@@ -137,6 +141,7 @@ fun AddTimeCapsuleScreen(
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
+    val locationBottomSheetState = rememberModalBottomSheetState()
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -161,7 +166,7 @@ fun AddTimeCapsuleScreen(
     }
     val density = LocalDensity.current
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel.sideEffect) {
         viewModel.sideEffect.collect { type ->
             when (type) {
                 is AddTimeCapsuleSideEffect.Message -> {
@@ -171,6 +176,12 @@ fun AddTimeCapsuleScreen(
                 is AddTimeCapsuleSideEffect.Completed -> {
                     if (type.isCompleted) {
                         onBack()
+                    }
+                }
+
+                is AddTimeCapsuleSideEffect.ShowPlaceBottomSheet -> {
+                    if (!type.show) {
+                        showLocationBottomSheet = false
                     }
                 }
             }
@@ -199,6 +210,23 @@ fun AddTimeCapsuleScreen(
     LaunchedEffect(imageUrl) {
         if (imageUrl.isNotEmpty()) {
             viewModel.addImage(imageUrl)
+        }
+    }
+
+    if (showLocationBottomSheet) {
+        ModalBottomSheet(
+            sheetState = locationBottomSheetState,
+            onDismissRequest = {
+                showLocationBottomSheet = false
+            },
+            modifier = Modifier
+                .fillMaxHeight(0.9f)
+        ) {
+            LocationSearchScreen(
+                uiState = uiState,
+                onQuery = viewModel::onQuery,
+                onClick = viewModel::onPlaceClick
+            )
         }
     }
 
@@ -342,7 +370,11 @@ fun AddTimeCapsuleScreen(
                 )
                 Column {
                     SwitchMenuItem(
-                        resId = R.drawable.ic_location_black,
+                        resId = if (uiState.checkLocation) {
+                            R.drawable.ic_location_primary
+                        } else {
+                            R.drawable.ic_location_black
+                        },
                         title = "위치 체크",
                         subTitle = "오픈할 수 있는 위치를 지정합니다.",
                         isChecked = uiState.checkLocation
@@ -353,10 +385,11 @@ fun AddTimeCapsuleScreen(
                         MenuItem(
                             resId = -1,
                             title = uiState.address.ifEmpty { "위치" },
-                            subTitle = "지정한 위치 근처에 있어야 오픈할 수 있습니다."
-                        ) {
-
-                        }
+                            subTitle = "지정한 위치 근처에 있어야 오픈할 수 있습니다.",
+                            onClick = {
+                                showLocationBottomSheet = true
+                            }
+                        )
                     }
 
                     Divider(

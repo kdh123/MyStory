@@ -35,7 +35,7 @@ class SearchViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             query.debounce(1000L).flatMapLatest {
-                searchRepository.getPlaceByKeyword(
+                searchRepository.getNearPlaceByKeyword(
                     query = it,
                     lat = "${currentLocation.latitude}",
                     lng = "${currentLocation.longitude}"
@@ -53,7 +53,7 @@ class SearchViewModel @Inject constructor(
         currentLocation = location
     }
 
-    fun query(s: String) {
+    fun onQuery(s: String) {
         query.value = s
         _uiState.value = _uiState.value.copy(isLoading = true, query = s)
     }

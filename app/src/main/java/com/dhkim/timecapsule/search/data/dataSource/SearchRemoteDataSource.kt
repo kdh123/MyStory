@@ -18,9 +18,15 @@ class SearchRemoteDataSource @Inject constructor(
 ) {
     private val service = api.create(SearchApi::class.java)
 
-    fun getPlaceByKeyword(query: String, lat: String, lng: String): Flow<PagingData<Place>> {
+    fun getNearPlaceByKeyword(query: String, lat: String, lng: String): Flow<PagingData<Place>> {
         return Pager(PagingConfig(pageSize = 15)) {
-            SearchKeywordPagingSource(service, query, lat, lng)
+            SearchKeywordPagingSource(api = service, query = query, lat = lat, lng = lng, isNear = true)
+        }.flow
+    }
+
+    fun getPlaceByKeyword(query: String): Flow<PagingData<Place>> {
+        return Pager(PagingConfig(pageSize = 15)) {
+            SearchKeywordPagingSource(api = service, query = query, isNear = false)
         }.flow
     }
 

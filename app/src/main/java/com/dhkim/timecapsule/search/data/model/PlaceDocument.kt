@@ -22,10 +22,14 @@ data class PlaceDocument(
         val df = DecimalFormat("#.#").apply {
             roundingMode = RoundingMode.UP
         }
-        val distanceResult = if (distance.toDouble() < 1000) {
-            "${distance}m"
+        val distanceResult = if (distance.isNotEmpty()) {
+            if (distance.toDouble() < 1000) {
+                "${distance}m"
+            } else {
+                "${df.format(distance.toDouble() / 1000.0)}km"
+            }
         } else {
-            "${df.format(distance.toDouble() / 1000.0)}km"
+            "알 수 없음"
         }
 
         return Place(

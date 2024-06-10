@@ -14,8 +14,12 @@ class SearchRepositoryImpl @Inject constructor(
     private val remoteDataSource: SearchRemoteDataSource
 ) : SearchRepository {
 
-    override suspend fun getPlaceByKeyword(query: String, lat: String, lng: String): Flow<PagingData<Place>> {
-        return remoteDataSource.getPlaceByKeyword(query, lat, lng)
+    override suspend fun getNearPlaceByKeyword(query: String, lat: String, lng: String): Flow<PagingData<Place>> {
+        return remoteDataSource.getNearPlaceByKeyword(query, lat, lng)
+    }
+
+    override suspend fun getPlaceByKeyword(query: String): Flow<PagingData<Place>> {
+        return remoteDataSource.getPlaceByKeyword(query = query)
     }
 
     override suspend fun getPlaceByCategory(category: Category, lat: String, lng: String): Flow<PagingData<Place>> {

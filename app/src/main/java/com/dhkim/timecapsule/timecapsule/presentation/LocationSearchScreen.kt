@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
-package com.dhkim.timecapsule.search.presentation
+package com.dhkim.timecapsule.timecapsule.presentation
 
 import android.util.Log
 import androidx.compose.foundation.clickable
@@ -20,9 +20,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -34,38 +32,33 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.search.domain.Place
-import com.naver.maps.geometry.LatLng
 import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import retrofit2.HttpException
 
 @Composable
-fun SearchScreen(
-    uiState: SearchUiState,
-    searchResult: LazyPagingItems<Place>,
-    latLng: LatLng,
-    onSetCurrentLocation: (LatLng) -> Unit,
+fun LocationSearchScreen(
+    uiState: AddTimeCapsuleUiState,
     onQuery: (String) -> Unit,
-    onBack: (Place) -> Unit
+    onClick: (Place) -> Unit
 ) {
-    LaunchedEffect(latLng) {
-        onSetCurrentLocation(latLng)
-    }
-
+    val searchResult = uiState.placeResult.collectAsLazyPagingItems()
     Column(modifier = Modifier.fillMaxSize()) {
-        SearchBar(query = uiState.query, onQuery = onQuery)
-        Box(modifier = Modifier.fillMaxSize()) {
+        SearchBar(query = uiState.placeQuery, onQuery = onQuery)
+        Box(modifier = Modifier.fillMaxWidth()) {
             if (uiState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier
+                        .padding(top = 10.dp)
                         .width(64.dp)
                         .align(Alignment.Center),
                     color = Color.White,
@@ -73,14 +66,26 @@ fun SearchScreen(
                 )
             }
             if (searchResult.itemCount > 0) {
-                PlaceList(places = searchResult, onBack = onBack)
+                PlaceList(places = searchResult, onPlaceClick = onClick)
             } else {
-                if (!uiState.isLoading && uiState.query.isNotEmpty()) {
+                if (!uiState.isLoading && uiState.placeQuery.isNotEmpty()) {
                     //Text(text = "검색 결과가 존재하지 않습니다.", modifier = Modifier.align(Alignment.Center))
                 }
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LocationSearchScreenPreview() {
+    val result: StateFlow<PagingData<Place>> = MutableStateFlow(PagingData.empty())
+
+    LocationSearchScreen(
+        uiState = AddTimeCapsuleUiState(),
+        onQuery = {},
+        onClick = {}
+    )
 }
 
 
@@ -115,7 +120,7 @@ fun SearchBar(query: String, onQuery: (String) -> Unit) {
 }
 
 @Composable
-fun PlaceList(places: LazyPagingItems<Place>, onBack: (Place) -> Unit) {
+fun PlaceList(places: LazyPagingItems<Place>, onPlaceClick: (Place) -> Unit) {
     val state = places.loadState.refresh
     if (state is LoadState.Error) {
         if ((state.error) is HttpException) {
@@ -133,7 +138,7 @@ fun PlaceList(places: LazyPagingItems<Place>, onBack: (Place) -> Unit) {
         ) { index ->
             val item = places[index]
             if (item != null) {
-                Place(place = item, onBack = onBack)
+                Place(place = item, onBack = onPlaceClick)
             }
         }
     }
@@ -192,20 +197,20 @@ fun Place(place: Place, onBack: (Place) -> Unit) {
             )
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = place.distance,
-                modifier = Modifier.padding(horizontal = 10.dp)
-            )
-            Text(
-                text = place.address,
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
+        if (place.address.isNotEmpty()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = place.address,
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                )
+            }
         }
+
         if (place.phone.isNotEmpty()) {
             Text(
                 text = place.phone,

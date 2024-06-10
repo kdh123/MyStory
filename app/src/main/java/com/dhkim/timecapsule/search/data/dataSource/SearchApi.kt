@@ -11,12 +11,20 @@ import retrofit2.http.Query
 interface SearchApi {
 
     @GET("search/keyword")
-    suspend fun getPlaceByKeyword(
+    suspend fun getNearPlaceByKeyword(
         @Header("Authorization") token: String = BuildConfig.KAKAO_API_KEY,
         @Query("query") query: String,
         @Query("y") lat: String,
         @Query("x") lng: String,
         @Query("radius") range:Int = 20000,
+        @Query("page") page: Int,
+        @Query("size") size: Int = 15
+    ): Response<PlaceDto>
+
+    @GET("search/keyword")
+    suspend fun getPlaceByKeyword(
+        @Header("Authorization") token: String = BuildConfig.KAKAO_API_KEY,
+        @Query("query") query: String,
         @Query("page") page: Int,
         @Query("size") size: Int = 15
     ): Response<PlaceDto>

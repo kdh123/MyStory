@@ -9,20 +9,28 @@ import java.io.IOException
 class SearchKeywordPagingSource(
     private val api: SearchApi,
     private val query: String,
-    private val lat: String,
-    private val lng: String
+    private val lat: String = "",
+    private val lng: String = "",
+    private val isNear: Boolean
 ) : PagingSource<Int, Place>() {
     private var isEnd = false
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Place> {
         try {
             val nextPageNumber = params.key ?: 1
-            val result = api.getPlaceByKeyword(
-                query = query,
-                lat = lat,
-                lng = lng,
-                page = nextPageNumber,
-            )
+            val result = if (isNear) {
+                api.getNearPlaceByKeyword(
+                    query = query,
+                    lat = lat,
+                    lng = lng,
+                    page = nextPageNumber,
+                )
+            } else {
+                api.getPlaceByKeyword(
+                    query = query,
+                    page = nextPageNumber
+                )
+            }
 
             val places = if (result.isSuccessful) {
                 if (!isEnd) {
