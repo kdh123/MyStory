@@ -42,7 +42,7 @@ class ExampleUnitTest {
 
     @Test
     fun `날짜 차이 테스트` () {
-        val gap = DateUtil.getDateGap("2024-06-4")
+        val gap = DateUtil.getDateGap("2024-06-09")
         println("gap : $gap")
     }
 

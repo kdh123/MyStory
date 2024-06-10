@@ -35,7 +35,17 @@ object DateUtil {
     fun getDateGap(newDate: String): Long {
         return try {
             val afterDate = convertStringToDate(newDate)
-            TimeUnit.DAYS.convert(afterDate!!.time - Calendar.getInstance().time.time, TimeUnit.MILLISECONDS)
+            val gap= TimeUnit.MINUTES.convert(
+                afterDate!!.time - Calendar.getInstance().time.time,
+                TimeUnit.MILLISECONDS
+            ).toDouble() / 1440
+            if (gap > 0 && gap <1) {
+                1
+            } else if (gap <= 0){
+                0
+            } else {
+                gap.toLong() + 1
+            }
         } catch (e: Exception) {
             -1
         }
