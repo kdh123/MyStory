@@ -44,6 +44,7 @@ import com.dhkim.timecapsule.search.presentation.navigation.searchNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleNavigation
+import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleOpenNavigation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,7 +137,11 @@ fun MainScreen() {
                 }
             )
             timeCapsuleDetailNavigation()
+            timeCapsuleOpenNavigation()
             timeCapsuleNavigation(
+                onNavigateToOpen = { id, isReceived ->
+                    navController.navigate("timeCapsuleOpen/$id/${isReceived}")
+                },
                 onNavigateToDetail = { id, isReceived ->
                     navController.navigate("timeCapsuleDetail/$id/${isReceived}")
                 },

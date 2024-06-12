@@ -44,8 +44,6 @@ fun TimeCapsuleDetailScreen(
     uiState: TimeCapsuleDetailUiState,
     init: (String, Boolean) -> Unit
 ) {
-    val timeCapsule = uiState.timeCapsule
-
     LaunchedEffect(uiState) {
         init(timeCapsuleId, isReceived)
     }
@@ -53,18 +51,19 @@ fun TimeCapsuleDetailScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) {
-        TimeCapsulePager(timeCapsule = timeCapsule)
+        TimeCapsulePager(uiState = uiState)
     }
 }
 
 @Preview
 @Composable
-private fun TimeCapsuleDetailScreenDetail() {
+private fun TimeCapsuleDetailScreenPreview() {
     
 }
 
 @Composable
-fun TimeCapsulePager(timeCapsule: TimeCapsule) {
+fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState) {
+    val timeCapsule = uiState.timeCapsule
     val images: List<String> = timeCapsule.medias
     val pagerState = rememberPagerState(pageCount = {
         images.size
