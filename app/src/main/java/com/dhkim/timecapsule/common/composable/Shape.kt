@@ -24,13 +24,18 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.Dp
 
 val gradientColors = listOf(
-    Color.Red,
-    Color.Magenta,
+    //Color.Red,
+    //Color.Magenta,
     //Color.Blue,
+    Color(0XFF3C5AFA),
+    //Color.Red,
+    Color(0XFFF361DC),
+    Color(0XFF00D8FF),
+    Color(0XFF5F00FF)
     //Color.Cyan,
     //Color.Green,
-    Color.Yellow,
-    Color.Red
+    //Color.Yellow,
+    //Color.Red
 )
 
 fun Modifier.drawAnimatedBorder(

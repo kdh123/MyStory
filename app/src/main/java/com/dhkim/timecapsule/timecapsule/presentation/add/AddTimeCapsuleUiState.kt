@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.timecapsule.presentation
+package com.dhkim.timecapsule.timecapsule.presentation.add
 
 import androidx.compose.runtime.Stable
 import androidx.paging.PagingData

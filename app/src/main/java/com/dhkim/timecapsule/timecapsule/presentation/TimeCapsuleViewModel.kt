@@ -53,13 +53,7 @@ class TimeCapsuleViewModel @Inject constructor(
     }
 
     fun openTimeCapsule(timeCapsule: TimeCapsule) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (timeCapsule.isReceived) {
-                timeCapsuleRepository.updateReceivedTimeCapsule(timeCapsule.toReceivedCapsule().copy(isOpened = true))
-            } else {
-                timeCapsuleRepository.editMyTimeCapsule(timeCapsule.toMyTimeCapsule().copy(isOpened = true))
-            }
-
+        viewModelScope.launch {
             _sideEffect.emit(TimeCapsuleSideEffect.NavigateToDetail(timeCapsule.id, timeCapsule.isReceived))
         }
     }

@@ -150,26 +150,26 @@ fun MainScreen() {
                     navController.navigate("camera")
                 },
                 onBack = {
-                    navController.popBackStack()
+                    navController.navigateUp()
                 }
             )
             cameraNavigation(
                 folderName = context.getString(R.string.app_name),
                 onNext = { imageUrl ->
-                    navController.popBackStack()
+                    navController.navigateUp()
                     navController.currentBackStackEntry
                         ?.savedStateHandle
                         ?.set("imageUrl", imageUrl)
                 }
             )
             searchNavigation {
-                navController.popBackStack()
+                navController.navigateUp()
                 navController.currentBackStackEntry
                     ?.savedStateHandle
                     ?.set("place", it)
             }
             profileNavigation {
-                navController.popBackStack()
+                navController.navigateUp()
             }
         }
     }

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 
-package com.dhkim.timecapsule.timecapsule.presentation
+package com.dhkim.timecapsule.timecapsule.presentation.add
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -87,6 +87,7 @@ import com.dhkim.timecapsule.timecapsule.domain.BaseTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SharedFriend
+import com.dhkim.timecapsule.timecapsule.presentation.LocationSearchScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState

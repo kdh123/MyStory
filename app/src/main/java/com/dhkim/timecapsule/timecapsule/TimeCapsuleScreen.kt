@@ -5,8 +5,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
@@ -31,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -87,7 +92,6 @@ fun TimeCapsuleScreen(
         }
     }
 
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -113,6 +117,40 @@ fun TimeCapsuleScreen(
                     })
         }
 
+        Text(
+            text = "오픈한 타임캡슐",
+            modifier = Modifier
+                .padding(start = 10.dp, end = 10.dp, top = 10.dp),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp)
+        ) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                contentPadding = PaddingValues(horizontal = 10.dp)
+            ) {
+                items(items = uiState.openedTimeCapsules.filter { it.isOpened }, key = {
+                    it.id
+                }) {
+                    GlideImage(
+                        contentScale = ContentScale.FillBounds,
+                        imageModel = it.medias[0],
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .width(120.dp)
+                            .height(150.dp)
+                            .clickable {
+                                onNavigateToDetail(it.id, it.isReceived)
+                            }
+                    )
+                }
+            }
+        }
+
         if (uiState.openedTimeCapsules.isNotEmpty()) {
             LazyRow(
                 modifier = Modifier
@@ -122,12 +160,7 @@ fun TimeCapsuleScreen(
                 items(items = uiState.openedTimeCapsules, key = {
                     it.id
                 }) {
-                    if (it.isOpened) {
-                        OpenedBox(
-                            timeCapsule = it,
-                            onClick = openTimeCapsule
-                        )
-                    } else {
+                    if (!it.isOpened) {
                         OpenableBox(
                             timeCapsule = it,
                             onClick = openTimeCapsule
@@ -458,6 +491,95 @@ fun ReceivedTimeCapsuleItem(timeCapsule: TimeCapsule) {
 }
 
 @Composable
+fun FilmLayout(uiState: TimeCapsuleUiState, onClick: (String, Boolean) -> Unit) {
+    val state = rememberScrollState()
+    val timeCapsules = uiState.openedTimeCapsules.filter { it.isOpened }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(state)
+            .background(color = Color.Black)
+
+    ) {
+        Box(
+            modifier = Modifier
+                .background(color = Color.White)
+                .width(10.dp)
+                .height(214.dp)
+        )
+
+        Column {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .background(color = Color.Black)
+                    .padding(vertical = 10.dp)
+            ) {
+                repeat(timeCapsules.size * 6 - 1) {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 10.dp)
+                            .background(color = Color.White)
+                            .width(12.dp)
+                            .height(12.dp)
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+            ) {
+                repeat(timeCapsules.size) {
+                    GlideImage(
+                        contentScale = ContentScale.FillBounds,
+                        imageModel = timeCapsules[it].medias[0],
+                        modifier = Modifier
+                            .padding(start = 10.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .width(120.dp)
+                            .height(150.dp)
+                            .clickable {
+                                onClick(timeCapsules[it].id, timeCapsules[it].isReceived)
+                            }
+                    )
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .background(color = Color.Black)
+                    .padding(vertical = 10.dp)
+            ) {
+                repeat(timeCapsules.size * 6 - 1) {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 10.dp)
+                            .background(color = Color.White)
+                            .width(12.dp)
+                            .height(12.dp)
+
+                    )
+                }
+            }
+        }
+        Box(
+            modifier = Modifier
+                .background(color = Color.White)
+                .width(10.dp)
+                .height(214.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FilmLayoutPreview() {
+    //FilmLayout()
+}
+
+@Composable
 fun MyTimeCapsuleScreen(uiState: TimeCapsuleUiState) {
     val unOpenedTimeCapsules = uiState.unOpenedMyTimeCapsules
 
@@ -520,11 +642,23 @@ fun TimeCapsuleItem(timeCapsule: TimeCapsule) {
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                         )
-                        Text(
-                            text = "후에 오픈할 수 있습니다.",
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                        )
+                        if (timeCapsule.checkLocation && timeCapsule.address.isNotEmpty()) {
+                            Text(
+                                text = "후에 ${timeCapsule.address}에서 오픈할 수 있습니다",
+                                fontSize = 14.sp,
+                                modifier = Modifier
+                                    .align(Alignment.CenterVertically)
+                                    .clickable {
+
+                                    }
+                            )
+                        } else {
+                            Text(
+                                text = "후에 오픈할 수 있습니다.",
+                                modifier = Modifier
+                                    .align(Alignment.CenterVertically)
+                            )
+                        }
                     }
                     if (timeCapsule.sharedFriends.isNotEmpty()) {
                         val count = timeCapsule.sharedFriends.size
@@ -573,7 +707,7 @@ private fun MyTimeCapsulePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun TimeCapsuleScreenPreview() {
-    TimeCapsuleScreen(TimeCapsuleUiState(), TimeCapsuleSideEffect.None, modifier = Modifier, {}, {_, _ ->}) { _, _, _, _, _, _, _ ->
+    TimeCapsuleScreen(TimeCapsuleUiState(), TimeCapsuleSideEffect.None, modifier = Modifier, {}, { _, _ -> }) { _, _, _, _, _, _, _ ->
 
     }
 }

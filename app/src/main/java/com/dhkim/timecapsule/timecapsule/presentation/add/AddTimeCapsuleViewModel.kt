@@ -1,6 +1,6 @@
 @file:OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 
-package com.dhkim.timecapsule.timecapsule.presentation
+package com.dhkim.timecapsule.timecapsule.presentation.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

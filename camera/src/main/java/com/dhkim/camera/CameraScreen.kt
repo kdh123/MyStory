@@ -96,9 +96,16 @@ fun CameraScreen(
         }
     }
 
-    if (uiState.isCompleted) {
-        onNext?.invoke(uiState.savedUrl)
-        return
+    LaunchedEffect(viewModel.sideEffect) {
+        viewModel.sideEffect.collect { sideEffect ->
+            when(sideEffect) {
+                CameraSideEffect.None -> {}
+
+                is CameraSideEffect.Completed -> {
+                    onNext?.invoke(uiState.savedUrl)
+                }
+            }
+        }
     }
 
     Scaffold(

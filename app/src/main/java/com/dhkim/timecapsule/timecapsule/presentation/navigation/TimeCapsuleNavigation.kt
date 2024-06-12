@@ -1,7 +1,6 @@
 package com.dhkim.timecapsule.timecapsule.presentation.navigation
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -9,10 +8,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.dhkim.timecapsule.main.Screen
 import com.dhkim.timecapsule.timecapsule.TimeCapsuleScreen
-import com.dhkim.timecapsule.timecapsule.presentation.AddTimeCapsuleScreen
-import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleDetailScreen
+import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleScreen
+import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailScreen
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleViewModel
+import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailViewModel
 
 fun NavGraphBuilder.timeCapsuleNavigation(
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
@@ -38,8 +38,15 @@ fun NavGraphBuilder.timeCapsuleDetailNavigation() {
     composable("timeCapsuleDetail/{id}/{isReceived}") { backStackEntry ->
         val id = backStackEntry.arguments?.getString("id") ?: ""
         val isReceived = (backStackEntry.arguments?.getString("isReceived") ?: "false").toBoolean()
+        val viewModel = hiltViewModel<TimeCapsuleDetailViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        TimeCapsuleDetailScreen(id, isReceived)
+        TimeCapsuleDetailScreen(
+            timeCapsuleId = id,
+            isReceived = isReceived,
+            uiState = uiState,
+            init = viewModel::init
+        )
     }
 }
 

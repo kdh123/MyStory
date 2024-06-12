@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +40,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.search.domain.Place
+import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleUiState
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -94,12 +95,13 @@ private fun LocationSearchScreenPreview() {
 fun SearchBar(query: String, onQuery: (String) -> Unit) {
     val focusRequester = remember { FocusRequester() }
 
-    TextField(
+    OutlinedTextField(
         value = query,
         onValueChange = {
             onQuery(it)
         },
         colors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = colorResource(id = R.color.primary),
             disabledTextColor = colorResource(id = R.color.primary),
             disabledIndicatorColor = colorResource(id = R.color.primary),
             containerColor = Color.White
@@ -109,6 +111,7 @@ fun SearchBar(query: String, onQuery: (String) -> Unit) {
         },
         singleLine = true,
         modifier = Modifier
+            .padding(10.dp)
             .fillMaxWidth()
             .focusRequester(focusRequester)
     )

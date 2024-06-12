@@ -1,19 +1,19 @@
 package com.dhkim.timecapsule.timecapsule.domain
 
 data class TimeCapsule(
-    val id: String,
-    val date: String,
-    val openDate: String,
-    val lat: String,
-    val lng: String,
-    val address: String,
-    val content: String,
-    val medias: List<String>,
-    val checkLocation: Boolean,
-    val isOpened: Boolean,
-    val sharedFriends: List<String>,
-    val isReceived: Boolean,
-    val sender: String
+    val id: String = "",
+    val date: String = "",
+    val openDate: String = "",
+    val lat: String = "",
+    val lng: String = "",
+    val address: String = "",
+    val content: String = "",
+    val medias: List<String> = listOf(),
+    val checkLocation: Boolean = false,
+    val isOpened: Boolean = false,
+    val sharedFriends: List<String> = listOf(),
+    val isReceived: Boolean = false,
+    val sender: String = ""
 ) {
     fun toMyTimeCapsule(): MyTimeCapsule {
         return MyTimeCapsule(
