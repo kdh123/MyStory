@@ -20,6 +20,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -393,6 +394,8 @@ fun AddTimeCapsuleScreen(
                             resId = -1,
                             title = uiState.address.ifEmpty { "위치" },
                             subTitle = "지정한 위치 근처에 있어야 오픈할 수 있습니다.",
+                            modifier = Modifier
+                                .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 0.dp),
                             onClick = {
                                 showLocationBottomSheet = true
                             }
@@ -406,7 +409,9 @@ fun AddTimeCapsuleScreen(
                     MenuItem(
                         resId = R.drawable.ic_calender_black,
                         title = uiState.openDate.ifEmpty { "오픈 날짜" },
-                        subTitle = "오픈 날짜는 오늘로부터 3개월 이후로 설정이 가능합니다."
+                        subTitle = "오픈 날짜는 오늘로부터 3개월 이후로 설정이 가능합니다.",
+                        modifier = Modifier
+                            .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 15.dp),
                     ) {
                         showDateDialog = true
                     }
@@ -443,7 +448,9 @@ fun AddTimeCapsuleScreen(
                         MenuItem(
                             resId = -1,
                             title = title.toString().ifEmpty { title.append("친구 목록").toString() },
-                            subTitle = "서로 승낙한 친구에게만 공유할 수 있습니다."
+                            subTitle = "서로 승낙한 친구에게만 공유할 수 있습니다.",
+                            modifier = Modifier
+                                .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 0.dp),
                         ) {
                             scope.launch {
                                 showSharedFriendsBottomSheet = true
@@ -736,10 +743,15 @@ private fun SwitchMenuItemPreview() {
 }
 
 @Composable
-private fun MenuItem(resId: Int, title: String, subTitle: String = "", onClick: () -> Unit) {
+private fun MenuItem(
+    resId: Int,
+    title: String,
+    subTitle: String = "",
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Row(
-        modifier = Modifier
-            .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 15.dp)
+        modifier = modifier
             .wrapContentHeight()
             .fillMaxWidth()
     ) {
@@ -811,13 +823,15 @@ private fun ImageListView(
 ) {
     if (imageUrls.isEmpty()) {
         Box(modifier = modifier) {
-            ImageView(imageUrl = "") {
+            ImageView(modifier = Modifier.padding(start = 5.dp), imageUrl = "") {
                 onSelectPicture(-1)
             }
         }
     } else {
         LazyRow(
-            modifier = modifier
+            modifier = modifier,
+            contentPadding = PaddingValues(horizontal = 5.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             itemsIndexed(items = imageUrls, key = { index, key ->
                 key
@@ -844,7 +858,7 @@ private fun ImageListViewPreview() {
 }
 
 @Composable
-private fun ImageView(imageUrl: String, onClick: () -> Unit) {
+private fun ImageView(imageUrl: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     OutlinedCard(
         colors = CardDefaults.cardColors(
             containerColor = colorResource(id = R.color.white),
@@ -852,7 +866,7 @@ private fun ImageView(imageUrl: String, onClick: () -> Unit) {
         ),
         elevation = CardDefaults.elevatedCardElevation(10.dp),
         onClick = onClick,
-        modifier = Modifier.padding(start = 10.dp)
+        modifier = modifier
     ) {
         GlideImage(
             imageModel = imageUrl,

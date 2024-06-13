@@ -450,9 +450,6 @@ fun RequestScreen(uiState: ProfileUiState, onClick: (Friend) -> Unit) {
 
 @Composable
 fun FriendScreen(uiState: ProfileUiState, onDeleteClick: (userId: String) -> Unit) {
-    val friends = uiState.user.friends.filter { !it.isPending }.map { it.id }
-    val requests = uiState.user.friends.filter { it.isPending }.map { it.id }
-
     Column {
         Column {
             Text(
@@ -461,19 +458,19 @@ fun FriendScreen(uiState: ProfileUiState, onDeleteClick: (userId: String) -> Uni
                 modifier = Modifier
                     .padding(10.dp)
             )
-            FriendItem(userId = uiState.user.id, buttonText = "삭제", isMe = true, onDeleteClick = onDeleteClick)
+            FriendItem(userId = uiState.user.id, isMe = true, onDeleteClick = onDeleteClick)
         }
         FriendList(
-            friends = friends,
+            uiState = uiState,
+            isFriend = true,
             title = "서로 승낙한 친구",
-            buttonText = "삭제",
             modifier = Modifier.fillMaxWidth(),
             onDeleteClick = onDeleteClick
         )
         FriendList(
-            friends = requests,
+            uiState = uiState,
+            isFriend = false,
             title = "내가 요청한 친구",
-            buttonText = "삭제",
             modifier = Modifier.fillMaxSize(),
             onDeleteClick = onDeleteClick
         )
@@ -518,12 +515,17 @@ fun RequestList(
 
 @Composable
 fun FriendList(
-    friends: List<UserId>,
+    uiState: ProfileUiState,
     title: String,
-    buttonText: String,
+    isFriend: Boolean,
     onDeleteClick: (userId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val friends = if (isFriend) {
+        uiState.user.friends.filter { !it.isPending }.map { it.id }
+    } else {
+        uiState.user.friends.filter { it.isPending }.map { it.id }
+    }
     Column {
         Text(
             text = title,
@@ -538,9 +540,9 @@ fun FriendList(
                 }
             ) { index, item ->
                 if (index == friends.size - 1) {
-                    FriendItem(userId = item, buttonText = buttonText, onDeleteClick = onDeleteClick)
+                    FriendItem(item, onDeleteClick = onDeleteClick)
                 } else {
-                    FriendItem(userId = item, buttonText = buttonText, onDeleteClick = onDeleteClick)
+                    FriendItem(item, onDeleteClick = onDeleteClick)
                     Divider(
                         color = colorResource(id = R.color.light_gray),
                         modifier = Modifier
@@ -599,14 +601,14 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
 }
 
 @Composable
-fun FriendItem(userId: String, buttonText: String, isMe: Boolean = false, onDeleteClick: (userId: String) -> Unit) {
+fun FriendItem(userId: String, isMe: Boolean = false, onDeleteClick: (userId: String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
     ) {
         Image(
-            painter = painterResource(id = R.mipmap.ic_box),
+            painter = painterResource(id = R.drawable.ic_smile_blue),
             contentDescription = null,
             modifier = Modifier.align(Alignment.CenterVertically)
         )
@@ -649,7 +651,7 @@ fun FriendItem(userId: String, buttonText: String, isMe: Boolean = false, onDele
 @Composable
 private fun FriendItemPreview() {
 
-    FriendItem(userId = "dh", buttonText = "삭제") {
+    FriendItem(userId = "") {
 
     }
 }
