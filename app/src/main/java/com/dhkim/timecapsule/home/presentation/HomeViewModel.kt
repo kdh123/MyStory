@@ -153,7 +153,7 @@ class HomeViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         query = query,
-                        category = Category.Popular,
+                        category = Category.entries.first { category ->  category.type == query },
                         places = flowOf(it).stateIn(viewModelScope),
                         selectedPlace = null
                     )

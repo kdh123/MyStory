@@ -319,24 +319,27 @@ fun HomeScreen(
                 )
 
                 LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp),
                     modifier = Modifier
                         .wrapContentWidth()
-                    //.padding(start = 10.dp)
                 ) {
                     items(Category.entries.filter { it != Category.None },
                         key = {
                             it.code
                         }) {
-                        CategoryChip(category = it, isSelected = it == uiState.category) {
-                            if (it == Category.Popular) {
-                                viewModel.searchPlacesByKeyword(
-                                    query = Category.Popular.type,
+                        CategoryChip(
+                            category = it, isSelected = it == uiState.category
+                        ) { category ->
+                            if (isCategory(category)) {
+                                viewModel.searchPlacesByCategory(
+                                    category = it,
                                     lat = currentLocation.latitude.toString(),
                                     lng = currentLocation.longitude.toString()
                                 )
                             } else {
-                                viewModel.searchPlacesByCategory(
-                                    category = it,
+                                viewModel.searchPlacesByKeyword(
+                                    query = category.type,
                                     lat = currentLocation.latitude.toString(),
                                     lng = currentLocation.longitude.toString()
                                 )
@@ -358,6 +361,18 @@ fun HomeScreen(
             }
         }
     }
+}
+
+private fun isCategory(category: Category): Boolean {
+    val categoryPlaces = listOf(
+        Category.Restaurant,
+        Category.Cafe,
+        Category.Attraction,
+        Category.Resort,
+        Category.Culture
+    )
+
+    return categoryPlaces.contains(category)
 }
 
 @Composable
@@ -567,10 +582,11 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
         ),
         border = BorderStroke(1.dp, color = color),
         modifier = Modifier
+            .height(45.dp)
             .clip(
                 shape = RoundedCornerShape(10.dp)
             )
-            .padding(start = 10.dp, bottom = 5.dp)
+            .padding(bottom = 5.dp)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null
@@ -582,14 +598,17 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
         ),
     ) {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
+                .fillMaxHeight()
                 .padding(horizontal = 8.dp, vertical = 5.dp)
         ) {
             Icon(
                 tint = Color.Unspecified,
                 painter = painterResource(id = category.resId),
                 contentDescription = null,
-                modifier = Modifier.align(Alignment.CenterVertically)
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
             )
             Text(
                 text = category.type,

@@ -31,7 +31,6 @@ fun NavGraphBuilder.timeCapsuleNavigation(
             sideEffect = sideEffect,
             modifier = modifier,
             shareTimeCapsule = viewModel::shareTimeCapsule,
-            openTimeCapsule = viewModel::openTimeCapsule,
             onNavigateToOpen = onNavigateToOpen,
             onNavigateToDetail = onNavigateToDetail
         )

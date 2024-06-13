@@ -58,7 +58,6 @@ fun TimeCapsuleScreen(
     uiState: TimeCapsuleUiState,
     sideEffect: TimeCapsuleSideEffect,
     modifier: Modifier = Modifier,
-    openTimeCapsule: (TimeCapsule) -> Unit,
     onNavigateToOpen: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     shareTimeCapsule: (
@@ -126,7 +125,7 @@ fun TimeCapsuleScreen(
             text = "오픈한 타임캡슐",
             modifier = Modifier
                 .padding(start = 10.dp, end = 10.dp, top = 10.dp),
-            fontSize = 18.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
         Box(
@@ -625,7 +624,7 @@ private fun MyTimeCapsulePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun TimeCapsuleScreenPreview() {
-    TimeCapsuleScreen(TimeCapsuleUiState(), TimeCapsuleSideEffect.None, modifier = Modifier, {}, { _, _ -> }, { _, _ -> }) { _, _, _, _, _, _, _ ->
+    TimeCapsuleScreen(TimeCapsuleUiState(), TimeCapsuleSideEffect.None, modifier = Modifier, { _, _ -> }, { _, _ -> }) { _, _, _, _, _, _, _ ->
 
     }
 }
