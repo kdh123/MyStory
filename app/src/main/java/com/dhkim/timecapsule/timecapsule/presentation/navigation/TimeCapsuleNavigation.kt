@@ -7,6 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.dhkim.timecapsule.main.Screen
+import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.timecapsule.TimeCapsuleScreen
 import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleScreen
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailScreen
@@ -74,10 +75,12 @@ fun NavGraphBuilder.addTimeCapsuleNavigation(
     onBack: () -> Unit,
 ) {
     composable("addTimeCapsule") { backStackEntry ->
+        val place = backStackEntry.savedStateHandle.get<Place>("place") ?: Place()
         val imageUrl = backStackEntry.savedStateHandle.get<String>("imageUrl") ?: ""
 
         AddTimeCapsuleScreen(
             imageUrl = imageUrl,
+            place = place,
             onNavigateToCamera = onNavigateToCamera,
             onBack = onBack
         )

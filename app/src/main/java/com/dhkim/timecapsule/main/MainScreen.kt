@@ -5,7 +5,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -104,14 +103,6 @@ fun MainScreen() {
                             )
                         }
                     }
-                } else {
-                    BottomPlace(
-                        place = selectedPlace!!,
-                        modifier = Modifier
-                            .background(color = colorResource(id = R.color.white))
-                    ) {
-
-                    }
                 }
             }
         }
@@ -134,6 +125,12 @@ fun MainScreen() {
                     navController.currentBackStackEntry
                         ?.savedStateHandle
                         ?.set("place", null)
+                },
+                onNavigateToAdd = { place ->
+                    navController.navigate("addTimeCapsule")
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("place", place)
                 }
             )
             timeCapsuleDetailNavigation()
@@ -183,8 +180,8 @@ fun MainScreen() {
 sealed class Screen(
     val title: String, val selected: Int, val unSelected: Int, val route: String
 ) {
-    object Home : Screen("홈", R.drawable.ic_home_primary, R.drawable.ic_home_black, "home")
-    object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, "addTimeCapsule")
-    object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, "timeCapsule")
-    object Profile : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, "profile")
+    data object Home : Screen("홈", R.drawable.ic_home_primary, R.drawable.ic_home_black, "home")
+    data object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, "addTimeCapsule")
+    data object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, "timeCapsule")
+    data object Profile : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, "profile")
 }

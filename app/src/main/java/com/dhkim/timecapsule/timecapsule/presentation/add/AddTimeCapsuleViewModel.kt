@@ -80,6 +80,15 @@ class AddTimeCapsuleViewModel @Inject constructor(
         }
     }
 
+    fun initPlace(place: Place) {
+        _uiState.value = _uiState.value.copy(
+            lat = place.lat,
+            lng = place.lng,
+            address = place.name,
+            checkLocation = true
+        )
+    }
+
     fun onQuery(s: String) {
         query.value = s
         _uiState.value = _uiState.value.copy(

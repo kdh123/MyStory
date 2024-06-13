@@ -13,6 +13,7 @@ import com.dhkim.timecapsule.search.domain.Place
 fun NavGraphBuilder.homeNavigation(
     scaffoldState: BottomSheetScaffoldState,
     onNavigateToSearch: (Double, Double) -> Unit,
+    onNavigateToAdd: (Place) -> Unit,
     onSelectPlace: (Place?) -> Unit,
     onInitSavedState: () -> Unit
 ) {
@@ -32,6 +33,9 @@ fun NavGraphBuilder.homeNavigation(
             },
             onInitSavedState = remember {
                 onInitSavedState
+            },
+            onNavigateToAddScreen = remember {
+                onNavigateToAdd
             }
         )
     }

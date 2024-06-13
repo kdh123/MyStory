@@ -39,7 +39,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.composable.LoadingProgressBar
 import com.dhkim.timecapsule.common.composable.drawAnimatedBorder
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.skydoves.landscapist.glide.GlideImage
@@ -95,16 +94,6 @@ fun TimeCapsuleOpenScreen(
             fadeIn(
                 animationSpec = tween(3000)
             ) togetherWith fadeOut(animationSpec = tween(3000))
-        },
-        modifier = Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null
-        ) {
-            state = when (state) {
-                UiState.Loading -> UiState.Loaded
-                UiState.Loaded -> UiState.Error
-                UiState.Error -> UiState.Loading
-            }
         },
         label = "Animated Content"
     ) { targetState ->

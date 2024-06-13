@@ -104,6 +104,7 @@ fun HomeScreen(
     scaffoldState: BottomSheetScaffoldState,
     place: Place?,
     onNavigateToSearch: (Double, Double) -> Unit,
+    onNavigateToAddScreen: (Place) -> Unit,
     onSelectPlace: (Place?) -> Unit,
     onInitSavedState: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
@@ -349,17 +350,22 @@ fun HomeScreen(
                     place = it,
                     modifier = Modifier
                         .background(color = colorResource(id = R.color.white))
-                        .align(Alignment.BottomCenter)
-                ) {
-
-                }
+                        .align(Alignment.BottomCenter),
+                    onTimeCapsuleClick = { place ->
+                        onNavigateToAddScreen(place)
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun BottomPlace(place: Place, modifier: Modifier, onTimeCapsuleClick: (Place) -> Unit) {
+fun BottomPlace(
+    place: Place,
+    modifier: Modifier,
+    onTimeCapsuleClick: (Place) -> Unit
+) {
     val interactionSource = remember { MutableInteractionSource() }
     Row(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -367,9 +373,6 @@ fun BottomPlace(place: Place, modifier: Modifier, onTimeCapsuleClick: (Place) ->
                 .width(0.dp)
                 .weight(1f)
                 .padding(vertical = 5.dp)
-                .clickable {
-                    onTimeCapsuleClick(place)
-                }
                 .align(Alignment.CenterVertically),
             verticalArrangement = Arrangement.Center
         ) {
@@ -422,20 +425,16 @@ fun BottomPlace(place: Place, modifier: Modifier, onTimeCapsuleClick: (Place) ->
                 .padding(10.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .align(Alignment.CenterVertically)
-                .border(
-                    width = 2.dp,
-                    color = colorResource(id = R.color.primary),
-                    shape = RoundedCornerShape(10.dp)
-                )
+                .background(color = colorResource(id = R.color.primary))
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null
                 ) {
-
+                    onTimeCapsuleClick(place)
                 }
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_time_primary),
+                painter = painterResource(id = R.drawable.ic_time_white),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(10.dp)

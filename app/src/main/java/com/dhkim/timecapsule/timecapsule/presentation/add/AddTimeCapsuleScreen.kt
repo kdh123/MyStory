@@ -83,6 +83,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.DateUtil
+import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.timecapsule.domain.BaseTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
@@ -102,6 +103,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddTimeCapsuleScreen(
     imageUrl: String,
+    place: Place,
     onNavigateToCamera: () -> Unit,
     onBack: () -> Unit,
     viewModel: AddTimeCapsuleViewModel = hiltViewModel()
@@ -152,8 +154,12 @@ fun AddTimeCapsuleScreen(
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     // Got last known location. In some rare situations this can be null.
-                    currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-                    viewModel.searchAddress("${currentLocation.latitude}", "${currentLocation.longitude}")
+                    if (place.lat == "" || place.lng == "") {
+                        currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+                        viewModel.searchAddress("${currentLocation.latitude}", "${currentLocation.longitude}")
+                    } else {
+                        viewModel.initPlace(place)
+                    }
                 }
         } else {
             // Handle permission denial
@@ -918,6 +924,7 @@ private fun ContentViewPreview() {
 private fun AddTimeCapsuleScreenPreview() {
     AddTimeCapsuleScreen(
         imageUrl = "imageUrl22",
+        place = Place(),
         onNavigateToCamera = {},
         onBack = {}
     )
