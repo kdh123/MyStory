@@ -8,6 +8,7 @@ data class TimeCapsuleUiState(
     val isLoading: Boolean = false,
     val isCompleted: Boolean = false,
     val openedTimeCapsules: List<TimeCapsule> = listOf(),
+    val unOpenedTimeCapsules: List<TimeCapsule> = listOf(),
     val unOpenedMyTimeCapsules: List<TimeCapsule> = listOf(),
     val unOpenedReceivedTimeCapsules: List<TimeCapsule> = listOf(),
 )

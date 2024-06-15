@@ -382,7 +382,6 @@ fun BottomSheetScreen(
                             colors = CardDefaults.cardColors(
                                 containerColor = colorResource(id = R.color.primary)
                             ),
-                            elevation = CardDefaults.cardElevation(10.dp),
                             modifier = Modifier
                                 .align(Alignment.CenterVertically),
                             onClick = {
@@ -456,7 +455,7 @@ fun FriendScreen(uiState: ProfileUiState, onDeleteClick: (userId: String) -> Uni
                 text = "나",
                 color = colorResource(id = R.color.gray),
                 modifier = Modifier
-                    .padding(10.dp)
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp)
             )
             FriendItem(userId = uiState.user.id, isMe = true, onDeleteClick = onDeleteClick)
         }
@@ -531,7 +530,7 @@ fun FriendList(
             text = title,
             color = colorResource(id = R.color.gray),
             modifier = Modifier
-                .padding(10.dp)
+                .padding(horizontal = 10.dp)
         )
         LazyColumn(modifier = modifier) {
             itemsIndexed(
@@ -605,7 +604,7 @@ fun FriendItem(userId: String, isMe: Boolean = false, onDeleteClick: (userId: St
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(horizontal = 10.dp)
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_smile_blue),
@@ -629,7 +628,6 @@ fun FriendItem(userId: String, isMe: Boolean = false, onDeleteClick: (userId: St
                 color = colorResource(id = R.color.primary)
             ),
             colors = CardDefaults.cardColors(colorResource(id = R.color.primary)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 20.dp),
             onClick = {
                 onDeleteClick(userId)
             }

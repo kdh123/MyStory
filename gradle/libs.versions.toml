@@ -40,9 +40,11 @@ dataStore = "1.0.0"
 fcm = "23.2.1"
 composeAnimation = "1.6.0"
 jodaTime = "2.12.7"
+cloudy = "0.1.2"
 
 
 [libraries]
+blur-cloudy = { module = "com.github.skydoves:cloudy", version.ref = "cloudy" }
 android-joda = { module = "net.danlew:android.joda", version.ref = "jodaTime" }
 androidx-compose-animation = { module = "androidx.compose.animation:animation-core" , version.ref = "composeAnimation" }
 google-firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "fcm" }

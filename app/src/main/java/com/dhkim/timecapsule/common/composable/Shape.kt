@@ -1,11 +1,19 @@
 package com.dhkim.timecapsule.common.composable
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.renderscript.Allocation
+import android.renderscript.RenderScript
+import android.renderscript.ScriptIntrinsicBlur
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -17,11 +25,19 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import com.dhkim.timecapsule.R
+import com.skydoves.cloudy.Cloudy
+import com.skydoves.landscapist.glide.GlideImage
 
 val gradientColors = listOf(
     //Color.Red,
@@ -37,6 +53,48 @@ val gradientColors = listOf(
     //Color.Yellow,
     //Color.Red
 )
+
+@Composable
+fun BlurImage(
+    bitmap: Bitmap,
+    modifier: Modifier = Modifier.fillMaxSize(),
+) {
+    Image(
+        bitmap = bitmap.asImageBitmap(),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun LegacyBlurImage(
+    bitmap: Bitmap,
+    blurRadio: Float,
+    modifier: Modifier = Modifier.fillMaxSize()
+) {
+
+    val renderScript = RenderScript.create(LocalContext.current)
+    val bitmapAlloc = Allocation.createFromBitmap(renderScript, bitmap)
+    ScriptIntrinsicBlur.create(renderScript, bitmapAlloc.element).apply {
+        setRadius(blurRadio)
+        setInput(bitmapAlloc)
+        forEach(bitmapAlloc)
+    }
+    bitmapAlloc.copyTo(bitmap)
+    renderScript.destroy()
+
+    BlurImage(bitmap, modifier)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BlurImagePreview() {
+    val bitmap = BitmapFactory
+        .decodeResource(LocalContext.current.resources, R.drawable.ic_launcher_background)
+
+    LegacyBlurImage(bitmap = bitmap, blurRadio = 15f)
+}
 
 fun Modifier.drawAnimatedBorder(
     strokeWidth: Dp,

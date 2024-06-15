@@ -19,6 +19,7 @@ import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleOpenScre
 fun NavGraphBuilder.timeCapsuleNavigation(
     onNavigateToOpen: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
+    onNavigateToNotification: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     composable(Screen.TimeCapsule.route) {
@@ -30,9 +31,9 @@ fun NavGraphBuilder.timeCapsuleNavigation(
             uiState = uiState,
             sideEffect = sideEffect,
             modifier = modifier,
-            shareTimeCapsule = viewModel::shareTimeCapsule,
             onNavigateToOpen = onNavigateToOpen,
-            onNavigateToDetail = onNavigateToDetail
+            onNavigateToDetail = onNavigateToDetail,
+            onNavigateToNotification = onNavigateToNotification
         )
     }
 }

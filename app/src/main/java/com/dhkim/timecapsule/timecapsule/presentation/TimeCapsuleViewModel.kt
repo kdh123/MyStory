@@ -3,7 +3,6 @@ package com.dhkim.timecapsule.timecapsule.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.timecapsule.common.DateUtil
-import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +18,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimeCapsuleViewModel @Inject constructor(
-    private val userRepository: UserRepository,
     private val timeCapsuleRepository: TimeCapsuleRepository
 ) : ViewModel() {
 
@@ -46,6 +44,7 @@ class TimeCapsuleViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         unOpenedMyTimeCapsules = unOpenedMyTimeCapsules,
                         unOpenedReceivedTimeCapsules = unOpenedReceivedTimeCapsules,
+                        unOpenedTimeCapsules = unOpenedMyTimeCapsules + unOpenedReceivedTimeCapsules,
                         openedTimeCapsules = openedTimeCapsules
                     )
                 }

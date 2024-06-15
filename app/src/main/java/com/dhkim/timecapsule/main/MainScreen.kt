@@ -35,8 +35,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.dhkim.camera.navigation.cameraNavigation
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.home.BottomPlace
 import com.dhkim.timecapsule.home.presentation.navigation.homeNavigation
+import com.dhkim.timecapsule.notification.navigation.navigateToNotification
+import com.dhkim.timecapsule.notification.navigation.notificationNavigation
 import com.dhkim.timecapsule.profile.presentation.navigation.profileNavigation
 import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.presentation.navigation.searchNavigation
@@ -54,7 +55,7 @@ fun MainScreen() {
     )
     val scaffoldState = rememberBottomSheetScaffoldState(state)
     val navController = rememberNavController()
-    val items = listOf(Screen.Home, Screen.AddTimeCapsule, Screen.TimeCapsule, Screen.Profile)
+    val items = listOf(Screen.TimeCapsule, Screen.AddTimeCapsule, Screen.Home, Screen.Profile)
     val isBottomNavShow = navController
         .currentBackStackEntryAsState()
         .value?.destination?.route in listOf(Screen.Home.route, Screen.TimeCapsule.route, Screen.Profile.route)
@@ -111,7 +112,7 @@ fun MainScreen() {
             modifier = Modifier
                 .fillMaxSize(),
             navController = navController,
-            startDestination = "home"
+            startDestination = "timeCapsule"
         ) {
             homeNavigation(
                 scaffoldState = scaffoldState,
@@ -142,10 +143,21 @@ fun MainScreen() {
                 onNavigateToDetail = { id, isReceived ->
                     navController.navigate("timeCapsuleDetail/$id/${isReceived}")
                 },
+                onNavigateToNotification = {
+                    navController.navigateToNotification()
+                },
                 modifier = Modifier
                     .padding(
                         bottom = innerPdding.calculateBottomPadding()
                     )
+            )
+            notificationNavigation(
+                onNavigateToTimeCapsule = {
+
+                },
+                onBack = {
+                    navController.navigateUp()
+                }
             )
             addTimeCapsuleNavigation(
                 onNavigateToCamera = {
@@ -180,7 +192,7 @@ fun MainScreen() {
 sealed class Screen(
     val title: String, val selected: Int, val unSelected: Int, val route: String
 ) {
-    data object Home : Screen("홈", R.drawable.ic_home_primary, R.drawable.ic_home_black, "home")
+    data object Home : Screen("홈", R.drawable.ic_map_primary, R.drawable.ic_map_black, "home")
     data object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, "addTimeCapsule")
     data object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, "timeCapsule")
     data object Profile : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, "profile")
