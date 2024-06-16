@@ -1,8 +1,11 @@
 package com.dhkim.timecapsule.timecapsule.presentation.detail
 
 import android.annotation.SuppressLint
+import android.view.MotionEvent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,59 +27,104 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.presentation.profileImage
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
+import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraPosition
+import com.naver.maps.map.CameraUpdate
+import com.naver.maps.map.compose.ExperimentalNaverMapApi
+import com.naver.maps.map.compose.LocationTrackingMode
+import com.naver.maps.map.compose.MapProperties
+import com.naver.maps.map.compose.MapUiSettings
+import com.naver.maps.map.compose.Marker
+import com.naver.maps.map.compose.MarkerState
+import com.naver.maps.map.compose.NaverMap
+import com.naver.maps.map.compose.rememberCameraPositionState
 import com.skydoves.landscapist.glide.GlideImage
 
+@OptIn(ExperimentalNaverMapApi::class, ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TimeCapsuleDetailScreen(
     timeCapsuleId: String,
     isReceived: Boolean,
     uiState: TimeCapsuleDetailUiState,
-    init: (String, Boolean) -> Unit
+    init: (String, Boolean) -> Unit,
+    onBack: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-
-    LaunchedEffect(uiState) {
-        init(timeCapsuleId, isReceived)
+    val cameraPositionState = rememberCameraPositionState()
+    val mapProperties by remember {
+        mutableStateOf(
+            MapProperties(maxZoom = 20.0, minZoom = 5.0, locationTrackingMode = LocationTrackingMode.NoFollow)
+        )
+    }
+    val mapUiSettings by remember {
+        mutableStateOf(
+            MapUiSettings(
+                isLocationButtonEnabled = false
+            )
+        )
+    }
+    var enableScroll by remember {
+        mutableStateOf(true)
     }
 
+    LaunchedEffect(uiState) {
+        cameraPositionState.move(
+            CameraUpdate.toCameraPosition(
+                CameraPosition(
+                    LatLng(uiState.timeCapsule.lat.toDouble(), uiState.timeCapsule.lng.toDouble()),
+                    15.0
+                )
+            )
+        )
+        init(timeCapsuleId, isReceived)
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier
-                .verticalScroll(scrollState)
+                .verticalScroll(
+                    scrollState,
+                    enabled = enableScroll
+                )
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_back_black),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 10.dp)
+                    .background(color = Color.White)
+                    .clickable {
+                        onBack()
+                    }
+            )
             val writer = if (!isReceived) {
                 "${uiState.timeCapsule.sender} (나)"
             } else {
                 "${uiState.timeCapsule.sender} (친구)"
             }
-            if (uiState.timeCapsule.medias.isNotEmpty()) {
-                TimeCapsulePager(uiState = uiState)
-            }
-            MenuItem(resId = R.drawable.ic_location_black, title = uiState.timeCapsule.address)
-            Divider(
-                color = colorResource(id = R.color.light_gray),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .height(1.dp)
-            )
+            TimeCapsulePager(uiState = uiState)
             MenuItem(resId = uiState.timeCapsule.host.profileImage.profileImage(), title = "작성자 : $writer")
             Divider(
                 color = colorResource(id = R.color.light_gray),
@@ -97,10 +145,56 @@ fun TimeCapsuleDetailScreen(
                 text = uiState.timeCapsule.content,
                 fontSize = 18.sp,
                 modifier = Modifier
-                    .padding(20.dp)
+                    .padding(horizontal = 20.dp, vertical = 30.dp)
             )
-        }
 
+            Divider(
+                color = colorResource(id = R.color.light_gray),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .height(1.dp)
+            )
+
+            LaunchedEffect(cameraPositionState.isMoving) {
+                enableScroll = !cameraPositionState.isMoving
+            }
+            if (uiState.timeCapsule.checkLocation || !isReceived) {
+                MenuItem(resId = R.drawable.ic_location_black, title = uiState.timeCapsule.address)
+                NaverMap(
+                    cameraPositionState = cameraPositionState,
+                    properties = mapProperties,
+                    uiSettings = mapUiSettings,
+                    modifier = Modifier
+                        .padding(start = 15.dp, end = 15.dp, bottom = 15.dp)
+                        .fillMaxWidth()
+                        .aspectRatio(1.3f)
+                        .padding(0.dp)
+                        .pointerInteropFilter(
+                            onTouchEvent = {
+                                when (it.action) {
+                                    MotionEvent.ACTION_DOWN -> {
+                                        enableScroll = false // 터치 시작 시 화면 스크롤 비활성화
+                                        false // 이벤트를 지도에 넘김
+                                    }
+
+                                    else -> true
+                                }
+                            }
+                        )
+                ) {
+                    Marker(
+                        state = MarkerState(
+                            position = LatLng(
+                                uiState.timeCapsule.lat.toDouble(),
+                                uiState.timeCapsule.lng.toDouble()
+                            )
+                        ),
+                        captionText = uiState.timeCapsule.address
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -143,6 +237,9 @@ private fun TimeCapsuleDetailScreenPreview() {
         uiState = TimeCapsuleDetailUiState(timeCapsule = timeCapsule),
         init = { _, _ ->
 
+        },
+        onBack = {
+
         }
     )
 }
@@ -165,14 +262,14 @@ fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState) {
         }
     }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        if (images.isNotEmpty()) {
             HorizontalPager(
                 state = pagerState
             ) { page ->
                 GlideImage(
                     imageModel = images[page],
-                    contentDescription = "pet image",
+                    contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
@@ -187,6 +284,26 @@ fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState) {
                     .background(color = colorResource(id = R.color.transparent_gray))
                     .padding(10.dp),
                 color = colorResource(id = R.color.black)
+            )
+        } else {
+            val brush = Brush.linearGradient(
+                listOf(Color(0XFF3C5AFA), Color(0XFFF361DC))
+            )
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+                onDraw = {
+                    drawRect(brush)
+                }
+            )
+            Text(
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                text = "사진이 존재하지 않습니다.",
+                modifier = Modifier
+                    .align(Alignment.Center)
             )
         }
     }

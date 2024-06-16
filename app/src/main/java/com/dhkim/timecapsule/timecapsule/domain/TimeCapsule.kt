@@ -1,5 +1,7 @@
 package com.dhkim.timecapsule.timecapsule.domain
 
+import com.dhkim.timecapsule.common.Constants
+
 data class Host(
     val id: String = "",
     val profileImage: String = ""
@@ -10,8 +12,8 @@ data class TimeCapsule(
     val host: Host = Host(),
     val date: String = "",
     val openDate: String = "",
-    val lat: String = "",
-    val lng: String = "",
+    val lat: String = "${Constants.defaultLocation.latitude}",
+    val lng: String = "${Constants.defaultLocation.longitude}",
     val address: String = "",
     val content: String = "",
     val medias: List<String> = listOf(),

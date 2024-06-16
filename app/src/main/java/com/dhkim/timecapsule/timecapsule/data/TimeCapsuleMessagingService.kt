@@ -58,9 +58,21 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
                     date = DateUtil.todayDate(),
                     openDate = openDate,
                     sender = sender,
-                    lat = lat,
-                    lng = lng,
-                    address = address,
+                    lat = if (checkLocation) {
+                        lat
+                    } else {
+                        "0.0"
+                    },
+                    lng = if (checkLocation) {
+                        lng
+                    } else {
+                        "0.0"
+                    },
+                    address = if (checkLocation) {
+                        address
+                    } else {
+                        ""
+                    },
                     content = content,
                     checkLocation = checkLocation,
                     isOpened = false

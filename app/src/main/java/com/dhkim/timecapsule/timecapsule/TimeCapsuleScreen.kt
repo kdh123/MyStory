@@ -54,6 +54,7 @@ fun TimeCapsuleScreen(
     uiState: TimeCapsuleUiState,
     sideEffect: TimeCapsuleSideEffect,
     modifier: Modifier = Modifier,
+    onNavigateToAdd: () -> Unit,
     onNavigateToOpen: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToNotification: () -> Unit
@@ -114,9 +115,11 @@ fun TimeCapsuleScreen(
         }
 
         OpenableTimeCapsules(uiState = uiState, onNavigateToOpen = onNavigateToOpen)
-        UnopenedTimeCapsules(uiState = uiState, onShowDetailBottom = { })
+        UnopenedTimeCapsules(uiState = uiState, onNavigateToAdd = onNavigateToAdd, onShowDetailBottom = { })
         OpenedTimeCapsules(uiState = uiState, onNavigateToDetail = onNavigateToDetail)
-        GuideItem()
+        if (uiState.openedTimeCapsules.isEmpty()) {
+            GuideItem()
+        }
     }
 }
 
@@ -215,7 +218,7 @@ private fun OpenableTimeCapsules(
 }
 
 @Composable
-private fun UnopenedTimeCapsules(uiState: TimeCapsuleUiState, onShowDetailBottom: ((TimeCapsule) -> Unit)) {
+private fun UnopenedTimeCapsules(uiState: TimeCapsuleUiState, onNavigateToAdd: () -> Unit, onShowDetailBottom: ((TimeCapsule) -> Unit)) {
     Text(
         text = "미개봉 타임캡슐",
         modifier = Modifier
@@ -233,7 +236,7 @@ private fun UnopenedTimeCapsules(uiState: TimeCapsuleUiState, onShowDetailBottom
                 .height(150.dp)
                 .background(color = colorResource(id = R.color.light_gray))
                 .clickable {
-
+                    onNavigateToAdd()
                 }
         ) {
             Image(
@@ -313,7 +316,9 @@ private fun TimeCapsuleScreenPreview() {
             openedTimeCapsules = openedList,
             unOpenedTimeCapsules = unOpenedList.toList()
         ),
-        sideEffect = TimeCapsuleSideEffect.None, modifier = Modifier,
+        sideEffect = TimeCapsuleSideEffect.None,
+        modifier = Modifier,
+        onNavigateToAdd = {  },
         onNavigateToOpen = { _, _ -> },
         onNavigateToDetail = { _, _ -> },
         onNavigateToNotification = { }

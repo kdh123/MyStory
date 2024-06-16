@@ -13,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimeCapsuleDetailViewModel @Inject constructor(
-    private val timeCapsuleRepository: TimeCapsuleRepository
+    private val timeCapsuleRepository: TimeCapsuleRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TimeCapsuleDetailUiState())
@@ -21,6 +22,7 @@ class TimeCapsuleDetailViewModel @Inject constructor(
 
     fun init(timeCapsuleId: String, isReceived: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
+            val myId = userRepository.getMyId()
             if (isReceived) {
                 timeCapsuleRepository.getReceivedTimeCapsule(id = timeCapsuleId)?.let {
                     timeCapsuleRepository.updateReceivedTimeCapsule(it.copy(isOpened = true))
@@ -29,7 +31,7 @@ class TimeCapsuleDetailViewModel @Inject constructor(
             } else {
                 timeCapsuleRepository.getMyTimeCapsule(id = timeCapsuleId)?.let {
                     timeCapsuleRepository.editMyTimeCapsule(it.copy(isOpened = true))
-                    _uiState.value = _uiState.value.copy(timeCapsule = it.toTimeCapsule())
+                    _uiState.value = _uiState.value.copy(timeCapsule = it.toTimeCapsule(myId))
                 }
             }
         }

@@ -33,9 +33,21 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
             profileImage = myProfileImage,
             openDate = openDate,
             content = content,
-            lat = lat,
-            lng = lng,
-            address = address,
+            lat = if (checkLocation) {
+                lat
+            } else {
+                "0.0"
+            },
+            lng = if (checkLocation) {
+                lng
+            } else {
+                "0.0"
+            },
+            address = if (checkLocation) {
+                address
+            } else {
+                ""
+            },
             checkLocation = checkLocation
         )
         val gson = Gson()

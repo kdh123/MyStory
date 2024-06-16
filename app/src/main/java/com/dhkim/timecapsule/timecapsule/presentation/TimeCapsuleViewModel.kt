@@ -3,6 +3,7 @@ package com.dhkim.timecapsule.timecapsule.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.timecapsule.common.DateUtil
+import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimeCapsuleViewModel @Inject constructor(
-    private val timeCapsuleRepository: TimeCapsuleRepository
+    private val timeCapsuleRepository: TimeCapsuleRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TimeCapsuleUiState())
@@ -29,9 +31,10 @@ class TimeCapsuleViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
+            val myId = userRepository.getMyId()
             timeCapsuleRepository.getMyAllTimeCapsule()
                 .combine(timeCapsuleRepository.getReceivedAllTimeCapsule()) { myTimeCapsules, receivedTimeCapsules ->
-                    myTimeCapsules.map { it.toTimeCapsule() } + receivedTimeCapsules.map { it.toTimeCapsule() }
+                    myTimeCapsules.map { it.toTimeCapsule(myId) } + receivedTimeCapsules.map { it.toTimeCapsule() }
                 }.catch { }
                 .collect { timeCapsules ->
                     val unOpenedMyTimeCapsules = timeCapsules
@@ -62,28 +65,6 @@ class TimeCapsuleViewModel @Inject constructor(
                         unOpenedTimeCapsules = unOpenedMyTimeCapsules + unOpenedReceivedTimeCapsules,
                     )
                 }
-        }
-    }
-
-    fun openTimeCapsule(timeCapsule: TimeCapsule) {
-        viewModelScope.launch {
-            _sideEffect.emit(TimeCapsuleSideEffect.NavigateToDetail(timeCapsule.id, timeCapsule.isReceived))
-        }
-    }
-
-    fun shareTimeCapsule(
-        friends: List<String>,
-        openDate: String,
-        content: String,
-        lat: String,
-        lng: String,
-        address: String,
-        checkLocation: Boolean
-    ) {
-        viewModelScope.launch {
-            timeCapsuleRepository.shareTimeCapsule(
-                friends, openDate, content, lat, lng, address, checkLocation
-            )
         }
     }
 

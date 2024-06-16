@@ -17,6 +17,7 @@ import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailVi
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleOpenScreen
 
 fun NavGraphBuilder.timeCapsuleNavigation(
+    onNavigateToAdd: () -> Unit,
     onNavigateToOpen: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToNotification: () -> Unit,
@@ -31,6 +32,7 @@ fun NavGraphBuilder.timeCapsuleNavigation(
             uiState = uiState,
             sideEffect = sideEffect,
             modifier = modifier,
+            onNavigateToAdd = onNavigateToAdd,
             onNavigateToOpen = onNavigateToOpen,
             onNavigateToDetail = onNavigateToDetail,
             onNavigateToNotification = onNavigateToNotification
@@ -38,7 +40,7 @@ fun NavGraphBuilder.timeCapsuleNavigation(
     }
 }
 
-fun NavGraphBuilder.timeCapsuleDetailNavigation() {
+fun NavGraphBuilder.timeCapsuleDetailNavigation(onBack: () -> Unit) {
     composable("timeCapsuleDetail/{id}/{isReceived}") { backStackEntry ->
         val id = backStackEntry.arguments?.getString("id") ?: ""
         val isReceived = (backStackEntry.arguments?.getString("isReceived") ?: "false").toBoolean()
@@ -49,6 +51,7 @@ fun NavGraphBuilder.timeCapsuleDetailNavigation() {
             timeCapsuleId = id,
             isReceived = isReceived,
             uiState = uiState,
+            onBack = onBack,
             init = viewModel::init
         )
     }

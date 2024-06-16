@@ -134,7 +134,11 @@ fun MainScreen() {
                         ?.set("place", place)
                 }
             )
-            timeCapsuleDetailNavigation()
+            timeCapsuleDetailNavigation(
+                onBack = {
+                    navController.navigateUp()
+                }
+            )
             timeCapsuleOpenNavigation(
                 onNavigateToDetail = { id, isReceived ->
                     navController.navigate("timeCapsuleDetail/$id/${isReceived}") {
@@ -145,6 +149,9 @@ fun MainScreen() {
                 }
             )
             timeCapsuleNavigation(
+                onNavigateToAdd = {
+                    navController.navigate(Screen.AddTimeCapsule.route)
+                },
                 onNavigateToOpen = { id, isReceived ->
                     navController.navigate("timeCapsuleOpen/$id/${isReceived}")
                 },

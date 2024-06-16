@@ -16,7 +16,7 @@ data class MyTimeCapsule(
     val sharedFriends: List<UserId>
 ) : BaseTimeCapsule {
 
-    fun toTimeCapsule(): TimeCapsule {
+    fun toTimeCapsule(myId: String): TimeCapsule {
         return TimeCapsule(
             id = id,
             date = date,
@@ -30,7 +30,7 @@ data class MyTimeCapsule(
             isOpened = isOpened,
             sharedFriends = sharedFriends,
             isReceived = false,
-            sender = id
+            sender = myId
         )
     }
 }
