@@ -33,7 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.skydoves.landscapist.glide.GlideImage
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -41,7 +40,7 @@ import com.skydoves.landscapist.glide.GlideImage
 fun TimeCapsuleDetailScreen(
     timeCapsuleId: String,
     isReceived: Boolean,
-    uiState: TimeCapsuleDetailUiState,
+    uiState: TimeCapsuleOpenUiState,
     init: (String, Boolean) -> Unit
 ) {
     LaunchedEffect(uiState) {
@@ -62,7 +61,7 @@ private fun TimeCapsuleDetailScreenPreview() {
 }
 
 @Composable
-fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState) {
+fun TimeCapsulePager(uiState: TimeCapsuleOpenUiState) {
     val timeCapsule = uiState.timeCapsule
     val images: List<String> = timeCapsule.medias
     val pagerState = rememberPagerState(pageCount = {

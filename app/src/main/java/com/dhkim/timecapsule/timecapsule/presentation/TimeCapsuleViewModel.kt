@@ -35,17 +35,31 @@ class TimeCapsuleViewModel @Inject constructor(
                 }.catch { }
                 .collect { timeCapsules ->
                     val unOpenedMyTimeCapsules = timeCapsules
-                        .filter { !it.isReceived && !it.isOpened }
+                        .filter { !it.isReceived && !it.isOpened && !DateUtil.isAfter(it.openDate)}
+                        .sortedBy {
+                            it.openDate
+                        }
                     val unOpenedReceivedTimeCapsules = timeCapsules
-                        .filter { it.isReceived && !it.isOpened }
-                    val openedTimeCapsules = timeCapsules
-                        .filter { (!it.isOpened && DateUtil.isAfter(strDate = it.openDate))} + timeCapsules.filter { it.isOpened }
+                        .filter { it.isReceived && !it.isOpened && !DateUtil.isAfter(it.openDate) }
+                        .sortedBy {
+                            it.openDate
+                        }
+                    val openableTimeCapsules = timeCapsules
+                        .filter { (!it.isOpened && DateUtil.isAfter(strDate = it.openDate)) }
+                        .sortedBy {
+                            it.openDate
+                        }
+                    val openedTimeCapsules = timeCapsules.filter { it.isOpened }
+                        .sortedByDescending {
+                            it.date
+                        }
 
                     _uiState.value = _uiState.value.copy(
+                        openableTimeCapsules = openableTimeCapsules,
+                        openedTimeCapsules = openedTimeCapsules,
                         unOpenedMyTimeCapsules = unOpenedMyTimeCapsules,
                         unOpenedReceivedTimeCapsules = unOpenedReceivedTimeCapsules,
                         unOpenedTimeCapsules = unOpenedMyTimeCapsules + unOpenedReceivedTimeCapsules,
-                        openedTimeCapsules = openedTimeCapsules
                     )
                 }
         }

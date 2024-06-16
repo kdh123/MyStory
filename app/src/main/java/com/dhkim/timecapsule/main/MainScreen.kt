@@ -135,7 +135,15 @@ fun MainScreen() {
                 }
             )
             timeCapsuleDetailNavigation()
-            timeCapsuleOpenNavigation()
+            timeCapsuleOpenNavigation(
+                onNavigateToDetail = { id, isReceived ->
+                    navController.navigate("timeCapsuleDetail/$id/${isReceived}") {
+                        popUpTo(navController.currentDestination?.id ?: return@navigate) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
             timeCapsuleNavigation(
                 onNavigateToOpen = { id, isReceived ->
                     navController.navigate("timeCapsuleOpen/$id/${isReceived}")

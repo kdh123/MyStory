@@ -54,7 +54,7 @@ fun NavGraphBuilder.timeCapsuleDetailNavigation() {
     }
 }
 
-fun NavGraphBuilder.timeCapsuleOpenNavigation() {
+fun NavGraphBuilder.timeCapsuleOpenNavigation(onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit) {
     composable("timeCapsuleOpen/{id}/{isReceived}") { backStackEntry ->
         val id = backStackEntry.arguments?.getString("id") ?: ""
         val isReceived = (backStackEntry.arguments?.getString("isReceived") ?: "false").toBoolean()
@@ -65,6 +65,7 @@ fun NavGraphBuilder.timeCapsuleOpenNavigation() {
             timeCapsuleId = id,
             isReceived = isReceived,
             uiState = uiState,
+            onNavigateToDetail = onNavigateToDetail,
             init = viewModel::init
         )
     }

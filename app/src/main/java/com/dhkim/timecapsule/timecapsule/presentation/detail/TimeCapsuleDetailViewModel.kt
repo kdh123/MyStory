@@ -15,7 +15,7 @@ class TimeCapsuleDetailViewModel @Inject constructor(
     private val timeCapsuleRepository: TimeCapsuleRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(TimeCapsuleDetailUiState())
+    private val _uiState = MutableStateFlow(TimeCapsuleOpenUiState())
     val uiState = _uiState.asStateFlow()
 
     fun init(timeCapsuleId: String, isReceived: Boolean) {

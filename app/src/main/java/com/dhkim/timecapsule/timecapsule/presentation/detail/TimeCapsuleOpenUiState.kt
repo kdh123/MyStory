@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 
 @Stable
-data class TimeCapsuleDetailUiState(
+data class TimeCapsuleOpenUiState(
     val isLoading: Boolean = false,
     val isReceived: Boolean = false,
     val timeCapsule: TimeCapsule = TimeCapsule()
