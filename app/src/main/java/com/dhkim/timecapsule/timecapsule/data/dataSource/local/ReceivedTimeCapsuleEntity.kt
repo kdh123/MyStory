@@ -11,6 +11,7 @@ data class ReceivedTimeCapsuleEntity(
     @ColumnInfo(name = "date") val date: String,
     @ColumnInfo(name = "openDate") val openDate: String,
     @ColumnInfo(name = "sender") val sender: String,
+    @ColumnInfo(name = "profileImage") val profileImage: String,
     @ColumnInfo(name = "lat") val lat: String,
     @ColumnInfo(name = "lng") val lng: String,
     @ColumnInfo(name = "address") val address: String,
@@ -20,7 +21,7 @@ data class ReceivedTimeCapsuleEntity(
 ) {
     fun toReceivedTimeCapsule(): ReceivedTimeCapsule {
         return ReceivedTimeCapsule(
-            id, date, openDate, sender, lat, lng, address, content, checkLocation, isOpened
+            id, date, openDate, sender, profileImage, lat, lng, address, content, checkLocation, isOpened
         )
     }
 }

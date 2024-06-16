@@ -64,7 +64,7 @@ class HomeViewModel @Inject constructor(
                     val getData = data["uuuuooo"] as? Map<*, *>
                     if (getData != null) {
                         Log.e("user", "user2222rr : ${getData["id"]}")
-                        Log.e("user", "user3333rr : ${getData["profileImageUrl"]}")
+                        Log.e("user", "user3333rr : ${getData["profileImage"]}")
                         Log.e("user", "user4444rr : ${getData["friends"]}")
                         Log.e("user", "user4444rr : ${getData["requests"]}")
 
@@ -87,8 +87,8 @@ class HomeViewModel @Inject constructor(
 
         val user = User(
             id = "dh3",
-            profileImageUrl = "uu",
-            friends = listOf(Friend("f1"), Friend("f2"), Friend("f3")),
+            profileImage = "",
+            friends = listOf(Friend("f1", ), Friend("f2"), Friend("f3")),
             requests = listOf(Friend("f1"), Friend("f2"), Friend("f3"))
         )
 

@@ -1,5 +1,6 @@
 package com.dhkim.timecapsule.timecapsule.data.repository
 
+import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.dhkim.timecapsule.timecapsule.data.dataSource.local.MyTimeCapsuleEntity
@@ -34,8 +35,24 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         checkLocation: Boolean
     ): isSuccessful {
         val myId = userRepository.getMyId()
+        val myProfileImage = when (userRepository.getProfileImage()) {
+            R.drawable.ic_smile_blue -> "0"
+            R.drawable.ic_smile_violet -> "1"
+            R.drawable.ic_smile_green -> "2"
+            R.drawable.ic_smile_orange -> "3"
+            else -> "0"
+        }
+
         return remoteDataSource.shareTimeCapsule(
-            myId, sharedFriends, openDate, content, lat, lng, address, checkLocation
+            myId = myId,
+            myProfileImage = myProfileImage,
+            sharedFriends = sharedFriends,
+            openDate = openDate,
+            content = content,
+            lat = lat,
+            lng = lng,
+            address = address,
+            checkLocation = checkLocation
         ) is CommonResult.Success
     }
 
@@ -150,7 +167,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun saveReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsule) {
         val entity = timeCapsule.run {
             ReceivedTimeCapsuleEntity(
-                id, date, openDate, sender, lat, lng, address, content, checkLocation, isOpened
+                id, date, openDate, sender, profileImage, lat, lng, address, content, checkLocation, isOpened
             )
         }
 
@@ -160,7 +177,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun updateReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsule) {
         val entity = timeCapsule.run {
             ReceivedTimeCapsuleEntity(
-                id, date, openDate, sender, lat, lng, address, content, checkLocation, isOpened
+                id, date, openDate, sender, profileImage, lat, lng, address, content, checkLocation, isOpened
             )
         }
 

@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
+import com.dhkim.timecapsule.common.presentation.profileImage
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -65,6 +66,8 @@ fun NotificationItem(
     timeCapsule: ReceivedTimeCapsule,
     onNavigateToTimeCapsule: () -> Unit
 ) {
+    val profileImage = timeCapsule.profileImage.profileImage()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,7 +77,7 @@ fun NotificationItem(
             .padding(horizontal = 10.dp)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_send_black),
+            painter = painterResource(id = profileImage),
             contentDescription = null,
             modifier = Modifier.align(Alignment.CenterVertically)
         )

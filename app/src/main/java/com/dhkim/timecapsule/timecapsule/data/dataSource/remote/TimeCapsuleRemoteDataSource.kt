@@ -19,6 +19,7 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
 
     suspend fun shareTimeCapsule(
         myId: String,
+        myProfileImage: String,
         sharedFriends: List<Uuid>,
         openDate: String,
         content: String,
@@ -29,7 +30,13 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
     ): CommonResult<isSuccessful> {
         val data = CustomField(
             sender = myId,
-            openDate, content, lat, lng, address, checkLocation
+            profileImage = myProfileImage,
+            openDate = openDate,
+            content = content,
+            lat = lat,
+            lng = lng,
+            address = address,
+            checkLocation = checkLocation
         )
         val gson = Gson()
         val payload = PushMessage(FcmData(custom_field = data))
@@ -66,6 +73,7 @@ data class FcmData(
 
 data class CustomField(
     val sender: String,
+    val profileImage: String,
     val openDate: String,
     val content: String,
     val lat: String,

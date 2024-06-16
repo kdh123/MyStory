@@ -2,6 +2,7 @@ package com.dhkim.timecapsule.timecapsule.presentation.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,7 @@ class TimeCapsuleDetailViewModel @Inject constructor(
     private val timeCapsuleRepository: TimeCapsuleRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(TimeCapsuleOpenUiState())
+    private val _uiState = MutableStateFlow(TimeCapsuleDetailUiState())
     val uiState = _uiState.asStateFlow()
 
     fun init(timeCapsuleId: String, isReceived: Boolean) {

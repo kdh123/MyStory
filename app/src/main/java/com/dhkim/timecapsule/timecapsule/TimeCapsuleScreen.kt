@@ -16,15 +16,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,7 +36,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.common.composable.drawAnimatedBorder
+import com.dhkim.timecapsule.timecapsule.domain.Host
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleUiState
@@ -235,6 +232,9 @@ private fun UnopenedTimeCapsules(uiState: TimeCapsuleUiState, onShowDetailBottom
                 .width(150.dp)
                 .height(150.dp)
                 .background(color = colorResource(id = R.color.light_gray))
+                .clickable {
+
+                }
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_add_primary),
@@ -328,16 +328,42 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
             .width(240.dp)
             .height(360.dp)
     ) {
-        GlideImage(
-            imageModel = timeCapsule.medias[0],
-            previewPlaceholder = R.drawable.ic_launcher_background,
-            error = painterResource(id = R.drawable.ic_launcher_background),
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable {
-                    onClick(timeCapsule)
+        if (timeCapsule.medias.isNotEmpty()) {
+            GlideImage(
+                imageModel = timeCapsule.medias[0],
+                previewPlaceholder = R.drawable.ic_launcher_background,
+                error = painterResource(id = R.drawable.ic_launcher_background),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable {
+                        onClick(timeCapsule)
+                    }
+            )
+        } else {
+            val brush = Brush.linearGradient(
+                listOf(Color(0XFF3C5AFA), Color(0XFFF361DC))
+            )
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(20.dp))
+                    .clickable {
+                        onClick(timeCapsule)
+                    },
+                onDraw = {
+                    drawRect(brush)
                 }
-        )
+            )
+            Text(
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                text = "사진이 존재하지 않습니다.",
+                modifier = Modifier
+                    .align(Alignment.Center)
+            )
+        }
+
         Text(
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -525,180 +551,25 @@ private fun LockTimeCapsulePreview() {
 private fun OpenableBoxPreview() {
     OpenableBox(
         timeCapsule = TimeCapsule(
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            listOf(),
-            false,
-            false,
-            listOf(),
-            false,
-            ""
+            id = "",
+            host = Host(),
+            date = "",
+            openDate = "",
+            lat = "",
+            lng = "",
+            address = "",
+            content = "",
+            medias = listOf(),
+            checkLocation = false,
+            isOpened = false,
+            sharedFriends = listOf(),
+            isReceived = false,
+            sender = ""
         ),
         onClick = { _ ->
 
         }
     )
-}
-
-@Preview
-@Composable
-private fun OpenedBoxListPreview() {
-
-}
-
-@Composable
-fun OpenedBoxList(uiState: TimeCapsuleUiState) {
-
-}
-
-@Composable
-fun TabBox(isSelected: Boolean, title: String, modifier: Modifier = Modifier, onClick: (Boolean) -> Unit) {
-    val fontWeight = if (isSelected) {
-        FontWeight.Bold
-    } else {
-        FontWeight.Normal
-    }
-
-    val fontColor = if (isSelected) {
-        Color.White
-    } else {
-        colorResource(id = R.color.black)
-    }
-
-    val background = if (isSelected) {
-        colorResource(id = R.color.primary)
-    } else {
-        colorResource(id = R.color.light_gray)
-    }
-
-    Text(
-        textAlign = TextAlign.Center,
-        fontWeight = fontWeight,
-        color = fontColor,
-        text = title,
-        modifier = modifier
-            .clip(RoundedCornerShape(15.dp))
-            .background(background)
-            .clickable {
-                onClick(!isSelected)
-            }
-            .padding(vertical = 10.dp),
-    )
-}
-
-@Composable
-fun ReceivedTimeCapsuleScreen(uiState: TimeCapsuleUiState) {
-    val timeCapsules = uiState.unOpenedReceivedTimeCapsules
-
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        itemsIndexed(
-            items = timeCapsules, key = { _, item ->
-                item.id
-            }
-        ) { index, item ->
-            if (DateUtil.getDateGap(newDate = item.openDate) > 0) {
-                if (index == timeCapsules.size - 1) {
-                    ReceivedTimeCapsuleItem(timeCapsule = item)
-                } else {
-                    ReceivedTimeCapsuleItem(timeCapsule = item)
-                    Divider(
-                        color = colorResource(id = R.color.light_gray),
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillMaxWidth()
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ReceivedTimeCapsuleItem(timeCapsule: TimeCapsule) {
-    val leftTime = DateUtil.getDateGap(newDate = timeCapsule.openDate)
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-    ) {
-        Image(
-            painter = painterResource(id = R.mipmap.ic_box),
-            contentDescription = null,
-            modifier = Modifier.align(Alignment.CenterVertically)
-        )
-        Column(
-            modifier = Modifier
-                .width(0.dp)
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-                .padding(start = 5.dp)
-        ) {
-            if (leftTime <= 0) {
-                Text(
-                    text = "오픈 하기",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.primary)
-                )
-            } else {
-                Column {
-                    Row {
-                        Text(
-                            text = "${leftTime}일 ",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Text(
-                            text = "후에 오픈할 수 있습니다.",
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                        )
-                    }
-                    Text(
-                        text = "${timeCapsule.sender}님에 의해 공유되었습니다.",
-                        fontSize = 14.sp,
-                        modifier = Modifier
-                            .clickable {
-
-                            }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun MyTimeCapsuleScreen(uiState: TimeCapsuleUiState) {
-    val unOpenedTimeCapsules = uiState.unOpenedMyTimeCapsules
-
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        itemsIndexed(
-            items = unOpenedTimeCapsules, key = { _, item ->
-                item.id
-            }
-        ) { index, item ->
-            if (DateUtil.getDateGap(newDate = item.openDate) > 0) {
-                if (index == unOpenedTimeCapsules.size - 1) {
-                    TimeCapsuleItem(timeCapsule = item)
-                } else {
-                    TimeCapsuleItem(timeCapsule = item)
-                    Divider(
-                        color = colorResource(id = R.color.light_gray),
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillMaxWidth()
-                    )
-                }
-            }
-        }
-    }
 }
 
 @Composable

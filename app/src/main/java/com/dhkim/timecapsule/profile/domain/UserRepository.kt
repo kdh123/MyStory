@@ -1,25 +1,26 @@
 package com.dhkim.timecapsule.profile.domain
 
+import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.profile.data.dataSource.isSuccessful
 import kotlinx.coroutines.flow.Flow
-
-typealias isExist = Boolean
 
 interface UserRepository {
 
     suspend fun getMyInfo(): Flow<User>
     suspend fun getMyId(): String
-    suspend fun signUp(userId: String, fcmToken: String): isSuccessful
+    suspend fun signUp(userId: String, profileImage: String, fcmToken: String): isSuccessful
     fun updateUser(user: User)
-    suspend fun searchUser(userId: String): Flow<isExist?>
+    suspend fun searchUser(userId: String): Flow<CommonResult<User?>>
 
-    suspend fun addFriend(userId: String): Flow<isSuccessful>
+    suspend fun addFriend(userId: String, userProfileImage: String): Flow<isSuccessful>
     suspend fun deleteFriend(userId: String): Flow<isSuccessful>
     suspend fun addRequests(userId: String): Flow<isSuccessful>
-    suspend fun acceptFriend(userId: String, userUuid: String): Flow<isSuccessful>
+    suspend fun acceptFriend(userId: String, userProfileImage: String, userUuid: String): Flow<isSuccessful>
 
     suspend fun getFcmToken(): String
     suspend fun updateLocalFcmToken(fcmToken: String)
+    suspend fun getProfileImage(): Int
+    suspend fun updateProfileImage(profileImage: String)
     suspend fun getMyUuid(): String
     suspend fun updateUuid(uuid: String)
     suspend fun updateRemoteFcmToken(fcmToken: String)

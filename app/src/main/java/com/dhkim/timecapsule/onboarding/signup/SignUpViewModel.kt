@@ -5,6 +5,7 @@ package com.dhkim.timecapsule.onboarding.signup
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -49,6 +50,10 @@ class SignUpViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(query = query)
     }
 
+    fun onProfileSelect(profileImage: Int) {
+        _uiState.value = _uiState.value.copy(profileImage = profileImage)
+    }
+
     fun signUp() {
         viewModelScope.launch {
             if (fcmToken.isEmpty()) {
@@ -74,17 +79,24 @@ class SignUpViewModel @Inject constructor(
                 else -> {
                     _uiState.value = _uiState.value.copy(isLoading = true)
                     val query = _uiState.value.query
-                    userRepository.searchUser(query).flatMapConcat { isExist ->
-                        if (isExist != null) {
-                            if (isExist) {
-                                _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = "이미 존재하는 아이디입니다.")
-                                flowOf(false)
-                            } else {
-                                flowOf(userRepository.signUp(userId = query, fcmToken))
+                    val profileImage = _uiState.value.profileImage
+
+                    userRepository.searchUser(query).flatMapConcat { result ->
+                        when (result) {
+                            is CommonResult.Success -> {
+                                val user = result.data
+                                if (user != null) {
+                                    _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = "이미 존재하는 아이디입니다.")
+                                    flowOf(false)
+                                } else {
+                                    flowOf(userRepository.signUp(userId = query, profileImage = "$profileImage", fcmToken = fcmToken))
+                                }
                             }
-                        } else {
-                            _sideEffect.emit(SignUpSideEffect.Message(message = "로그인에 실패하였습니다."))
-                            flowOf(false)
+
+                            is CommonResult.Error -> {
+                                _sideEffect.emit(SignUpSideEffect.Message(message = "로그인에 실패하였습니다."))
+                                flowOf(false)
+                            }
                         }
                     }.catch {
                         _sideEffect.emit(SignUpSideEffect.Message(message = "로그인에 실패하였습니다."))

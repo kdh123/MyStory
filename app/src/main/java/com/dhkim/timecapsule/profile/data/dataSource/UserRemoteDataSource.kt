@@ -19,7 +19,6 @@ import java.util.UUID
 import javax.inject.Inject
 
 typealias isSuccessful = Boolean
-typealias isExist = Boolean
 
 class UserRemoteDataSource @Inject constructor(
     @RetrofitModule.KakaoPush private val pushApi: Retrofit,
@@ -43,6 +42,7 @@ class UserRemoteDataSource @Inject constructor(
 
                         Friend(
                             id = data["id"] as? String ?: "",
+                            profileImage = data["profileImage"] as? String ?: "0",
                             uuid = data["uuid"] as? String ?: "",
                             isPending = data["pending"] as? Boolean ?: true,
                         )
@@ -53,19 +53,19 @@ class UserRemoteDataSource @Inject constructor(
 
                         Friend(
                             id = data["id"] as? String ?: "",
+                            profileImage = data["profileImage"] as? String ?: "0",
                             uuid = data["uuid"] as? String ?: "",
                             isPending = data["pending"] as? Boolean ?: true,
                         )
                     } ?: listOf()
 
-
                     val uuid = data?.get("uuid") as? String ?: ""
-                    val profileImageUrl = data?.get("profileImageUrl") as? String ?: ""
+                    val profileImage = data?.get("profileImage") as? String ?: ""
 
                     val user = User(
                         id = myId,
                         uuid = uuid,
-                        profileImageUrl = profileImageUrl,
+                        profileImage = profileImage,
                         friends = currentFriends,
                         requests = currentRequests
                     )
@@ -83,13 +83,16 @@ class UserRemoteDataSource @Inject constructor(
         }
     }
 
-    fun searchUser(userId: String): Flow<CommonResult<isExist>> {
+    fun searchUser(userId: String): Flow<CommonResult<User?>> {
         return callbackFlow {
             database.child("users").child(userId).get().addOnSuccessListener { data ->
+                val user = data.value as? Map<*, *>
+                val profileImage = user?.get("profileImage") as? String ?: "0"
+
                 data.value?.let {
-                    trySend(CommonResult.Success(true))
+                    trySend(CommonResult.Success(User(id = userId, profileImage = profileImage)))
                 } ?: kotlin.run {
-                    trySend(CommonResult.Success(false))
+                    trySend(CommonResult.Success(null))
                 }
             }.addOnFailureListener {
                 trySend(CommonResult.Error(-1))
@@ -109,12 +112,19 @@ class UserRemoteDataSource @Inject constructor(
         }
     }
 
-    fun acceptFriend(myId: String, myUuid: String, userId: String, userUuid: String): Flow<isSuccessful> {
+    fun acceptFriend(
+        myId: String,
+        myProfileImage: String,
+        myUuid: String,
+        userId: String,
+        userProfileImage: String,
+        userUuid: String
+    ): Flow<isSuccessful> {
         return callbackFlow {
             val childUpdates = hashMapOf<String, Any?>(
                 "/users/$myId/requests/$userId" to null,
-                "/users/$myId/friends/$userId" to Friend(id = userId, uuid = userUuid, isPending = false),
-                "/users/$userId/friends/$myId" to Friend(id = myId, uuid = myUuid, isPending = false)
+                "/users/$myId/friends/$userId" to Friend(id = userId, profileImage = userProfileImage, uuid = userUuid, isPending = false),
+                "/users/$userId/friends/$myId" to Friend(id = myId, profileImage = myProfileImage, uuid = myUuid, isPending = false)
             )
 
             database.updateChildren(childUpdates)
@@ -128,11 +138,11 @@ class UserRemoteDataSource @Inject constructor(
         }
     }
 
-    fun addFriend(myId: String, myUuid: String, userId: String): Flow<isSuccessful> {
+    fun addFriend(myId: String, myProfileImage: String, myUuid: String, userId: String, userProfileImage: String): Flow<isSuccessful> {
         return callbackFlow {
             val childUpdates = hashMapOf<String, Any>(
-                "/users/$myId/friends/$userId" to Friend(id = userId, isPending = true),
-                "/users/$userId/requests/$myId" to Friend(id = myId, uuid = myUuid, isPending = true),
+                "/users/$myId/friends/$userId" to Friend(id = userId, profileImage = userProfileImage, isPending = true),
+                "/users/$userId/requests/$myId" to Friend(id = myId, profileImage = myProfileImage, uuid = myUuid, isPending = true),
             )
 
             database.updateChildren(childUpdates)
@@ -165,15 +175,14 @@ class UserRemoteDataSource @Inject constructor(
         }
     }
 
-
-    fun addRequest(myId: String, userId: String): Flow<isSuccessful> {
+    fun addRequest(myId: String, myProfileImage: String, userId: String): Flow<isSuccessful> {
         return callbackFlow {
             database
                 .child("users")
                 .child(userId)
                 .child("requests")
                 .child(myId)
-                .setValue(Friend(id = myId, isPending = true))
+                .setValue(Friend(id = myId, profileImage = myProfileImage, isPending = true))
             awaitClose()
         }
     }

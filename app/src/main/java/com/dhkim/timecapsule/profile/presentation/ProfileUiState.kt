@@ -13,5 +13,6 @@ data class ProfileUiState(
 data class SearchResult(
     val query: String = "",
     val userId: String?= "",
+    val userProfileImage: String = "0",
     val isMe: Boolean = false
 )

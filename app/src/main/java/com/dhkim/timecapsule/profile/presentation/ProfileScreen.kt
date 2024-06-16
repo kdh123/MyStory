@@ -61,6 +61,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.composable.LoadingProgressBar
 import com.dhkim.timecapsule.common.composable.WarningDialog
+import com.dhkim.timecapsule.common.presentation.profileImage
 import com.dhkim.timecapsule.profile.domain.Friend
 import kotlinx.coroutines.launch
 
@@ -457,7 +458,12 @@ fun FriendScreen(uiState: ProfileUiState, onDeleteClick: (userId: String) -> Uni
                 modifier = Modifier
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp)
             )
-            FriendItem(userId = uiState.user.id, isMe = true, onDeleteClick = onDeleteClick)
+            FriendItem(
+                userId = uiState.user.id,
+                isMe = true,
+                profileImage = uiState.user.profileImage.profileImage(),
+                onDeleteClick = onDeleteClick
+            )
         }
         FriendList(
             uiState = uiState,
@@ -521,9 +527,9 @@ fun FriendList(
     modifier: Modifier = Modifier
 ) {
     val friends = if (isFriend) {
-        uiState.user.friends.filter { !it.isPending }.map { it.id }
+        uiState.user.friends.filter { !it.isPending }
     } else {
-        uiState.user.friends.filter { it.isPending }.map { it.id }
+        uiState.user.friends.filter { it.isPending }
     }
     Column {
         Text(
@@ -535,13 +541,21 @@ fun FriendList(
         LazyColumn(modifier = modifier) {
             itemsIndexed(
                 items = friends, key = { _, item ->
-                    item
+                    item.id
                 }
             ) { index, item ->
                 if (index == friends.size - 1) {
-                    FriendItem(item, onDeleteClick = onDeleteClick)
+                    FriendItem(
+                        userId = item.id,
+                        profileImage = item.profileImage.profileImage(),
+                        onDeleteClick = onDeleteClick
+                    )
                 } else {
-                    FriendItem(item, onDeleteClick = onDeleteClick)
+                    FriendItem(
+                        userId = item.id,
+                        profileImage = item.profileImage.profileImage(),
+                        onDeleteClick = onDeleteClick
+                    )
                     Divider(
                         color = colorResource(id = R.color.light_gray),
                         modifier = Modifier
@@ -562,7 +576,7 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
             .padding(10.dp)
     ) {
         Image(
-            painter = painterResource(id = R.mipmap.ic_box),
+            painter = painterResource(id = friend.profileImage.profileImage()),
             contentDescription = null,
             modifier = Modifier.align(Alignment.CenterVertically)
         )
@@ -600,14 +614,14 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
 }
 
 @Composable
-fun FriendItem(userId: String, isMe: Boolean = false, onDeleteClick: (userId: String) -> Unit) {
+fun FriendItem(userId: String, profileImage: Int, isMe: Boolean = false, onDeleteClick: (userId: String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_smile_blue),
+            painter = painterResource(id = profileImage),
             contentDescription = null,
             modifier = Modifier.align(Alignment.CenterVertically)
         )
@@ -648,8 +662,7 @@ fun FriendItem(userId: String, isMe: Boolean = false, onDeleteClick: (userId: St
 @Preview(showBackground = true)
 @Composable
 private fun FriendItemPreview() {
-
-    FriendItem(userId = "") {
+    FriendItem(userId = "", 0) {
 
     }
 }

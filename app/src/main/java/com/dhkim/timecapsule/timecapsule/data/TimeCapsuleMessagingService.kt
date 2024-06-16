@@ -54,6 +54,7 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
             sharedTimeCapsule.run {
                 val receivedTimeCapsule = ReceivedTimeCapsule(
                     id = "${System.currentTimeMillis()}",
+                    profileImage = profileImage,
                     date = DateUtil.todayDate(),
                     openDate = openDate,
                     sender = sender,

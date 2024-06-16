@@ -76,7 +76,7 @@ sealed interface UiState {
 fun TimeCapsuleOpenScreen(
     timeCapsuleId: String,
     isReceived: Boolean,
-    uiState: TimeCapsuleOpenUiState,
+    uiState: TimeCapsuleDetailUiState,
     init: (String, Boolean) -> Unit,
     onNavigateToDetail: (String, Boolean) -> Unit
 ) {
@@ -146,7 +146,7 @@ private fun TimeCapsuleOpenScreenPreview() {
     TimeCapsuleOpenScreen(
         timeCapsuleId = "",
         isReceived = false,
-        uiState = TimeCapsuleOpenUiState(),
+        uiState = TimeCapsuleDetailUiState(),
         onNavigateToDetail = { _, _ ->
 
         },
@@ -155,7 +155,7 @@ private fun TimeCapsuleOpenScreenPreview() {
 }
 
 @Composable
-fun LoadedScreen(uiState: TimeCapsuleOpenUiState, onNavigateToDetail: (String, Boolean) -> Unit) {
+fun LoadedScreen(uiState: TimeCapsuleDetailUiState, onNavigateToDetail: (String, Boolean) -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val medias = uiState.timeCapsule.medias
     var imageUrl by remember {
@@ -303,7 +303,7 @@ private fun Test() {
 }
 
 @Composable
-private fun TimeCapsuleSlideImages(uiState: TimeCapsuleOpenUiState) {
+private fun TimeCapsuleSlideImages(uiState: TimeCapsuleDetailUiState) {
     val interactionSource = remember { MutableInteractionSource() }
     val imageUrls = uiState.timeCapsule.medias
     var index by remember {
@@ -372,7 +372,7 @@ private fun LoadedScreenPreview() {
         content = "안녕하세요",
         medias = listOf("")
     )
-    val uiState = TimeCapsuleOpenUiState(
+    val uiState = TimeCapsuleDetailUiState(
         timeCapsule = timeCapsule
     )
 
@@ -387,25 +387,37 @@ private fun LoadedScreenPreview() {
 @Composable
 fun LoadingScreen(countDownNumber: Int) {
     Box(modifier = Modifier.fillMaxSize()) {
-        Box(
+        Column(
             modifier = Modifier
-                .width(100.dp)
-                .height(100.dp)
+                .fillMaxWidth()
                 .align(Alignment.Center)
-                .drawAnimatedBorder(
-                    strokeWidth = 5.dp,
-                    shape = CircleShape,
-                    durationMillis = 1000
-                )
         ) {
-            Text(
-                text = "$countDownNumber",
-                fontSize = 18.sp,
+            Box(
                 modifier = Modifier
-                    .clip(CircleShape)
-                    .padding(10.dp)
-                    .align(Alignment.Center),
-                textAlign = TextAlign.Center
+                    .width(100.dp)
+                    .height(100.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .drawAnimatedBorder(
+                        strokeWidth = 5.dp,
+                        shape = CircleShape,
+                        durationMillis = 1000
+                    )
+            ) {
+                Text(
+                    text = "$countDownNumber",
+                    fontSize = 24.sp,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .padding(10.dp)
+                        .align(Alignment.Center),
+                    textAlign = TextAlign.Center
+                )
+            }
+            Text(
+                text = "과거로 돌아가는 중",
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 10.dp)
             )
         }
     }
@@ -418,7 +430,7 @@ private fun LoadingScreenPreview() {
 }
 
 @Composable
-fun FilmLayout(uiState: TimeCapsuleOpenUiState, onClick: (String, Boolean) -> Unit) {
+fun FilmLayout(uiState: TimeCapsuleDetailUiState, onClick: (String, Boolean) -> Unit) {
     val state = rememberScrollState()
     val imageUrls = uiState.timeCapsule.medias
 
@@ -503,11 +515,11 @@ fun FilmLayout(uiState: TimeCapsuleOpenUiState, onClick: (String, Boolean) -> Un
 @Preview(showBackground = true)
 @Composable
 private fun FilmLayoutPreview() {
-    val timeCapsuleOpenUiState = TimeCapsuleOpenUiState().copy(
+    val timeCapsuleDetailUiState = TimeCapsuleDetailUiState().copy(
         timeCapsule = TimeCapsule(medias = listOf("", "", "", ""))
     )
 
-    FilmLayout(timeCapsuleOpenUiState, onClick = { _, _ ->
+    FilmLayout(timeCapsuleDetailUiState, onClick = { _, _ ->
 
     })
 

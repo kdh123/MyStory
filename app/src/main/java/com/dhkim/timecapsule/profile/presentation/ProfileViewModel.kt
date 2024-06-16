@@ -2,8 +2,9 @@ package com.dhkim.timecapsule.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.timecapsule.common.CommonResult
+import com.dhkim.timecapsule.common.presentation.profileImage
 import com.dhkim.timecapsule.profile.domain.Friend
-import com.dhkim.timecapsule.profile.domain.User
 import com.dhkim.timecapsule.profile.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,8 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-typealias UserId = String
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -30,7 +29,9 @@ class ProfileViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val myId = userRepository.getMyId()
-            _uiState.value = _uiState.value.copy(user = User().copy(id = myId))
+            val myProfileImage = userRepository.getProfileImage().profileImage()
+            val user = _uiState.value.user
+            _uiState.value = _uiState.value.copy(user = user.copy(id = myId, profileImage = myProfileImage))
         }
 
         viewModelScope.launch {
@@ -54,8 +55,9 @@ class ProfileViewModel @Inject constructor(
     fun addFriend() {
         viewModelScope.launch {
             val searchUserId = _uiState.value.searchResult.userId ?: ""
+            val searchUserProfileImage = _uiState.value.searchResult.userProfileImage
 
-            userRepository.addFriend(searchUserId)
+            userRepository.addFriend(searchUserId, searchUserProfileImage)
                 .catch {
                     _sideEffect.emit(ProfileSideEffect.Message(message = "친구 추가에 실패하였습니다."))
                 }
@@ -89,7 +91,7 @@ class ProfileViewModel @Inject constructor(
 
     fun acceptFriend(friend: Friend) {
         viewModelScope.launch {
-            userRepository.acceptFriend(friend.id, friend.uuid)
+            userRepository.acceptFriend(friend.id, friend.profileImage, friend.uuid)
                 .catch {
                     _sideEffect.emit(ProfileSideEffect.Message(message = "친구 추가에 실패하였습니다."))
                 }
@@ -111,23 +113,28 @@ class ProfileViewModel @Inject constructor(
                     _sideEffect.emit(ProfileSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
                     _uiState.value = _uiState.value.copy(isLoading = false)
                 }
-                .collect { isExist ->
-                    if (isExist != null) {
-                        if (isExist) {
-                            val isMe = searchResult.query == myId
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = false,
-                                searchResult = searchResult.copy(userId = searchResult.query, isMe = isMe)
-                            )
-                        } else {
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = false,
-                                searchResult = searchResult.copy(userId = null)
-                            )
+                .collect { result ->
+                    when (result) {
+                        is CommonResult.Success -> {
+                            val user = result.data
+
+                            if (user != null) {
+                                val isMe = searchResult.query == myId
+                                _uiState.value = _uiState.value.copy(
+                                    isLoading = false,
+                                    searchResult = searchResult.copy(userId = user.id, userProfileImage = user.profileImage, isMe = isMe)
+                                )
+                            } else {
+                                _uiState.value = _uiState.value.copy(
+                                    isLoading = false,
+                                    searchResult = searchResult.copy(userId = null)
+                                )
+                            }
                         }
-                    } else {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
-                        _sideEffect.emit(ProfileSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
+                        is CommonResult.Error -> {
+                            _uiState.value = _uiState.value.copy(isLoading = false)
+                            _sideEffect.emit(ProfileSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
+                        }
                     }
                 }
         }

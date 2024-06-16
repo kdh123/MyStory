@@ -30,7 +30,7 @@ data class MyTimeCapsule(
             isOpened = isOpened,
             sharedFriends = sharedFriends,
             isReceived = false,
-            sender = ""
+            sender = id
         )
     }
 }
