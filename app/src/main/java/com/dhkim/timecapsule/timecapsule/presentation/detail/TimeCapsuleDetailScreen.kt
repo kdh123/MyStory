@@ -18,9 +18,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
+import com.dhkim.timecapsule.common.composable.WarningDialog
 import com.dhkim.timecapsule.common.presentation.profileImage
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.naver.maps.geometry.LatLng
@@ -60,13 +64,15 @@ import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberCameraPositionState
 import com.skydoves.landscapist.glide.GlideImage
 
-@OptIn(ExperimentalNaverMapApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalNaverMapApi::class, ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TimeCapsuleDetailScreen(
     timeCapsuleId: String,
     isReceived: Boolean,
     uiState: TimeCapsuleDetailUiState,
+    sideEffect: TimeCapsuleDetailSideEffect,
+    onDelete: (String) -> Unit,
     init: (String, Boolean) -> Unit,
     onBack: () -> Unit
 ) {
@@ -87,6 +93,12 @@ fun TimeCapsuleDetailScreen(
     var enableScroll by remember {
         mutableStateOf(true)
     }
+    var showOption by remember {
+        mutableStateOf(false)
+    }
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(uiState) {
         cameraPositionState.move(
@@ -99,9 +111,64 @@ fun TimeCapsuleDetailScreen(
         )
         init(timeCapsuleId, isReceived)
     }
+
+    LaunchedEffect(sideEffect) {
+        when (sideEffect) {
+            is TimeCapsuleDetailSideEffect.None -> {}
+
+            is TimeCapsuleDetailSideEffect.Completed -> {
+                onBack()
+            }
+        }
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) {
+        if (showOption) {
+            ModalBottomSheet(
+                modifier = Modifier
+                    .padding(bottom = it.calculateBottomPadding()),
+                onDismissRequest = {
+                    showOption = false
+                }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(start = 10.dp, end = 10.dp, bottom = 48.dp)
+                        .fillMaxWidth()
+                        .clickable {
+                            showOption = false
+                            showDeleteDialog = true
+                        }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_delete_black),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                    )
+                    Text(
+                        fontSize = 18.sp,
+                        text = "삭제"
+                    )
+                }
+            }
+        }
+
+        if (showDeleteDialog) {
+            WarningDialog(
+                onConfirmation = {
+                    onDelete(timeCapsuleId)
+                },
+                onDismissRequest = {
+                    showDeleteDialog = false
+                },
+                dialogTitle = "삭제",
+                dialogText = "정말 삭제하겠습니까?"
+            )
+        }
+
         Column(
             modifier = Modifier
                 .verticalScroll(
@@ -124,7 +191,12 @@ fun TimeCapsuleDetailScreen(
             } else {
                 "${uiState.timeCapsule.sender} (친구)"
             }
-            TimeCapsulePager(uiState = uiState)
+            TimeCapsulePager(
+                uiState = uiState,
+                onOptionClick = {
+                    showOption = it
+                }
+            )
             MenuItem(resId = uiState.timeCapsule.host.profileImage.profileImage(), title = "작성자 : $writer")
             Divider(
                 color = colorResource(id = R.color.light_gray),
@@ -235,7 +307,11 @@ private fun TimeCapsuleDetailScreenPreview() {
         timeCapsuleId = "",
         isReceived = false,
         uiState = TimeCapsuleDetailUiState(timeCapsule = timeCapsule),
+        sideEffect = TimeCapsuleDetailSideEffect.None,
         init = { _, _ ->
+
+        },
+        onDelete = {
 
         },
         onBack = {
@@ -245,7 +321,7 @@ private fun TimeCapsuleDetailScreenPreview() {
 }
 
 @Composable
-fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState) {
+fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState, onOptionClick: (Boolean) -> Unit) {
     val timeCapsule = uiState.timeCapsule
     val images: List<String> = timeCapsule.medias
     val pagerState = rememberPagerState(pageCount = {
@@ -304,6 +380,44 @@ fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState) {
                 text = "사진이 존재하지 않습니다.",
                 modifier = Modifier
                     .align(Alignment.Center)
+            )
+        }
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .clip(CircleShape)
+                .width(48.dp)
+                .height(48.dp)
+                .background(color = Color.White)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_back_black),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxSize()
+
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .clip(CircleShape)
+                .width(48.dp)
+                .height(48.dp)
+                .background(color = Color.White)
+                .align(Alignment.TopEnd)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_option_black),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxSize()
+                    .clickable {
+                        onOptionClick(true)
+                    }
             )
         }
     }

@@ -97,7 +97,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteMyTimeCapsule(id: String) {
-        localDataSource.deleteSendTimeCapsule(id = id)
+        localDataSource.deleteMyTimeCapsule(id = id)
     }
 
     override suspend fun getSendAllTimeCapsule(): Flow<List<SendTimeCapsule>> {

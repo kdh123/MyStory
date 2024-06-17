@@ -28,7 +28,6 @@ class TimeCapsuleLocalDataSource @Inject constructor(
         return myTimeCapsuleService.saveTimeCapsule(timeCapsule)
     }
 
-
     fun updateMyTimeCapsule(timeCapsule: MyTimeCapsuleEntity) {
         myTimeCapsuleService.updateTimeCapsule(timeCapsule)
     }

@@ -13,6 +13,7 @@ import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleScreen
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailScreen
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleViewModel
+import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailViewModel
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleOpenScreen
 
@@ -46,12 +47,15 @@ fun NavGraphBuilder.timeCapsuleDetailNavigation(onBack: () -> Unit) {
         val isReceived = (backStackEntry.arguments?.getString("isReceived") ?: "false").toBoolean()
         val viewModel = hiltViewModel<TimeCapsuleDetailViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = TimeCapsuleDetailSideEffect.None)
 
         TimeCapsuleDetailScreen(
             timeCapsuleId = id,
             isReceived = isReceived,
             uiState = uiState,
+            sideEffect = sideEffect,
             onBack = onBack,
+            onDelete = viewModel::deleteTImeCapsule,
             init = viewModel::init
         )
     }
