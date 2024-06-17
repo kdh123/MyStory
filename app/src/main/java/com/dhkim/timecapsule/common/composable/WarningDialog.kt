@@ -14,7 +14,8 @@ fun WarningDialog(
     onDismissRequest: () -> Unit,
     dialogTitle: String,
     dialogText: String,
-    iconResId: Int = R.drawable.ic_warning_yellow
+    iconResId: Int = R.drawable.ic_warning_yellow,
+    choice: Boolean = true
 ) {
     AlertDialog(
         icon = {
@@ -33,12 +34,14 @@ fun WarningDialog(
             onDismissRequest()
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
+            if (choice) {
+                TextButton(
+                    onClick = {
+                        onConfirmation()
+                    }
+                ) {
+                    Text("예")
                 }
-            ) {
-                Text("예")
             }
         },
         dismissButton = {
@@ -47,7 +50,11 @@ fun WarningDialog(
                     onDismissRequest()
                 }
             ) {
-                Text("아니오")
+                if (choice) {
+                    Text("아니오")
+                } else {
+                    Text("확인")
+                }
             }
         }
     )

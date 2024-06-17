@@ -1,6 +1,7 @@
 package com.dhkim.timecapsule
 
 import com.dhkim.timecapsule.common.DateUtil
+import com.dhkim.timecapsule.common.presentation.DistanceManager
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -12,6 +13,18 @@ import kotlin.random.Random
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class ExampleUnitTest {
+
+    @Test
+    fun distanceLocation() {
+        val lat1 = 37.4550341
+        val lng1 = 126.6802119
+        val lat2 = 37.4539764
+        val lng2 = 126.6735901
+
+        val distance = DistanceManager.getDistance(lat1, lng1, lat2, lng2)
+        println("distance : $distance")
+
+    }
 
     fun containsSpecialCharacters(input: String): Boolean {
         val specialCharactersPattern = Regex("[^a-zA-Z0-9 ]") // 알파벳, 숫자, 공백 제외한 모든 문자
