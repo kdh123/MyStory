@@ -38,10 +38,11 @@ class SearchRemoteDataSource @Inject constructor(
 
     suspend fun getAddress(lat: String, lng: String): CommonResult<Address> {
         return try {
-            val response = service.getAddress(lat = lat, lng = lng)
+            val response = service.getAddress2(lat = lat, lng = lng)
             if (response.isSuccessful) {
                 CommonResult.Success(data = response.body()?.toAddress() ?: Address())
             } else {
+                val err = response.errorBody().toString()
                 CommonResult.Error(code = -1)
             }
         } catch (e: HttpException) {

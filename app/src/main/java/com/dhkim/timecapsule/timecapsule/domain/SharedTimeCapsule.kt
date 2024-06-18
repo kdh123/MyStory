@@ -7,6 +7,7 @@ data class SharedTimeCapsule(
     val content: String,
     val lat: String,
     val lng: String,
+    val placeName: String,
     val address: String,
     val checkLocation: Boolean
 )

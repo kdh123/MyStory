@@ -68,6 +68,11 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
                     } else {
                         "0.0"
                     },
+                    placeName = if (checkLocation) {
+                        placeName
+                    } else {
+                        ""
+                    },
                     address = if (checkLocation) {
                         address
                     } else {

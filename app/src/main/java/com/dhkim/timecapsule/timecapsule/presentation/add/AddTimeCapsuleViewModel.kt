@@ -102,7 +102,8 @@ class AddTimeCapsuleViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 lat = place.lat,
                 lng = place.lng,
-                address = place.name
+                placeName = place.name,
+                address = place.address
             )
             _sideEffect.emit(AddTimeCapsuleSideEffect.ShowPlaceBottomSheet(show = false))
         }
@@ -118,11 +119,16 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
             when (result) {
                 is CommonResult.Success -> {
-                    _uiState.value = _uiState.value.copy(lat = lat, lng = lng, address = result.data?.address ?: "알 수 없음")
+                    _uiState.value = _uiState.value.copy(
+                        lat = lat,
+                        lng = lng,
+                        placeName = result.data?.placeName ?: "알 수 없음",
+                        address = result.data?.placeName ?: "알 수 없음"
+                    )
                 }
 
                 is CommonResult.Error -> {
-                    _uiState.value = _uiState.value.copy(lat = lat, lng = lng, address = "알 수 없음")
+                    _uiState.value = _uiState.value.copy(lat = lat, lng = lng, placeName = "알 수 없음", address = "알 수 없음")
                 }
             }
         }
@@ -155,6 +161,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
                             openDate = openDate,
                             lat = lat,
                             lng = lng,
+                            placeName = placeName,
                             address = address,
                             medias = imageUrls,
                             content = content,
@@ -173,6 +180,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
                                 content = content,
                                 lat = lat,
                                 lng = lng,
+                                placeName = placeName,
                                 address = address,
                                 checkLocation = checkLocation
                             )

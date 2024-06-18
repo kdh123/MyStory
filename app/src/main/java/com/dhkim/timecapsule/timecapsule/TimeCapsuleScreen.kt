@@ -304,7 +304,7 @@ fun LocationDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(375.dp)
+                .height(400.dp)
                 .padding(10.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
@@ -312,11 +312,18 @@ fun LocationDialog(
                 modifier = Modifier
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
+                //horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "${timeCapsule.address} 근처에 있어야 오픈할 수 있습니다.",
-                    modifier = Modifier.padding(16.dp),
+                    text = "${timeCapsule.placeName} 근처에서 오픈할 수 있습니다.",
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                )
+
+                Text(
+                    fontWeight = FontWeight.Bold,
+                    text = timeCapsule.address,
+                    modifier = Modifier
+                        .padding(16.dp),
                 )
 
                 NaverMap(
@@ -336,7 +343,7 @@ fun LocationDialog(
                                 timeCapsule.lng.toDouble()
                             )
                         ),
-                        captionText = timeCapsule.address
+                        captionText = timeCapsule.placeName
                     )
                 }
 
@@ -422,7 +429,7 @@ private fun UnopenedTimeCapsules(uiState: TimeCapsuleUiState, onNavigateToAdd: (
                 }
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_add_primary),
+                painter = painterResource(id = R.drawable.ic_add_black),
                 contentDescription = null,
                 modifier = Modifier
                     .width(50.dp)
@@ -727,7 +734,7 @@ private fun LockTimeCapsule(
                 maxLines = 1,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
-                text = timeCapsule.address,
+                text = timeCapsule.placeName,
                 modifier = Modifier
                     .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
                     .align(Alignment.BottomCenter)

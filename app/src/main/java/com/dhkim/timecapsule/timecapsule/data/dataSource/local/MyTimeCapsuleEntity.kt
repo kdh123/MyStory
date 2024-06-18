@@ -12,6 +12,7 @@ data class MyTimeCapsuleEntity(
     @ColumnInfo(name = "openDate") val openDate: String,
     @ColumnInfo(name = "lat") val lat: String,
     @ColumnInfo(name = "lng") val lng: String,
+    @ColumnInfo(name = "placeName") val placeName: String,
     @ColumnInfo(name = "address") val address: String,
     @ColumnInfo(name = "content") val content: String,
     @ColumnInfo(name = "media") val medias: List<String>,
@@ -21,7 +22,7 @@ data class MyTimeCapsuleEntity(
 ) {
     fun toMyTimeCapsule(): MyTimeCapsule {
         return MyTimeCapsule(
-            id, date, openDate, lat, lng, address, content, medias, checkLocation, isOpened, sharedFriends
+            id, date, openDate, lat, lng, placeName, address, content, medias, checkLocation, isOpened, sharedFriends
         )
     }
 }

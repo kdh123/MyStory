@@ -176,16 +176,6 @@ fun TimeCapsuleDetailScreen(
                     enabled = enableScroll
                 )
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_back_black),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 10.dp)
-                    .background(color = Color.White)
-                    .clickable {
-                        onBack()
-                    }
-            )
             val writer = if (!isReceived) {
                 "${uiState.timeCapsule.sender} (나)"
             } else {
@@ -195,7 +185,8 @@ fun TimeCapsuleDetailScreen(
                 uiState = uiState,
                 onOptionClick = {
                     showOption = it
-                }
+                },
+                onBack = onBack
             )
             MenuItem(resId = uiState.timeCapsule.host.profileImage.profileImage(), title = "작성자 : $writer")
             Divider(
@@ -321,7 +312,7 @@ private fun TimeCapsuleDetailScreenPreview() {
 }
 
 @Composable
-fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState, onOptionClick: (Boolean) -> Unit) {
+fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState, onBack: () -> kotlin.Unit, onOptionClick: (Boolean) -> Unit) {
     val timeCapsule = uiState.timeCapsule
     val images: List<String> = timeCapsule.medias
     val pagerState = rememberPagerState(pageCount = {
@@ -396,7 +387,9 @@ fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState, onOptionClick: (Boolean)
                 modifier = Modifier
                     .padding(10.dp)
                     .fillMaxSize()
-
+                    .clickable {
+                        onBack()
+                    }
             )
         }
 

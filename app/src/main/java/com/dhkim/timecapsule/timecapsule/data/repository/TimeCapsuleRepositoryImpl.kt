@@ -31,6 +31,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         content: String,
         lat: String,
         lng: String,
+        placeName: String,
         address: String,
         checkLocation: Boolean
     ): isSuccessful {
@@ -51,6 +52,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
             content = content,
             lat = lat,
             lng = lng,
+            placeName = placeName,
             address = address,
             checkLocation = checkLocation
         ) is CommonResult.Success
@@ -79,7 +81,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun saveMyTimeCapsule(timeCapsule: MyTimeCapsule) {
         val entity = timeCapsule.run {
             MyTimeCapsuleEntity(
-                id, date, openDate, lat, lng, address, content, medias, checkLocation, isOpened, sharedFriends
+                id, date, openDate, lat, lng, placeName, address, content, medias, checkLocation, isOpened, sharedFriends
             )
         }
 
@@ -89,7 +91,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun editMyTimeCapsule(timeCapsule: MyTimeCapsule) {
         val entity = timeCapsule.run {
             MyTimeCapsuleEntity(
-                id, date, openDate, lat, lng, address, content, medias, checkLocation, isOpened, sharedFriends
+                id, date, openDate, lat, lng, placeName, address, content, medias, checkLocation, isOpened, sharedFriends
             )
         }
 
@@ -167,7 +169,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun saveReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsule) {
         val entity = timeCapsule.run {
             ReceivedTimeCapsuleEntity(
-                id, date, openDate, sender, profileImage, lat, lng, address, content, checkLocation, isOpened
+                id, date, openDate, sender, profileImage, lat, lng, placeName, address, content, checkLocation, isOpened
             )
         }
 
@@ -177,7 +179,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun updateReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsule) {
         val entity = timeCapsule.run {
             ReceivedTimeCapsuleEntity(
-                id, date, openDate, sender, profileImage, lat, lng, address, content, checkLocation, isOpened
+                id, date, openDate, sender, profileImage, lat, lng, placeName, address, content, checkLocation, isOpened
             )
         }
 

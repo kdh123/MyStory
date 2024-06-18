@@ -25,6 +25,7 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
         content: String,
         lat: String,
         lng: String,
+        placeName: String,
         address: String,
         checkLocation: Boolean
     ): CommonResult<isSuccessful> {
@@ -42,6 +43,11 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
                 lng
             } else {
                 "0.0"
+            },
+            placeName = if (checkLocation) {
+                placeName
+            } else {
+                ""
             },
             address = if (checkLocation) {
                 address
@@ -90,6 +96,7 @@ data class CustomField(
     val content: String,
     val lat: String,
     val lng: String,
+    val placeName: String,
     val address: String,
     val checkLocation: Boolean
 )

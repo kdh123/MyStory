@@ -393,7 +393,7 @@ fun AddTimeCapsuleScreen(
                         MenuItem(
                             resId = -1,
                             title = uiState.address.ifEmpty { "위치" },
-                            subTitle = "지정한 위치 근처에 있어야 오픈할 수 있습니다.",
+                            subTitle = "지정한 위치 근처에서 오픈할 수 있습니다.",
                             modifier = Modifier
                                 .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 0.dp),
                             onClick = {
@@ -736,7 +736,7 @@ private fun SwitchMenuItemPreview() {
         resId = R.drawable.ic_map_black,
         isChecked = true,
         title = "위치 체크",
-        subTitle = "이 위치 근처에 있어야 타임캡슐을 오픈할 수 있습니다."
+        subTitle = "이 위치 근처에서 타임캡슐을 오픈할 수 있습니다."
     ) {
 
     }

@@ -14,6 +14,7 @@ data class TimeCapsule(
     val openDate: String = "",
     val lat: String = "${Constants.defaultLocation.latitude}",
     val lng: String = "${Constants.defaultLocation.longitude}",
+    val placeName: String = "",
     val address: String = "",
     val content: String = "",
     val medias: List<String> = listOf(),
@@ -25,7 +26,7 @@ data class TimeCapsule(
 ) {
     fun toMyTimeCapsule(): MyTimeCapsule {
         return MyTimeCapsule(
-            id, date, openDate, lat, lng, address, content, medias, checkLocation, isOpened, sharedFriends
+            id, date, openDate, lat, lng, placeName, address, content, medias, checkLocation, isOpened, sharedFriends
         )
     }
 

@@ -13,6 +13,7 @@ interface TimeCapsuleRepository {
         content: String,
         lat: String,
         lng: String,
+        placeName: String,
         address: String,
         checkLocation: Boolean
     ): isSuccessful
