@@ -56,6 +56,7 @@ import androidx.compose.ui.window.Dialog
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.DateUtil
+import com.dhkim.timecapsule.common.composable.WarningDialog
 import com.dhkim.timecapsule.common.composable.drawAnimatedBorder
 import com.dhkim.timecapsule.common.presentation.DistanceManager
 import com.dhkim.timecapsule.timecapsule.domain.Host
@@ -103,7 +104,9 @@ fun TimeCapsuleScreen(
     var showLocationDialog by remember {
         mutableStateOf(false)
     }
-
+    var showOpenDialog by remember {
+        mutableStateOf(false)
+    }
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
@@ -121,6 +124,19 @@ fun TimeCapsuleScreen(
         } else {
             // Handle permission denial
         }
+    }
+
+    if (showOpenDialog) {
+        WarningDialog(
+            dialogTitle = "오픈",
+            dialogText = "정말 오픈하겠습니까?",
+            onConfirmation = {
+                onNavigateToOpen(selectedTimeCapsule.id, selectedTimeCapsule.isReceived)
+            },
+            onDismissRequest = {
+                showOpenDialog = false
+            },
+        )
     }
 
     if (showLocationDialog) {
@@ -197,7 +213,10 @@ fun TimeCapsuleScreen(
                 selectedTimeCapsule = it
                 showLocationDialog = true
             },
-            onNavigateToOpen = onNavigateToOpen
+            onShowOpenDialog = {
+                selectedTimeCapsule = it
+                showOpenDialog = true
+            }
         )
         UnopenedTimeCapsules(uiState = uiState, onNavigateToAdd = onNavigateToAdd, onShowDetailBottom = { })
         OpenedTimeCapsules(uiState = uiState, onNavigateToDetail = onNavigateToDetail)
@@ -372,7 +391,7 @@ private fun OpenableTimeCapsules(
     currentLat: Double,
     currentLng: Double,
     onShowLocationDialog: ((TimeCapsule) -> Unit),
-    onNavigateToOpen: (timeCapsuleId: String, isReceived: Boolean) -> Unit
+    onShowOpenDialog: (TimeCapsule) -> Unit
 ) {
     if (uiState.openableTimeCapsules.isEmpty()) {
         return
@@ -400,7 +419,7 @@ private fun OpenableTimeCapsules(
                 currentLat = currentLat,
                 currentLng = currentLng,
                 onShowLocationDialog = onShowLocationDialog,
-                onNavigateToOpen = onNavigateToOpen
+                onShowOpenDialog = onShowOpenDialog
             )
         }
     }
@@ -632,7 +651,7 @@ private fun LockTimeCapsule(
     timeCapsule: TimeCapsule,
     currentLat: Double = 0.0,
     currentLng: Double = 0.0,
-    onNavigateToOpen: ((timeCapsuleId: String, isReceived: Boolean) -> Unit)? = null,
+    onShowOpenDialog: ((TimeCapsule) -> Unit)? = null,
     onShowLocationDialog: ((TimeCapsule) -> Unit)? = null,
     onShowDetailBottom: ((TimeCapsule) -> Unit)? = null
 ) {
@@ -649,12 +668,12 @@ private fun LockTimeCapsule(
                 if (canOpen) {
                     if (checkLocation) {
                         if (isNear) {
-                            onNavigateToOpen?.invoke(timeCapsule.id, timeCapsule.isReceived)
+                            onShowOpenDialog?.invoke(timeCapsule)
                         } else {
                             onShowLocationDialog?.invoke(timeCapsule)
                         }
                     } else {
-                        onNavigateToOpen?.invoke(timeCapsule.id, timeCapsule.isReceived)
+                        onShowOpenDialog?.invoke(timeCapsule)
                     }
                 } else {
                     onShowDetailBottom?.invoke(timeCapsule)
@@ -673,17 +692,27 @@ private fun LockTimeCapsule(
         Box(
             modifier = modifier
         ) {
-            GlideImage(
-                imageModel = if (timeCapsule.medias.isNotEmpty()) {
-                    timeCapsule.medias[0]
-                } else {
-                    R.drawable.ic_launcher_background
-                },
-                previewPlaceholder = R.drawable.ic_launcher_background,
-                error = painterResource(id = R.drawable.ic_launcher_background),
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+            if (timeCapsule.medias.isNotEmpty()) {
+                GlideImage(
+                    imageModel = timeCapsule.medias[0],
+                    previewPlaceholder = R.drawable.ic_launcher_background,
+                    error = painterResource(id = R.drawable.ic_launcher_background),
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            } else {
+                val brush = Brush.linearGradient(
+                    listOf(Color(0XFF3C5AFA), Color(0XFFF361DC))
+                )
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f),
+                    onDraw = {
+                        drawRect(brush)
+                    }
+                )
+            }
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 Box(

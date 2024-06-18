@@ -10,12 +10,12 @@ import com.dhkim.timecapsule.R
 
 @Composable
 fun WarningDialog(
-    onConfirmation: () -> Unit,
-    onDismissRequest: () -> Unit,
     dialogTitle: String,
     dialogText: String,
     iconResId: Int = R.drawable.ic_warning_yellow,
-    choice: Boolean = true
+    choice: Boolean = true,
+    onConfirmation: () -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
     AlertDialog(
         icon = {

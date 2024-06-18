@@ -407,7 +407,11 @@ fun AddTimeCapsuleScreen(
                         color = colorResource(id = R.color.light_gray)
                     )
                     MenuItem(
-                        resId = R.drawable.ic_calender_black,
+                        resId = if (uiState.openDate.isNotEmpty()) {
+                            R.drawable.ic_calender_primary
+                        } else {
+                            R.drawable.ic_calender_black
+                        },
                         title = uiState.openDate.ifEmpty { "오픈 날짜" },
                         subTitle = "오픈 날짜는 오늘로부터 3개월 이후로 설정이 가능합니다.",
                         modifier = Modifier
@@ -422,7 +426,11 @@ fun AddTimeCapsuleScreen(
                     )
 
                     SwitchMenuItem(
-                        resId = R.drawable.ic_face_black,
+                        resId = if (uiState.isShare) {
+                            R.drawable.ic_smile_blue
+                        } else {
+                            R.drawable.ic_face_black
+                        },
                         title = "친구와 공유하기",
                         subTitle = "사진은 친구에게 공유되지 않습니다.",
                         isChecked = uiState.isShare
@@ -635,7 +643,7 @@ fun Calender(
     val startDate = DateUtil.dateAfterMonths(3)
 
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = DateUtil.dateToMills(DateUtil.todayDate()),
+        initialSelectedDateMillis = DateUtil.dateToMills(DateUtil.dateAfterDays(1)),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return utcTimeMillis >= DateUtil.dateToMills(DateUtil.todayDate())
@@ -690,7 +698,7 @@ private fun SwitchMenuItem(
             painter = painterResource(id = resId),
             contentDescription = null,
             modifier = Modifier
-                .align(Alignment.CenterVertically)
+                .padding(top = 3.dp)
         )
         Column(
             modifier = Modifier
@@ -765,7 +773,7 @@ private fun MenuItem(
             ),
             contentDescription = null,
             modifier = Modifier
-                .align(Alignment.CenterVertically)
+                .padding(top = 3.dp)
                 .alpha(
                     if (resId == -1) {
                         0f

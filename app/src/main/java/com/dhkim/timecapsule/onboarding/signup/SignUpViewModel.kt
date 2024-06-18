@@ -68,6 +68,10 @@ class SignUpViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(errorMessage = "아이디를 입력하세요.")
                 }
 
+                containSpace(userId) -> {
+                    _uiState.value = _uiState.value.copy(errorMessage = "공백은 포함될 수 없습니다.")
+                }
+
                 containsSpecialCharacters(userId) -> {
                     _uiState.value = _uiState.value.copy(errorMessage = "특수 문자는 포함될 수 없습니다.")
                 }
@@ -110,6 +114,10 @@ class SignUpViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun containSpace(input: String): Boolean {
+        return !input.matches(Regex("\\S+"))
     }
 
     private fun containsSpecialCharacters(input: String): Boolean {

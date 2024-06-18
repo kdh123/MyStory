@@ -26,6 +26,16 @@ class ExampleUnitTest {
 
     }
 
+    @Test
+    fun containSpaceTest() {
+        val str = "abcdefg"
+        println("isTrue : ${containSpace(str)}")
+    }
+
+    private fun containSpace(input: String): Boolean {
+        return !input.matches(Regex("\\S+"))
+    }
+
     fun containsSpecialCharacters(input: String): Boolean {
         val specialCharactersPattern = Regex("[^a-zA-Z0-9 ]") // 알파벳, 숫자, 공백 제외한 모든 문자
         return specialCharactersPattern.containsMatchIn(input)
