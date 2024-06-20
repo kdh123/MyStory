@@ -41,7 +41,7 @@ interface SearchApi {
     ): Response<PlaceDto>
 
     @GET("geo/coord2address.json")
-    suspend fun getAddress2(
+    suspend fun getAddress(
         @Header("Authorization") token: String = BuildConfig.KAKAO_API_KEY,
         @Query("y") lat: String,
         @Query("x") lng: String

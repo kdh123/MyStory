@@ -7,20 +7,22 @@ data class AddressDto(
     val meta: AddressMeta
 ) {
     fun toAddress(): Address {
+        val standardAddress = if (documents.isNotEmpty()) {
+            documents[0].address?.address_name ?: "알 수 없음"
+        } else {
+            "알 수 없음"
+        }
+
         val address = if (documents.isNotEmpty()) {
-            documents[0].road_address.address_name
+            documents[0].road_address?.address_name ?: standardAddress
         } else {
             "알 수 없음"
         }
 
         val placeName = if (documents.isNotEmpty()) {
-            documents[0].road_address.building_name
+            documents[0].road_address?.building_name ?: standardAddress
         } else {
-            if (address != "알 수 없음") {
-                address
-            } else {
-                "알 수 없음"
-            }
+            "알 수 없음"
         }
 
         return Address(address = address, placeName = placeName)

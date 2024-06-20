@@ -112,6 +112,7 @@ dependencies {
     implementation(libs.naver.map.compose)
     implementation(libs.naver.map.location)
     implementation(libs.hilt)
+    kapt(libs.androidx.hilt.compiler)
     kapt(libs.hilt.compiler)
     implementation(libs.retrofit)
     implementation(libs.retrofit.convertor)
@@ -134,4 +135,6 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.google.firebase.messaging.ktx)
     implementation(libs.blur.cloudy)
+    implementation(libs.androidx.work)
+    implementation(libs.androidx.hilt.work)
 }

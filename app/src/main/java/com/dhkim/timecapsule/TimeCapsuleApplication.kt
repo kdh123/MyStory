@@ -5,14 +5,20 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 @HiltAndroidApp
-class TimeCapsuleApplication : Application() {
+class TimeCapsuleApplication : Application(), Configuration.Provider {
 
     companion object {
         const val CHANNEL_ID = "timeCapsule"
     }
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
         super.onCreate()
@@ -31,4 +37,9 @@ class TimeCapsuleApplication : Application() {
             notificationManager.createNotificationChannel(channel)
         }
     }
+
+    override fun getWorkManagerConfiguration() =
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }

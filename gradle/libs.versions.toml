@@ -41,9 +41,16 @@ fcm = "23.2.1"
 composeAnimation = "1.6.0"
 jodaTime = "2.12.7"
 cloudy = "0.1.2"
+workManager = "2.7.1"
+hiltWorkManager = "1.0.0"
+hiltCompiler = "1.0.0"
 
 
 [libraries]
+
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
+androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWorkManager" }
+androidx-work = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
 blur-cloudy = { module = "com.github.skydoves:cloudy", version.ref = "cloudy" }
 android-joda = { module = "net.danlew:android.joda", version.ref = "jodaTime" }
 androidx-compose-animation = { module = "androidx.compose.animation:animation-core" , version.ref = "composeAnimation" }
