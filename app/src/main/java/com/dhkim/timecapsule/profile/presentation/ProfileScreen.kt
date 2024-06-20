@@ -5,11 +5,14 @@ package com.dhkim.timecapsule.profile.presentation
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -56,6 +60,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.R
@@ -68,6 +73,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    onDeleteFriend: (String) -> Unit,
     onBack: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -84,10 +90,16 @@ fun ProfileScreen(
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(state)
     val scope = rememberCoroutineScope()
     var showBottomSheet = false
-    var selectedDeleteUserId by remember {
+    var selectedUserId by remember {
         mutableStateOf("")
     }
     val focusManager = LocalFocusManager.current
+    var showMenuDialog by remember {
+        mutableStateOf(false)
+    }
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(true) {
         viewModel.sideEffect.collect { sideEffect ->
@@ -98,7 +110,7 @@ fun ProfileScreen(
 
                 is ProfileSideEffect.ShowDialog -> {
                     if (!sideEffect.show) {
-                        selectedDeleteUserId = ""
+                        selectedUserId = ""
                     }
                 }
 
@@ -124,14 +136,56 @@ fun ProfileScreen(
         }
     }
 
-    if (selectedDeleteUserId.isNotEmpty()) {
+    if (showMenuDialog) {
+        Dialog(
+            onDismissRequest = {
+                selectedUserId = ""
+                showMenuDialog = false
+            }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        text = "메뉴",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "삭제",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showMenuDialog = false
+                                showDeleteDialog = true
+                            }
+                    )
+                }
+            }
+
+
+        }
+    }
+
+    if (showDeleteDialog) {
         WarningDialog(
-            onDismissRequest = { selectedDeleteUserId = "" },
+            onDismissRequest = {
+                showDeleteDialog = false
+                selectedUserId = ""
+            },
             onConfirmation = {
-                viewModel.deleteFriend(userId = selectedDeleteUserId)
+                onDeleteFriend(selectedUserId)
             },
             dialogTitle = "삭제",
-            dialogText = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedDeleteUserId}님을 정말 삭제하시겠습니까?",
+            dialogText = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedUserId}님을 정말 삭제하시겠습니까?",
             iconResId = R.drawable.ic_warning_yellow
         )
     }
@@ -152,7 +206,7 @@ fun ProfileScreen(
                     viewModel::addFriend
                 },
                 onDeleteClick = {
-                    selectedDeleteUserId = it
+                    selectedUserId = it
                 }
             )
         },
@@ -246,8 +300,9 @@ fun ProfileScreen(
                         0 -> {
                             FriendScreen(
                                 uiState = uiState,
-                                onDeleteClick = {
-                                    selectedDeleteUserId = it
+                                onLongClick = {
+                                    selectedUserId = it
+                                    showMenuDialog = true
                                 }
                             )
                         }
@@ -378,7 +433,7 @@ fun BottomSheetScreen(
                             .padding(10.dp)
                             .align(Alignment.CenterVertically)
                     )
-                    if (!uiState.searchResult.isMe) {
+                    if (!uiState.searchResult.isMe && !isMyFriend) {
                         Card(
                             colors = CardDefaults.cardColors(
                                 containerColor = colorResource(id = R.color.primary)
@@ -386,19 +441,11 @@ fun BottomSheetScreen(
                             modifier = Modifier
                                 .align(Alignment.CenterVertically),
                             onClick = {
-                                if (isMyFriend) {
-                                    onDeleteClick(userId)
-                                } else {
-                                    onAddFriend()
-                                }
+                                onAddFriend()
                             }
                         ) {
                             Image(
-                                painter = if (isMyFriend) {
-                                    painterResource(id = R.drawable.ic_delete_white)
-                                } else {
-                                    painterResource(id = R.drawable.ic_person_add_white)
-                                },
+                                painter = painterResource(id = R.drawable.ic_person_add_white),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .padding(10.dp)
@@ -449,7 +496,7 @@ fun RequestScreen(uiState: ProfileUiState, onClick: (Friend) -> Unit) {
 }
 
 @Composable
-fun FriendScreen(uiState: ProfileUiState, onDeleteClick: (userId: String) -> Unit) {
+fun FriendScreen(uiState: ProfileUiState, onLongClick: (userId: String) -> Unit) {
     Column {
         Column {
             Text(
@@ -462,7 +509,7 @@ fun FriendScreen(uiState: ProfileUiState, onDeleteClick: (userId: String) -> Uni
                 userId = uiState.user.id,
                 isMe = true,
                 profileImage = uiState.user.profileImage.profileImage(),
-                onDeleteClick = onDeleteClick
+                onLongClick = onLongClick
             )
         }
         FriendList(
@@ -470,14 +517,14 @@ fun FriendScreen(uiState: ProfileUiState, onDeleteClick: (userId: String) -> Uni
             isFriend = true,
             title = "서로 승낙한 친구",
             modifier = Modifier.fillMaxWidth(),
-            onDeleteClick = onDeleteClick
+            onDeleteClick = onLongClick
         )
         FriendList(
             uiState = uiState,
             isFriend = false,
             title = "내가 요청한 친구",
             modifier = Modifier.fillMaxSize(),
-            onDeleteClick = onDeleteClick
+            onDeleteClick = onLongClick
         )
     }
 }
@@ -548,13 +595,13 @@ fun FriendList(
                     FriendItem(
                         userId = item.id,
                         profileImage = item.profileImage.profileImage(),
-                        onDeleteClick = onDeleteClick
+                        onLongClick = onDeleteClick
                     )
                 } else {
                     FriendItem(
                         userId = item.id,
                         profileImage = item.profileImage.profileImage(),
-                        onDeleteClick = onDeleteClick
+                        onLongClick = onDeleteClick
                     )
                     Divider(
                         color = colorResource(id = R.color.light_gray),
@@ -613,12 +660,21 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FriendItem(userId: String, profileImage: Int, isMe: Boolean = false, onDeleteClick: (userId: String) -> Unit) {
+fun FriendItem(userId: String, profileImage: Int, isMe: Boolean = false, onLongClick: (userId: String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp)
+            .padding(10.dp)
+            .combinedClickable(
+                onClick = { },
+                onLongClick = {
+                    if (!isMe) {
+                        onLongClick(userId)
+                    }
+                }
+            )
     ) {
         Image(
             painter = painterResource(id = profileImage),
@@ -635,27 +691,6 @@ fun FriendItem(userId: String, profileImage: Int, isMe: Boolean = false, onDelet
                 .align(Alignment.CenterVertically)
                 .padding(start = 5.dp)
         )
-
-        Card(
-            border = BorderStroke(
-                width = 1.dp,
-                color = colorResource(id = R.color.primary)
-            ),
-            colors = CardDefaults.cardColors(colorResource(id = R.color.primary)),
-            onClick = {
-                onDeleteClick(userId)
-            }
-        ) {
-            if (!isMe) {
-                Image(
-                    painter =
-                    painterResource(id = R.drawable.ic_delete_white),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(10.dp)
-                )
-            }
-        }
     }
 }
 
