@@ -84,7 +84,8 @@ class AddTimeCapsuleViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             lat = place.lat,
             lng = place.lng,
-            address = place.name,
+            placeName = place.name,
+            address = place.address,
             checkLocation = true
         )
     }
