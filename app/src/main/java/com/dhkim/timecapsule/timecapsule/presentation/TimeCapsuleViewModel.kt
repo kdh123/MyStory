@@ -68,6 +68,16 @@ class TimeCapsuleViewModel @Inject constructor(
         }
     }
 
+    fun deleteTimeCapsule(timeCapsuleId: String, isReceived: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isReceived) {
+                timeCapsuleRepository.deleteReceivedTimeCapsule(timeCapsuleId)
+            } else {
+                timeCapsuleRepository.deleteMyTimeCapsule(timeCapsuleId)
+            }
+        }
+    }
+
     fun onAction(action: TimeCapsuleAction) {
         viewModelScope.launch(Dispatchers.IO) {
             when (action) {

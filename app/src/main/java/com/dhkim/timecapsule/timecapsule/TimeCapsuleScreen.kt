@@ -8,14 +8,17 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,9 +60,7 @@ import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.common.composable.WarningDialog
-import com.dhkim.timecapsule.common.composable.drawAnimatedBorder
 import com.dhkim.timecapsule.common.presentation.DistanceManager
-import com.dhkim.timecapsule.timecapsule.domain.Host
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleUiState
@@ -88,6 +89,7 @@ fun TimeCapsuleScreen(
     uiState: TimeCapsuleUiState,
     sideEffect: TimeCapsuleSideEffect,
     modifier: Modifier = Modifier,
+    onDeleteTimeCapsule: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToAdd: () -> Unit,
     onNavigateToOpen: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
@@ -105,6 +107,12 @@ fun TimeCapsuleScreen(
         mutableStateOf(false)
     }
     var showOpenDialog by remember {
+        mutableStateOf(false)
+    }
+    var showMenuDialog by remember {
+        mutableStateOf(false)
+    }
+    var showDeleteDialog by remember {
         mutableStateOf(false)
     }
     val fusedLocationClient = remember {
@@ -126,6 +134,57 @@ fun TimeCapsuleScreen(
         }
     }
 
+    if (showMenuDialog) {
+        Dialog(
+            onDismissRequest = {
+                selectedTimeCapsule = TimeCapsule()
+                showMenuDialog = false
+            }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        text = "메뉴",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "삭제",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showMenuDialog = false
+                                showDeleteDialog = true
+                            }
+                    )
+                }
+            }
+        }
+    }
+
+    if (showDeleteDialog) {
+        WarningDialog(
+            dialogTitle = "삭제",
+            dialogText = "정말 삭제하겠습니까?",
+            onConfirmation = {
+                onDeleteTimeCapsule(selectedTimeCapsule.id, selectedTimeCapsule.isReceived)
+                showDeleteDialog = false
+            },
+            onDismissRequest = {
+                showOpenDialog = false
+            }
+        )
+    }
+
     if (showOpenDialog) {
         WarningDialog(
             dialogTitle = "오픈",
@@ -135,7 +194,7 @@ fun TimeCapsuleScreen(
             },
             onDismissRequest = {
                 showOpenDialog = false
-            },
+            }
         )
     }
 
@@ -216,10 +275,29 @@ fun TimeCapsuleScreen(
             onShowOpenDialog = {
                 selectedTimeCapsule = it
                 showOpenDialog = true
+            },
+            onLongClick = {
+                selectedTimeCapsule = it
+                showMenuDialog = true
             }
         )
-        UnopenedTimeCapsules(uiState = uiState, onNavigateToAdd = onNavigateToAdd, onShowDetailBottom = { })
-        OpenedTimeCapsules(uiState = uiState, onNavigateToDetail = onNavigateToDetail)
+        UnopenedTimeCapsules(
+            uiState = uiState,
+            onLongClick = {
+                selectedTimeCapsule = it
+                showMenuDialog = true
+            },
+            onNavigateToAdd = onNavigateToAdd,
+            onShowDetailBottom = { }
+        )
+        OpenedTimeCapsules(
+            uiState = uiState,
+            onLongClick = {
+                selectedTimeCapsule = it
+                showMenuDialog = true
+            },
+            onNavigateToDetail = onNavigateToDetail
+        )
         if (uiState.openedTimeCapsules.isEmpty()) {
             GuideItem()
         }
@@ -257,6 +335,7 @@ private fun GuideItem() {
 @Composable
 private fun OpenedTimeCapsules(
     uiState: TimeCapsuleUiState,
+    onLongClick: (TimeCapsule) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit
 ) {
     Text(
@@ -282,6 +361,9 @@ private fun OpenedTimeCapsules(
                     timeCapsule = it,
                     onClick = {
                         onNavigateToDetail(it.id, it.isReceived)
+                    },
+                    onLongClick = {
+                        onLongClick(it)
                     }
                 )
             }
@@ -391,7 +473,8 @@ private fun OpenableTimeCapsules(
     currentLat: Double,
     currentLng: Double,
     onShowLocationDialog: ((TimeCapsule) -> Unit),
-    onShowOpenDialog: (TimeCapsule) -> Unit
+    onShowOpenDialog: (TimeCapsule) -> Unit,
+    onLongClick: (TimeCapsule) -> Unit
 ) {
     if (uiState.openableTimeCapsules.isEmpty()) {
         return
@@ -419,14 +502,22 @@ private fun OpenableTimeCapsules(
                 currentLat = currentLat,
                 currentLng = currentLng,
                 onShowLocationDialog = onShowLocationDialog,
-                onShowOpenDialog = onShowOpenDialog
+                onShowOpenDialog = onShowOpenDialog,
+                onLongClick = {
+                    onLongClick(it)
+                }
             )
         }
     }
 }
 
 @Composable
-private fun UnopenedTimeCapsules(uiState: TimeCapsuleUiState, onNavigateToAdd: () -> Unit, onShowDetailBottom: ((TimeCapsule) -> Unit)) {
+private fun UnopenedTimeCapsules(
+    uiState: TimeCapsuleUiState,
+    onLongClick: (TimeCapsule) -> Unit,
+    onNavigateToAdd: () -> Unit,
+    onShowDetailBottom: ((TimeCapsule) -> Unit)
+) {
     Text(
         text = "미개봉 타임캡슐",
         modifier = Modifier
@@ -475,7 +566,13 @@ private fun UnopenedTimeCapsules(uiState: TimeCapsuleUiState, onNavigateToAdd: (
             items(items = uiState.unOpenedTimeCapsules.filter { !it.checkLocation }, key = {
                 it.id
             }) {
-                LockTimeCapsule(timeCapsule = it, onShowDetailBottom = onShowDetailBottom)
+                LockTimeCapsule(
+                    timeCapsule = it,
+                    onShowDetailBottom = onShowDetailBottom,
+                    onLongClick = {
+                        onLongClick(it)
+                    }
+                )
             }
         }
     }
@@ -496,7 +593,12 @@ private fun UnopenedTimeCapsules(uiState: TimeCapsuleUiState, onNavigateToAdd: (
             items(items = uiState.unOpenedTimeCapsules.filter { it.checkLocation }, key = {
                 it.id
             }) {
-                LockTimeCapsule(timeCapsule = it)
+                LockTimeCapsule(
+                    timeCapsule = it,
+                    onLongClick = {
+                        onLongClick(it)
+                    }
+                )
             }
         }
     }
@@ -526,6 +628,7 @@ private fun TimeCapsuleScreenPreview() {
         ),
         sideEffect = TimeCapsuleSideEffect.None,
         modifier = Modifier,
+        onDeleteTimeCapsule = { _, _ -> },
         onNavigateToAdd = { },
         onNavigateToOpen = { _, _ -> },
         onNavigateToDetail = { _, _ -> },
@@ -533,13 +636,22 @@ private fun TimeCapsuleScreenPreview() {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
+fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongClick: (TimeCapsule) -> Unit) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
             .width(240.dp)
             .height(360.dp)
+            .combinedClickable(
+                onClick = {
+                    onClick(timeCapsule)
+                },
+                onLongClick = {
+                    onLongClick(timeCapsule)
+                }
+            )
     ) {
         if (timeCapsule.medias.isNotEmpty()) {
             GlideImage(
@@ -548,9 +660,6 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
                 error = painterResource(id = R.drawable.ic_launcher_background),
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable {
-                        onClick(timeCapsule)
-                    }
             )
         } else {
             val brush = Brush.linearGradient(
@@ -559,10 +668,7 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(20.dp))
-                    .clickable {
-                        onClick(timeCapsule)
-                    },
+                    .clip(RoundedCornerShape(20.dp)),
                 onDraw = {
                     drawRect(brush)
                 }
@@ -608,44 +714,10 @@ private fun OpenedBoxPreview() {
         sender = ""
     )
 
-    OpenedBox(timeCapsule) {
-
-    }
+    OpenedBox(timeCapsule, onClick = {}, onLongClick = {})
 }
 
-@Composable
-fun OpenableBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit) {
-    Box(
-        modifier = Modifier
-            .padding(start = 10.dp)
-            .drawAnimatedBorder(
-                strokeWidth = 5.dp,
-                shape = CircleShape,
-                durationMillis = 2000
-            )
-            .clickable {
-                onClick(timeCapsule)
-            }
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(7.dp)
-                .clip(CircleShape)
-                .width(78.dp)
-                .height(78.dp)
-                .background(color = colorResource(id = R.color.white))
-        ) {
-            Image(
-                painter = painterResource(id = R.mipmap.ic_box),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .align(Alignment.Center)
-            )
-        }
-    }
-}
-
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LockTimeCapsule(
     timeCapsule: TimeCapsule,
@@ -653,7 +725,8 @@ private fun LockTimeCapsule(
     currentLng: Double = 0.0,
     onShowOpenDialog: ((TimeCapsule) -> Unit)? = null,
     onShowLocationDialog: ((TimeCapsule) -> Unit)? = null,
-    onShowDetailBottom: ((TimeCapsule) -> Unit)? = null
+    onShowDetailBottom: ((TimeCapsule) -> Unit)? = null,
+    onLongClick: (TimeCapsule) -> Unit
 ) {
     val checkLocation = timeCapsule.checkLocation
     val isNear = DistanceManager.getDistance(currentLat, currentLng, timeCapsule.lat.toDouble(), timeCapsule.lng.toDouble()) <= 100
@@ -664,21 +737,26 @@ private fun LockTimeCapsule(
             .width(150.dp)
             .height(150.dp)
             .clip(RoundedCornerShape(20.dp))
-            .clickable {
-                if (canOpen) {
-                    if (checkLocation) {
-                        if (isNear) {
-                            onShowOpenDialog?.invoke(timeCapsule)
+            .combinedClickable(
+                onClick = {
+                    if (canOpen) {
+                        if (checkLocation) {
+                            if (isNear) {
+                                onShowOpenDialog?.invoke(timeCapsule)
+                            } else {
+                                onShowLocationDialog?.invoke(timeCapsule)
+                            }
                         } else {
-                            onShowLocationDialog?.invoke(timeCapsule)
+                            onShowOpenDialog?.invoke(timeCapsule)
                         }
                     } else {
-                        onShowOpenDialog?.invoke(timeCapsule)
+                        onShowDetailBottom?.invoke(timeCapsule)
                     }
-                } else {
-                    onShowDetailBottom?.invoke(timeCapsule)
+                },
+                onLongClick = {
+                    onLongClick(timeCapsule)
                 }
-            }
+            )
     ) {
         val modifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Modifier
@@ -779,33 +857,9 @@ private fun LockTimeCapsulePreview() {
         medias = listOf("")
     )
 
-    LockTimeCapsule(timeCapsule = timeCapsule)
-}
+    LockTimeCapsule(timeCapsule = timeCapsule, onLongClick = {
 
-@Preview(showBackground = true)
-@Composable
-private fun OpenableBoxPreview() {
-    OpenableBox(
-        timeCapsule = TimeCapsule(
-            id = "",
-            host = Host(),
-            date = "",
-            openDate = "",
-            lat = "",
-            lng = "",
-            address = "",
-            content = "",
-            medias = listOf(),
-            checkLocation = false,
-            isOpened = false,
-            sharedFriends = listOf(),
-            isReceived = false,
-            sender = ""
-        ),
-        onClick = { _ ->
-
-        }
-    )
+    })
 }
 
 @Composable

@@ -170,8 +170,6 @@ fun ProfileScreen(
                     )
                 }
             }
-
-
         }
     }
 
@@ -578,37 +576,40 @@ fun FriendList(
     } else {
         uiState.user.friends.filter { it.isPending }
     }
-    Column {
-        Text(
-            text = title,
-            color = colorResource(id = R.color.gray),
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-        )
-        LazyColumn(modifier = modifier) {
-            itemsIndexed(
-                items = friends, key = { _, item ->
-                    item.id
-                }
-            ) { index, item ->
-                if (index == friends.size - 1) {
-                    FriendItem(
-                        userId = item.id,
-                        profileImage = item.profileImage.profileImage(),
-                        onLongClick = onDeleteClick
-                    )
-                } else {
-                    FriendItem(
-                        userId = item.id,
-                        profileImage = item.profileImage.profileImage(),
-                        onLongClick = onDeleteClick
-                    )
-                    Divider(
-                        color = colorResource(id = R.color.light_gray),
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillMaxWidth()
-                    )
+
+    if (friends.isNotEmpty()) {
+        Column {
+            Text(
+                text = title,
+                color = colorResource(id = R.color.gray),
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+            )
+            LazyColumn(modifier = modifier) {
+                itemsIndexed(
+                    items = friends, key = { _, item ->
+                        item.id
+                    }
+                ) { index, item ->
+                    if (index == friends.size - 1) {
+                        FriendItem(
+                            userId = item.id,
+                            profileImage = item.profileImage.profileImage(),
+                            onLongClick = onDeleteClick
+                        )
+                    } else {
+                        FriendItem(
+                            userId = item.id,
+                            profileImage = item.profileImage.profileImage(),
+                            onLongClick = onDeleteClick
+                        )
+                        Divider(
+                            color = colorResource(id = R.color.light_gray),
+                            modifier = Modifier
+                                .height(1.dp)
+                                .fillMaxWidth()
+                        )
+                    }
                 }
             }
         }

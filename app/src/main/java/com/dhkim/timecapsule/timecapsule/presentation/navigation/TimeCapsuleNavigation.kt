@@ -33,6 +33,7 @@ fun NavGraphBuilder.timeCapsuleNavigation(
             uiState = uiState,
             sideEffect = sideEffect,
             modifier = modifier,
+            onDeleteTimeCapsule = viewModel::deleteTimeCapsule,
             onNavigateToAdd = onNavigateToAdd,
             onNavigateToOpen = onNavigateToOpen,
             onNavigateToDetail = onNavigateToDetail,
