@@ -35,6 +35,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.dhkim.camera.navigation.cameraNavigation
 import com.dhkim.timecapsule.R
+import com.dhkim.timecapsule.common.composable.WarningDialog
 import com.dhkim.timecapsule.home.presentation.navigation.homeNavigation
 import com.dhkim.timecapsule.notification.navigation.navigateToNotification
 import com.dhkim.timecapsule.notification.navigation.notificationNavigation
@@ -51,7 +52,11 @@ import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleOpen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    showGuide: Boolean,
+    onCloseGuide: () -> Unit,
+    onNeverShowGuideAgain: () -> Unit
+) {
     val context = LocalContext.current
     val state = rememberStandardBottomSheetState(
         skipHiddenState = false
@@ -110,7 +115,20 @@ fun MainScreen() {
                 }
             }
         }
-    ) { innerPdding ->
+    ) { innerPadding ->
+        if (showGuide) {
+            WarningDialog(
+                dialogTitle = "알림",
+                dialogText = "나의스토리는 사용자의 이름, 전화번호, 주소 등의 어떠한 개인정보도 수집하지 않습니다. " +
+                        "그리고 앱에서 작성한 글, 사진 등은 모두 서버가 아닌 디바이스에 저장되기 때문에 " +
+                        "앱 삭제시 모든 데이터가 삭제될 수 있으니 이 점 유의하시길 바랍니다.",
+                negativeText = "확인",
+                positiveText = "다시 보지 않기",
+                onConfirmation = onNeverShowGuideAgain,
+                onDismissRequest = onCloseGuide
+            )
+        }
+
         NavHost(
             modifier = Modifier
                 .fillMaxSize(),
@@ -172,7 +190,7 @@ fun MainScreen() {
                 },
                 modifier = Modifier
                     .padding(
-                        bottom = innerPdding.calculateBottomPadding()
+                        bottom = innerPadding.calculateBottomPadding()
                     )
             )
             notificationNavigation(

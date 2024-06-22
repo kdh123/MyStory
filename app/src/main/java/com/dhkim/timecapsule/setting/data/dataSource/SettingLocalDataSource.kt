@@ -13,6 +13,20 @@ class SettingLocalDataSource @Inject constructor(
 ) {
 
     private val PREF_KEY_SETTING = booleanPreferencesKey("setting")
+    private val PREF_KEY_SETTING_GUIDE = booleanPreferencesKey("settingGuide")
+
+    suspend fun getGuideSetting(): Flow<Boolean> {
+        return dataStore.data
+            .map { preferences ->
+                preferences[PREF_KEY_SETTING_GUIDE] ?: true
+            }
+    }
+
+    suspend fun updateGuideSetting(show: Boolean) {
+        dataStore.edit { settings ->
+            settings[PREF_KEY_SETTING_GUIDE] = show
+        }
+    }
 
     suspend fun getNotificationSetting(): Flow<Boolean> {
         return dataStore.data

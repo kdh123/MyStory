@@ -14,6 +14,8 @@ fun WarningDialog(
     dialogText: String,
     iconResId: Int = R.drawable.ic_warning_yellow,
     choice: Boolean = true,
+    negativeText: String = "아니오",
+    positiveText: String = "예",
     onConfirmation: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
@@ -40,7 +42,7 @@ fun WarningDialog(
                         onConfirmation()
                     }
                 ) {
-                    Text("예")
+                    Text(positiveText)
                 }
             }
         },
@@ -51,7 +53,7 @@ fun WarningDialog(
                 }
             ) {
                 if (choice) {
-                    Text("아니오")
+                    Text(negativeText)
                 } else {
                     Text("확인")
                 }
