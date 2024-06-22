@@ -392,7 +392,7 @@ fun AddTimeCapsuleScreen(
                     if (uiState.checkLocation) {
                         MenuItem(
                             resId = -1,
-                            title = uiState.address.ifEmpty { "위치" },
+                            title = uiState.placeName.ifEmpty { "알 수 없음" },
                             subTitle = "지정한 위치 근처에서 오픈할 수 있습니다.",
                             modifier = Modifier
                                 .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 0.dp),
@@ -413,7 +413,7 @@ fun AddTimeCapsuleScreen(
                             R.drawable.ic_calender_black
                         },
                         title = uiState.openDate.ifEmpty { "오픈 날짜" },
-                        subTitle = "오픈 날짜는 오늘로부터 3개월 이후로 설정이 가능합니다.",
+                        subTitle = "지정한 날짜 이후에 오픈이 가능합니다.",
                         modifier = Modifier
                             .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 15.dp),
                     ) {
@@ -571,7 +571,6 @@ private fun SharedFriendItemPreview() {
 private fun SaveButton(modifier: Modifier, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.primary)),
-        elevation = CardDefaults.cardElevation(20.dp),
         shape = RoundedCornerShape(50.dp),
         modifier = modifier
             .fillMaxWidth()

@@ -147,10 +147,6 @@ class AddTimeCapsuleViewModel @Inject constructor(
                         _sideEffect.emit(AddTimeCapsuleSideEffect.Message("내용을 입력해주세요."))
                     }
 
-                    imageUrls.isEmpty() -> {
-                        _sideEffect.emit(AddTimeCapsuleSideEffect.Message("최소 1장 이상의 사진을 등록해주세요."))
-                    }
-
                     isShare && sharedFriends.isEmpty() -> {
                         _sideEffect.emit(AddTimeCapsuleSideEffect.Message("친구를 선택해주세요."))
                     }

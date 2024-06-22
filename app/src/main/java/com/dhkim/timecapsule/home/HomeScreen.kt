@@ -449,12 +449,11 @@ fun BottomPlace(
                 }
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_time_white),
+                painter = painterResource(id = R.mipmap.ic_send_time_white),
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(10.dp)
-                    .width(36.dp)
-                    .height(36.dp)
+                    .width(52.dp)
+                    .height(52.dp)
             )
         }
     }

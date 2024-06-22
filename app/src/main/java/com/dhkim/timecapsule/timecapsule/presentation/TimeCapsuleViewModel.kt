@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.profile.domain.UserRepository
-import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +57,7 @@ class TimeCapsuleViewModel @Inject constructor(
                         }
 
                     _uiState.value = _uiState.value.copy(
+                        isLoading = false,
                         openableTimeCapsules = openableTimeCapsules,
                         openedTimeCapsules = openedTimeCapsules,
                         unOpenedMyTimeCapsules = unOpenedMyTimeCapsules,

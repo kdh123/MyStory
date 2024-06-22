@@ -63,6 +63,7 @@ import androidx.compose.ui.window.Dialog
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.DateUtil
+import com.dhkim.timecapsule.common.composable.ShimmerBrush
 import com.dhkim.timecapsule.common.composable.WarningDialog
 import com.dhkim.timecapsule.common.presentation.DistanceManager
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
@@ -84,6 +85,7 @@ import com.naver.maps.map.compose.Marker
 import com.naver.maps.map.compose.MarkerState
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberCameraPositionState
+import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.glide.GlideImage
 
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
@@ -108,8 +110,6 @@ fun TimeCapsuleScreen(
         mutableStateOf(TimeCapsule())
     }
     val context = LocalContext.current
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     var showLocationDialog by remember {
         mutableStateOf(false)
@@ -295,50 +295,109 @@ fun TimeCapsuleScreen(
                 .verticalScroll(scrollState)
                 .fillMaxSize()
         ) {
-            OpenableTimeCapsules(
-                uiState = uiState,
-                currentLat = currentLocation.latitude,
-                currentLng = currentLocation.longitude,
-                onShowLocationDialog = {
-                    selectedTimeCapsule = it
-                    showLocationDialog = true
-                },
-                onShowOpenDialog = {
-                    selectedTimeCapsule = it
-                    showOpenDialog = true
-                },
-                onLongClick = {
-                    selectedTimeCapsule = it
-                    showMenuDialog = true
-                }
-            )
-            UnopenedTimeCapsules(
-                uiState = uiState,
-                onClick = {
-                    selectedTimeCapsule = it
-                    showLocationDialog = true
-                },
-                onLongClick = {
-                    selectedTimeCapsule = it
-                    showMenuDialog = true
-                },
-                onNavigateToAdd = onNavigateToAdd
-            )
-            OpenedTimeCapsules(
-                uiState = uiState,
-                onLongClick = {
-                    selectedTimeCapsule = it
-                    showMenuDialog = true
-                },
-                onNavigateToDetail = onNavigateToDetail
-            )
-            if (true || uiState.openedTimeCapsules.isEmpty()) {
+            if (uiState.isLoading) {
+                LoadingScreen()
+            } else {
+                OpenableTimeCapsules(
+                    uiState = uiState,
+                    currentLat = currentLocation.latitude,
+                    currentLng = currentLocation.longitude,
+                    onShowLocationDialog = {
+                        selectedTimeCapsule = it
+                        showLocationDialog = true
+                    },
+                    onShowOpenDialog = {
+                        selectedTimeCapsule = it
+                        showOpenDialog = true
+                    },
+                    onLongClick = {
+                        selectedTimeCapsule = it
+                        showMenuDialog = true
+                    }
+                )
+                UnopenedTimeCapsules(
+                    uiState = uiState,
+                    onClick = {
+                        selectedTimeCapsule = it
+                        showLocationDialog = true
+                    },
+                    onLongClick = {
+                        selectedTimeCapsule = it
+                        showMenuDialog = true
+                    },
+                    onNavigateToAdd = onNavigateToAdd
+                )
+                OpenedTimeCapsules(
+                    uiState = uiState,
+                    onLongClick = {
+                        selectedTimeCapsule = it
+                        showMenuDialog = true
+                    },
+                    onNavigateToDetail = onNavigateToDetail
+                )
+
                 InviteFriendItem(
                     onNavigateToProfile = onNavigateToProfile
                 )
             }
         }
     }
+}
+
+@Composable
+private fun LoadingScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+                .height(38.dp)
+                .background(
+                    brush = ShimmerBrush(targetValue = 1300f)
+                )
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .width(150.dp)
+                .height(150.dp)
+                .background(
+                    brush = ShimmerBrush(targetValue = 1300f)
+                )
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+                .height(38.dp)
+                .background(
+                    brush = ShimmerBrush(targetValue = 1300f)
+                )
+        )
+
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .width(240.dp)
+                .height(360.dp)
+                .background(
+                    brush = ShimmerBrush(targetValue = 1300f)
+                )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoadingScreenPreview() {
+    LoadingScreen()
 }
 
 @Composable
