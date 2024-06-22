@@ -144,7 +144,7 @@ fun TimeCapsuleScreen(
     if (showPermissionDialog) {
         WarningDialog(
             dialogTitle = "위치 권한 요청",
-            dialogText = "타임캡슐을 오픈하기 위해서 위치 권한을 허용해주세요.",
+            dialogText = "타임캡슐을 개봉하기 위해서 위치 권한을 허용해주세요.",
             onConfirmation = {
                 showPermissionDialog = false
                 val uri = Uri.fromParts("package", context.packageName, null)
@@ -219,8 +219,8 @@ fun TimeCapsuleScreen(
 
     if (showOpenDialog) {
         WarningDialog(
-            dialogTitle = "오픈",
-            dialogText = "정말 오픈하겠습니까?",
+            dialogTitle = "개봉",
+            dialogText = "정말 개봉하겠습니까?",
             onConfirmation = {
                 onNavigateToOpen(selectedTimeCapsule.id, selectedTimeCapsule.isReceived)
             },
@@ -460,7 +460,7 @@ private fun OpenedTimeCapsules(
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit
 ) {
     Text(
-        text = "오픈한 타임캡슐",
+        text = "개봉한 타임캡슐",
         modifier = Modifier
             .padding(start = 10.dp, end = 10.dp, top = 10.dp),
         fontSize = 24.sp,
@@ -522,9 +522,9 @@ fun LocationDialog(
     )
 
     val desc = if (timeCapsule.checkLocation) {
-        "${timeCapsule.openDate} 이후에 ${timeCapsule.placeName} 근처에서 오픈할 수 있습니다."
+        "${timeCapsule.openDate} 이후에 ${timeCapsule.placeName} 근처에서 개봉할 수 있습니다."
     } else {
-        "${timeCapsule.openDate} 이후에 어디에서나 오픈할 수 있습니다."
+        "${timeCapsule.openDate} 이후에 어디에서나 개봉할 수 있습니다."
     }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -605,7 +605,7 @@ private fun OpenableTimeCapsules(
     }
 
     Text(
-        text = "오늘 오픈할 수 있는 타임캡슐",
+        text = "오늘 개봉할 수 있는 타임캡슐",
         modifier = Modifier
             .padding(horizontal = 10.dp),
         fontSize = 24.sp,
@@ -676,7 +676,7 @@ private fun UnopenedTimeCapsules(
 
     if (uiState.unOpenedTimeCapsules.any { !it.checkLocation }) {
         Text(
-            text = "아무 장소에서나 열 수 있는 타임캡슐이에요",
+            text = "아무 장소에서나 개봉할 수 있는 타임캡슐이에요",
             modifier = Modifier
                 .padding(top = 10.dp, start = 10.dp, end = 10.dp),
         )
@@ -701,7 +701,7 @@ private fun UnopenedTimeCapsules(
 
     if (uiState.unOpenedTimeCapsules.any { it.checkLocation }) {
         Text(
-            text = "특정 장소에서만 열 수 있는 타임캡슐이에요",
+            text = "특정 장소에서만 개봉할 수 있는 타임캡슐이에요",
             modifier = Modifier
                 .padding(top = 10.dp, start = 10.dp, end = 10.dp),
         )
@@ -931,7 +931,7 @@ private fun LockTimeCapsule(
                 fontSize = 18.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
-                text = "오픈 하기",
+                text = "개봉 하기",
                 modifier = Modifier
                     .padding(10.dp)
                     .align(Alignment.Center)
@@ -1008,7 +1008,7 @@ fun TimeCapsuleItem(timeCapsule: TimeCapsule) {
         ) {
             if (leftTime <= 0) {
                 Text(
-                    text = "오픈 하기",
+                    text = "개봉 하기",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(id = R.color.primary)
@@ -1023,7 +1023,7 @@ fun TimeCapsuleItem(timeCapsule: TimeCapsule) {
                         )
                         if (timeCapsule.checkLocation && timeCapsule.address.isNotEmpty()) {
                             Text(
-                                text = "후에 ${timeCapsule.address}에서 오픈할 수 있습니다",
+                                text = "후에 ${timeCapsule.address}에서 개봉할 수 있습니다",
                                 fontSize = 14.sp,
                                 modifier = Modifier
                                     .align(Alignment.CenterVertically)
@@ -1033,7 +1033,7 @@ fun TimeCapsuleItem(timeCapsule: TimeCapsule) {
                             )
                         } else {
                             Text(
-                                text = "후에 오픈할 수 있습니다.",
+                                text = "후에 개봉할 수 있습니다.",
                                 modifier = Modifier
                                     .align(Alignment.CenterVertically)
                             )

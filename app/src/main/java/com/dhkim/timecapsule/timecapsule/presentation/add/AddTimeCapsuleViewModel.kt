@@ -140,7 +140,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
             with(_uiState.value) {
                 when {
                     openDate.isEmpty() -> {
-                        _sideEffect.emit(AddTimeCapsuleSideEffect.Message("오픈 날짜를 선택해주세요."))
+                        _sideEffect.emit(AddTimeCapsuleSideEffect.Message("개봉 날짜를 선택해주세요."))
                     }
 
                     content.isEmpty() || content.isBlank() -> {

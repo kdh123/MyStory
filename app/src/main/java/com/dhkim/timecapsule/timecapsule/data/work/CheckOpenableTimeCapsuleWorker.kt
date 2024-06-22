@@ -39,7 +39,7 @@ class CheckOpenableTimeCapsuleWorker @AssistedInject constructor(
             }.catch { }.firstOrNull() ?: false
 
             if (isOpenableTimeCapsuleExist) {
-                notificationManager.showNotification("알림", "오늘 오픈할 수 있는 타임캡슐이 존재합니다.")
+                notificationManager.showNotification("알림", "오늘 개봉할 수 있는 타임캡슐이 존재합니다.")
             }
 
             Result.success()

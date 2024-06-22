@@ -96,7 +96,7 @@ fun SettingScreen(
                     .clickable {
                         val browserIntent = Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse("https://sites.google.com/view/petmemory/")
+                            Uri.parse("https://sites.google.com/view/mystorytimecapsule/")
                         )
                         context.startActivity(browserIntent)
                     }

@@ -384,7 +384,7 @@ fun AddTimeCapsuleScreen(
                             R.drawable.ic_location_black
                         },
                         title = "위치 체크",
-                        subTitle = "오픈할 수 있는 위치를 지정합니다.",
+                        subTitle = "개봉할 수 있는 위치를 지정합니다.",
                         isChecked = uiState.checkLocation
                     ) {
                         viewModel.setCheckLocation(isChecked = it)
@@ -393,7 +393,7 @@ fun AddTimeCapsuleScreen(
                         MenuItem(
                             resId = -1,
                             title = uiState.placeName.ifEmpty { "알 수 없음" },
-                            subTitle = "지정한 위치 근처에서 오픈할 수 있습니다.",
+                            subTitle = "지정한 위치 근처에서 개봉할 수 있습니다.",
                             modifier = Modifier
                                 .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 0.dp),
                             onClick = {
@@ -412,8 +412,8 @@ fun AddTimeCapsuleScreen(
                         } else {
                             R.drawable.ic_calender_black
                         },
-                        title = uiState.openDate.ifEmpty { "오픈 날짜" },
-                        subTitle = "지정한 날짜 이후에 오픈이 가능합니다.",
+                        title = uiState.openDate.ifEmpty { "개봉 날짜" },
+                        subTitle = "지정한 날짜 이후에 개봉이 가능합니다.",
                         modifier = Modifier
                             .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 15.dp),
                     ) {
@@ -743,7 +743,7 @@ private fun SwitchMenuItemPreview() {
         resId = R.drawable.ic_map_black,
         isChecked = true,
         title = "위치 체크",
-        subTitle = "이 위치 근처에서 타임캡슐을 오픈할 수 있습니다."
+        subTitle = "이 위치 근처에서 타임캡슐을 개봉할 수 있습니다."
     ) {
 
     }
@@ -817,7 +817,7 @@ private fun MenuItem(
 @Preview(showBackground = true)
 @Composable
 private fun MenuItemPreview() {
-    MenuItem(resId = R.drawable.ic_calender_black, "오픈 날짜") {
+    MenuItem(resId = R.drawable.ic_calender_black, "개봉 날짜") {
 
     }
 }
