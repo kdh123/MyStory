@@ -38,9 +38,12 @@ import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.home.presentation.navigation.homeNavigation
 import com.dhkim.timecapsule.notification.navigation.navigateToNotification
 import com.dhkim.timecapsule.notification.navigation.notificationNavigation
+import com.dhkim.timecapsule.profile.presentation.navigation.navigateToProfile
 import com.dhkim.timecapsule.profile.presentation.navigation.profileNavigation
 import com.dhkim.timecapsule.search.domain.Place
 import com.dhkim.timecapsule.search.presentation.navigation.searchNavigation
+import com.dhkim.timecapsule.setting.presentation.navigation.navigateToSetting
+import com.dhkim.timecapsule.setting.presentation.navigation.settingNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleNavigation
@@ -161,6 +164,12 @@ fun MainScreen() {
                 onNavigateToNotification = {
                     navController.navigateToNotification()
                 },
+                onNavigateToSetting = {
+                    navController.navigateToSetting()
+                },
+                onNavigateToProfile = {
+                    navController.navigateToProfile()
+                },
                 modifier = Modifier
                     .padding(
                         bottom = innerPdding.calculateBottomPadding()
@@ -170,6 +179,11 @@ fun MainScreen() {
                 onNavigateToTimeCapsule = {
 
                 },
+                onBack = {
+                    navController.navigateUp()
+                }
+            )
+            settingNavigation(
                 onBack = {
                     navController.navigateUp()
                 }

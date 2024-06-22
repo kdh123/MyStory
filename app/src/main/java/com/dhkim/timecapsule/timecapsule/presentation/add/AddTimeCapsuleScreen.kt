@@ -841,8 +841,8 @@ private fun ImageListView(
             contentPadding = PaddingValues(horizontal = 5.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            itemsIndexed(items = imageUrls, key = { index, key ->
-                key
+            itemsIndexed(items = imageUrls, key = { index, item ->
+                "${item}${index}"
             }) { index, item ->
                 ImageView(imageUrl = item) {
                     onSelectPicture(index)

@@ -14,6 +14,7 @@ import com.dhkim.timecapsule.TimeCapsuleApplication
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.onboarding.OnboardingActivity
 import com.dhkim.timecapsule.profile.domain.UserRepository
+import com.dhkim.timecapsule.setting.domain.SettingRepository
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.DeleteTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SharedTimeCapsule
@@ -24,6 +25,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,6 +38,9 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
 
     @Inject
     lateinit var timeCapsuleRepository: TimeCapsuleRepository
+
+    @Inject
+    lateinit var settingRepository: SettingRepository
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
@@ -55,8 +60,11 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
                 val deleteTimeCapsule = Gson().fromJson(jsonData, DeleteTimeCapsule::class.java)
                 CoroutineScope(Dispatchers.IO).launch {
                     timeCapsuleRepository.deleteReceivedTimeCapsule(id = deleteTimeCapsule.timeCapsuleId)
+                    val isNotificationOn = settingRepository.getNotificationSetting().first()
+                    if (isNotificationOn) {
+                        showNotification("나의이야기", "${deleteTimeCapsule.sender}님이 나에게 공유한 타임캡슐을 삭제하였습니다.")
+                    }
                 }
-                showNotification("TimeCapsule", "${deleteTimeCapsule.sender}님이 나에게 공유한 타임캡슐을 삭제하였습니다.")
             } else {
                 val sharedTimeCapsule = Gson().fromJson(jsonData, SharedTimeCapsule::class.java)
                 Log.e("data", "sharedData : $sharedTimeCapsule")
@@ -95,9 +103,11 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
 
                     CoroutineScope(Dispatchers.IO).launch {
                         timeCapsuleRepository.saveReceivedTimeCapsule(receivedTimeCapsule)
+                        val isNotificationOn = settingRepository.getNotificationSetting().first()
+                        if (isNotificationOn) {
+                            showNotification("나의이야기", "${sender}님이 타임캡슐을 공유하였습니다.")
+                        }
                     }
-
-                    showNotification("TimeCapsule", "${sender}님이 타임캡슐을 공유하였습니다.")
                 }
             }
         }

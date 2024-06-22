@@ -383,8 +383,8 @@ fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState, onBack: () -> kotlin.Uni
             modifier = Modifier
                 .padding(10.dp)
                 .clip(CircleShape)
-                .width(48.dp)
-                .height(48.dp)
+                .width(38.dp)
+                .height(38.dp)
                 .background(color = Color.White)
         ) {
             Image(
@@ -403,8 +403,8 @@ fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState, onBack: () -> kotlin.Uni
             modifier = Modifier
                 .padding(10.dp)
                 .clip(CircleShape)
-                .width(48.dp)
-                .height(48.dp)
+                .width(38.dp)
+                .height(38.dp)
                 .background(color = Color.White)
                 .align(Alignment.TopEnd)
         ) {

@@ -22,6 +22,8 @@ fun NavGraphBuilder.timeCapsuleNavigation(
     onNavigateToOpen: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToNotification: () -> Unit,
+    onNavigateToSetting: () -> Unit,
+    onNavigateToProfile: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     composable(Screen.TimeCapsule.route) {
@@ -37,7 +39,9 @@ fun NavGraphBuilder.timeCapsuleNavigation(
             onNavigateToAdd = onNavigateToAdd,
             onNavigateToOpen = onNavigateToOpen,
             onNavigateToDetail = onNavigateToDetail,
-            onNavigateToNotification = onNavigateToNotification
+            onNavigateToNotification = onNavigateToNotification,
+            onNavigateToSetting = onNavigateToSetting,
+            onNavigateToProfile = onNavigateToProfile
         )
     }
 }
