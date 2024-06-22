@@ -2,8 +2,11 @@ package com.dhkim.timecapsule.timecapsule
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.location.Location
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,17 +35,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat.startActivity
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.DateUtil
@@ -85,7 +86,6 @@ import com.naver.maps.map.compose.Marker
 import com.naver.maps.map.compose.MarkerState
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberCameraPositionState
-import com.skydoves.landscapist.Shimmer
 import com.skydoves.landscapist.glide.GlideImage
 
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
@@ -123,6 +123,9 @@ fun TimeCapsuleScreen(
     var showDeleteDialog by remember {
         mutableStateOf(false)
     }
+    var showPermissionDialog by remember {
+        mutableStateOf(false)
+    }
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
@@ -131,15 +134,30 @@ fun TimeCapsuleScreen(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            // Permission granted
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
-                    // Got last known location. In some rare situations this can be null.
                     currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
                 }
-        } else {
-            // Handle permission denial
         }
+    }
+
+    if (showPermissionDialog) {
+        WarningDialog(
+            dialogTitle = "위치 권한 요청",
+            dialogText = "타임캡슐을 오픈하기 위해서 위치 권한을 허용해주세요.",
+            onConfirmation = {
+                showPermissionDialog = false
+                val uri = Uri.fromParts("package", context.packageName, null)
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    data = uri
+                }
+                context.startActivity(intent)
+            },
+            onDismissRequest = {
+                showPermissionDialog = false
+            }
+        )
     }
 
     if (showMenuDialog) {
@@ -303,8 +321,12 @@ fun TimeCapsuleScreen(
                     currentLat = currentLocation.latitude,
                     currentLng = currentLocation.longitude,
                     onShowLocationDialog = {
-                        selectedTimeCapsule = it
-                        showLocationDialog = true
+                        if (!locationPermissionState.status.isGranted) {
+                            showPermissionDialog = true
+                        } else {
+                            selectedTimeCapsule = it
+                            showLocationDialog = true
+                        }
                     },
                     onShowOpenDialog = {
                         selectedTimeCapsule = it
