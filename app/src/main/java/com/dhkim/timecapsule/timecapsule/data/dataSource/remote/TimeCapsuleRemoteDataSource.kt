@@ -29,7 +29,8 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
         address: String,
         checkLocation: Boolean
     ): CommonResult<isSuccessful> {
-        val data = CustomField(
+        val data = ShareTimeCapsuleField(
+            timeCapsuleId = "${System.currentTimeMillis()}",
             sender = myId,
             profileImage = myProfileImage,
             openDate = openDate,
@@ -79,6 +80,36 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
             CommonResult.Error(-1)
         }
     }
+
+    suspend fun deleteTimeCapsule(myId: String, sharedFriends: List<Uuid>, timeCapsuleId: String): CommonResult<isSuccessful> {
+        val data = DeleteTimeCapsule(
+            sender = myId,
+            timeCapsuleId = timeCapsuleId
+        )
+
+        val gson = Gson()
+        val payload = PushMessage(FcmData(DeleteTimeCapsuleField(custom_field = data)))
+
+        val friendsJson = gson.toJson(sharedFriends)
+        val payloadJson = gson.toJson(payload)
+
+        return try {
+            val result = pushService.shareTimeCapsule(
+                toUserIds = friendsJson,
+                body = payloadJson
+            )
+
+            if (result.isSuccessful) {
+                CommonResult.Success(true)
+            } else {
+                CommonResult.Error(-1)
+            }
+        } catch (e: HttpException) {
+            CommonResult.Error(e.code())
+        } catch (e: Exception) {
+            CommonResult.Error(-1)
+        }
+    }
 }
 
 data class PushMessage(
@@ -89,7 +120,14 @@ data class FcmData(
     val custom_field: CustomField
 )
 
-data class CustomField(
+interface CustomField
+
+data class DeleteTimeCapsuleField(
+    val custom_field: DeleteTimeCapsule
+) : CustomField
+
+data class ShareTimeCapsuleField(
+    val timeCapsuleId: String,
     val sender: String,
     val profileImage: String,
     val openDate: String,
@@ -99,4 +137,10 @@ data class CustomField(
     val placeName: String,
     val address: String,
     val checkLocation: Boolean
+) : CustomField
+
+data class DeleteTimeCapsule(
+    val sender: String = "",
+    val isDelete: Boolean = true,
+    val timeCapsuleId: String = ""
 )

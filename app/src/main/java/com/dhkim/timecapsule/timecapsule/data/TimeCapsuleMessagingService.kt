@@ -14,6 +14,7 @@ import com.dhkim.timecapsule.TimeCapsuleApplication
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.onboarding.OnboardingActivity
 import com.dhkim.timecapsule.profile.domain.UserRepository
+import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.DeleteTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SharedTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
@@ -46,48 +47,58 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
             Log.e("fcm", "Message data payload: ${remoteMessage.data}")
+
+            val isDelete = remoteMessage.data.containsKey("isDelete")
             val jsonData = Gson().toJson(remoteMessage.data)
 
-            val sharedTimeCapsule = Gson().fromJson(jsonData, SharedTimeCapsule::class.java)
-            Log.e("data", "sharedData : $sharedTimeCapsule")
-
-            sharedTimeCapsule.run {
-                val receivedTimeCapsule = ReceivedTimeCapsule(
-                    id = "${System.currentTimeMillis()}",
-                    profileImage = profileImage,
-                    date = DateUtil.todayDate(),
-                    openDate = openDate,
-                    sender = sender,
-                    lat = if (checkLocation) {
-                        lat
-                    } else {
-                        "0.0"
-                    },
-                    lng = if (checkLocation) {
-                        lng
-                    } else {
-                        "0.0"
-                    },
-                    placeName = if (checkLocation) {
-                        placeName
-                    } else {
-                        ""
-                    },
-                    address = if (checkLocation) {
-                        address
-                    } else {
-                        ""
-                    },
-                    content = content,
-                    checkLocation = checkLocation,
-                    isOpened = false
-                )
-
+            if (isDelete) {
+                val deleteTimeCapsule = Gson().fromJson(jsonData, DeleteTimeCapsule::class.java)
                 CoroutineScope(Dispatchers.IO).launch {
-                    timeCapsuleRepository.saveReceivedTimeCapsule(receivedTimeCapsule)
+                    timeCapsuleRepository.deleteReceivedTimeCapsule(id = deleteTimeCapsule.timeCapsuleId)
                 }
+                showNotification("TimeCapsule", "${deleteTimeCapsule.sender}님이 나에게 공유한 타임캡슐을 삭제하였습니다.")
+            } else {
+                val sharedTimeCapsule = Gson().fromJson(jsonData, SharedTimeCapsule::class.java)
+                Log.e("data", "sharedData : $sharedTimeCapsule")
 
-                showNotification("TimeCapsule", "${sender}님이 타임캡슐을 공유하였습니다.")
+                sharedTimeCapsule.run {
+                    val receivedTimeCapsule = ReceivedTimeCapsule(
+                        id = timeCapsuleId,
+                        profileImage = profileImage,
+                        date = DateUtil.todayDate(),
+                        openDate = openDate,
+                        sender = sender,
+                        lat = if (checkLocation) {
+                            lat
+                        } else {
+                            "0.0"
+                        },
+                        lng = if (checkLocation) {
+                            lng
+                        } else {
+                            "0.0"
+                        },
+                        placeName = if (checkLocation) {
+                            placeName
+                        } else {
+                            ""
+                        },
+                        address = if (checkLocation) {
+                            address
+                        } else {
+                            ""
+                        },
+                        content = content,
+                        checkLocation = checkLocation,
+                        isOpened = false
+                    )
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        timeCapsuleRepository.saveReceivedTimeCapsule(receivedTimeCapsule)
+                    }
+
+                    showNotification("TimeCapsule", "${sender}님이 타임캡슐을 공유하였습니다.")
+                }
             }
         }
 

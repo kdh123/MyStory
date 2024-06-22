@@ -1,6 +1,7 @@
 package com.dhkim.timecapsule.timecapsule.domain
 
 data class SharedTimeCapsule(
+    val timeCapsuleId: String,
     val sender: String,
     val profileImage: String,
     val openDate: String,

@@ -1,6 +1,7 @@
 package com.dhkim.timecapsule.timecapsule.domain
 
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.Uuid
+import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.isSuccessful
 import kotlinx.coroutines.flow.Flow
 
 typealias isSuccessful = Boolean
@@ -17,6 +18,8 @@ interface TimeCapsuleRepository {
         address: String,
         checkLocation: Boolean
     ): isSuccessful
+
+    suspend fun deleteTimeCapsule(sharedFriends: List<Uuid>, timeCapsuleId: String): isSuccessful
 
     suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>>
     suspend fun getMyTimeCapsule(id: String): MyTimeCapsule?

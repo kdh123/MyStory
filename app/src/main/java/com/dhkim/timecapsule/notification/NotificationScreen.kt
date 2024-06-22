@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,17 +46,27 @@ fun NotificationScreen(
                         onBack()
                     }
             )
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(vertical = 10.dp),
-                modifier = Modifier
-                    .padding(bottom = it.calculateBottomPadding())
-            ) {
-                items(items = uiState.timeCapsules, key = {
-                    it.id
-                }) {
-                    NotificationItem(timeCapsule = it, onNavigateToTimeCapsule = onNavigateToTimeCapsule)
+            if (uiState.timeCapsules.isNotEmpty()) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(vertical = 10.dp),
+                    modifier = Modifier
+                        .padding(bottom = it.calculateBottomPadding())
+                ) {
+                    items(items = uiState.timeCapsules, key = {
+                        it.id
+                    }) {
+                        NotificationItem(timeCapsule = it, onNavigateToTimeCapsule = onNavigateToTimeCapsule)
+                    }
                 }
+            } else {
+                Text(
+                    textAlign = TextAlign.Center,
+                    text = "알림이 존재하지 않습니다.",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                )
             }
         }
     }

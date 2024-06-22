@@ -157,6 +157,12 @@ fun TimeCapsuleDetailScreen(
         }
 
         if (showDeleteDialog) {
+            val desc = if (uiState.timeCapsule.sharedFriends.isNotEmpty() && !uiState.timeCapsule.isReceived) {
+                "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
+            } else {
+                "정말 삭제하겠습니까?"
+            }
+
             WarningDialog(
                 onConfirmation = {
                     onDelete(timeCapsuleId)
@@ -165,7 +171,7 @@ fun TimeCapsuleDetailScreen(
                     showDeleteDialog = false
                 },
                 dialogTitle = "삭제",
-                dialogText = "정말 삭제하겠습니까?"
+                dialogText = desc
             )
         }
 

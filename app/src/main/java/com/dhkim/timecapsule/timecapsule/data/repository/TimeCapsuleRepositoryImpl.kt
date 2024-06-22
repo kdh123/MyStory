@@ -9,6 +9,7 @@ import com.dhkim.timecapsule.timecapsule.data.dataSource.local.SendTimeCapsuleEn
 import com.dhkim.timecapsule.timecapsule.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.TimeCapsuleRemoteDataSource
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.Uuid
+import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.isSuccessful
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
@@ -56,6 +57,11 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
             address = address,
             checkLocation = checkLocation
         ) is CommonResult.Success
+    }
+
+    override suspend fun deleteTimeCapsule(sharedFriends: List<Uuid>, timeCapsuleId: String): isSuccessful {
+        val myId = userRepository.getMyId()
+        return remoteDataSource.deleteTimeCapsule(myId, sharedFriends, timeCapsuleId) is CommonResult.Success
     }
 
     override suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>> {

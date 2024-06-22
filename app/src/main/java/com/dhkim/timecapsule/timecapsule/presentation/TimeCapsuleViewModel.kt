@@ -38,7 +38,7 @@ class TimeCapsuleViewModel @Inject constructor(
                 }.catch { }
                 .collect { timeCapsules ->
                     val unOpenedMyTimeCapsules = timeCapsules
-                        .filter { !it.isReceived && !it.isOpened && !DateUtil.isAfter(it.openDate)}
+                        .filter { !it.isReceived && !it.isOpened && !DateUtil.isAfter(it.openDate) }
                         .sortedBy {
                             it.openDate
                         }
@@ -70,10 +70,22 @@ class TimeCapsuleViewModel @Inject constructor(
 
     fun deleteTimeCapsule(timeCapsuleId: String, isReceived: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (isReceived) {
-                timeCapsuleRepository.deleteReceivedTimeCapsule(timeCapsuleId)
-            } else {
-                timeCapsuleRepository.deleteMyTimeCapsule(timeCapsuleId)
+            with(timeCapsuleRepository) {
+                if (isReceived) {
+                    deleteReceivedTimeCapsule(timeCapsuleId)
+                } else {
+                    val sharedFriends = getMyTimeCapsule(timeCapsuleId)?.sharedFriends ?: listOf()
+                    if (sharedFriends.isNotEmpty()) {
+                        val isSuccessful = deleteTimeCapsule(sharedFriends, timeCapsuleId)
+                        if (isSuccessful) {
+                            deleteMyTimeCapsule(timeCapsuleId)
+                        } else {
+                            _sideEffect.emit(TimeCapsuleSideEffect.Message("삭제에 실패하였습니다."))
+                        }
+                    } else {
+                        deleteMyTimeCapsule(timeCapsuleId)
+                    }
+                }
             }
         }
     }

@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -202,9 +203,6 @@ fun ProfileScreen(
                 },
                 onAddFriend = remember(viewModel) {
                     viewModel::addFriend
-                },
-                onDeleteClick = {
-                    selectedUserId = it
                 }
             )
         },
@@ -327,24 +325,41 @@ fun AddFriend(modifier: Modifier = Modifier) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetScreen(
     uiState: ProfileUiState,
     onQuery: (String) -> Unit,
     onSearch: () -> Unit,
-    onAddFriend: () -> Unit,
-    onDeleteClick: (userId: String) -> Unit
+    onAddFriend: () -> Unit
 ) {
     val userId = uiState.searchResult.userId
     val friendsIds = uiState.user.friends.map { it.id }
     val requestIds = uiState.user.requests.map { it.id }
 
-    val isMyFriend = if (friendsIds.contains(userId)
-        || requestIds.contains(userId)
-    ) {
-        true
-    } else {
-        false
+    val isInMyFriendsOrRequests = friendsIds.contains(userId) || requestIds.contains(userId)
+    val isMyFriend = uiState.user.friends.firstOrNull()?.isPending == false
+
+    val friendMetaInfoText = when {
+        uiState.searchResult.isMe -> {
+            "나입니다."
+        }
+
+        isMyFriend -> {
+            "친구로 등록된 사용자입니다."
+        }
+
+        uiState.user.friends.firstOrNull()?.isPending == true && isInMyFriendsOrRequests -> {
+            "내가 친구 요청을 한 사용자입니다."
+        }
+
+        requestIds.contains(userId) -> {
+            "나에게 친구 요청을 한 사용자입니다."
+        }
+
+        else -> {
+            ""
+        }
     }
 
     Column(
@@ -352,9 +367,9 @@ fun BottomSheetScreen(
     ) {
         Row(
             modifier = Modifier
-                .padding(10.dp)
                 .fillMaxWidth()
                 .height(48.dp)
+                .padding(horizontal = 10.dp)
         ) {
             OutlinedCard(
                 colors = CardDefaults.cardColors(
@@ -371,18 +386,20 @@ fun BottomSheetScreen(
                     .fillMaxHeight()
             ) {
                 TextField(
+                    textStyle = TextStyle(fontSize = 12.sp),
                     singleLine = true,
+                    value = uiState.searchResult.query,
                     label = {
                         Text(text = "아이디 검색")
                     },
-                    value = uiState.searchResult.query,
                     onValueChange = {
                         onQuery(it)
                     },
                     modifier = Modifier
                         .fillMaxSize(),
                     colors = androidx.compose.material3.TextFieldDefaults.textFieldColors(
-                        containerColor = Color.White
+                        containerColor = Color.White,
+                        focusedIndicatorColor = Color.Transparent,
                     )
                 )
             }
@@ -423,15 +440,24 @@ fun BottomSheetScreen(
                     modifier = Modifier
                         .padding(10.dp)
                 ) {
-                    Text(
-                        text = userId,
+                    Column(
                         modifier = Modifier
                             .width(0.dp)
                             .weight(1f)
                             .padding(10.dp)
                             .align(Alignment.CenterVertically)
-                    )
-                    if (!uiState.searchResult.isMe && !isMyFriend) {
+                    ) {
+                        Text(text = "$userId")
+                        if (friendMetaInfoText.isNotEmpty()) {
+                            Text(
+                                text = friendMetaInfoText,
+                                fontSize = 12.sp,
+                                color = colorResource(id = R.color.gray)
+                            )
+                        }
+                    }
+
+                    if (!uiState.searchResult.isMe && !isInMyFriendsOrRequests) {
                         Card(
                             colors = CardDefaults.cardColors(
                                 containerColor = colorResource(id = R.color.primary)
@@ -459,9 +485,7 @@ fun BottomSheetScreen(
 @Preview(showBackground = true)
 @Composable
 private fun SearchScreenPreview() {
-    BottomSheetScreen(ProfileUiState(), {}, {}, {}) {
-
-    }
+    BottomSheetScreen(ProfileUiState(), {}, {}, {})
 }
 
 @Preview(showBackground = true)
@@ -551,12 +575,6 @@ fun RequestList(
                     RequestItem(friend = item, onClick = onClick)
                 } else {
                     RequestItem(friend = item, onClick = onClick)
-                    Divider(
-                        color = colorResource(id = R.color.light_gray),
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillMaxWidth()
-                    )
                 }
             }
         }
@@ -603,12 +621,6 @@ fun FriendList(
                             profileImage = item.profileImage.profileImage(),
                             onLongClick = onDeleteClick
                         )
-                        Divider(
-                            color = colorResource(id = R.color.light_gray),
-                            modifier = Modifier
-                                .height(1.dp)
-                                .fillMaxWidth()
-                        )
                     }
                 }
             }
@@ -631,7 +643,6 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
         Text(
             text = friend.id,
             fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .width(0.dp)
                 .weight(1f)
@@ -664,10 +675,8 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FriendItem(userId: String, profileImage: Int, isMe: Boolean = false, onLongClick: (userId: String) -> Unit) {
-    Row(
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
             .combinedClickable(
                 onClick = { },
                 onLongClick = {
@@ -677,21 +686,25 @@ fun FriendItem(userId: String, profileImage: Int, isMe: Boolean = false, onLongC
                 }
             )
     ) {
-        Image(
-            painter = painterResource(id = profileImage),
-            contentDescription = null,
-            modifier = Modifier.align(Alignment.CenterVertically)
-        )
-        Text(
-            text = userId,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
+        Row(
             modifier = Modifier
-                .width(0.dp)
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-                .padding(start = 5.dp)
-        )
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+            Image(
+                painter = painterResource(id = profileImage),
+                contentDescription = null,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+            Text(
+                text = userId,
+                modifier = Modifier
+                    .width(0.dp)
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+                    .padding(start = 5.dp)
+            )
+        }
     }
 }
 
