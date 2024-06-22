@@ -2,16 +2,24 @@ package com.dhkim.timecapsule.onboarding.splash
 
 import android.app.Activity
 import android.content.Intent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -29,19 +37,29 @@ fun SplashScreen(
     onNavigateToSignUp: () -> Unit,
     viewModel: SplashViewModel = hiltViewModel()
 ) {
+    val brush = Brush.linearGradient(
+        listOf(Color(0XFF3C5AFA), Color(0XFFF361DC))
+    )
     val context = LocalContext.current
     val isSignedUp by viewModel.isSignUp.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = colorResource(id = R.color.primary))
     ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize(),
+            onDraw = {
+                drawRect(brush)
+            }
+        )
+
         Image(
-            painter = painterResource(id = R.drawable.ic_time_white),
+            painter = painterResource(id = R.mipmap.ic_send_time_white),
             contentDescription = null,
             modifier = Modifier
-                .padding(100.dp)
+                .padding(70.dp)
                 .fillMaxSize()
                 .align(Alignment.Center)
         )
