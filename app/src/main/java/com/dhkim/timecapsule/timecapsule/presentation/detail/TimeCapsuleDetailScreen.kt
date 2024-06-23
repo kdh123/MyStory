@@ -209,6 +209,28 @@ fun TimeCapsuleDetailScreen(
                     .padding(horizontal = 20.dp)
                     .height(1.dp)
             )
+            if (uiState.timeCapsule.sharedFriends.isNotEmpty()) {
+                val sharedFriendsText = StringBuilder("공유 : ")
+
+                uiState.timeCapsule.sharedFriends.forEachIndexed { index, s ->
+                    if (index < uiState.timeCapsule.sharedFriends.size - 1) {
+                        sharedFriendsText.append("$s, ")
+                    } else {
+                        sharedFriendsText.append(s)
+                    }
+                }
+
+                MenuItem(resId = R.drawable.ic_people_black, title = "$sharedFriendsText")
+
+                Divider(
+                    color = colorResource(id = R.color.light_gray),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .height(1.dp)
+                )
+            }
+
             Text(
                 text = uiState.timeCapsule.content,
                 fontSize = 18.sp,
@@ -280,6 +302,7 @@ fun MenuItem(resId: Int, title: String) {
                 .padding(end = 10.dp)
                 .width(24.dp)
                 .height(24.dp)
+                .align(Alignment.CenterVertically)
         )
         Text(
             text = title,

@@ -152,8 +152,9 @@ class AddTimeCapsuleViewModel @Inject constructor(
                     }
 
                     else -> {
+                        val timeCapsuleId = "${System.currentTimeMillis()}"
                         val timeCapsule = MyTimeCapsule(
-                            id = "${System.currentTimeMillis()}",
+                            id = timeCapsuleId,
                             date = DateUtil.todayDate(),
                             openDate = openDate,
                             lat = lat,
@@ -172,6 +173,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
                             _sideEffect.emit(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
                         } else {
                             val isSuccessful = timeCapsuleRepository.shareTimeCapsule(
+                                timeCapsuleId = timeCapsuleId,
                                 sharedFriends = sharedFriends.filter { it.isChecked }.map { it.uuid },
                                 openDate = openDate,
                                 content = content,

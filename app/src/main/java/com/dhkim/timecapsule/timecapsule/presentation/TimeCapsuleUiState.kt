@@ -6,7 +6,7 @@ import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 @Stable
 data class TimeCapsuleUiState(
     val isLoading: Boolean = true,
-    val isCompleted: Boolean = false,
+    val isNothing: Boolean = true,
     val openableTimeCapsules: List<TimeCapsule> = listOf(),
     val openedTimeCapsules: List<TimeCapsule> = listOf(),
     val unOpenedTimeCapsules: List<TimeCapsule> = listOf(),

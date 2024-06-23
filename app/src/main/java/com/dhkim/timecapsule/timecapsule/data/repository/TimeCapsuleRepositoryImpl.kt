@@ -27,6 +27,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
 ) : TimeCapsuleRepository {
 
     override suspend fun shareTimeCapsule(
+        timeCapsuleId: String,
         sharedFriends: List<Uuid>,
         openDate: String,
         content: String,
@@ -46,6 +47,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         }
 
         return remoteDataSource.shareTimeCapsule(
+            timeCapsuleId = timeCapsuleId,
             myId = myId,
             myProfileImage = myProfileImage,
             sharedFriends = sharedFriends,

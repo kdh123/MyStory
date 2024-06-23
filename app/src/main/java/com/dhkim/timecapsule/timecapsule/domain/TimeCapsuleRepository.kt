@@ -9,6 +9,7 @@ typealias isSuccessful = Boolean
 interface TimeCapsuleRepository {
 
     suspend fun shareTimeCapsule(
+        timeCapsuleId: String,
         sharedFriends: List<Uuid>,
         openDate: String,
         content: String,

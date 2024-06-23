@@ -18,6 +18,7 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
     private val pushService = pushApi.create(TimeCapsuleApi::class.java)
 
     suspend fun shareTimeCapsule(
+        timeCapsuleId: String,
         myId: String,
         myProfileImage: String,
         sharedFriends: List<Uuid>,
@@ -30,7 +31,7 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
         checkLocation: Boolean
     ): CommonResult<isSuccessful> {
         val data = ShareTimeCapsuleField(
-            timeCapsuleId = "${System.currentTimeMillis()}",
+            timeCapsuleId = timeCapsuleId,
             sender = myId,
             profileImage = myProfileImage,
             openDate = openDate,
@@ -83,12 +84,13 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
 
     suspend fun deleteTimeCapsule(myId: String, sharedFriends: List<Uuid>, timeCapsuleId: String): CommonResult<isSuccessful> {
         val data = DeleteTimeCapsule(
+            isDelete = true,
             sender = myId,
             timeCapsuleId = timeCapsuleId
         )
 
         val gson = Gson()
-        val payload = PushMessage(FcmData(DeleteTimeCapsuleField(custom_field = data)))
+        val payload = PushMessage(FcmData(custom_field = data))
 
         val friendsJson = gson.toJson(sharedFriends)
         val payloadJson = gson.toJson(payload)
@@ -122,10 +124,6 @@ data class FcmData(
 
 interface CustomField
 
-data class DeleteTimeCapsuleField(
-    val custom_field: DeleteTimeCapsule
-) : CustomField
-
 data class ShareTimeCapsuleField(
     val timeCapsuleId: String,
     val sender: String,
@@ -141,6 +139,6 @@ data class ShareTimeCapsuleField(
 
 data class DeleteTimeCapsule(
     val sender: String = "",
-    val isDelete: Boolean = true,
+    val isDelete: Boolean = false,
     val timeCapsuleId: String = ""
-)
+): CustomField

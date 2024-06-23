@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -58,6 +59,7 @@ class TimeCapsuleViewModel @Inject constructor(
 
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
+                        isNothing = timeCapsules.isEmpty(),
                         openableTimeCapsules = openableTimeCapsules,
                         openedTimeCapsules = openedTimeCapsules,
                         unOpenedMyTimeCapsules = unOpenedMyTimeCapsules,
@@ -75,8 +77,16 @@ class TimeCapsuleViewModel @Inject constructor(
                     deleteReceivedTimeCapsule(timeCapsuleId)
                 } else {
                     val sharedFriends = getMyTimeCapsule(timeCapsuleId)?.sharedFriends ?: listOf()
-                    if (sharedFriends.isNotEmpty()) {
-                        val isSuccessful = deleteTimeCapsule(sharedFriends, timeCapsuleId)
+                    val sharedFriendsUuids = userRepository.getMyInfo().catch { }
+                        .firstOrNull()?.friends
+                        ?.filter {
+                            sharedFriends.contains(it.id)
+                        }?.map {
+                            it.uuid
+                        } ?: listOf()
+
+                    if (sharedFriendsUuids.isNotEmpty()) {
+                        val isSuccessful = deleteTimeCapsule(sharedFriendsUuids, timeCapsuleId)
                         if (isSuccessful) {
                             deleteMyTimeCapsule(timeCapsuleId)
                         } else {

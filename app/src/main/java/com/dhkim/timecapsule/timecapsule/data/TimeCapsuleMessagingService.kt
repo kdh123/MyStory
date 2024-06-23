@@ -46,11 +46,10 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
         if (remoteMessage.data.isNotEmpty()) {
             Log.e("fcm", "Message data payload: ${remoteMessage.data}")
 
-            val isDelete = remoteMessage.data.containsKey("isDelete")
             val jsonData = Gson().toJson(remoteMessage.data)
+            val deleteTimeCapsule = Gson().fromJson(jsonData, DeleteTimeCapsule::class.java)
 
-            if (isDelete) {
-                val deleteTimeCapsule = Gson().fromJson(jsonData, DeleteTimeCapsule::class.java)
+            if (deleteTimeCapsule.isDelete) {
                 CoroutineScope(Dispatchers.IO).launch {
                     timeCapsuleRepository.deleteReceivedTimeCapsule(id = deleteTimeCapsule.timeCapsuleId)
                     notificationManager.showNotification(
@@ -62,7 +61,7 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
                 val sharedTimeCapsule = Gson().fromJson(jsonData, SharedTimeCapsule::class.java)
                 Log.e("data", "sharedData : $sharedTimeCapsule")
 
-                sharedTimeCapsule.run {
+                sharedTimeCapsule?.run {
                     val receivedTimeCapsule = ReceivedTimeCapsule(
                         id = timeCapsuleId,
                         profileImage = profileImage,
