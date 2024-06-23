@@ -62,6 +62,8 @@ import com.naver.maps.map.compose.MarkerState
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberCameraPositionState
 import com.skydoves.landscapist.glide.GlideImage
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalNaverMapApi::class, ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -71,6 +73,7 @@ fun TimeCapsuleDetailScreen(
     isReceived: Boolean,
     uiState: TimeCapsuleDetailUiState,
     sideEffect: TimeCapsuleDetailSideEffect,
+    onNavigateToImageDetail: (String, String) -> Unit,
     onDelete: (String) -> Unit,
     init: (String, Boolean) -> Unit,
     onBack: () -> Unit
@@ -188,6 +191,7 @@ fun TimeCapsuleDetailScreen(
             }
             TimeCapsulePager(
                 uiState = uiState,
+                onNavigateToImageDetail = onNavigateToImageDetail,
                 onOptionClick = {
                     showOption = it
                 },
@@ -330,6 +334,9 @@ private fun TimeCapsuleDetailScreenPreview() {
         init = { _, _ ->
 
         },
+        onNavigateToImageDetail = { _, _ ->
+
+        },
         onDelete = {
 
         },
@@ -340,7 +347,12 @@ private fun TimeCapsuleDetailScreenPreview() {
 }
 
 @Composable
-fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState, onBack: () -> kotlin.Unit, onOptionClick: (Boolean) -> Unit) {
+fun TimeCapsulePager(
+    uiState: TimeCapsuleDetailUiState,
+    onNavigateToImageDetail: (String, String) -> Unit,
+    onBack: () -> Unit,
+    onOptionClick: (Boolean) -> Unit
+) {
     val timeCapsule = uiState.timeCapsule
     val images: List<String> = timeCapsule.medias
     val pagerState = rememberPagerState(pageCount = {
@@ -368,6 +380,13 @@ fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState, onBack: () -> kotlin.Uni
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
+                        .clickable {
+                            val images = URLEncoder.encode(
+                                uiState.timeCapsule.medias.joinToString(separator = ","),
+                                StandardCharsets.UTF_8.toString()
+                            )
+                            onNavigateToImageDetail("$page", images)
+                        }
                 )
             }
             Text(

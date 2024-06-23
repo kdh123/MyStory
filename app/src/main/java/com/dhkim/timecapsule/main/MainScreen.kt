@@ -46,6 +46,8 @@ import com.dhkim.timecapsule.location.presentation.navigation.searchNavigation
 import com.dhkim.timecapsule.setting.presentation.navigation.navigateToSetting
 import com.dhkim.timecapsule.setting.presentation.navigation.settingNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
+import com.dhkim.timecapsule.timecapsule.presentation.navigation.imageDetailNavigation
+import com.dhkim.timecapsule.timecapsule.presentation.navigation.navigateToImageDetail
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleOpenNavigation
@@ -156,10 +158,14 @@ fun MainScreen(
                 }
             )
             timeCapsuleDetailNavigation(
+                onNavigateToImageDetail = { index, images ->
+                    navController.navigateToImageDetail(index, images)
+                },
                 onBack = {
                     navController.navigateUp()
                 }
             )
+            imageDetailNavigation()
             timeCapsuleOpenNavigation(
                 onNavigateToDetail = { id, isReceived ->
                     navController.navigate("timeCapsuleDetail/$id/${isReceived}") {

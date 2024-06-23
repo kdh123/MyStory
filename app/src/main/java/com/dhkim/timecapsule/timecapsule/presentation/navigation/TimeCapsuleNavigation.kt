@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.dhkim.timecapsule.main.Screen
@@ -15,9 +16,25 @@ import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleViewModel
 import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleViewModel
+import com.dhkim.timecapsule.timecapsule.presentation.detail.ImageDetailScreen
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailViewModel
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleOpenScreen
+
+const val IMAGE_DETAIL_ROUTE = "imageDetail"
+
+fun NavGraphBuilder.imageDetailNavigation() {
+    composable("${IMAGE_DETAIL_ROUTE}/{currentIndex}/{images}") {
+        val currentIndex = it.arguments?.getString("currentIndex") ?: ""
+        val images = it.arguments?.getString("images") ?: ""
+
+        ImageDetailScreen(currentIndex = currentIndex.toInt(), images = images.split(","))
+    }
+}
+
+fun NavController.navigateToImageDetail(currentIndex: String, images: String) {
+    navigate("$IMAGE_DETAIL_ROUTE/$currentIndex/$images")
+}
 
 fun NavGraphBuilder.timeCapsuleNavigation(
     onNavigateToAdd: () -> Unit,
@@ -48,7 +65,10 @@ fun NavGraphBuilder.timeCapsuleNavigation(
     }
 }
 
-fun NavGraphBuilder.timeCapsuleDetailNavigation(onBack: () -> Unit) {
+fun NavGraphBuilder.timeCapsuleDetailNavigation(
+    onNavigateToImageDetail: (String, String) -> Unit,
+    onBack: () -> Unit
+) {
     composable("timeCapsuleDetail/{id}/{isReceived}") { backStackEntry ->
         val id = backStackEntry.arguments?.getString("id") ?: ""
         val isReceived = (backStackEntry.arguments?.getString("isReceived") ?: "false").toBoolean()
@@ -61,6 +81,7 @@ fun NavGraphBuilder.timeCapsuleDetailNavigation(onBack: () -> Unit) {
             isReceived = isReceived,
             uiState = uiState,
             sideEffect = sideEffect,
+            onNavigateToImageDetail = onNavigateToImageDetail,
             onBack = onBack,
             onDelete = viewModel::deleteTImeCapsule,
             init = viewModel::init
