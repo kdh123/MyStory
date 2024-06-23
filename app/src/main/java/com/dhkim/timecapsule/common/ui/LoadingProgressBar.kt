@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.common.composable
+package com.dhkim.timecapsule.common.ui
 
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator

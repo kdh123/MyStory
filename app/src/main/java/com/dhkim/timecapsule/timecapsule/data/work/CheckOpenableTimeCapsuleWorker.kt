@@ -1,7 +1,6 @@
 package com.dhkim.timecapsule.timecapsule.data.work
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -15,6 +14,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @HiltWorker
 class CheckOpenableTimeCapsuleWorker @AssistedInject constructor(
@@ -23,7 +23,9 @@ class CheckOpenableTimeCapsuleWorker @AssistedInject constructor(
     private val timeCapsuleRepository: TimeCapsuleRepository
 ) : CoroutineWorker(context, params) {
 
-    private val notificationManager = NotificationManager(context)
+    @Inject
+    lateinit var notificationManager: NotificationManager
+
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             val isOpenableTimeCapsuleExist = combine(

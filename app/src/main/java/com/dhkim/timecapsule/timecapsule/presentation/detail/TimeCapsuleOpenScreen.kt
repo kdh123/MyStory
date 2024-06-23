@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.composable.drawAnimatedBorder
+import com.dhkim.timecapsule.common.ui.drawAnimatedBorder
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.delay

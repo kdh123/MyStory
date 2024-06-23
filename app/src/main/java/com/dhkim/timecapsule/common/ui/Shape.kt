@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.common.composable
+package com.dhkim.timecapsule.common.ui
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -32,12 +32,9 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.dhkim.timecapsule.R
-import com.skydoves.cloudy.Cloudy
-import com.skydoves.landscapist.glide.GlideImage
 
 val gradientColors = listOf(
     //Color.Red,

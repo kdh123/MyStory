@@ -10,7 +10,6 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,7 +48,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -60,13 +58,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat.startActivity
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.DateUtil
-import com.dhkim.timecapsule.common.composable.ShimmerBrush
-import com.dhkim.timecapsule.common.composable.WarningDialog
+import com.dhkim.timecapsule.common.ui.ShimmerBrush
+import com.dhkim.timecapsule.common.ui.WarningDialog
 import com.dhkim.timecapsule.common.presentation.DistanceManager
+import com.dhkim.timecapsule.common.ui.DefaultBackground
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleUiState
@@ -424,11 +422,8 @@ private fun LoadingScreenPreview() {
 
 @Composable
 private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
-    val brush = Brush.linearGradient(
-        listOf(Color(0XFF3C5AFA), Color(0XFFF361DC))
-    )
     Box {
-        Canvas(
+        DefaultBackground(
             modifier = Modifier
                 .padding(10.dp)
                 .clip(RoundedCornerShape(20.dp))
@@ -437,19 +432,17 @@ private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
                 .height(360.dp)
                 .clickable {
                     onNavigateToProfile()
-                },
-            onDraw = {
-                drawRect(brush)
-            }
-        )
-        Text(
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
-            text = "친구 추가",
-            modifier = Modifier
-                .align(Alignment.Center)
-        )
+                }
+        ) {
+            Text(
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                text = "친구 추가",
+                modifier = Modifier
+                    .align(Alignment.Center)
+            )
+        }
     }
 }
 
@@ -785,25 +778,20 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongCl
                     .fillMaxSize()
             )
         } else {
-            val brush = Brush.linearGradient(
-                listOf(Color(0XFF3C5AFA), Color(0XFFF361DC))
-            )
-            Canvas(
+            DefaultBackground(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(20.dp)),
-                onDraw = {
-                    drawRect(brush)
-                }
-            )
-            Text(
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                text = "사진이 존재하지 않습니다.",
-                modifier = Modifier
-                    .align(Alignment.Center)
-            )
+                    .clip(RoundedCornerShape(20.dp))
+            ) {
+                Text(
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    text = "사진이 존재하지 않습니다.",
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
+            }
         }
 
         Text(
@@ -902,16 +890,10 @@ private fun LockTimeCapsule(
                         .fillMaxSize()
                 )
             } else {
-                val brush = Brush.linearGradient(
-                    listOf(Color(0XFF3C5AFA), Color(0XFFF361DC))
-                )
-                Canvas(
+                DefaultBackground(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f),
-                    onDraw = {
-                        drawRect(brush)
-                    }
                 )
             }
 

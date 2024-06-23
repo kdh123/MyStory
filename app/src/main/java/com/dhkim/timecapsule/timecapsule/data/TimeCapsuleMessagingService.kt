@@ -1,18 +1,9 @@
 package com.dhkim.timecapsule.timecapsule.data
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.app.PendingIntent
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.TimeCapsuleApplication
 import com.dhkim.timecapsule.common.DateUtil
-import com.dhkim.timecapsule.onboarding.OnboardingActivity
+import com.dhkim.timecapsule.common.presentation.NotificationManager
 import com.dhkim.timecapsule.profile.domain.UserRepository
 import com.dhkim.timecapsule.setting.domain.SettingRepository
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.DeleteTimeCapsule
@@ -25,7 +16,6 @@ import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,6 +31,9 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
 
     @Inject
     lateinit var settingRepository: SettingRepository
+
+    @Inject
+    lateinit var notificationManager: NotificationManager
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
@@ -60,10 +53,10 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
                 val deleteTimeCapsule = Gson().fromJson(jsonData, DeleteTimeCapsule::class.java)
                 CoroutineScope(Dispatchers.IO).launch {
                     timeCapsuleRepository.deleteReceivedTimeCapsule(id = deleteTimeCapsule.timeCapsuleId)
-                    val isNotificationOn = settingRepository.getNotificationSetting().first()
-                    if (isNotificationOn) {
-                        showNotification("나의이야기", "${deleteTimeCapsule.sender}님이 나에게 공유한 타임캡슐을 삭제하였습니다.")
-                    }
+                    notificationManager.showNotification(
+                        title = "나의이야기",
+                        desc = "${deleteTimeCapsule.sender}님이 나에게 공유한 타임캡슐을 삭제하였습니다."
+                    )
                 }
             } else {
                 val sharedTimeCapsule = Gson().fromJson(jsonData, SharedTimeCapsule::class.java)
@@ -103,10 +96,10 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
 
                     CoroutineScope(Dispatchers.IO).launch {
                         timeCapsuleRepository.saveReceivedTimeCapsule(receivedTimeCapsule)
-                        val isNotificationOn = settingRepository.getNotificationSetting().first()
-                        if (isNotificationOn) {
-                            showNotification("나의이야기", "${sender}님이 타임캡슐을 공유하였습니다.")
-                        }
+                        notificationManager.showNotification(
+                            title = "나의이야기",
+                            desc = "${sender}님이 타임캡슐을 공유하였습니다."
+                        )
                     }
                 }
             }
@@ -117,34 +110,6 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
             Log.e("fcm", "Message Notification Body: ${it.body}")
         }
     }
-
-    private fun showNotification(title: String, desc: String) {
-        // Create an explicit intent for an Activity in your app.
-        val intent = Intent(this, OnboardingActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-        val builder = NotificationCompat.Builder(this, TimeCapsuleApplication.CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_time_primary)
-            .setContentTitle(title)
-            .setContentText(desc)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-
-        with(NotificationManagerCompat.from(this)) {
-            if (ActivityCompat.checkSelfPermission(
-                    this@TimeCapsuleMessagingService,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                return@with
-            }
-            notify(System.currentTimeMillis().toInt(), builder.build())
-        }
-    }
-
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)

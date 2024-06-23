@@ -11,13 +11,22 @@ import androidx.core.app.NotificationManagerCompat
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.TimeCapsuleApplication
 import com.dhkim.timecapsule.onboarding.OnboardingActivity
-import dagger.hilt.android.qualifiers.ActivityContext
+import com.dhkim.timecapsule.setting.domain.SettingRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class NotificationManager @Inject constructor(@ActivityContext private val context: Context) {
+class NotificationManager @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val settingRepository: SettingRepository
+) {
 
-    fun showNotification(title: String, desc: String) {
-        // Create an explicit intent for an Activity in your app.
+    suspend fun showNotification(title: String, desc: String) {
+        val showNotificationSetting = settingRepository.getNotificationSetting().first()
+        if (!showNotificationSetting) {
+            return
+        }
+
         val intent = Intent(context, OnboardingActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }

@@ -35,7 +35,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.dhkim.camera.navigation.cameraNavigation
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.composable.WarningDialog
+import com.dhkim.timecapsule.common.ui.WarningDialog
 import com.dhkim.timecapsule.home.presentation.navigation.homeNavigation
 import com.dhkim.timecapsule.notification.navigation.navigateToNotification
 import com.dhkim.timecapsule.notification.navigation.notificationNavigation

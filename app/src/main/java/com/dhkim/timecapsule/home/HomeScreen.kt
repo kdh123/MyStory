@@ -71,7 +71,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
-import com.dhkim.timecapsule.common.composable.LoadingProgressBar
+import com.dhkim.timecapsule.common.ui.LoadingProgressBar
 import com.dhkim.timecapsule.home.domain.Category
 import com.dhkim.timecapsule.home.presentation.HomeSideEffect
 import com.dhkim.timecapsule.home.presentation.HomeUiState

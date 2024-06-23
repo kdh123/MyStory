@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.main.MainActivity
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.composable.LoadingProgressBar
+import com.dhkim.timecapsule.common.ui.LoadingProgressBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

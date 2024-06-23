@@ -65,8 +65,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.composable.LoadingProgressBar
-import com.dhkim.timecapsule.common.composable.WarningDialog
+import com.dhkim.timecapsule.common.ui.LoadingProgressBar
+import com.dhkim.timecapsule.common.ui.WarningDialog
 import com.dhkim.timecapsule.common.presentation.profileImage
 import com.dhkim.timecapsule.profile.domain.Friend
 import kotlinx.coroutines.launch

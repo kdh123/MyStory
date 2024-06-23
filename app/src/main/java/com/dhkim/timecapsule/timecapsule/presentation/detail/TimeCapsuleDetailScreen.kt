@@ -2,7 +2,6 @@ package com.dhkim.timecapsule.timecapsule.presentation.detail
 
 import android.annotation.SuppressLint
 import android.view.MotionEvent
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.colorResource
@@ -48,8 +46,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.composable.WarningDialog
+import com.dhkim.timecapsule.common.ui.WarningDialog
 import com.dhkim.timecapsule.common.presentation.profileImage
+import com.dhkim.timecapsule.common.ui.DefaultBackground
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
@@ -359,25 +358,20 @@ fun TimeCapsulePager(uiState: TimeCapsuleDetailUiState, onBack: () -> kotlin.Uni
                 color = colorResource(id = R.color.black)
             )
         } else {
-            val brush = Brush.linearGradient(
-                listOf(Color(0XFF3C5AFA), Color(0XFFF361DC))
-            )
-            Canvas(
+            DefaultBackground(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f),
-                onDraw = {
-                    drawRect(brush)
-                }
-            )
-            Text(
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                text = "사진이 존재하지 않습니다.",
-                modifier = Modifier
-                    .align(Alignment.Center)
-            )
+            ) {
+                Text(
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    text = "사진이 존재하지 않습니다.",
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
+            }
         }
         Box(
             modifier = Modifier

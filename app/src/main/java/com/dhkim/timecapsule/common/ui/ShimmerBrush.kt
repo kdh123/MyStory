@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.common.composable
+package com.dhkim.timecapsule.common.ui
 
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
