@@ -1,7 +1,7 @@
-package com.dhkim.timecapsule.profile.domain
+package com.dhkim.timecapsule.user.domain
 
 import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.timecapsule.profile.data.dataSource.isSuccessful
+import com.dhkim.timecapsule.user.data.dataSource.isSuccessful
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {

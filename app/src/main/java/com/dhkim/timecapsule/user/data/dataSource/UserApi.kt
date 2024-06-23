@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.profile.data.dataSource
+package com.dhkim.timecapsule.user.data.dataSource
 
 import com.dhkim.timecapsule.BuildConfig
 import retrofit2.Response

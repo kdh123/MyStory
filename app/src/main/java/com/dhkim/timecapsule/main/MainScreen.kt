@@ -39,8 +39,8 @@ import com.dhkim.timecapsule.common.ui.WarningDialog
 import com.dhkim.timecapsule.map.presentation.navigation.mapNavigation
 import com.dhkim.timecapsule.notification.navigation.navigateToNotification
 import com.dhkim.timecapsule.notification.navigation.notificationNavigation
-import com.dhkim.timecapsule.profile.presentation.navigation.navigateToProfile
-import com.dhkim.timecapsule.profile.presentation.navigation.profileNavigation
+import com.dhkim.timecapsule.friend.presentation.navigation.navigateToFriend
+import com.dhkim.timecapsule.friend.presentation.navigation.friendNavigation
 import com.dhkim.timecapsule.location.domain.Place
 import com.dhkim.timecapsule.location.presentation.navigation.searchNavigation
 import com.dhkim.timecapsule.setting.presentation.navigation.navigateToSetting
@@ -63,10 +63,10 @@ fun MainScreen(
     )
     val scaffoldState = rememberBottomSheetScaffoldState(state)
     val navController = rememberNavController()
-    val items = listOf(Screen.TimeCapsule, Screen.AddTimeCapsule, Screen.Home, Screen.Profile)
+    val items = listOf(Screen.TimeCapsule, Screen.AddTimeCapsule, Screen.Home, Screen.Friend)
     val isBottomNavShow = navController
         .currentBackStackEntryAsState()
-        .value?.destination?.route in listOf(Screen.Home.route, Screen.TimeCapsule.route, Screen.Profile.route)
+        .value?.destination?.route in listOf(Screen.Home.route, Screen.TimeCapsule.route, Screen.Friend.route)
     var selectedPlace: Place? by remember {
         mutableStateOf(null)
     }
@@ -186,7 +186,7 @@ fun MainScreen(
                     navController.navigateToSetting()
                 },
                 onNavigateToProfile = {
-                    navController.navigateToProfile()
+                    navController.navigateToFriend()
                 },
                 modifier = Modifier
                     .padding(
@@ -229,7 +229,7 @@ fun MainScreen(
                     ?.savedStateHandle
                     ?.set("place", it)
             }
-            profileNavigation {
+            friendNavigation {
                 navController.navigateUp()
             }
         }
@@ -242,5 +242,5 @@ sealed class Screen(
     data object Home : Screen("홈", R.drawable.ic_map_primary, R.drawable.ic_map_black, "home")
     data object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, "addTimeCapsule")
     data object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, "timeCapsule")
-    data object Profile : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, "profile")
+    data object Friend : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, "profile")
 }

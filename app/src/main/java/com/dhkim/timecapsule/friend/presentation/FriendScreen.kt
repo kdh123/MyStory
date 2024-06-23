@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
-package com.dhkim.timecapsule.profile.presentation
+package com.dhkim.timecapsule.friend.presentation
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -66,14 +66,14 @@ import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.ui.LoadingProgressBar
 import com.dhkim.timecapsule.common.ui.WarningDialog
 import com.dhkim.timecapsule.common.presentation.profileImage
-import com.dhkim.timecapsule.profile.domain.Friend
+import com.dhkim.timecapsule.user.domain.Friend
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     uiState: ProfileUiState,
-    sideEffect: ProfileSideEffect,
+    sideEffect: FriendSideEffect,
     onQuery: (String) -> Unit,
     onSearchUser: () -> Unit,
     onAddFriend: () -> Unit,
@@ -106,23 +106,23 @@ fun ProfileScreen(
 
     LaunchedEffect(sideEffect) {
         when (sideEffect) {
-            is ProfileSideEffect.None -> {}
+            is FriendSideEffect.None -> {}
 
-            is ProfileSideEffect.Message -> {
+            is FriendSideEffect.Message -> {
                 Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
             }
 
-            is ProfileSideEffect.ShowDialog -> {
+            is FriendSideEffect.ShowDialog -> {
                 if (!sideEffect.show) {
                     selectedUserId = ""
                 }
             }
 
-            is ProfileSideEffect.ShowBottomSheet -> {
+            is FriendSideEffect.ShowBottomSheet -> {
                 bottomSheetScaffoldState.bottomSheetState.hide()
             }
 
-            is ProfileSideEffect.ShowKeyboard -> {
+            is FriendSideEffect.ShowKeyboard -> {
                 focusManager.clearFocus()
             }
         }

@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.common.presentation.NotificationManager
-import com.dhkim.timecapsule.profile.domain.UserRepository
+import com.dhkim.timecapsule.user.domain.UserRepository
 import com.dhkim.timecapsule.setting.domain.SettingRepository
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.DeleteTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule

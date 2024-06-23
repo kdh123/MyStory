@@ -1,11 +1,11 @@
-package com.dhkim.timecapsule.profile.presentation
+package com.dhkim.timecapsule.friend.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.common.presentation.profileImage
-import com.dhkim.timecapsule.profile.domain.Friend
-import com.dhkim.timecapsule.profile.domain.UserRepository
+import com.dhkim.timecapsule.user.domain.Friend
+import com.dhkim.timecapsule.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,14 +16,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(
+class FriendViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<ProfileSideEffect>()
+    private val _sideEffect = MutableSharedFlow<FriendSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
     init {
@@ -59,13 +59,13 @@ class ProfileViewModel @Inject constructor(
 
             userRepository.addFriend(searchUserId, searchUserProfileImage)
                 .catch {
-                    _sideEffect.emit(ProfileSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+                    _sideEffect.emit(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
                 }
                 .collect { isSuccessful ->
                     if (isSuccessful) {
-                        _sideEffect.emit(ProfileSideEffect.ShowKeyboard(show = false))
+                        _sideEffect.emit(FriendSideEffect.ShowKeyboard(show = false))
                     } else {
-                        _sideEffect.emit(ProfileSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+                        _sideEffect.emit(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
                     }
                 }
         }
@@ -75,15 +75,15 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.deleteFriend(userId = userId)
                 .catch {
-                    _sideEffect.emit(ProfileSideEffect.ShowDialog(show = false))
-                    _sideEffect.emit(ProfileSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
+                    _sideEffect.emit(FriendSideEffect.ShowDialog(show = false))
+                    _sideEffect.emit(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
                 }.collect { isSuccessful ->
                     if (isSuccessful) {
-                        _sideEffect.emit(ProfileSideEffect.ShowKeyboard(show = false))
-                        _sideEffect.emit(ProfileSideEffect.ShowDialog(show = false))
+                        _sideEffect.emit(FriendSideEffect.ShowKeyboard(show = false))
+                        _sideEffect.emit(FriendSideEffect.ShowDialog(show = false))
                     } else {
-                        _sideEffect.emit(ProfileSideEffect.ShowDialog(show = false))
-                        _sideEffect.emit(ProfileSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
+                        _sideEffect.emit(FriendSideEffect.ShowDialog(show = false))
+                        _sideEffect.emit(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
                     }
                 }
         }
@@ -93,11 +93,11 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.acceptFriend(friend.id, friend.profileImage, friend.uuid)
                 .catch {
-                    _sideEffect.emit(ProfileSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+                    _sideEffect.emit(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
                 }
                 .collect { isSuccessful ->
                     if (!isSuccessful) {
-                        _sideEffect.emit(ProfileSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+                        _sideEffect.emit(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
                     }
                 }
         }
@@ -110,7 +110,7 @@ class ProfileViewModel @Inject constructor(
 
             userRepository.searchUser(searchResult.query)
                 .catch {
-                    _sideEffect.emit(ProfileSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
+                    _sideEffect.emit(FriendSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
                     _uiState.value = _uiState.value.copy(isLoading = false)
                 }
                 .collect { result ->
@@ -133,7 +133,7 @@ class ProfileViewModel @Inject constructor(
                         }
                         is CommonResult.Error -> {
                             _uiState.value = _uiState.value.copy(isLoading = false)
-                            _sideEffect.emit(ProfileSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
+                            _sideEffect.emit(FriendSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
                         }
                     }
                 }

@@ -2,7 +2,7 @@ package com.dhkim.timecapsule.timecapsule.data.repository
 
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.timecapsule.profile.domain.UserRepository
+import com.dhkim.timecapsule.user.domain.UserRepository
 import com.dhkim.timecapsule.timecapsule.data.dataSource.local.MyTimeCapsuleEntity
 import com.dhkim.timecapsule.timecapsule.data.dataSource.local.ReceivedTimeCapsuleEntity
 import com.dhkim.timecapsule.timecapsule.data.dataSource.local.SendTimeCapsuleEntity

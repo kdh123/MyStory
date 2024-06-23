@@ -1,7 +1,7 @@
-package com.dhkim.timecapsule.profile.data.di
+package com.dhkim.timecapsule.user.data.di
 
-import com.dhkim.timecapsule.profile.data.UserRepositoryImpl
-import com.dhkim.timecapsule.profile.domain.UserRepository
+import com.dhkim.timecapsule.user.data.UserRepositoryImpl
+import com.dhkim.timecapsule.user.domain.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

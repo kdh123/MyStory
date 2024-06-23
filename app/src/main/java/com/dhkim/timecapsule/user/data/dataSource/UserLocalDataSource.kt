@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.profile.data.dataSource
+package com.dhkim.timecapsule.user.data.dataSource
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

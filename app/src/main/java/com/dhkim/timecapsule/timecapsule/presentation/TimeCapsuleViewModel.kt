@@ -3,7 +3,7 @@ package com.dhkim.timecapsule.timecapsule.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.timecapsule.common.DateUtil
-import com.dhkim.timecapsule.profile.domain.UserRepository
+import com.dhkim.timecapsule.user.domain.UserRepository
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

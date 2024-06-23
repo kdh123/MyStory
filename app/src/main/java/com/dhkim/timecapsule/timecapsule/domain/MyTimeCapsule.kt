@@ -1,6 +1,6 @@
 package com.dhkim.timecapsule.timecapsule.domain
 
-import com.dhkim.timecapsule.profile.domain.UserId
+import com.dhkim.timecapsule.user.domain.UserId
 
 data class MyTimeCapsule(
     val id: String,
