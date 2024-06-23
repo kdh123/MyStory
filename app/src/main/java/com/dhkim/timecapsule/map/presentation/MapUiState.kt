@@ -2,7 +2,7 @@ package com.dhkim.timecapsule.map.presentation
 
 import androidx.compose.runtime.Stable
 import androidx.paging.PagingData
-import com.dhkim.timecapsule.map.domain.Category
+import com.dhkim.timecapsule.location.domain.Category
 import com.dhkim.timecapsule.location.domain.Place
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

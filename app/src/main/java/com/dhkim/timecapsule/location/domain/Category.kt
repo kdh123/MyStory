@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.map.domain
+package com.dhkim.timecapsule.location.domain
 
 import com.dhkim.timecapsule.R
 

@@ -2,7 +2,7 @@ package com.dhkim.timecapsule.location.data.repository
 
 import androidx.paging.PagingData
 import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.timecapsule.map.domain.Category
+import com.dhkim.timecapsule.location.domain.Category
 import com.dhkim.timecapsule.location.data.dataSource.remote.LocationRemoteDataSource
 import com.dhkim.timecapsule.location.domain.Address
 import com.dhkim.timecapsule.location.domain.Place

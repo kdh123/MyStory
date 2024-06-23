@@ -2,7 +2,6 @@ package com.dhkim.timecapsule.location.domain
 
 import androidx.paging.PagingData
 import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.timecapsule.map.domain.Category
 import kotlinx.coroutines.flow.Flow
 
 interface LocationRepository {

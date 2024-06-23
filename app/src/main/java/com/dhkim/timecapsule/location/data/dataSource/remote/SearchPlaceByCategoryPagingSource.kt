@@ -2,7 +2,7 @@ package com.dhkim.timecapsule.location.data.dataSource.remote
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.dhkim.timecapsule.map.domain.Category
+import com.dhkim.timecapsule.location.domain.Category
 import com.dhkim.timecapsule.location.domain.Place
 import retrofit2.HttpException
 import java.io.IOException

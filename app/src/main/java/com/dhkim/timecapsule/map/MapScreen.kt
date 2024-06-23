@@ -70,7 +70,7 @@ import androidx.paging.compose.itemKey
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.ui.LoadingProgressBar
-import com.dhkim.timecapsule.map.domain.Category
+import com.dhkim.timecapsule.location.domain.Category
 import com.dhkim.timecapsule.map.presentation.MapSideEffect
 import com.dhkim.timecapsule.map.presentation.MapUiState
 import com.dhkim.timecapsule.location.domain.Place
@@ -315,7 +315,8 @@ fun MapScreen(
                     modifier = Modifier
                         .wrapContentWidth()
                 ) {
-                    items(Category.entries.filter { it != Category.None },
+                    items(
+                        Category.entries.filter { it != Category.None },
                         key = {
                             it.code
                         }) {

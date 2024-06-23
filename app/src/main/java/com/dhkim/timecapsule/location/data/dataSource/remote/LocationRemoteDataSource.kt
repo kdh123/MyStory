@@ -5,7 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.common.data.di.RetrofitModule
-import com.dhkim.timecapsule.map.domain.Category
+import com.dhkim.timecapsule.location.domain.Category
 import com.dhkim.timecapsule.location.domain.Address
 import com.dhkim.timecapsule.location.domain.Place
 import kotlinx.coroutines.flow.Flow
