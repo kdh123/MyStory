@@ -5,6 +5,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.dhkim.timecapsule.onboarding.SplashViewModel
 import com.dhkim.timecapsule.onboarding.signup.SignUpScreen
 import com.dhkim.timecapsule.onboarding.signup.SignUpSideEffect
 import com.dhkim.timecapsule.onboarding.signup.SignUpViewModel
@@ -14,7 +15,14 @@ fun NavGraphBuilder.onboardingNavigation(
     onNavigateToSignUp: () -> Unit
 ) {
     composable("splash") {
-        SplashScreen(onNavigateToSignUp)
+        val viewModel = hiltViewModel<SplashViewModel>()
+        val isSignedUp by viewModel.isSignUp.collectAsStateWithLifecycle()
+
+        SplashScreen(
+            isSignedUp = isSignedUp,
+            onCheckSignedUp = viewModel::checkSignedUp,
+            onNavigateToSignUp = onNavigateToSignUp
+        )
     }
 
     composable("signUp") {

@@ -79,8 +79,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.DateUtil
@@ -103,11 +101,24 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "MissingPermission")
 @Composable
 fun AddTimeCapsuleScreen(
+    uiState: AddTimeCapsuleUiState,
+    sideEffect: AddTimeCapsuleSideEffect,
     imageUrl: String,
     place: Place,
+    onSaveTimeCapsule: () -> Unit,
+    onSetCheckShare: (Boolean) -> Unit,
+    onSetCheckLocation: (Boolean) -> Unit,
+    onSetSelectImageIndex: (Int) -> Unit,
+    onSetOpenDate: (String) -> Unit,
+    onTyping: (String) -> Unit,
+    onCheckSharedFriend: (String) -> Unit,
+    onQuery: (String) -> Unit,
+    onPlaceClick: (Place) -> Unit,
+    onSearchAddress: (lat: String, lng: String) -> Unit,
+    onInitPlace: (Place) -> Unit,
+    onAddImage: (imageUrl: String) -> Unit,
     onNavigateToCamera: () -> Unit,
     onBack: () -> Unit,
-    viewModel: AddTimeCapsuleViewModel = hiltViewModel()
 ) {
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
@@ -121,7 +132,7 @@ fun AddTimeCapsuleScreen(
     val scaffoldState = rememberBottomSheetScaffoldState(state)
     var showBottomMenu = false
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
@@ -130,7 +141,7 @@ fun AddTimeCapsuleScreen(
                 val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 context.contentResolver.takePersistableUriPermission(it, flag)
             }
-            viewModel.addImage(imageUrl = it.toString())
+            onAddImage("$it")
         }
     }
     var showLocationBottomSheet by remember {
@@ -157,9 +168,9 @@ fun AddTimeCapsuleScreen(
                     // Got last known location. In some rare situations this can be null.
                     if (place.lat == "" || place.lng == "") {
                         currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-                        viewModel.searchAddress("${currentLocation.latitude}", "${currentLocation.longitude}")
+                        onSearchAddress("${currentLocation.latitude}", "${currentLocation.longitude}")
                     } else {
-                        viewModel.initPlace(place)
+                        onInitPlace(place)
                     }
                 }
         } else {
@@ -174,23 +185,23 @@ fun AddTimeCapsuleScreen(
     }
     val density = LocalDensity.current
 
-    LaunchedEffect(viewModel.sideEffect) {
-        viewModel.sideEffect.collect { type ->
-            when (type) {
-                is AddTimeCapsuleSideEffect.Message -> {
-                    Toast.makeText(context, type.message, Toast.LENGTH_SHORT).show()
-                }
+    LaunchedEffect(sideEffect) {
+        when (sideEffect) {
+            is AddTimeCapsuleSideEffect.None -> {}
 
-                is AddTimeCapsuleSideEffect.Completed -> {
-                    if (type.isCompleted) {
-                        onBack()
-                    }
-                }
+            is AddTimeCapsuleSideEffect.Message -> {
+                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+            }
 
-                is AddTimeCapsuleSideEffect.ShowPlaceBottomSheet -> {
-                    if (!type.show) {
-                        showLocationBottomSheet = false
-                    }
+            is AddTimeCapsuleSideEffect.Completed -> {
+                if (sideEffect.isCompleted) {
+                    onBack()
+                }
+            }
+
+            is AddTimeCapsuleSideEffect.ShowPlaceBottomSheet -> {
+                if (!sideEffect.show) {
+                    showLocationBottomSheet = false
                 }
             }
         }
@@ -217,7 +228,7 @@ fun AddTimeCapsuleScreen(
 
     LaunchedEffect(imageUrl) {
         if (imageUrl.isNotEmpty()) {
-            viewModel.addImage(imageUrl)
+            onAddImage(imageUrl)
         }
     }
 
@@ -232,8 +243,8 @@ fun AddTimeCapsuleScreen(
         ) {
             LocationSearchScreen(
                 uiState = uiState,
-                onQuery = viewModel::onQuery,
-                onClick = viewModel::onPlaceClick
+                onQuery = onQuery,
+                onClick = onPlaceClick
             )
         }
     }
@@ -332,7 +343,7 @@ fun AddTimeCapsuleScreen(
                 SharedFriendList(
                     modifier = Modifier.padding(bottom = 50.dp),
                     sharedFriends = uiState.sharedFriends,
-                    onClickCheckBox = viewModel::checkSharedFriend
+                    onClickCheckBox = onCheckSharedFriend
                 )
             }
         }
@@ -354,7 +365,7 @@ fun AddTimeCapsuleScreen(
             ) {
                 if (showDateDialog) {
                     Calender(
-                        onSave = viewModel::setOpenDate,
+                        onSave = onSetOpenDate,
                         onDismiss = {
                             showDateDialog = false
                         }
@@ -362,14 +373,14 @@ fun AddTimeCapsuleScreen(
                 }
                 ContentsView(
                     content = uiState.content,
-                    onType = viewModel::typing
+                    onType = onTyping
                 )
                 ImageListView(
                     imageUrls = uiState.imageUrls,
                     modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
                     onSelectPicture = {
                         scope.launch {
-                            viewModel.setSelectImageIndex(index = it)
+                            onSetSelectImageIndex(it)
                             focusManager.clearFocus()
                             scaffoldState.bottomSheetState.expand()
                             showBottomMenu = true
@@ -387,7 +398,7 @@ fun AddTimeCapsuleScreen(
                         subTitle = "개봉할 수 있는 위치를 지정합니다.",
                         isChecked = uiState.checkLocation
                     ) {
-                        viewModel.setCheckLocation(isChecked = it)
+                        onSetCheckLocation(it)
                     }
                     if (uiState.checkLocation) {
                         MenuItem(
@@ -435,7 +446,7 @@ fun AddTimeCapsuleScreen(
                         subTitle = "사진은 친구에게 공유되지 않습니다.",
                         isChecked = uiState.isShare
                     ) {
-                        viewModel.setCheckSend(isChecked = it)
+                        onSetCheckShare(it)
                         if (uiState.checkLocation) {
                             scope.launch {
                                 scrollState.animateScrollTo(200)
@@ -477,7 +488,7 @@ fun AddTimeCapsuleScreen(
                         }
                     }
             ) {
-                viewModel.saveTimeCapsule()
+                onSaveTimeCapsule()
             }
         }
     }
@@ -944,10 +955,24 @@ private fun ContentViewPreview() {
 @Composable
 private fun AddTimeCapsuleScreenPreview() {
     AddTimeCapsuleScreen(
-        imageUrl = "imageUrl22",
+        uiState = AddTimeCapsuleUiState(),
+        sideEffect = AddTimeCapsuleSideEffect.None,
+        imageUrl = "imageUrl2",
         place = Place(),
-        onNavigateToCamera = {},
-        onBack = {}
+        onSaveTimeCapsule = { },
+        onSetCheckShare = { },
+        onSetCheckLocation = { },
+        onSetSelectImageIndex = { },
+        onSetOpenDate = { },
+        onTyping = { },
+        onCheckSharedFriend = { },
+        onQuery = { },
+        onPlaceClick = { },
+        onSearchAddress = { _, _ -> },
+        onInitPlace = { },
+        onAddImage = { },
+        onNavigateToCamera = { },
+        onBack = { }
     )
 }
 

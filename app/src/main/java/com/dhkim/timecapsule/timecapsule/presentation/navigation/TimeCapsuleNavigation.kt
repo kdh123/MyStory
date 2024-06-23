@@ -13,6 +13,8 @@ import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleScreen
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailScreen
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleViewModel
+import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleSideEffect
+import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleViewModel
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailViewModel
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleOpenScreen
@@ -88,12 +90,29 @@ fun NavGraphBuilder.addTimeCapsuleNavigation(
     onBack: () -> Unit,
 ) {
     composable("addTimeCapsule") { backStackEntry ->
+        val viewModel = hiltViewModel<AddTimeCapsuleViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = AddTimeCapsuleSideEffect.None)
         val place = backStackEntry.savedStateHandle.get<Place>("place") ?: Place()
         val imageUrl = backStackEntry.savedStateHandle.get<String>("imageUrl") ?: ""
 
         AddTimeCapsuleScreen(
+            uiState = uiState,
+            sideEffect = sideEffect,
             imageUrl = imageUrl,
             place = place,
+            onSaveTimeCapsule = viewModel::saveTimeCapsule,
+            onSetCheckShare = viewModel::setCheckSend,
+            onSetCheckLocation = viewModel::setCheckLocation,
+            onSetSelectImageIndex = viewModel::setSelectImageIndex,
+            onSetOpenDate = viewModel::setOpenDate,
+            onTyping = viewModel::typing,
+            onCheckSharedFriend = viewModel::checkSharedFriend,
+            onQuery = viewModel::onQuery,
+            onPlaceClick = viewModel::onPlaceClick,
+            onSearchAddress = viewModel::searchAddress,
+            onInitPlace = viewModel::initPlace,
+            onAddImage = viewModel::addImage,
             onNavigateToCamera = onNavigateToCamera,
             onBack = onBack
         )

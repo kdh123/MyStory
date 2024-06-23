@@ -62,8 +62,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.ui.LoadingProgressBar
 import com.dhkim.timecapsule.common.ui.WarningDialog
@@ -74,12 +72,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    uiState: ProfileUiState,
+    sideEffect: ProfileSideEffect,
+    onQuery: (String) -> Unit,
+    onSearchUser: () -> Unit,
+    onAddFriend: () -> Unit,
+    onAcceptFriend: (Friend) -> Unit,
     onDeleteFriend: (String) -> Unit,
     onBack: () -> Unit,
-    viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var currentTab by remember { mutableIntStateOf(0) }
     val titles = listOf("친구", "요청")
     val pagerState = rememberPagerState(pageCount = {
@@ -102,26 +104,26 @@ fun ProfileScreen(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(true) {
-        viewModel.sideEffect.collect { sideEffect ->
-            when (sideEffect) {
-                is ProfileSideEffect.Message -> {
-                    Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
-                }
+    LaunchedEffect(sideEffect) {
+        when (sideEffect) {
+            is ProfileSideEffect.None -> {}
 
-                is ProfileSideEffect.ShowDialog -> {
-                    if (!sideEffect.show) {
-                        selectedUserId = ""
-                    }
-                }
+            is ProfileSideEffect.Message -> {
+                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+            }
 
-                is ProfileSideEffect.ShowBottomSheet -> {
-                    bottomSheetScaffoldState.bottomSheetState.hide()
+            is ProfileSideEffect.ShowDialog -> {
+                if (!sideEffect.show) {
+                    selectedUserId = ""
                 }
+            }
 
-                is ProfileSideEffect.ShowKeyboard -> {
-                    focusManager.clearFocus()
-                }
+            is ProfileSideEffect.ShowBottomSheet -> {
+                bottomSheetScaffoldState.bottomSheetState.hide()
+            }
+
+            is ProfileSideEffect.ShowKeyboard -> {
+                focusManager.clearFocus()
             }
         }
     }
@@ -195,15 +197,9 @@ fun ProfileScreen(
         sheetContent = {
             BottomSheetScreen(
                 uiState = uiState,
-                onSearch = remember(viewModel) {
-                    viewModel::searchUser
-                },
-                onQuery = remember(viewModel) {
-                    viewModel::onQuery
-                },
-                onAddFriend = remember(viewModel) {
-                    viewModel::addFriend
-                }
+                onSearch = onSearchUser,
+                onQuery = onQuery,
+                onAddFriend = onAddFriend
             )
         },
         topBar = {
@@ -304,9 +300,7 @@ fun ProfileScreen(
                         }
 
                         else -> {
-                            RequestScreen(uiState = uiState, onClick = remember(viewModel) {
-                                viewModel::acceptFriend
-                            })
+                            RequestScreen(uiState = uiState, onClick = onAcceptFriend)
                         }
                     }
                     currentTab = pos

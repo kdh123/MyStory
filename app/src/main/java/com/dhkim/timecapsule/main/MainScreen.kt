@@ -140,7 +140,7 @@ fun MainScreen(
                 onNavigateToSearch = { lat, lng ->
                     navController.navigate("search/$lat/$lng")
                 },
-                onSelectPlace = { place ->
+                onHideBottomNav = { place ->
                     selectedPlace = place
                 },
                 onInitSavedState = {

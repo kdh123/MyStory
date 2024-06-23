@@ -63,8 +63,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -75,7 +73,6 @@ import com.dhkim.timecapsule.common.ui.LoadingProgressBar
 import com.dhkim.timecapsule.home.domain.Category
 import com.dhkim.timecapsule.home.presentation.HomeSideEffect
 import com.dhkim.timecapsule.home.presentation.HomeUiState
-import com.dhkim.timecapsule.home.presentation.HomeViewModel
 import com.dhkim.timecapsule.search.domain.Place
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -101,17 +98,21 @@ import retrofit2.HttpException
 @OptIn(ExperimentalNaverMapApi::class)
 @Composable
 fun HomeScreen(
+    uiState: HomeUiState,
+    sideEffect: HomeSideEffect,
     scaffoldState: BottomSheetScaffoldState,
     place: Place?,
+    onSelectPlace: (Place) -> Unit,
+    onSearchPlaceByQuery: (query: String, lat: String, lng: String) -> Unit,
+    onSearchPlaceByCategory: (Category, lat: String, lng: String) -> Unit,
+    onCloseSearch: (Boolean) -> Unit,
     onNavigateToSearch: (Double, Double) -> Unit,
     onNavigateToAddScreen: (Place) -> Unit,
-    onSelectPlace: (Place?) -> Unit,
-    onInitSavedState: () -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    onHideBottomNav: (Place?) -> Unit,
+    onInitSavedState: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val places = uiState.places.collectAsLazyPagingItems()
     val paddingValues = WindowInsets.navigationBars.asPaddingValues()
     val peekHeight = if (uiState.category != Category.None) {
@@ -138,16 +139,16 @@ fun HomeScreen(
         )
     }
 
-    LaunchedEffect(true) {
-        viewModel.sideEffect.collect { sideEffect ->
-            when (sideEffect) {
-                is HomeSideEffect.BottomSheet -> {
-                    scope.launch {
-                        if (sideEffect.isHide) {
-                            scaffoldState.bottomSheetState.hide()
-                        } else {
-                            scaffoldState.bottomSheetState.expand()
-                        }
+    LaunchedEffect(sideEffect) {
+        when (sideEffect) {
+            is HomeSideEffect.None -> {}
+
+            is HomeSideEffect.BottomSheet -> {
+                scope.launch {
+                    if (sideEffect.isHide) {
+                        scaffoldState.bottomSheetState.hide()
+                    } else {
+                        scaffoldState.bottomSheetState.expand()
                     }
                 }
             }
@@ -157,14 +158,14 @@ fun HomeScreen(
     BackHandler {
         if (uiState.query.isNotEmpty()) {
             onInitSavedState()
-            viewModel.closeSearch(false)
+            onCloseSearch(false)
         } else {
             (context as? Activity)?.finish()
         }
     }
 
     LaunchedEffect(uiState.selectedPlace) {
-        onSelectPlace(uiState.selectedPlace)
+        onHideBottomNav(uiState.selectedPlace)
     }
 
     LaunchedEffect(places.itemSnapshotList, uiState.selectedPlace, currentLocation) {
@@ -194,7 +195,7 @@ fun HomeScreen(
 
     LaunchedEffect(place) {
         place?.let {
-            viewModel.selectPlace(it)
+            onSelectPlace(it)
         }
     }
 
@@ -244,7 +245,7 @@ fun HomeScreen(
             } else {
                 PlaceList(
                     uiState = uiState,
-                    onPlaceClick = viewModel::selectPlace,
+                    onPlaceClick = onSelectPlace,
                     onHide = {
                     }
                 )
@@ -275,7 +276,7 @@ fun HomeScreen(
                             ),
                             onClick = {
                                 place?.let {
-                                    viewModel.selectPlace(place = it)
+                                    onSelectPlace(it)
                                 }
                                 true
                             },
@@ -291,7 +292,7 @@ fun HomeScreen(
                                     )
                                 ),
                                 onClick = {
-                                    viewModel.selectPlace(place = place)
+                                    onSelectPlace(place)
                                     true
                                 },
                                 captionText = place.name
@@ -307,15 +308,9 @@ fun HomeScreen(
                     lat = currentLocation.latitude,
                     lng = currentLocation.longitude,
                     showClose = uiState.category != Category.None || uiState.selectedPlace != null,
-                    onClose = remember(viewModel) {
-                        viewModel::closeSearch
-                    },
-                    onNavigateToSearch = remember {
-                        onNavigateToSearch
-                    },
-                    onInitSavedState = remember {
-                        onInitSavedState
-                    }
+                    onClose = onCloseSearch,
+                    onNavigateToSearch = onNavigateToSearch,
+                    onInitSavedState = onInitSavedState
                 )
 
                 LazyRow(
@@ -332,17 +327,9 @@ fun HomeScreen(
                             category = it, isSelected = it == uiState.category
                         ) { category ->
                             if (isCategory(category)) {
-                                viewModel.searchPlacesByCategory(
-                                    category = it,
-                                    lat = currentLocation.latitude.toString(),
-                                    lng = currentLocation.longitude.toString()
-                                )
+                                onSearchPlaceByCategory(it, "${currentLocation.latitude}", "${currentLocation.longitude}")
                             } else {
-                                viewModel.searchPlacesByKeyword(
-                                    query = category.type,
-                                    lat = currentLocation.latitude.toString(),
-                                    lng = currentLocation.longitude.toString()
-                                )
+                                onSearchPlaceByQuery(category.type, "${currentLocation.latitude}", "${currentLocation.longitude}")
                             }
                         }
                     }
