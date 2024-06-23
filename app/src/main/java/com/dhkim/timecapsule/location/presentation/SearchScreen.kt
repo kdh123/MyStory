@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
-package com.dhkim.timecapsule.timecapsule.presentation
+package com.dhkim.timecapsule.location.presentation
 
 import android.util.Log
 import androidx.compose.foundation.clickable
@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,26 +40,30 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.location.domain.Place
-import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleUiState
+import com.naver.maps.geometry.LatLng
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import retrofit2.HttpException
 
 @Composable
-fun LocationSearchScreen(
-    uiState: AddTimeCapsuleUiState,
+fun SearchScreen(
+    uiState: SearchUiState,
+    searchResult: LazyPagingItems<Place>,
+    latLng: LatLng,
+    onSetCurrentLocation: (LatLng) -> Unit,
     onQuery: (String) -> Unit,
-    onClick: (Place) -> Unit
+    onBack: (Place) -> Unit
 ) {
-    val searchResult = uiState.placeResult.collectAsLazyPagingItems()
+    LaunchedEffect(latLng) {
+        onSetCurrentLocation(latLng)
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
-        SearchBar(query = uiState.placeQuery, onQuery = onQuery)
-        Box(modifier = Modifier.fillMaxWidth()) {
+        SearchBar(query = uiState.query, onQuery = onQuery)
+        Box(modifier = Modifier.fillMaxSize()) {
             if (uiState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier
-                        .padding(top = 10.dp)
                         .width(64.dp)
                         .align(Alignment.Center),
                     color = Color.White,
@@ -67,9 +71,9 @@ fun LocationSearchScreen(
                 )
             }
             if (searchResult.itemCount > 0) {
-                PlaceList(places = searchResult, onPlaceClick = onClick)
+                PlaceList(places = searchResult, onBack = onBack)
             } else {
-                if (!uiState.isLoading && uiState.placeQuery.isNotEmpty()) {
+                if (!uiState.isLoading && uiState.query.isNotEmpty()) {
                     //Text(text = "검색 결과가 존재하지 않습니다.", modifier = Modifier.align(Alignment.Center))
                 }
             }
@@ -79,13 +83,16 @@ fun LocationSearchScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun LocationSearchScreenPreview() {
-    val result: StateFlow<PagingData<Place>> = MutableStateFlow(PagingData.empty())
+private fun SearchScreenPreview() {
+    val result = MutableStateFlow<PagingData<Place>>(PagingData.empty())
 
-    LocationSearchScreen(
-        uiState = AddTimeCapsuleUiState(),
+    SearchScreen(
+        uiState = SearchUiState(),
+        searchResult = result.collectAsLazyPagingItems(),
+        latLng = LatLng(0.0, 0.0),
+        onSetCurrentLocation = {},
         onQuery = {},
-        onClick = {}
+        onBack = {}
     )
 }
 
@@ -95,13 +102,12 @@ private fun LocationSearchScreenPreview() {
 fun SearchBar(query: String, onQuery: (String) -> Unit) {
     val focusRequester = remember { FocusRequester() }
 
-    OutlinedTextField(
+    TextField(
         value = query,
         onValueChange = {
             onQuery(it)
         },
         colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = colorResource(id = R.color.primary),
             disabledTextColor = colorResource(id = R.color.primary),
             disabledIndicatorColor = colorResource(id = R.color.primary),
             containerColor = Color.White
@@ -111,7 +117,6 @@ fun SearchBar(query: String, onQuery: (String) -> Unit) {
         },
         singleLine = true,
         modifier = Modifier
-            .padding(10.dp)
             .fillMaxWidth()
             .focusRequester(focusRequester)
     )
@@ -123,7 +128,7 @@ fun SearchBar(query: String, onQuery: (String) -> Unit) {
 }
 
 @Composable
-fun PlaceList(places: LazyPagingItems<Place>, onPlaceClick: (Place) -> Unit) {
+fun PlaceList(places: LazyPagingItems<Place>, onBack: (Place) -> Unit) {
     val state = places.loadState.refresh
     if (state is LoadState.Error) {
         if ((state.error) is HttpException) {
@@ -141,7 +146,7 @@ fun PlaceList(places: LazyPagingItems<Place>, onPlaceClick: (Place) -> Unit) {
         ) { index ->
             val item = places[index]
             if (item != null) {
-                Place(place = item, onBack = onPlaceClick)
+                Place(place = item, onBack = onBack)
             }
         }
     }
@@ -200,20 +205,20 @@ fun Place(place: Place, onBack: (Place) -> Unit) {
             )
         }
 
-        if (place.address.isNotEmpty()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = place.address,
-                    color = Color.Gray,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(horizontal = 10.dp)
-                )
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = place.distance,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+            Text(
+                text = place.address,
+                color = Color.Gray,
+                fontSize = 12.sp
+            )
         }
-
         if (place.phone.isNotEmpty()) {
             Text(
                 text = place.phone,

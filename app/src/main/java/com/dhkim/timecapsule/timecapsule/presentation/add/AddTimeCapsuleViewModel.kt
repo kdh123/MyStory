@@ -9,8 +9,8 @@ import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.profile.domain.UserId
 import com.dhkim.timecapsule.profile.domain.UserRepository
-import com.dhkim.timecapsule.search.domain.Place
-import com.dhkim.timecapsule.search.domain.SearchRepository
+import com.dhkim.timecapsule.location.domain.Place
+import com.dhkim.timecapsule.location.domain.LocationRepository
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SharedFriend
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
@@ -34,7 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddTimeCapsuleViewModel @Inject constructor(
     private val timeCapsuleRepository: TimeCapsuleRepository,
-    private val searchRepository: SearchRepository,
+    private val locationRepository: LocationRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -66,7 +66,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
         viewModelScope.launch {
             query.debounce(1000L).flatMapLatest {
-                searchRepository.getPlaceByKeyword(
+                locationRepository.getPlaceByKeyword(
                     query = it
                 )
             }.cachedIn(viewModelScope)
@@ -116,7 +116,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
     fun searchAddress(lat: String, lng: String) {
         viewModelScope.launch {
-            val result = searchRepository.getAddress(lat, lng)
+            val result = locationRepository.getAddress(lat, lng)
 
             when (result) {
                 is CommonResult.Success -> {

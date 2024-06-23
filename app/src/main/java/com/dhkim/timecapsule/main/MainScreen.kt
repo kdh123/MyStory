@@ -36,13 +36,13 @@ import androidx.navigation.compose.rememberNavController
 import com.dhkim.camera.navigation.cameraNavigation
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.ui.WarningDialog
-import com.dhkim.timecapsule.home.presentation.navigation.homeNavigation
+import com.dhkim.timecapsule.map.presentation.navigation.mapNavigation
 import com.dhkim.timecapsule.notification.navigation.navigateToNotification
 import com.dhkim.timecapsule.notification.navigation.notificationNavigation
 import com.dhkim.timecapsule.profile.presentation.navigation.navigateToProfile
 import com.dhkim.timecapsule.profile.presentation.navigation.profileNavigation
-import com.dhkim.timecapsule.search.domain.Place
-import com.dhkim.timecapsule.search.presentation.navigation.searchNavigation
+import com.dhkim.timecapsule.location.domain.Place
+import com.dhkim.timecapsule.location.presentation.navigation.searchNavigation
 import com.dhkim.timecapsule.setting.presentation.navigation.navigateToSetting
 import com.dhkim.timecapsule.setting.presentation.navigation.settingNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
@@ -135,7 +135,7 @@ fun MainScreen(
             navController = navController,
             startDestination = "timeCapsule"
         ) {
-            homeNavigation(
+            mapNavigation(
                 scaffoldState = scaffoldState,
                 onNavigateToSearch = { lat, lng ->
                     navController.navigate("search/$lat/$lng")

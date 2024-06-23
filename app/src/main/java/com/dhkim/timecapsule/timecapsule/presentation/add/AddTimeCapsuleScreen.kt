@@ -82,7 +82,7 @@ import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.DateUtil
-import com.dhkim.timecapsule.search.domain.Place
+import com.dhkim.timecapsule.location.domain.Place
 import com.dhkim.timecapsule.timecapsule.domain.BaseTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule

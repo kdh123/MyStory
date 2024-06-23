@@ -7,7 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.dhkim.timecapsule.main.Screen
-import com.dhkim.timecapsule.search.domain.Place
+import com.dhkim.timecapsule.location.domain.Place
 import com.dhkim.timecapsule.timecapsule.TimeCapsuleScreen
 import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleScreen
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailScreen
