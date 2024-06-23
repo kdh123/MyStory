@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.onboarding.signup
+package com.dhkim.timecapsule.signUp
 
 data class SignUpUiState(
     val isLoading: Boolean = false,

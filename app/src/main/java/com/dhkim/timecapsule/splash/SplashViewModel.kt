@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.onboarding
+package com.dhkim.timecapsule.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

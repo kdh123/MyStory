@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-package com.dhkim.timecapsule.onboarding.signup
+package com.dhkim.timecapsule.signUp
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

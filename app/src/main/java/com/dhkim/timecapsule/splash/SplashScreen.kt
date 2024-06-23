@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.onboarding.splash
+package com.dhkim.timecapsule.splash
 
 import android.app.Activity
 import android.content.Intent
@@ -14,18 +14,28 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.dhkim.timecapsule.main.MainActivity
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.ui.DefaultBackground
+import com.dhkim.timecapsule.signUp.navigation.navigateToSignUp
+import com.dhkim.timecapsule.signUp.navigation.signUpNavigation
+import com.dhkim.timecapsule.splash.navigation.splashNavigation
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
     isSignedUp: Boolean?,
-    onCheckSignedUp: () -> Unit,
-    onNavigateToSignUp: () -> Unit
+    navController: NavHostController = rememberNavController()
 ) {
     val context = LocalContext.current
+
+    NavHost(navController = navController, startDestination = "splash") {
+        splashNavigation()
+        signUpNavigation()
+    }
 
     Box(
         modifier = Modifier
@@ -46,10 +56,6 @@ fun SplashScreen(
         }
     }
 
-    LaunchedEffect(true) {
-        onCheckSignedUp()
-    }
-
     LaunchedEffect(isSignedUp) {
         delay(500L)
         isSignedUp?.let {
@@ -59,7 +65,7 @@ fun SplashScreen(
                 }
                 (context as? Activity)?.finish()
             } else {
-                onNavigateToSignUp()
+                navController.navigateToSignUp()
             }
         }
     }
@@ -69,8 +75,6 @@ fun SplashScreen(
 @Composable
 private fun SplashScreenPreview() {
     SplashScreen(
-        isSignedUp = false,
-        onCheckSignedUp = {},
-        onNavigateToSignUp = {}
+        isSignedUp = false
     )
 }

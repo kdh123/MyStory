@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.timecapsule
+package com.dhkim.timecapsule.timecapsule.presentation
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -66,8 +66,6 @@ import com.dhkim.timecapsule.common.ui.WarningDialog
 import com.dhkim.timecapsule.common.presentation.DistanceManager
 import com.dhkim.timecapsule.common.ui.DefaultBackground
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
-import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleSideEffect
-import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleUiState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState

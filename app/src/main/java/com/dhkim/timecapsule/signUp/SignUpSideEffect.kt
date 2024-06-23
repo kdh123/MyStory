@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.onboarding.signup
+package com.dhkim.timecapsule.signUp
 
 sealed interface SignUpSideEffect {
 

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
-package com.dhkim.timecapsule.onboarding.signup
+package com.dhkim.timecapsule.signUp
 
 import android.app.Activity
 import android.content.Intent

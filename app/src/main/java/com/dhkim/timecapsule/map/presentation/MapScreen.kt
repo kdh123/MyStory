@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class, ExperimentalNaverMapApi::class)
 
-package com.dhkim.timecapsule.map
+package com.dhkim.timecapsule.map.presentation
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -71,8 +71,6 @@ import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.Constants
 import com.dhkim.timecapsule.common.ui.LoadingProgressBar
 import com.dhkim.timecapsule.location.domain.Category
-import com.dhkim.timecapsule.map.presentation.MapSideEffect
-import com.dhkim.timecapsule.map.presentation.MapUiState
 import com.dhkim.timecapsule.location.domain.Place
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted

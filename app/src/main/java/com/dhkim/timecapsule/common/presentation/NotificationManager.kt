@@ -10,7 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.TimeCapsuleApplication
-import com.dhkim.timecapsule.onboarding.OnboardingActivity
+import com.dhkim.timecapsule.splash.SplashActivity
 import com.dhkim.timecapsule.setting.domain.SettingRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
@@ -27,7 +27,7 @@ class NotificationManager @Inject constructor(
             return
         }
 
-        val intent = Intent(context, OnboardingActivity::class.java).apply {
+        val intent = Intent(context, SplashActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
