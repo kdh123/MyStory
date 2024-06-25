@@ -37,6 +37,8 @@ class TimeCapsuleViewModel @Inject constructor(
                     myTimeCapsules.map { it.toTimeCapsule(myId) } + receivedTimeCapsules.map { it.toTimeCapsule() }
                 }.catch { }
                 .collect { timeCapsules ->
+                    val timeCapsuleItems = mutableListOf<TimeCapsuleItem>()
+
                     val unOpenedMyTimeCapsules = timeCapsules
                         .filter { !it.isReceived && !it.isOpened && !DateUtil.isAfter(it.openDate) }
                         .sortedBy {
@@ -57,6 +59,42 @@ class TimeCapsuleViewModel @Inject constructor(
                             it.date
                         }
 
+                    if (openableTimeCapsules.isNotEmpty()) {
+                        timeCapsuleItems.run {
+                            add(TimeCapsuleItem(id = 0, type = TimeCapsuleType.Title, "오늘 개봉할 수 있는 타임캡슐"))
+                            add(TimeCapsuleItem(id = 1, type = TimeCapsuleType.OpenableTimeCapsule, openableTimeCapsules))
+                        }
+                    }
+
+                    if (unOpenedMyTimeCapsules.isNotEmpty() || unOpenedReceivedTimeCapsules.isNotEmpty()) {
+                        timeCapsuleItems.run {
+                            add(TimeCapsuleItem(id = 2, type = TimeCapsuleType.Title, "미개봉 타임캡슐"))
+                            add(
+                                TimeCapsuleItem(
+                                    id = 3,
+                                    type = TimeCapsuleType.UnopenedTimeCapsule,
+                                    unOpenedMyTimeCapsules + unOpenedReceivedTimeCapsules
+                                )
+                            )
+                        }
+                    }
+
+                    if (openedTimeCapsules.isNotEmpty()) {
+                        timeCapsuleItems.run {
+                            add(TimeCapsuleItem(id = 4, type = TimeCapsuleType.Title, "개봉한 타임캡슐"))
+                            add(TimeCapsuleItem(id = 5, type = TimeCapsuleType.OpenedTimeCapsule, openedTimeCapsules))
+                        }
+                    }
+
+                    if (timeCapsuleItems.isEmpty()) {
+                        timeCapsuleItems.run {
+                            add(TimeCapsuleItem(id = 6, type = TimeCapsuleType.Title, "나의 첫 타임캡슐을 만들어보세요."))
+                            add(TimeCapsuleItem(id = 7, type = TimeCapsuleType.NoneTimeCapsule, ""))
+                        }
+                    }
+
+                    timeCapsuleItems.add(TimeCapsuleItem(id = 8, type = TimeCapsuleType.InviteFriend, ""))
+
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         isNothing = timeCapsules.isEmpty(),
@@ -65,6 +103,7 @@ class TimeCapsuleViewModel @Inject constructor(
                         unOpenedMyTimeCapsules = unOpenedMyTimeCapsules,
                         unOpenedReceivedTimeCapsules = unOpenedReceivedTimeCapsules,
                         unOpenedTimeCapsules = unOpenedMyTimeCapsules + unOpenedReceivedTimeCapsules,
+                        timeCapsules = timeCapsuleItems
                     )
                 }
         }

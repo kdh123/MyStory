@@ -513,7 +513,10 @@ fun RequestScreen(uiState: ProfileUiState, onClick: (Friend) -> Unit) {
 
 @Composable
 fun FriendScreen(uiState: ProfileUiState, onLongClick: (userId: String) -> Unit) {
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         Column {
             Text(
                 text = "나",
@@ -552,7 +555,10 @@ fun RequestList(
     onClick: (Friend) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         Text(
             text = title,
             color = colorResource(id = R.color.gray),

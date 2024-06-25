@@ -12,4 +12,20 @@ data class TimeCapsuleUiState(
     val unOpenedTimeCapsules: List<TimeCapsule> = listOf(),
     val unOpenedMyTimeCapsules: List<TimeCapsule> = listOf(),
     val unOpenedReceivedTimeCapsules: List<TimeCapsule> = listOf(),
+    val timeCapsules: List<TimeCapsuleItem> = listOf()
 )
+
+data class TimeCapsuleItem(
+    val id: Int,
+    val type: TimeCapsuleType,
+    val data: Any
+)
+
+enum class TimeCapsuleType {
+    Title,
+    NoneTimeCapsule,
+    OpenableTimeCapsule,
+    UnopenedTimeCapsule,
+    OpenedTimeCapsule,
+    InviteFriend
+}

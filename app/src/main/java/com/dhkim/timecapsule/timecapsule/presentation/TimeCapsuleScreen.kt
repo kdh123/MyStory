@@ -28,11 +28,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -106,7 +106,6 @@ fun TimeCapsuleScreen(
         mutableStateOf(TimeCapsule())
     }
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
     var showLocationDialog by remember {
         mutableStateOf(false)
     }
@@ -303,89 +302,110 @@ fun TimeCapsuleScreen(
             }
         }
     ) {
-        Column(
+        Box(
             modifier = modifier
                 .padding(top = it.calculateTopPadding())
-                .verticalScroll(scrollState)
                 .fillMaxSize()
         ) {
             if (uiState.isLoading) {
                 LoadingScreen()
             } else {
-                if (uiState.isNothing) {
-                    Text(
-                        text = "나의 첫 타임캡슐을 만들어보세요.",
-                        modifier = Modifier
-                            .padding(horizontal = 10.dp),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Box(
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .width(150.dp)
-                            .height(150.dp)
-                            .background(color = colorResource(id = R.color.light_gray))
-                            .clickable {
-                                onNavigateToAdd()
+                LazyColumn {
+                    items(uiState.timeCapsules, key = {
+                        it.id
+                    }) {
+                        when (it.type) {
+                            TimeCapsuleType.Title -> {
+                                Text(
+                                    text = it.data as? String ?: "",
+                                    modifier = Modifier
+                                        .padding(horizontal = 10.dp),
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_add_black),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .width(50.dp)
-                                .height(50.dp)
-                                .align(Alignment.Center)
-                        )
+
+                            TimeCapsuleType.OpenableTimeCapsule -> {
+                                OpenableTimeCapsules(
+                                    uiState = uiState,
+                                    currentLat = currentLocation.latitude,
+                                    currentLng = currentLocation.longitude,
+                                    onShowLocationDialog = {
+                                        if (!locationPermissionState.status.isGranted) {
+                                            showPermissionDialog = true
+                                        } else {
+                                            selectedTimeCapsule = it
+                                            showLocationDialog = true
+                                        }
+                                    },
+                                    onShowOpenDialog = {
+                                        selectedTimeCapsule = it
+                                        showOpenDialog = true
+                                    },
+                                    onLongClick = {
+                                        selectedTimeCapsule = it
+                                        showMenuDialog = true
+                                    }
+                                )
+                            }
+
+                            TimeCapsuleType.UnopenedTimeCapsule -> {
+                                UnopenedTimeCapsules(
+                                    uiState = uiState,
+                                    onClick = {
+                                        selectedTimeCapsule = it
+                                        showLocationDialog = true
+                                    },
+                                    onLongClick = {
+                                        selectedTimeCapsule = it
+                                        showMenuDialog = true
+                                    }
+                                )
+                            }
+
+                            TimeCapsuleType.OpenedTimeCapsule -> {
+                                OpenedTimeCapsules(
+                                    uiState = uiState,
+                                    onLongClick = {
+                                        selectedTimeCapsule = it
+                                        showMenuDialog = true
+                                    },
+                                    onNavigateToDetail = onNavigateToDetail
+                                )
+                            }
+
+                            TimeCapsuleType.NoneTimeCapsule -> {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(10.dp)
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .width(150.dp)
+                                        .height(150.dp)
+                                        .background(color = colorResource(id = R.color.light_gray))
+                                        .clickable {
+                                            onNavigateToAdd()
+                                        }
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.ic_add_black),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .width(50.dp)
+                                            .height(50.dp)
+                                            .align(Alignment.Center)
+                                    )
+                                }
+                            }
+
+                            TimeCapsuleType.InviteFriend -> {
+                                InviteFriendItem(
+                                    onNavigateToProfile = onNavigateToProfile
+                                )
+                            }
+                        }
                     }
-                } else {
-                    OpenableTimeCapsules(
-                        uiState = uiState,
-                        currentLat = currentLocation.latitude,
-                        currentLng = currentLocation.longitude,
-                        onShowLocationDialog = {
-                            if (!locationPermissionState.status.isGranted) {
-                                showPermissionDialog = true
-                            } else {
-                                selectedTimeCapsule = it
-                                showLocationDialog = true
-                            }
-                        },
-                        onShowOpenDialog = {
-                            selectedTimeCapsule = it
-                            showOpenDialog = true
-                        },
-                        onLongClick = {
-                            selectedTimeCapsule = it
-                            showMenuDialog = true
-                        }
-                    )
-                    UnopenedTimeCapsules(
-                        uiState = uiState,
-                        onClick = {
-                            selectedTimeCapsule = it
-                            showLocationDialog = true
-                        },
-                        onLongClick = {
-                            selectedTimeCapsule = it
-                            showMenuDialog = true
-                        }
-                    )
-                    OpenedTimeCapsules(
-                        uiState = uiState,
-                        onLongClick = {
-                            selectedTimeCapsule = it
-                            showMenuDialog = true
-                        },
-                        onNavigateToDetail = onNavigateToDetail
-                    )
                 }
 
-                InviteFriendItem(
-                    onNavigateToProfile = onNavigateToProfile
-                )
             }
         }
     }
@@ -482,14 +502,6 @@ private fun OpenedTimeCapsules(
     if (uiState.openedTimeCapsules.isEmpty()) {
         return
     }
-
-    Text(
-        text = "개봉한 타임캡슐",
-        modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 10.dp),
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Bold
-    )
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -618,21 +630,13 @@ private fun OpenableTimeCapsules(
     uiState: TimeCapsuleUiState,
     currentLat: Double,
     currentLng: Double,
-    onShowLocationDialog: ((TimeCapsule) -> Unit),
+    onShowLocationDialog: (TimeCapsule) -> Unit,
     onShowOpenDialog: (TimeCapsule) -> Unit,
     onLongClick: (TimeCapsule) -> Unit
 ) {
     if (uiState.openableTimeCapsules.isEmpty()) {
         return
     }
-
-    Text(
-        text = "오늘 개봉할 수 있는 타임캡슐",
-        modifier = Modifier
-            .padding(horizontal = 10.dp),
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Bold
-    )
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(horizontal = 10.dp),
@@ -666,14 +670,6 @@ private fun UnopenedTimeCapsules(
     if (uiState.unOpenedTimeCapsules.isEmpty()) {
         return
     }
-
-    Text(
-        text = "미개봉 타임캡슐",
-        modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 10.dp),
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Bold
-    )
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(horizontal = 10.dp),
