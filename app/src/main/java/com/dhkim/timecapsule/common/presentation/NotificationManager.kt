@@ -33,7 +33,7 @@ class NotificationManager @Inject constructor(
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(context, TimeCapsuleApplication.CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_send_time_black)
+            .setSmallIcon(R.drawable.ic_time_primary)
             .setContentTitle(title)
             .setContentText(desc)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

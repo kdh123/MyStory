@@ -35,7 +35,7 @@ class MainViewModel @Inject constructor(
         }
 
         val checkOpenableTimeCapsuleWorker = PeriodicWorkRequestBuilder<CheckOpenableTimeCapsuleWorker>(
-            6, TimeUnit.HOURS
+            24, TimeUnit.HOURS
         ).build()
 
         workManager.enqueueUniquePeriodicWork(
