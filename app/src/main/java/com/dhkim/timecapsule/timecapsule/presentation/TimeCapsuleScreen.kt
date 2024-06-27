@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.dhkim.timecapsule.timecapsule.presentation
 
 import android.Manifest
@@ -31,7 +33,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
@@ -64,6 +65,7 @@ import com.dhkim.timecapsule.common.DateUtil
 import com.dhkim.timecapsule.common.ui.ShimmerBrush
 import com.dhkim.timecapsule.common.ui.WarningDialog
 import com.dhkim.timecapsule.common.presentation.DistanceManager
+import com.dhkim.timecapsule.common.presentation.StableList
 import com.dhkim.timecapsule.common.ui.DefaultBackground
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -325,9 +327,18 @@ fun TimeCapsuleScreen(
                                 )
                             }
 
+                            TimeCapsuleType.SubTitle -> {
+                                Text(
+                                    text = it.data as? String ?: "",
+                                    modifier = Modifier
+                                        .padding(horizontal = 10.dp),
+                                    color = colorResource(id = R.color.gray)
+                                )
+                            }
+
                             TimeCapsuleType.OpenableTimeCapsule -> {
                                 OpenableTimeCapsules(
-                                    uiState = uiState,
+                                    timeCapsules = it.data as? StableList<TimeCapsule> ?: StableList(),
                                     currentLat = currentLocation.latitude,
                                     currentLng = currentLocation.longitude,
                                     onShowLocationDialog = {
@@ -349,9 +360,23 @@ fun TimeCapsuleScreen(
                                 )
                             }
 
-                            TimeCapsuleType.UnopenedTimeCapsule -> {
+                            TimeCapsuleType.UnopenedMyTimeCapsule -> {
                                 UnopenedTimeCapsules(
-                                    uiState = uiState,
+                                    timeCapsules = it.data as? StableList<TimeCapsule> ?: StableList(),
+                                    onClick = {
+                                        selectedTimeCapsule = it
+                                        showLocationDialog = true
+                                    },
+                                    onLongClick = {
+                                        selectedTimeCapsule = it
+                                        showMenuDialog = true
+                                    }
+                                )
+                            }
+
+                            TimeCapsuleType.UnopenedReceivedTimeCapsule -> {
+                                UnopenedTimeCapsules(
+                                    timeCapsules = it.data as? StableList<TimeCapsule> ?: StableList(),
                                     onClick = {
                                         selectedTimeCapsule = it
                                         showLocationDialog = true
@@ -365,7 +390,7 @@ fun TimeCapsuleScreen(
 
                             TimeCapsuleType.OpenedTimeCapsule -> {
                                 OpenedTimeCapsules(
-                                    uiState = uiState,
+                                    timeCapsules = it.data as? StableList<TimeCapsule> ?: StableList(),
                                     onLongClick = {
                                         selectedTimeCapsule = it
                                         showMenuDialog = true
@@ -402,10 +427,13 @@ fun TimeCapsuleScreen(
                                     onNavigateToProfile = onNavigateToProfile
                                 )
                             }
+
+                            TimeCapsuleType.Line -> {
+                                Spacer(modifier = Modifier.height(20.dp))
+                            }
                         }
                     }
                 }
-
             }
         }
     }
@@ -495,11 +523,11 @@ private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
 
 @Composable
 private fun OpenedTimeCapsules(
-    uiState: TimeCapsuleUiState,
+    timeCapsules: StableList<TimeCapsule>,
     onLongClick: (TimeCapsule) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit
 ) {
-    if (uiState.openedTimeCapsules.isEmpty()) {
+    if (timeCapsules.data.isEmpty()) {
         return
     }
 
@@ -510,7 +538,7 @@ private fun OpenedTimeCapsules(
             .padding(vertical = 10.dp)
             .fillMaxWidth()
     ) {
-        items(items = uiState.openedTimeCapsules, key = {
+        items(items = timeCapsules.data, key = {
             it.id
         }) {
             OpenedBox(
@@ -576,12 +604,21 @@ fun LocationDialog(
                     text = desc,
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 )
+                if (timeCapsule.isReceived && timeCapsule.sender.isNotEmpty()) {
+                    Text(
+                        fontWeight = FontWeight.Bold,
+                        text = "공유한 친구 : ${timeCapsule.sender}",
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp, top = 10.dp)
+                    )
+                }
+
                 if (timeCapsule.checkLocation) {
                     Text(
                         fontWeight = FontWeight.Bold,
                         text = timeCapsule.address,
                         modifier = Modifier
-                            .padding(16.dp),
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
                     )
 
                     NaverMap(
@@ -627,14 +664,14 @@ fun LocationDialog(
 
 @Composable
 private fun OpenableTimeCapsules(
-    uiState: TimeCapsuleUiState,
+    timeCapsules: StableList<TimeCapsule>,
     currentLat: Double,
     currentLng: Double,
     onShowLocationDialog: (TimeCapsule) -> Unit,
     onShowOpenDialog: (TimeCapsule) -> Unit,
     onLongClick: (TimeCapsule) -> Unit
 ) {
-    if (uiState.openableTimeCapsules.isEmpty()) {
+    if (timeCapsules.data.isEmpty()) {
         return
     }
     LazyRow(
@@ -644,7 +681,7 @@ private fun OpenableTimeCapsules(
             .fillMaxWidth()
             .padding(vertical = 10.dp)
     ) {
-        items(items = uiState.openableTimeCapsules, key = {
+        items(items = timeCapsules.data, key = {
             it.id
         }) {
             LockTimeCapsule(
@@ -663,11 +700,11 @@ private fun OpenableTimeCapsules(
 
 @Composable
 private fun UnopenedTimeCapsules(
-    uiState: TimeCapsuleUiState,
+    timeCapsules: StableList<TimeCapsule>,
     onClick: (TimeCapsule) -> Unit,
     onLongClick: (TimeCapsule) -> Unit
 ) {
-    if (uiState.unOpenedTimeCapsules.isEmpty()) {
+    if (timeCapsules.data.isEmpty()) {
         return
     }
     LazyRow(
@@ -677,7 +714,7 @@ private fun UnopenedTimeCapsules(
             .fillMaxWidth()
             .padding(vertical = 10.dp)
     ) {
-        items(items = uiState.unOpenedTimeCapsules, key = {
+        items(items = timeCapsules.data, key = {
             it.id
         }) {
             LockTimeCapsule(
@@ -707,10 +744,7 @@ private fun TimeCapsuleScreenPreview() {
     }
 
     TimeCapsuleScreen(
-        uiState = TimeCapsuleUiState(
-            openedTimeCapsules = openedList,
-            unOpenedTimeCapsules = unOpenedList.toList()
-        ),
+        uiState = TimeCapsuleUiState(),
         sideEffect = TimeCapsuleSideEffect.None,
         modifier = Modifier,
         onDeleteTimeCapsule = { _, _ -> },
@@ -843,7 +877,7 @@ private fun LockTimeCapsule(
         val modifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Modifier
                 .fillMaxSize()
-                .blur(18.dp)
+                .blur(16.dp)
         } else {
             Modifier
                 .fillMaxSize()

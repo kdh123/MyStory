@@ -1,31 +1,28 @@
 package com.dhkim.timecapsule.timecapsule.presentation
 
 import androidx.compose.runtime.Stable
-import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 
 @Stable
 data class TimeCapsuleUiState(
     val isLoading: Boolean = true,
     val isNothing: Boolean = true,
-    val openableTimeCapsules: List<TimeCapsule> = listOf(),
-    val openedTimeCapsules: List<TimeCapsule> = listOf(),
-    val unOpenedTimeCapsules: List<TimeCapsule> = listOf(),
-    val unOpenedMyTimeCapsules: List<TimeCapsule> = listOf(),
-    val unOpenedReceivedTimeCapsules: List<TimeCapsule> = listOf(),
     val timeCapsules: List<TimeCapsuleItem> = listOf()
 )
 
 data class TimeCapsuleItem(
-    val id: Int,
-    val type: TimeCapsuleType,
-    val data: Any
+    val id: Int = 0,
+    val type: TimeCapsuleType = TimeCapsuleType.NoneTimeCapsule,
+    val data: Any? = null
 )
 
 enum class TimeCapsuleType {
     Title,
+    SubTitle,
     NoneTimeCapsule,
     OpenableTimeCapsule,
-    UnopenedTimeCapsule,
+    UnopenedMyTimeCapsule,
+    UnopenedReceivedTimeCapsule,
     OpenedTimeCapsule,
-    InviteFriend
+    InviteFriend,
+    Line,
 }

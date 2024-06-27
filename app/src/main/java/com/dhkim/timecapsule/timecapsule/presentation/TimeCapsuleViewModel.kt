@@ -3,6 +3,7 @@ package com.dhkim.timecapsule.timecapsule.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.timecapsule.common.DateUtil
+import com.dhkim.timecapsule.common.presentation.StableList
 import com.dhkim.timecapsule.user.domain.UserRepository
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +29,8 @@ class TimeCapsuleViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<TimeCapsuleSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
+
+    private var spaceId = 100
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -62,47 +65,71 @@ class TimeCapsuleViewModel @Inject constructor(
                     if (openableTimeCapsules.isNotEmpty()) {
                         timeCapsuleItems.run {
                             add(TimeCapsuleItem(id = 0, type = TimeCapsuleType.Title, "오늘 개봉할 수 있는 타임캡슐"))
-                            add(TimeCapsuleItem(id = 1, type = TimeCapsuleType.OpenableTimeCapsule, openableTimeCapsules))
+                            add(
+                                TimeCapsuleItem(
+                                    id = 1,
+                                    type = TimeCapsuleType.OpenableTimeCapsule,
+                                    data = StableList(data = openableTimeCapsules)
+                                )
+                            )
+                            add(TimeCapsuleItem(id = spaceId++, type = TimeCapsuleType.Line))
                         }
                     }
 
-                    if (unOpenedMyTimeCapsules.isNotEmpty() || unOpenedReceivedTimeCapsules.isNotEmpty()) {
+                    if (unOpenedMyTimeCapsules.isNotEmpty()) {
                         timeCapsuleItems.run {
-                            add(TimeCapsuleItem(id = 2, type = TimeCapsuleType.Title, "미개봉 타임캡슐"))
+                            add(TimeCapsuleItem(id = 2, type = TimeCapsuleType.Title, "내가 만든 타임캡슐"))
                             add(
                                 TimeCapsuleItem(
                                     id = 3,
-                                    type = TimeCapsuleType.UnopenedTimeCapsule,
-                                    unOpenedMyTimeCapsules + unOpenedReceivedTimeCapsules
+                                    type = TimeCapsuleType.UnopenedMyTimeCapsule,
+                                    data = StableList(data = unOpenedMyTimeCapsules)
                                 )
                             )
+                            add(TimeCapsuleItem(id = spaceId++, type = TimeCapsuleType.Line))
+                        }
+                    }
+
+                    if (unOpenedReceivedTimeCapsules.isNotEmpty()) {
+                        timeCapsuleItems.run {
+                            add(TimeCapsuleItem(id = 4, type = TimeCapsuleType.Title, "친구가 공유한 타임캡슐"))
+                            add(
+                                TimeCapsuleItem(
+                                    id = 5,
+                                    type = TimeCapsuleType.UnopenedReceivedTimeCapsule,
+                                    data = StableList(data = unOpenedReceivedTimeCapsules)
+                                )
+                            )
+                            add(TimeCapsuleItem(id = spaceId++, type = TimeCapsuleType.Line))
                         }
                     }
 
                     if (openedTimeCapsules.isNotEmpty()) {
                         timeCapsuleItems.run {
-                            add(TimeCapsuleItem(id = 4, type = TimeCapsuleType.Title, "개봉한 타임캡슐"))
-                            add(TimeCapsuleItem(id = 5, type = TimeCapsuleType.OpenedTimeCapsule, openedTimeCapsules))
+                            add(TimeCapsuleItem(id = 6, type = TimeCapsuleType.Title, "개봉한 타임캡슐"))
+                            add(
+                                TimeCapsuleItem(
+                                    id = 7,
+                                    type = TimeCapsuleType.OpenedTimeCapsule,
+                                    data = StableList(data = openedTimeCapsules)
+                                )
+                            )
+                            add(TimeCapsuleItem(id = spaceId++, type = TimeCapsuleType.Line))
                         }
                     }
 
                     if (timeCapsuleItems.isEmpty()) {
                         timeCapsuleItems.run {
-                            add(TimeCapsuleItem(id = 6, type = TimeCapsuleType.Title, "나의 첫 타임캡슐을 만들어보세요."))
-                            add(TimeCapsuleItem(id = 7, type = TimeCapsuleType.NoneTimeCapsule, ""))
+                            add(TimeCapsuleItem(id = 8, type = TimeCapsuleType.Title, "나의 첫 타임캡슐을 만들어보세요."))
+                            add(TimeCapsuleItem(id = 9, type = TimeCapsuleType.NoneTimeCapsule))
                         }
                     }
 
-                    timeCapsuleItems.add(TimeCapsuleItem(id = 8, type = TimeCapsuleType.InviteFriend, ""))
+                    timeCapsuleItems.add(TimeCapsuleItem(id = 10, type = TimeCapsuleType.InviteFriend))
 
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         isNothing = timeCapsules.isEmpty(),
-                        openableTimeCapsules = openableTimeCapsules,
-                        openedTimeCapsules = openedTimeCapsules,
-                        unOpenedMyTimeCapsules = unOpenedMyTimeCapsules,
-                        unOpenedReceivedTimeCapsules = unOpenedReceivedTimeCapsules,
-                        unOpenedTimeCapsules = unOpenedMyTimeCapsules + unOpenedReceivedTimeCapsules,
                         timeCapsules = timeCapsuleItems
                     )
                 }
