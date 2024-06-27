@@ -36,6 +36,12 @@ app/google-services.json
 # Android Profiling
 *.hprof
 
+app/release/baselineProfiles/0/app-release.dm
+app/release/baselineProfiles/1/app-release.dm
+
+mystory_keystore
+app/release/output-metadata.json
+
 ### Android Patch ###
 gen-external-apklibs
 
