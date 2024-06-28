@@ -35,6 +35,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -54,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -321,7 +323,7 @@ fun TimeCapsuleScreen(
                                 Text(
                                     text = it.data as? String ?: "",
                                     modifier = Modifier
-                                        .padding(horizontal = 10.dp),
+                                        .padding(horizontal = 20.dp),
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -331,7 +333,7 @@ fun TimeCapsuleScreen(
                                 Text(
                                     text = it.data as? String ?: "",
                                     modifier = Modifier
-                                        .padding(horizontal = 10.dp),
+                                        .padding(horizontal = 20.dp),
                                     color = colorResource(id = R.color.gray)
                                 )
                             }
@@ -360,21 +362,7 @@ fun TimeCapsuleScreen(
                                 )
                             }
 
-                            TimeCapsuleType.UnopenedMyTimeCapsule -> {
-                                UnopenedTimeCapsules(
-                                    timeCapsules = it.data as? StableList<TimeCapsule> ?: StableList(),
-                                    onClick = {
-                                        selectedTimeCapsule = it
-                                        showLocationDialog = true
-                                    },
-                                    onLongClick = {
-                                        selectedTimeCapsule = it
-                                        showMenuDialog = true
-                                    }
-                                )
-                            }
-
-                            TimeCapsuleType.UnopenedReceivedTimeCapsule -> {
+                            TimeCapsuleType.UnopenedTimeCapsule -> {
                                 UnopenedTimeCapsules(
                                     timeCapsules = it.data as? StableList<TimeCapsule> ?: StableList(),
                                     onClick = {
@@ -402,7 +390,7 @@ fun TimeCapsuleScreen(
                             TimeCapsuleType.NoneTimeCapsule -> {
                                 Box(
                                     modifier = Modifier
-                                        .padding(10.dp)
+                                        .padding(horizontal = 20.dp, vertical = 10.dp)
                                         .clip(RoundedCornerShape(20.dp))
                                         .width(150.dp)
                                         .height(150.dp)
@@ -497,26 +485,32 @@ private fun LoadingScreenPreview() {
 
 @Composable
 private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
-    Box {
-        DefaultBackground(
-            modifier = Modifier
-                .padding(10.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .background(color = colorResource(id = R.color.primary))
-                .width(240.dp)
-                .height(360.dp)
-                .clickable {
-                    onNavigateToProfile()
-                }
-        ) {
-            Text(
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                text = "친구 추가",
+    Card(
+        elevation = CardDefaults.cardElevation(10.dp),
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .padding(horizontal = 20.dp, vertical = 20.dp)
+            .width(260.dp)
+            .height(360.dp)
+            .padding(bottom = 10.dp, end = 10.dp)
+            .clickable {
+                onNavigateToProfile()
+            }
+    ) {
+        Box {
+            DefaultBackground(
                 modifier = Modifier
-                    .align(Alignment.Center)
-            )
+                    .fillMaxSize()
+            ) {
+                Text(
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    text = "친구 추가",
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
+            }
         }
     }
 }
@@ -533,7 +527,7 @@ private fun OpenedTimeCapsules(
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
-        contentPadding = PaddingValues(horizontal = 10.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp),
         modifier = Modifier
             .padding(vertical = 10.dp)
             .fillMaxWidth()
@@ -676,7 +670,7 @@ private fun OpenableTimeCapsules(
     }
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
-        contentPadding = PaddingValues(horizontal = 10.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 10.dp)
@@ -709,7 +703,7 @@ private fun UnopenedTimeCapsules(
     }
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
-        contentPadding = PaddingValues(horizontal = 10.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 10.dp)
@@ -760,11 +754,12 @@ private fun TimeCapsuleScreenPreview() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongClick: (TimeCapsule) -> Unit) {
-    Box(
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(10.dp),
         modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .width(240.dp)
-            .height(360.dp)
+            .width(260.dp)
+            .padding(bottom = 10.dp, end = 10.dp)
             .combinedClickable(
                 onClick = {
                     onClick(timeCapsule)
@@ -774,40 +769,59 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongCl
                 }
             )
     ) {
-        if (timeCapsule.medias.isNotEmpty()) {
-            GlideImage(
-                imageModel = timeCapsule.medias[0],
-                previewPlaceholder = R.drawable.ic_launcher_background,
-                error = painterResource(id = R.drawable.ic_launcher_background),
-                modifier = Modifier
-                    .fillMaxSize()
-            )
-        } else {
-            DefaultBackground(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(20.dp))
-            ) {
+        Column {
+            Box {
+                if (timeCapsule.medias.isNotEmpty()) {
+                    GlideImage(
+                        imageModel = timeCapsule.medias[0],
+                        previewPlaceholder = R.drawable.ic_launcher_background,
+                        error = painterResource(id = R.drawable.ic_launcher_background),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(0.8f)
+                    )
+                } else {
+                    DefaultBackground(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(20.dp))
+                    ) {
+                        Text(
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            text = "사진이 존재하지 않습니다.",
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                        )
+                    }
+                }
+
                 Text(
-                    color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    text = "사진이 존재하지 않습니다.",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    text = timeCapsule.date,
                     modifier = Modifier
-                        .align(Alignment.Center)
+                        .padding(bottom = 10.dp)
+                        .align(Alignment.BottomCenter)
                 )
             }
+            Text(
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                text = if (timeCapsule.isReceived) {
+                    "친구"
+                } else {
+                    "나"
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color.White)
+                    .padding(10.dp)
+            )
         }
-
-        Text(
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            fontSize = 16.sp,
-            text = timeCapsule.date,
-            modifier = Modifier
-                .padding(bottom = 10.dp)
-                .align(Alignment.BottomCenter)
-        )
     }
 }
 
@@ -848,11 +862,12 @@ private fun LockTimeCapsule(
     val isNear = DistanceManager.getDistance(currentLat, currentLng, timeCapsule.lat.toDouble(), timeCapsule.lng.toDouble()) <= 100
     val canOpen = DateUtil.getDateGap(timeCapsule.openDate) <= 0
 
-    Box(
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(10.dp),
         modifier = Modifier
-            .width(150.dp)
-            .height(150.dp)
-            .clip(RoundedCornerShape(20.dp))
+            .width(165.dp)
+            .padding(bottom = 10.dp, end = 10.dp)
             .combinedClickable(
                 onClick = {
                     if (canOpen) {
@@ -876,85 +891,99 @@ private fun LockTimeCapsule(
     ) {
         val modifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Modifier
-                .fillMaxSize()
                 .blur(16.dp)
         } else {
             Modifier
-                .fillMaxSize()
         }
 
-        Box(
-            modifier = modifier
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
-            if (timeCapsule.medias.isNotEmpty()) {
-                GlideImage(
-                    imageModel = timeCapsule.medias[0],
-                    previewPlaceholder = R.drawable.ic_launcher_background,
-                    error = painterResource(id = R.drawable.ic_launcher_background),
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
-            } else {
-                DefaultBackground(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f),
-                )
-            }
+            Box(
+                modifier = Modifier
+            ) {
+                if (timeCapsule.medias.isNotEmpty()) {
+                    GlideImage(
+                        imageModel = timeCapsule.medias[0],
+                        previewPlaceholder = R.drawable.ic_launcher_background,
+                        error = painterResource(id = R.drawable.ic_launcher_background),
+                        modifier = modifier
+                            .aspectRatio(1f)
+                    )
+                } else {
+                    DefaultBackground(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f),
+                    )
+                }
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = colorResource(id = R.color.transparent_black))
-                ) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = colorResource(id = R.color.transparent_black))
+                    )
+                }
 
+                if (canOpen) {
+                    Text(
+                        fontSize = 18.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        text = "개봉 하기",
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .align(Alignment.Center)
+                    )
+                } else {
+                    Text(
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        text = "D - ${DateUtil.getDateGap(timeCapsule.openDate)}",
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .align(Alignment.TopCenter)
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_lock_white),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .width(40.dp)
+                            .height(40.dp)
+                            .align(Alignment.Center)
+                    )
+                }
+
+                if (timeCapsule.checkLocation) {
+                    Text(
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        text = timeCapsule.placeName,
+                        modifier = Modifier
+                            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                            .align(Alignment.BottomCenter)
+                    )
                 }
             }
-        }
-
-        if (canOpen) {
             Text(
-                fontSize = 18.sp,
-                color = Color.White,
+                textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
-                text = "개봉 하기",
+                text = if (timeCapsule.isReceived) {
+                    "친구"
+                } else {
+                    "나"
+                },
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color.White)
                     .padding(10.dp)
-                    .align(Alignment.Center)
-            )
-        } else {
-            Text(
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                text = "D - ${DateUtil.getDateGap(timeCapsule.openDate)}",
-                modifier = Modifier
-                    .padding(10.dp)
-                    .align(Alignment.TopCenter)
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.ic_lock_white),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(40.dp)
-                    .height(40.dp)
-                    .align(Alignment.Center)
-            )
-        }
-
-        if (timeCapsule.checkLocation) {
-            Text(
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                text = timeCapsule.placeName,
-                modifier = Modifier
-                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-                    .align(Alignment.BottomCenter)
             )
         }
     }
