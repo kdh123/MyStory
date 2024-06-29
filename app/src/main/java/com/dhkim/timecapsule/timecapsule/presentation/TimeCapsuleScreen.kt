@@ -15,8 +15,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -101,7 +103,8 @@ fun TimeCapsuleScreen(
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToNotification: () -> Unit,
     onNavigateToSetting: () -> Unit,
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    onNavigateToMore: () -> Unit
 ) {
     var currentLocation by remember {
         mutableStateOf(Constants.defaultLocation)
@@ -320,13 +323,42 @@ fun TimeCapsuleScreen(
                     }) {
                         when (it.type) {
                             TimeCapsuleType.Title -> {
-                                Text(
-                                    text = it.data as? String ?: "",
+                                val title = it.data as? String ?: ""
+                                Row(
                                     modifier = Modifier
-                                        .padding(horizontal = 20.dp),
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                        .padding(horizontal = 20.dp)
+                                ) {
+                                    Text(
+                                        text = it.data as? String ?: "",
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier
+                                            .width(0.dp)
+                                            .weight(1f)
+                                            .align(Alignment.CenterVertically)
+                                    )
+
+                                    if (title == "나의 이야기") {
+                                        val interactionSource = remember { MutableInteractionSource() }
+                                        Text(
+                                            text = "더보기",
+                                            modifier = Modifier
+                                                .align(Alignment.CenterVertically)
+                                                .border(
+                                                    color = colorResource(id = R.color.gray),
+                                                    width = 1.dp,
+                                                    shape = RoundedCornerShape(20.dp)
+                                                )
+                                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                                                .clickable(
+                                                    interactionSource = interactionSource,
+                                                    indication = null
+                                                ) {
+                                                    onNavigateToMore()
+                                                }
+                                        )
+                                    }
+                                }
                             }
 
                             TimeCapsuleType.SubTitle -> {
@@ -489,23 +521,23 @@ private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
         elevation = CardDefaults.cardElevation(10.dp),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 20.dp)
+            .padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
             .width(260.dp)
             .height(360.dp)
             .padding(bottom = 10.dp, end = 10.dp)
-            .clickable {
-                onNavigateToProfile()
-            }
     ) {
         Box {
             DefaultBackground(
                 modifier = Modifier
                     .fillMaxSize()
+                    .clickable {
+                        onNavigateToProfile()
+                    }
             ) {
                 Text(
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
+                    fontSize = 24.sp,
                     text = "친구 추가",
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -747,7 +779,8 @@ private fun TimeCapsuleScreenPreview() {
         onNavigateToDetail = { _, _ -> },
         onNavigateToNotification = { },
         onNavigateToSetting = { },
-        onNavigateToProfile = { }
+        onNavigateToProfile = { },
+        onNavigateToMore = { }
     )
 }
 
@@ -760,16 +793,18 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongCl
         modifier = Modifier
             .width(260.dp)
             .padding(bottom = 10.dp, end = 10.dp)
-            .combinedClickable(
-                onClick = {
-                    onClick(timeCapsule)
-                },
-                onLongClick = {
-                    onLongClick(timeCapsule)
-                }
-            )
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .combinedClickable(
+                    onClick = {
+                        onClick(timeCapsule)
+                    },
+                    onLongClick = {
+                        onLongClick(timeCapsule)
+                    }
+                )
+        ) {
             Box {
                 if (timeCapsule.medias.isNotEmpty()) {
                     GlideImage(
@@ -784,8 +819,7 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongCl
                     DefaultBackground(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(20.dp))
+                            .aspectRatio(0.8f)
                     ) {
                         Text(
                             color = Color.White,
@@ -868,26 +902,6 @@ private fun LockTimeCapsule(
         modifier = Modifier
             .width(165.dp)
             .padding(bottom = 10.dp, end = 10.dp)
-            .combinedClickable(
-                onClick = {
-                    if (canOpen) {
-                        if (checkLocation) {
-                            if (isNear) {
-                                onShowOpenDialog?.invoke(timeCapsule)
-                            } else {
-                                onShowLocationDialog?.invoke(timeCapsule)
-                            }
-                        } else {
-                            onShowOpenDialog?.invoke(timeCapsule)
-                        }
-                    } else {
-                        onClick?.invoke(timeCapsule)
-                    }
-                },
-                onLongClick = {
-                    onLongClick(timeCapsule)
-                }
-            )
     ) {
         val modifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Modifier
@@ -899,6 +913,26 @@ private fun LockTimeCapsule(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .combinedClickable(
+                    onClick = {
+                        if (canOpen) {
+                            if (checkLocation) {
+                                if (isNear) {
+                                    onShowOpenDialog?.invoke(timeCapsule)
+                                } else {
+                                    onShowLocationDialog?.invoke(timeCapsule)
+                                }
+                            } else {
+                                onShowOpenDialog?.invoke(timeCapsule)
+                            }
+                        } else {
+                            onClick?.invoke(timeCapsule)
+                        }
+                    },
+                    onLongClick = {
+                        onLongClick(timeCapsule)
+                    }
+                )
         ) {
             Box(
                 modifier = Modifier
@@ -999,80 +1033,4 @@ private fun LockTimeCapsulePreview() {
     LockTimeCapsule(timeCapsule = timeCapsule, onLongClick = {
 
     })
-}
-
-@Composable
-fun TimeCapsuleItem(timeCapsule: TimeCapsule) {
-    val leftTime = DateUtil.getDateGap(newDate = timeCapsule.openDate)
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-    ) {
-        Image(
-            painter = painterResource(id = R.mipmap.ic_box),
-            contentDescription = null,
-            modifier = Modifier.align(Alignment.CenterVertically)
-        )
-        Column(
-            modifier = Modifier
-                .width(0.dp)
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-                .padding(start = 5.dp)
-        ) {
-            if (leftTime <= 0) {
-                Text(
-                    text = "개봉 하기",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.primary)
-                )
-            } else {
-                Column {
-                    Row {
-                        Text(
-                            text = "${leftTime}일 ",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        if (timeCapsule.checkLocation && timeCapsule.address.isNotEmpty()) {
-                            Text(
-                                text = "후에 ${timeCapsule.address}에서 개봉할 수 있습니다",
-                                fontSize = 14.sp,
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .clickable {
-
-                                    }
-                            )
-                        } else {
-                            Text(
-                                text = "후에 개봉할 수 있습니다.",
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                            )
-                        }
-                    }
-                    if (timeCapsule.sharedFriends.isNotEmpty()) {
-                        val count = timeCapsule.sharedFriends.size
-                        val sharedText = if (count == 1) {
-                            "${timeCapsule.sharedFriends[0]}님에게 공유하였습니다."
-                        } else {
-                            "${timeCapsule.sharedFriends[0]}님 외 ${count - 1}명에게 공유하였습니다."
-                        }
-                        Text(
-                            text = sharedText,
-                            fontSize = 14.sp,
-                            modifier = Modifier
-                                .clickable {
-
-                                }
-                        )
-                    }
-                }
-            }
-        }
-    }
 }

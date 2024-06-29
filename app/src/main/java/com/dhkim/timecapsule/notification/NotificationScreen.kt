@@ -90,7 +90,6 @@ fun NotificationItem(
         Image(
             painter = painterResource(id = profileImage),
             contentDescription = null,
-            modifier = Modifier.align(Alignment.CenterVertically)
         )
         Column(
             modifier = Modifier

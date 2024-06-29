@@ -20,8 +20,11 @@ import com.dhkim.timecapsule.timecapsule.presentation.detail.ImageDetailScreen
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailSideEffect
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailViewModel
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleOpenScreen
+import com.dhkim.timecapsule.timecapsule.presentation.more.MoreTimeCapsuleScreen
+import com.dhkim.timecapsule.timecapsule.presentation.more.MoreTimeCapsuleViewModel
 
 const val IMAGE_DETAIL_ROUTE = "imageDetail"
+const val MORE_TIME_CAPSULE = "moreTimeCapsule"
 
 fun NavGraphBuilder.imageDetailNavigation() {
     composable("${IMAGE_DETAIL_ROUTE}/{currentIndex}/{images}") {
@@ -36,6 +39,26 @@ fun NavController.navigateToImageDetail(currentIndex: String, images: String) {
     navigate("$IMAGE_DETAIL_ROUTE/$currentIndex/$images")
 }
 
+fun NavController.navigateToMore() {
+    navigate(MORE_TIME_CAPSULE)
+}
+
+fun NavGraphBuilder.moreTimeCapsuleNavigation(
+    onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
+    onBack: () -> Unit
+) {
+    composable(MORE_TIME_CAPSULE) {
+        val viewModel = hiltViewModel<MoreTimeCapsuleViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        MoreTimeCapsuleScreen(
+            uiState = uiState,
+            onNavigateToDetail = onNavigateToDetail,
+            onBack = onBack
+        )
+    }
+}
+
 fun NavGraphBuilder.timeCapsuleNavigation(
     onNavigateToAdd: () -> Unit,
     onNavigateToOpen: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
@@ -43,6 +66,7 @@ fun NavGraphBuilder.timeCapsuleNavigation(
     onNavigateToNotification: () -> Unit,
     onNavigateToSetting: () -> Unit,
     onNavigateToProfile: () -> Unit,
+    onNavigateToMore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     composable(Screen.TimeCapsule.route) {
@@ -60,7 +84,8 @@ fun NavGraphBuilder.timeCapsuleNavigation(
             onNavigateToDetail = onNavigateToDetail,
             onNavigateToNotification = onNavigateToNotification,
             onNavigateToSetting = onNavigateToSetting,
-            onNavigateToProfile = onNavigateToProfile
+            onNavigateToProfile = onNavigateToProfile,
+            onNavigateToMore = onNavigateToMore
         )
     }
 }

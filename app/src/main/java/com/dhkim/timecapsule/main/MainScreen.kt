@@ -47,7 +47,9 @@ import com.dhkim.timecapsule.setting.presentation.navigation.navigateToSetting
 import com.dhkim.timecapsule.setting.presentation.navigation.settingNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.imageDetailNavigation
+import com.dhkim.timecapsule.timecapsule.presentation.navigation.moreTimeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.navigateToImageDetail
+import com.dhkim.timecapsule.timecapsule.presentation.navigation.navigateToMore
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleOpenNavigation
@@ -166,6 +168,14 @@ fun MainScreen(
                 }
             )
             imageDetailNavigation()
+            moreTimeCapsuleNavigation(
+                onNavigateToDetail = { id, isReceived ->
+                    navController.navigate("timeCapsuleDetail/$id/${isReceived}")
+                },
+                onBack = {
+                    navController.navigateUp()
+                }
+            )
             timeCapsuleOpenNavigation(
                 onNavigateToDetail = { id, isReceived ->
                     navController.navigate("timeCapsuleDetail/$id/${isReceived}") {
@@ -193,6 +203,9 @@ fun MainScreen(
                 },
                 onNavigateToProfile = {
                     navController.navigateToFriend()
+                },
+                onNavigateToMore = {
+                    navController.navigateToMore()
                 },
                 modifier = Modifier
                     .padding(
