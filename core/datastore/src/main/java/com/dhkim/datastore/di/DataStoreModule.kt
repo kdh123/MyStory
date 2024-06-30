@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.common.data.di
+package com.dhkim.datastore.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
