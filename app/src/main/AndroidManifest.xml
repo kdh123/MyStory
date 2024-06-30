@@ -42,7 +42,7 @@
         </provider>
 
         <service
-            android:name=".timecapsule.data.TimeCapsuleMessagingService"
+            android:name=".data.TimeCapsuleMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -65,7 +65,7 @@
             android:value="timeCapsule" />
 
         <activity
-            android:name=".onboarding.OnboardingActivity"
+            android:name="com.dhkim.onboarding.OnboardingActivity"
             android:label="@string/app_name"
             android:exported="true">
             <intent-filter>
@@ -80,7 +80,7 @@
             android:value="${NAVER_MAP_API_KEY}" />
 
         <activity
-            android:name=".main.MainActivity"
+            android:name="com.dhkim.main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.TimeCapsule">
         </activity>

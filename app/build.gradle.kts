@@ -79,18 +79,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:map"))
-    implementation(project(":feature:friend"))
-    implementation(project(":feature:location"))
-    implementation(project(":feature:setting"))
+    implementation(project(":feature:onboarding"))
     implementation(project(":core:common"))
-    implementation(project(":core:user"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:work"))
-    implementation(project(":core:datastore"))
-    implementation(project(":core:network"))
-    implementation(project(":core:database"))
-    implementation(project(":camera"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
