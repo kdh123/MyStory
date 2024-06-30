@@ -39,8 +39,8 @@ import com.dhkim.location.presentation.navigation.searchNavigation
 import com.dhkim.setting.presentation.navigation.navigateToSetting
 import com.dhkim.setting.presentation.navigation.settingNavigation
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.friend.presentation.navigation.friendNavigation
-import com.dhkim.timecapsule.friend.presentation.navigation.navigateToFriend
+import com.dhkim.friend.presentation.navigation.friendNavigation
+import com.dhkim.friend.presentation.navigation.navigateToFriend
 import com.dhkim.timecapsule.map.presentation.navigation.mapNavigation
 import com.dhkim.timecapsule.notification.navigation.navigateToNotification
 import com.dhkim.timecapsule.notification.navigation.notificationNavigation
@@ -261,5 +261,5 @@ sealed class Screen(
     data object Home : Screen("홈", R.drawable.ic_map_primary, R.drawable.ic_map_black, "home")
     data object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, "addTimeCapsule")
     data object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, "timeCapsule")
-    data object Friend : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, "profile")
+    data object Friend : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, "friend")
 }

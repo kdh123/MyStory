@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.friend.presentation
+package com.dhkim.friend.presentation
 
 import androidx.compose.runtime.Stable
 import com.dhkim.user.domain.User

@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.friend.presentation.navigation
+package com.dhkim.friend.presentation.navigation
 
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -7,13 +7,14 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.dhkim.timecapsule.main.Screen
-import com.dhkim.timecapsule.friend.presentation.ProfileScreen
-import com.dhkim.timecapsule.friend.presentation.FriendSideEffect
-import com.dhkim.timecapsule.friend.presentation.FriendViewModel
+import com.dhkim.friend.presentation.FriendSideEffect
+import com.dhkim.friend.presentation.FriendViewModel
+import com.dhkim.friend.presentation.ProfileScreen
+
+const val FRIEND_ROUTE = "friend"
 
 fun NavController.navigateToFriend() {
-    navigate(Screen.Friend.route) {
+    navigate(FRIEND_ROUTE) {
         popUpTo(graph.findStartDestination().id) {
             saveState = true
         }
@@ -25,7 +26,7 @@ fun NavController.navigateToFriend() {
 fun NavGraphBuilder.friendNavigation(
     onBack: () -> Unit
 ) {
-    composable(Screen.Friend.route) {
+    composable(FRIEND_ROUTE) {
         val viewModel = hiltViewModel<FriendViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = FriendSideEffect.None)

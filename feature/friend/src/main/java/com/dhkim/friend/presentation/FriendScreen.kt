@@ -1,6 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalFoundationApi::class)
 
-package com.dhkim.timecapsule.friend.presentation
+package com.dhkim.friend.presentation
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -63,10 +63,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.dhkim.timecapsule.R
+import com.dhkim.common.profileImage
+import com.dhkim.friend.R
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.WarningDialog
-import com.dhkim.common.profileImage
 import com.dhkim.user.domain.Friend
 import kotlinx.coroutines.launch
 
@@ -190,7 +190,6 @@ fun ProfileScreen(
             },
             dialogTitle = "삭제",
             dialogText = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedUserId}님을 정말 삭제하시겠습니까?",
-            iconResId = R.drawable.ic_warning_yellow
         )
     }
 
@@ -250,7 +249,7 @@ fun ProfileScreen(
                 )
             }
         }
-    ) { innerPadding ->
+    ) {
         Column(modifier = Modifier.fillMaxSize()) {
             TabRow(
                 selectedTabIndex = currentTab,
@@ -675,7 +674,6 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FriendItem(userId: String, profileImage: Int, isMe: Boolean = false, onLongClick: (userId: String) -> Unit) {
     Box(

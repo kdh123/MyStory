@@ -41,20 +41,20 @@ dataStore = "1.0.0"
 fcm = "23.2.1"
 composeAnimation = "1.6.0"
 jodaTime = "2.12.7"
-cloudy = "0.1.2"
 workManager = "2.7.1"
 hiltWorkManager = "1.0.0"
 hiltCompiler = "1.0.0"
 jetbrainsKotlinJvm = "1.9.0"
 gson = "2.8.6"
+composeFoundation = "1.7.0-alpha02"
 
 [libraries]
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWorkManager" }
 androidx-work = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
-blur-cloudy = { module = "com.github.skydoves:cloudy", version.ref = "cloudy" }
 android-joda = { module = "net.danlew:android.joda", version.ref = "jodaTime" }
 
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "composeFoundation" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test", version.ref = "composeTest" }
 androidx-compose-animation = { module = "androidx.compose.animation:animation-core", version.ref = "composeAnimation" }
@@ -141,7 +141,8 @@ androidx-compose-main = [
     "androidx-ui-graphics",
     "androidx-ui-tooling-preview",
     "androidx-ui-tooling",
-    "androidx-material3"
+    "androidx-material3",
+    "androidx-compose-foundation"
 ]
 
 android-ui-test = [

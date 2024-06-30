@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.friend.presentation
+package com.dhkim.friend.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
