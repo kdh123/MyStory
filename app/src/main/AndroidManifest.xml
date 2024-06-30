@@ -42,7 +42,7 @@
         </provider>
 
         <service
-            android:name=".data.TimeCapsuleMessagingService"
+            android:name="com.dhkim.main.TimeCapsuleMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

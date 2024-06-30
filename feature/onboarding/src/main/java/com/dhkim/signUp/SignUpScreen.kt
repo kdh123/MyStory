@@ -137,7 +137,7 @@ fun SignUpScreen(
 
             Text(
                 fontSize = 18.sp,
-                text = "아이디를 입력하세요",
+                text = "닉네임을 입력하세요",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 30.dp, bottom = 10.dp)

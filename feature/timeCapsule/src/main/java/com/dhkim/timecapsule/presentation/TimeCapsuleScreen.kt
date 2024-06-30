@@ -945,19 +945,19 @@ private fun LockTimeCapsule(
                         modifier = modifier
                             .aspectRatio(1f)
                     )
+
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                        Box(
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .background(color = colorResource(id = R.color.transparent_black))
+                        )
+                    }
                 } else {
                     DefaultBackground(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f),
-                    )
-                }
-
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = colorResource(id = R.color.transparent_black))
                     )
                 }
 

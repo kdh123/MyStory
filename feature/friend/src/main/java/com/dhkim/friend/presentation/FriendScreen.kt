@@ -386,7 +386,7 @@ fun BottomSheetScreen(
                     singleLine = true,
                     value = uiState.searchResult.query,
                     label = {
-                        Text(text = "아이디 검색")
+                        Text(text = "닉네임 검색")
                     },
                     onValueChange = {
                         onQuery(it)

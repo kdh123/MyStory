@@ -65,7 +65,7 @@ class SignUpViewModel @Inject constructor(
 
             when {
                 userId.isEmpty() || userId.isBlank() -> {
-                    _uiState.value = _uiState.value.copy(errorMessage = "아이디를 입력하세요.")
+                    _uiState.value = _uiState.value.copy(errorMessage = "닉네임을 입력하세요.")
                 }
 
                 containSpace(userId) -> {
@@ -77,7 +77,7 @@ class SignUpViewModel @Inject constructor(
                 }
 
                 userId.length < 6 -> {
-                    _uiState.value = _uiState.value.copy(errorMessage = "최소 6자리 이상의 아이디를 입력해주세요.")
+                    _uiState.value = _uiState.value.copy(errorMessage = "최소 6자리 이상의 닉네임 입력해주세요.")
                 }
 
                 else -> {
@@ -90,7 +90,7 @@ class SignUpViewModel @Inject constructor(
                             is CommonResult.Success -> {
                                 val user = result.data
                                 if (user != null) {
-                                    _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = "이미 존재하는 아이디입니다.")
+                                    _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = "이미 존재하는 닉네임입니다.")
                                     flowOf(false)
                                 } else {
                                     flowOf(userRepository.signUp(userId = query, profileImage = "$profileImage", fcmToken = fcmToken))
