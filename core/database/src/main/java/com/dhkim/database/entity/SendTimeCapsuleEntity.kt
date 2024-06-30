@@ -1,9 +1,8 @@
-package com.dhkim.timecapsule.timecapsule.data.dataSource.local
+package com.dhkim.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
 
 @Entity(tableName = "sendTimeCapsule")
 data class SendTimeCapsuleEntity(
@@ -17,10 +16,4 @@ data class SendTimeCapsuleEntity(
     @ColumnInfo(name = "content") val content: String,
     @ColumnInfo(name = "checkLocation") val checkLocation: Boolean,
     @ColumnInfo(name = "isChecked") val isChecked: Boolean
-) {
-    fun toSenderTimeCapsule(): SendTimeCapsule {
-        return SendTimeCapsule(
-            id, date, openDate, receiver, lat, lng, address, content, checkLocation, isChecked
-        )
-    }
-}
+)

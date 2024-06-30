@@ -1,8 +1,8 @@
-package com.dhkim.timecapsule.common.data.di
+package com.dhkim.database.di
 
 import android.content.Context
 import androidx.room.Room
-import com.dhkim.timecapsule.common.data.room.AppDatabase
+import com.dhkim.database.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,10 +16,10 @@ object RoomModule {
 
     @Provides
     @Singleton
-    fun roomBuilder(@ApplicationContext context: Context): AppDatabase {
+    fun roomBuilder(@ApplicationContext context: Context): com.dhkim.database.AppDatabase {
         return Room.databaseBuilder(
             context,
-            AppDatabase::class.java, "timeCapsule"
+            com.dhkim.database.AppDatabase::class.java, "timeCapsule"
         ).build()
     }
 }

@@ -3,13 +3,16 @@ package com.dhkim.timecapsule.timecapsule.data.repository
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.common.CommonResult
 import com.dhkim.timecapsule.user.domain.UserRepository
-import com.dhkim.timecapsule.timecapsule.data.dataSource.local.MyTimeCapsuleEntity
-import com.dhkim.timecapsule.timecapsule.data.dataSource.local.ReceivedTimeCapsuleEntity
-import com.dhkim.timecapsule.timecapsule.data.dataSource.local.SendTimeCapsuleEntity
+import com.dhkim.database.entity.MyTimeCapsuleEntity
+import com.dhkim.database.entity.ReceivedTimeCapsuleEntity
+import com.dhkim.database.entity.SendTimeCapsuleEntity
 import com.dhkim.timecapsule.timecapsule.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.TimeCapsuleRemoteDataSource
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.Uuid
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.isSuccessful
+import com.dhkim.timecapsule.timecapsule.data.dataSource.toMyTimeCapsule
+import com.dhkim.timecapsule.timecapsule.data.dataSource.toReceivedTimeCapsule
+import com.dhkim.timecapsule.timecapsule.data.dataSource.toSenderTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule
@@ -88,7 +91,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
 
     override suspend fun saveMyTimeCapsule(timeCapsule: MyTimeCapsule) {
         val entity = timeCapsule.run {
-            MyTimeCapsuleEntity(
+            com.dhkim.database.entity.MyTimeCapsuleEntity(
                 id, date, openDate, lat, lng, placeName, address, content, medias, checkLocation, isOpened, sharedFriends
             )
         }
@@ -98,7 +101,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
 
     override suspend fun editMyTimeCapsule(timeCapsule: MyTimeCapsule) {
         val entity = timeCapsule.run {
-            MyTimeCapsuleEntity(
+            com.dhkim.database.entity.MyTimeCapsuleEntity(
                 id, date, openDate, lat, lng, placeName, address, content, medias, checkLocation, isOpened, sharedFriends
             )
         }
@@ -132,7 +135,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
 
     override suspend fun saveSendTimeCapsule(timeCapsule: SendTimeCapsule) {
         val entity = timeCapsule.run {
-            SendTimeCapsuleEntity(
+            com.dhkim.database.entity.SendTimeCapsuleEntity(
                 id, date, openDate, sharedFriends, lat, lng, address, content, checkLocation, isChecked
             )
         }
@@ -142,7 +145,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
 
     override suspend fun editSendTimeCapsule(timeCapsule: SendTimeCapsule) {
         val entity = timeCapsule.run {
-            SendTimeCapsuleEntity(
+            com.dhkim.database.entity.SendTimeCapsuleEntity(
                 id, date, openDate, sharedFriends, lat, lng, address, content, checkLocation, isChecked
             )
         }
@@ -176,7 +179,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
 
     override suspend fun saveReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsule) {
         val entity = timeCapsule.run {
-            ReceivedTimeCapsuleEntity(
+            com.dhkim.database.entity.ReceivedTimeCapsuleEntity(
                 id, date, openDate, sender, profileImage, lat, lng, placeName, address, content, checkLocation, isOpened
             )
         }
@@ -186,7 +189,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
 
     override suspend fun updateReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsule) {
         val entity = timeCapsule.run {
-            ReceivedTimeCapsuleEntity(
+            com.dhkim.database.entity.ReceivedTimeCapsuleEntity(
                 id, date, openDate, sender, profileImage, lat, lng, placeName, address, content, checkLocation, isOpened
             )
         }

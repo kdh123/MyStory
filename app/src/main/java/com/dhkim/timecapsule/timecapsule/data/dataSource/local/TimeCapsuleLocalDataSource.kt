@@ -1,6 +1,6 @@
 package com.dhkim.timecapsule.timecapsule.data.dataSource.local
 
-import com.dhkim.timecapsule.common.data.room.AppDatabase
+import com.dhkim.database.AppDatabase
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -12,23 +12,23 @@ class TimeCapsuleLocalDataSource @Inject constructor(
     private val sendTimeCapsuleService = db.sendTimeCapsuleDao()
     private val receivedTimeCapsuleService = db.receivedTimeCapsuleDao()
 
-    suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsuleEntity>?> {
+    suspend fun getMyAllTimeCapsule(): Flow<List<com.dhkim.database.entity.MyTimeCapsuleEntity>?> {
         return myTimeCapsuleService.getAllTimeCapsule()
     }
 
-    fun getMyTimeCapsule(id: String): MyTimeCapsuleEntity? {
+    fun getMyTimeCapsule(id: String): com.dhkim.database.entity.MyTimeCapsuleEntity? {
         return myTimeCapsuleService.getTimeCapsule(id)
     }
 
-    fun getMyTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<MyTimeCapsuleEntity>?> {
+    fun getMyTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<com.dhkim.database.entity.MyTimeCapsuleEntity>?> {
         return myTimeCapsuleService.getTimeCapsulesInDate(startDate, endDate)
     }
 
-    fun saveMyTimeCapsule(timeCapsule: MyTimeCapsuleEntity) {
+    fun saveMyTimeCapsule(timeCapsule: com.dhkim.database.entity.MyTimeCapsuleEntity) {
         return myTimeCapsuleService.saveTimeCapsule(timeCapsule)
     }
 
-    fun updateMyTimeCapsule(timeCapsule: MyTimeCapsuleEntity) {
+    fun updateMyTimeCapsule(timeCapsule: com.dhkim.database.entity.MyTimeCapsuleEntity) {
         myTimeCapsuleService.updateTimeCapsule(timeCapsule)
     }
 
@@ -38,23 +38,23 @@ class TimeCapsuleLocalDataSource @Inject constructor(
 
 
 
-    fun getSendAllTimeCapsule(): Flow<List<SendTimeCapsuleEntity>?> {
+    fun getSendAllTimeCapsule(): Flow<List<com.dhkim.database.entity.SendTimeCapsuleEntity>?> {
         return sendTimeCapsuleService.getAllTimeCapsule()
     }
 
-    fun getSendTimeCapsule(id: String): SendTimeCapsuleEntity? {
+    fun getSendTimeCapsule(id: String): com.dhkim.database.entity.SendTimeCapsuleEntity? {
         return sendTimeCapsuleService.getTimeCapsule(id)
     }
 
-    fun getSendTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<SendTimeCapsuleEntity>?> {
+    fun getSendTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<com.dhkim.database.entity.SendTimeCapsuleEntity>?> {
         return sendTimeCapsuleService.getTimeCapsulesInDate(startDate, endDate)
     }
 
-    fun saveSendTimeCapsule(timeCapsule: SendTimeCapsuleEntity) {
+    fun saveSendTimeCapsule(timeCapsule: com.dhkim.database.entity.SendTimeCapsuleEntity) {
         return sendTimeCapsuleService.saveTimeCapsule(timeCapsule)
     }
 
-    fun updateSendTimeCapsule(timeCapsule: SendTimeCapsuleEntity) {
+    fun updateSendTimeCapsule(timeCapsule: com.dhkim.database.entity.SendTimeCapsuleEntity) {
         sendTimeCapsuleService.updateTimeCapsule(timeCapsule)
     }
 
@@ -63,23 +63,23 @@ class TimeCapsuleLocalDataSource @Inject constructor(
     }
 
 
-    fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsuleEntity>?> {
+    fun getReceivedAllTimeCapsule(): Flow<List<com.dhkim.database.entity.ReceivedTimeCapsuleEntity>?> {
         return receivedTimeCapsuleService.getAllTimeCapsule()
     }
 
-    fun getReceivedTimeCapsule(id: String): ReceivedTimeCapsuleEntity? {
+    fun getReceivedTimeCapsule(id: String): com.dhkim.database.entity.ReceivedTimeCapsuleEntity? {
         return receivedTimeCapsuleService.getTimeCapsule(id)
     }
 
-    fun getReceivedTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<ReceivedTimeCapsuleEntity>?> {
+    fun getReceivedTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<com.dhkim.database.entity.ReceivedTimeCapsuleEntity>?> {
         return receivedTimeCapsuleService.getTimeCapsulesInDate(startDate, endDate)
     }
 
-    fun saveReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsuleEntity) {
+    fun saveReceivedTimeCapsule(timeCapsule: com.dhkim.database.entity.ReceivedTimeCapsuleEntity) {
         return receivedTimeCapsuleService.saveTimeCapsule(timeCapsule)
     }
 
-    fun updateReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsuleEntity) {
+    fun updateReceivedTimeCapsule(timeCapsule: com.dhkim.database.entity.ReceivedTimeCapsuleEntity) {
         receivedTimeCapsuleService.updateTimeCapsule(timeCapsule)
     }
 

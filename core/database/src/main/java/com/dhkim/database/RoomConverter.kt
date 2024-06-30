@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.common.data.room
+package com.dhkim.database
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

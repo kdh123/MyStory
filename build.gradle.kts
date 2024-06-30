@@ -7,4 +7,5 @@ plugins {
     alias(libs.plugins.parcelize) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.google.service) apply false
+    alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 }

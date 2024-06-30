@@ -45,7 +45,8 @@ cloudy = "0.1.2"
 workManager = "2.7.1"
 hiltWorkManager = "1.0.0"
 hiltCompiler = "1.0.0"
-
+jetbrainsKotlinJvm = "1.9.0"
+gson = "2.8.6"
 
 [libraries]
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
@@ -54,7 +55,7 @@ androidx-work = { module = "androidx.work:work-runtime-ktx", version.ref = "work
 blur-cloudy = { module = "com.github.skydoves:cloudy", version.ref = "cloudy" }
 android-joda = { module = "net.danlew:android.joda", version.ref = "jodaTime" }
 
-
+google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test", version.ref = "composeTest" }
 androidx-compose-animation = { module = "androidx.compose.animation:animation-core", version.ref = "composeAnimation" }
 google-firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "fcm" }
@@ -210,4 +211,5 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 google-service = { id = "com.google.gms.google-services", version.ref = "googleService" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 

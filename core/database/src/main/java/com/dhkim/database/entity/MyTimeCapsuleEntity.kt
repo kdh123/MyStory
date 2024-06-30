@@ -1,9 +1,8 @@
-package com.dhkim.timecapsule.timecapsule.data.dataSource.local
+package com.dhkim.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 
 @Entity(tableName = "myTimeCapsule")
 data class MyTimeCapsuleEntity(
@@ -19,10 +18,4 @@ data class MyTimeCapsuleEntity(
     @ColumnInfo(name = "checkLocation") val checkLocation: Boolean,
     @ColumnInfo(name = "isOpened") val isOpened: Boolean,
     @ColumnInfo(name = "sharedFriends") val sharedFriends: List<String>
-) {
-    fun toMyTimeCapsule(): MyTimeCapsule {
-        return MyTimeCapsule(
-            id, date, openDate, lat, lng, placeName, address, content, medias, checkLocation, isOpened, sharedFriends
-        )
-    }
-}
+)

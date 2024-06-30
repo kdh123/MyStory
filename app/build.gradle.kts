@@ -79,6 +79,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:database"))
     implementation(project(":camera"))
 
     implementation(libs.androidx.core.ktx)
