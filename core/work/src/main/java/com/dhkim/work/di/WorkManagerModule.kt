@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.common.data.di
+package com.dhkim.work.di
 
 import android.content.Context
 import androidx.work.WorkManager

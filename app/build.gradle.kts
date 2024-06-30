@@ -79,6 +79,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:work"))
     implementation(project(":core:datastore"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
