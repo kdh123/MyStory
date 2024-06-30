@@ -3,8 +3,7 @@ package com.dhkim.timecapsule.location.data.dataSource.remote
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.network.di.RetrofitModule
+import com.dhkim.common.CommonResult
 import com.dhkim.timecapsule.location.domain.Category
 import com.dhkim.timecapsule.location.domain.Address
 import com.dhkim.timecapsule.location.domain.Place

@@ -46,9 +46,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.ui.WarningDialog
-import com.dhkim.timecapsule.common.presentation.profileImage
-import com.dhkim.timecapsule.common.ui.DefaultBackground
+import com.dhkim.ui.WarningDialog
+import com.dhkim.common.profileImage
+import com.dhkim.ui.DefaultBackground
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsule
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition

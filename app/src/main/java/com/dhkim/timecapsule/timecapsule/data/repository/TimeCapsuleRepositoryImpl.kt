@@ -1,11 +1,8 @@
 package com.dhkim.timecapsule.timecapsule.data.repository
 
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.CommonResult
+import com.dhkim.common.CommonResult
 import com.dhkim.timecapsule.user.domain.UserRepository
-import com.dhkim.database.entity.MyTimeCapsuleEntity
-import com.dhkim.database.entity.ReceivedTimeCapsuleEntity
-import com.dhkim.database.entity.SendTimeCapsuleEntity
 import com.dhkim.timecapsule.timecapsule.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.TimeCapsuleRemoteDataSource
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.Uuid

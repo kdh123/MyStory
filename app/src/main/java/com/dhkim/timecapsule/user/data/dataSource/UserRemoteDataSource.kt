@@ -1,7 +1,7 @@
 package com.dhkim.timecapsule.user.data.dataSource
 
 import android.util.Log
-import com.dhkim.timecapsule.common.CommonResult
+import com.dhkim.common.CommonResult
 import com.dhkim.network.di.FirebaseModule
 import com.dhkim.timecapsule.user.domain.Friend
 import com.dhkim.timecapsule.user.domain.User

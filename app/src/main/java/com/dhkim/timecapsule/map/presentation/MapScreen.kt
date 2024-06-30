@@ -68,8 +68,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.Constants
-import com.dhkim.timecapsule.common.ui.LoadingProgressBar
+import com.dhkim.common.Constants
+import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.timecapsule.location.domain.Category
 import com.dhkim.timecapsule.location.domain.Place
 import com.google.accompanist.permissions.ExperimentalPermissionsApi

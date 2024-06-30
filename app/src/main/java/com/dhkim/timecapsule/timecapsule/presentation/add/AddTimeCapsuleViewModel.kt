@@ -5,8 +5,8 @@ package com.dhkim.timecapsule.timecapsule.presentation.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.timecapsule.common.DateUtil
+import com.dhkim.common.CommonResult
+import com.dhkim.common.DateUtil
 import com.dhkim.timecapsule.user.domain.UserId
 import com.dhkim.timecapsule.user.domain.UserRepository
 import com.dhkim.timecapsule.location.domain.Place

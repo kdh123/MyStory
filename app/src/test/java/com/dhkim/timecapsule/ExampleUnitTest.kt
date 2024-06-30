@@ -1,11 +1,8 @@
 package com.dhkim.timecapsule
 
-import com.dhkim.timecapsule.common.DateUtil
-import com.dhkim.timecapsule.common.presentation.DistanceManager
+import com.dhkim.common.DateUtil
+import com.dhkim.common.DistanceManager
 import org.junit.Test
-
-import org.junit.Assert.*
-import kotlin.random.Random
 
 /**
  * Example local unit test, which will execute on the development machine (host).

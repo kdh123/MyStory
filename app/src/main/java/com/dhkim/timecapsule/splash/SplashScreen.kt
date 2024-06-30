@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dhkim.timecapsule.main.MainActivity
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.ui.DefaultBackground
+import com.dhkim.ui.DefaultBackground
 import kotlinx.coroutines.delay
 
 @Composable

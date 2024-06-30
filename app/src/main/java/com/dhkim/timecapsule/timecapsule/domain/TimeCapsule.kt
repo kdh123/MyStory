@@ -1,6 +1,6 @@
 package com.dhkim.timecapsule.timecapsule.domain
 
-import com.dhkim.timecapsule.common.Constants
+import com.dhkim.common.Constants
 
 data class Host(
     val id: String = "",

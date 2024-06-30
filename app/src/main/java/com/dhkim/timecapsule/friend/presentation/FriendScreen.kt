@@ -64,9 +64,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.common.ui.LoadingProgressBar
-import com.dhkim.timecapsule.common.ui.WarningDialog
-import com.dhkim.timecapsule.common.presentation.profileImage
+import com.dhkim.ui.LoadingProgressBar
+import com.dhkim.ui.WarningDialog
+import com.dhkim.common.profileImage
 import com.dhkim.timecapsule.user.domain.Friend
 import kotlinx.coroutines.launch
 

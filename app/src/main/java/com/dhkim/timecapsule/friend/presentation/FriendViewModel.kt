@@ -2,8 +2,8 @@ package com.dhkim.timecapsule.friend.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.timecapsule.common.presentation.profileImage
+import com.dhkim.common.CommonResult
+import com.dhkim.common.profileImage
 import com.dhkim.timecapsule.user.domain.Friend
 import com.dhkim.timecapsule.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

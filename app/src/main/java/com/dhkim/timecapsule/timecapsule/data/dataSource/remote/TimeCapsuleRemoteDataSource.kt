@@ -1,7 +1,6 @@
 package com.dhkim.timecapsule.timecapsule.data.dataSource.remote
 
-import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.network.di.RetrofitModule
+import com.dhkim.common.CommonResult
 import com.google.gson.Gson
 import retrofit2.HttpException
 import retrofit2.Retrofit

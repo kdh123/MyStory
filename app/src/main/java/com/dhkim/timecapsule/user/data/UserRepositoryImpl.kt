@@ -1,7 +1,7 @@
 package com.dhkim.timecapsule.user.data
 
-import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.timecapsule.common.presentation.profileImage
+import com.dhkim.common.CommonResult
+import com.dhkim.common.profileImage
 import com.dhkim.timecapsule.user.data.dataSource.UserLocalDataSource
 import com.dhkim.timecapsule.user.data.dataSource.UserRemoteDataSource
 import com.dhkim.timecapsule.user.data.dataSource.isSuccessful

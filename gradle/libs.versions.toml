@@ -135,6 +135,26 @@ firebase = [
     "google-firebase-messaging-ktx"
 ]
 
+androidx-compose-main = [
+    "androidx-activity-compose",
+    "androidx-ui",
+    "androidx-ui-graphics",
+    "androidx-ui-tooling-preview",
+    "androidx-ui-tooling",
+    "androidx-material3"
+]
+
+android-ui-test = [
+    "androidx-junit",
+    "androidx-espresso-core",
+    "androidx-ui-test-junit4"
+]
+
+debug-ui-test = [
+    "androidx-ui-tooling",
+    "androidx-ui-test-manifest"
+]
+
 androidx-compose-side = [
     "compose-glide",
     "androidx-lifecycle-compose",
@@ -142,16 +162,6 @@ androidx-compose-side = [
     "compose-navigation",
     "compose-hilt-navigation",
     "androidx-compose-material"
-]
-
-test-junit = [
-    "androidx-ui-test-junit4"
-]
-
-test-ui = [
-    "androidx-espresso-core",
-    "androidx-ui-test-manifest",
-    "androidx-compose-ui-test"
 ]
 
 google-location = [
