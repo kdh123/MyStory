@@ -1,10 +1,10 @@
-package com.dhkim.timecapsule.user.data.dataSource
+package com.dhkim.user.data.dataSource
 
 import android.util.Log
 import com.dhkim.common.CommonResult
 import com.dhkim.network.di.FirebaseModule
-import com.dhkim.timecapsule.user.domain.Friend
-import com.dhkim.timecapsule.user.domain.User
+import com.dhkim.user.domain.Friend
+import com.dhkim.user.domain.User
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference

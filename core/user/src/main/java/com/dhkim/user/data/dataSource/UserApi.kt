@@ -1,6 +1,6 @@
-package com.dhkim.timecapsule.user.data.dataSource
+package com.dhkim.user.data.dataSource
 
-import com.dhkim.timecapsule.BuildConfig
+import com.dhkim.network.BuildConfig
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded

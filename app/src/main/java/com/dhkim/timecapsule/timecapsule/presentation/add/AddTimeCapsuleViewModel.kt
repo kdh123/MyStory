@@ -12,8 +12,8 @@ import com.dhkim.location.domain.Place
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SharedFriend
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
-import com.dhkim.timecapsule.user.domain.UserId
-import com.dhkim.timecapsule.user.domain.UserRepository
+import com.dhkim.user.domain.UserId
+import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

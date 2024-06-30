@@ -67,7 +67,7 @@ import com.dhkim.timecapsule.R
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.WarningDialog
 import com.dhkim.common.profileImage
-import com.dhkim.timecapsule.user.domain.Friend
+import com.dhkim.user.domain.Friend
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

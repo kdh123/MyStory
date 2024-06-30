@@ -82,6 +82,7 @@ dependencies {
     implementation(project(":feature:location"))
     implementation(project(":feature:setting"))
     implementation(project(":core:common"))
+    implementation(project(":core:user"))
     implementation(project(":core:ui"))
     implementation(project(":core:work"))
     implementation(project(":core:datastore"))

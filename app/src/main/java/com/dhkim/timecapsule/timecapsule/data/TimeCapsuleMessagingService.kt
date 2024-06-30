@@ -6,7 +6,7 @@ import android.util.Log
 import com.dhkim.common.DateUtil
 import com.dhkim.common.NotificationManager
 import com.dhkim.timecapsule.onboarding.OnboardingActivity
-import com.dhkim.timecapsule.user.domain.UserRepository
+import com.dhkim.user.domain.UserRepository
 import com.dhkim.setting.domain.SettingRepository
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.DeleteTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule

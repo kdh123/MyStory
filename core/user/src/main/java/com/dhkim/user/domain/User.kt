@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.user.domain
+package com.dhkim.user.domain
 
 typealias UserId = String
 

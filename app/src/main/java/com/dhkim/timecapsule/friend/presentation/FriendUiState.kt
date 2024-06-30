@@ -1,7 +1,7 @@
 package com.dhkim.timecapsule.friend.presentation
 
 import androidx.compose.runtime.Stable
-import com.dhkim.timecapsule.user.domain.User
+import com.dhkim.user.domain.User
 
 @Stable
 data class ProfileUiState(

@@ -2,7 +2,7 @@ package com.dhkim.timecapsule.timecapsule.data.repository
 
 import com.dhkim.timecapsule.R
 import com.dhkim.common.CommonResult
-import com.dhkim.timecapsule.user.domain.UserRepository
+import com.dhkim.user.domain.UserRepository
 import com.dhkim.timecapsule.timecapsule.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.TimeCapsuleRemoteDataSource
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.Uuid

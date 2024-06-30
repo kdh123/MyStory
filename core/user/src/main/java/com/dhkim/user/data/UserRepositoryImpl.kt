@@ -1,12 +1,12 @@
-package com.dhkim.timecapsule.user.data
+package com.dhkim.user.data
 
 import com.dhkim.common.CommonResult
 import com.dhkim.common.profileImage
-import com.dhkim.timecapsule.user.data.dataSource.UserLocalDataSource
-import com.dhkim.timecapsule.user.data.dataSource.UserRemoteDataSource
-import com.dhkim.timecapsule.user.data.dataSource.isSuccessful
-import com.dhkim.timecapsule.user.domain.User
-import com.dhkim.timecapsule.user.domain.UserRepository
+import com.dhkim.user.data.dataSource.UserLocalDataSource
+import com.dhkim.user.data.dataSource.UserRemoteDataSource
+import com.dhkim.user.data.dataSource.isSuccessful
+import com.dhkim.user.domain.User
+import com.dhkim.user.domain.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull

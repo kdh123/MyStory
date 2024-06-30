@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.CommonResult
 import com.dhkim.common.profileImage
-import com.dhkim.timecapsule.user.domain.Friend
-import com.dhkim.timecapsule.user.domain.UserRepository
+import com.dhkim.user.domain.Friend
+import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

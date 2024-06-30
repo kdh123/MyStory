@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.dhkim.timecapsule.user.domain.UserRepository
+import com.dhkim.user.domain.UserRepository
 import com.dhkim.setting.domain.SettingRepository
 import com.dhkim.timecapsule.timecapsule.data.work.CheckOpenableTimeCapsuleWorker
 import dagger.hilt.android.lifecycle.HiltViewModel

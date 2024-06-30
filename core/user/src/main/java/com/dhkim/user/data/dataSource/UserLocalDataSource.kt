@@ -1,11 +1,11 @@
-package com.dhkim.timecapsule.user.data.dataSource
+package com.dhkim.user.data.dataSource
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.dhkim.timecapsule.R
+import com.dhkim.user.R
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
