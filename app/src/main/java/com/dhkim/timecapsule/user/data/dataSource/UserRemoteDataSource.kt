@@ -2,8 +2,7 @@ package com.dhkim.timecapsule.user.data.dataSource
 
 import android.util.Log
 import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.timecapsule.common.data.di.RetrofitModule
-import com.dhkim.timecapsule.common.data.di.FirebaseModule
+import com.dhkim.network.di.FirebaseModule
 import com.dhkim.timecapsule.user.domain.Friend
 import com.dhkim.timecapsule.user.domain.User
 import com.google.firebase.database.DataSnapshot
@@ -21,7 +20,7 @@ import javax.inject.Inject
 typealias isSuccessful = Boolean
 
 class UserRemoteDataSource @Inject constructor(
-    @RetrofitModule.KakaoPush private val pushApi: Retrofit,
+    @com.dhkim.network.di.RetrofitModule.KakaoPush private val pushApi: Retrofit,
     @FirebaseModule.FirebaseDatabase private val database: DatabaseReference,
     @FirebaseModule.UserFirebaseDatabase private val userDatabase: DatabaseReference
 ) {

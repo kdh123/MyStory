@@ -1,7 +1,7 @@
 package com.dhkim.timecapsule.timecapsule.data.dataSource.remote
 
 import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.timecapsule.common.data.di.RetrofitModule
+import com.dhkim.network.di.RetrofitModule
 import com.google.gson.Gson
 import retrofit2.HttpException
 import retrofit2.Retrofit
@@ -11,8 +11,8 @@ typealias isSuccessful = Boolean
 typealias Uuid = String
 
 class TimeCapsuleRemoteDataSource @Inject constructor(
-    @RetrofitModule.Fcm private val api: Retrofit,
-    @RetrofitModule.KakaoPush private val pushApi: Retrofit
+    @com.dhkim.network.di.RetrofitModule.Fcm private val api: Retrofit,
+    @com.dhkim.network.di.RetrofitModule.KakaoPush private val pushApi: Retrofit
 ) {
 
     private val pushService = pushApi.create(TimeCapsuleApi::class.java)

@@ -1,6 +1,6 @@
-package com.dhkim.timecapsule.common.data.di
+package com.dhkim.network.di
 
-import com.dhkim.timecapsule.BuildConfig
+import com.dhkim.network.BuildConfig
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module

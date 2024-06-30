@@ -4,7 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.dhkim.timecapsule.common.CommonResult
-import com.dhkim.timecapsule.common.data.di.RetrofitModule
+import com.dhkim.network.di.RetrofitModule
 import com.dhkim.timecapsule.location.domain.Category
 import com.dhkim.timecapsule.location.domain.Address
 import com.dhkim.timecapsule.location.domain.Place
@@ -14,7 +14,7 @@ import retrofit2.Retrofit
 import javax.inject.Inject
 
 class LocationRemoteDataSource @Inject constructor(
-    @RetrofitModule.KakaoLocal private val api: Retrofit
+    @com.dhkim.network.di.RetrofitModule.KakaoLocal private val api: Retrofit
 ) {
     private val service = api.create(LocationApi::class.java)
 
