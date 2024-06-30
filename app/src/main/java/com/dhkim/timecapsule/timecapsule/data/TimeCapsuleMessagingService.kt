@@ -7,7 +7,7 @@ import com.dhkim.common.DateUtil
 import com.dhkim.common.NotificationManager
 import com.dhkim.timecapsule.onboarding.OnboardingActivity
 import com.dhkim.timecapsule.user.domain.UserRepository
-import com.dhkim.timecapsule.setting.domain.SettingRepository
+import com.dhkim.setting.domain.SettingRepository
 import com.dhkim.timecapsule.timecapsule.data.dataSource.remote.DeleteTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.ReceivedTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SharedTimeCapsule
@@ -33,7 +33,7 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
     lateinit var timeCapsuleRepository: TimeCapsuleRepository
 
     @Inject
-    lateinit var settingRepository: SettingRepository
+    lateinit var settingRepository: com.dhkim.setting.domain.SettingRepository
 
     @Inject
     lateinit var notificationManager: NotificationManager

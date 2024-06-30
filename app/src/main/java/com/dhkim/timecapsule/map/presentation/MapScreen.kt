@@ -67,11 +67,11 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.dhkim.timecapsule.R
 import com.dhkim.common.Constants
+import com.dhkim.location.domain.Category
+import com.dhkim.location.domain.Place
+import com.dhkim.timecapsule.R
 import com.dhkim.ui.LoadingProgressBar
-import com.dhkim.timecapsule.location.domain.Category
-import com.dhkim.timecapsule.location.domain.Place
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState

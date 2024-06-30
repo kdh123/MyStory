@@ -34,17 +34,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.dhkim.camera.navigation.cameraNavigation
+import com.dhkim.location.domain.Place
+import com.dhkim.location.presentation.navigation.searchNavigation
+import com.dhkim.setting.presentation.navigation.navigateToSetting
+import com.dhkim.setting.presentation.navigation.settingNavigation
 import com.dhkim.timecapsule.R
-import com.dhkim.ui.WarningDialog
+import com.dhkim.timecapsule.friend.presentation.navigation.friendNavigation
+import com.dhkim.timecapsule.friend.presentation.navigation.navigateToFriend
 import com.dhkim.timecapsule.map.presentation.navigation.mapNavigation
 import com.dhkim.timecapsule.notification.navigation.navigateToNotification
 import com.dhkim.timecapsule.notification.navigation.notificationNavigation
-import com.dhkim.timecapsule.friend.presentation.navigation.navigateToFriend
-import com.dhkim.timecapsule.friend.presentation.navigation.friendNavigation
-import com.dhkim.timecapsule.location.domain.Place
-import com.dhkim.timecapsule.location.presentation.navigation.searchNavigation
-import com.dhkim.timecapsule.setting.presentation.navigation.navigateToSetting
-import com.dhkim.timecapsule.setting.presentation.navigation.settingNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.imageDetailNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.moreTimeCapsuleNavigation
@@ -53,6 +52,7 @@ import com.dhkim.timecapsule.timecapsule.presentation.navigation.navigateToMore
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.timeCapsuleOpenNavigation
+import com.dhkim.ui.WarningDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

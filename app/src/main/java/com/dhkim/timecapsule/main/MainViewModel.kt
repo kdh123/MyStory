@@ -6,7 +6,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.dhkim.timecapsule.user.domain.UserRepository
-import com.dhkim.timecapsule.setting.domain.SettingRepository
+import com.dhkim.setting.domain.SettingRepository
 import com.dhkim.timecapsule.timecapsule.data.work.CheckOpenableTimeCapsuleWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,7 +21,7 @@ const val CHECK_OPENABLE_TIME_CAPSULE_WORK_NAME = "checkOpenableTimeCapsuleWork"
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val settingRepository: SettingRepository,
+    private val settingRepository: com.dhkim.setting.domain.SettingRepository,
     private val workManager: WorkManager
 ) : ViewModel() {
 

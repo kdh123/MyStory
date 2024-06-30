@@ -8,7 +8,7 @@ import androidx.work.WorkerParameters
 import com.dhkim.common.DateUtil
 import com.dhkim.common.NotificationManager
 import com.dhkim.timecapsule.onboarding.OnboardingActivity
-import com.dhkim.timecapsule.setting.domain.SettingRepository
+import com.dhkim.setting.domain.SettingRepository
 import com.dhkim.timecapsule.timecapsule.domain.TimeCapsuleRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -25,7 +25,7 @@ class CheckOpenableTimeCapsuleWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val timeCapsuleRepository: TimeCapsuleRepository,
-    private val settingRepository: SettingRepository,
+    private val settingRepository: com.dhkim.setting.domain.SettingRepository,
 ) : CoroutineWorker(context, params) {
 
     private val workerContext = context

@@ -7,8 +7,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.dhkim.location.domain.Place
 import com.dhkim.timecapsule.main.Screen
-import com.dhkim.timecapsule.location.domain.Place
 import com.dhkim.timecapsule.timecapsule.presentation.TimeCapsuleScreen
 import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleScreen
 import com.dhkim.timecapsule.timecapsule.presentation.detail.TimeCapsuleDetailScreen

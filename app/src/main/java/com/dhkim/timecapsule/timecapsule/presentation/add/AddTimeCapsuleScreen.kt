@@ -79,10 +79,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dhkim.timecapsule.R
 import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
-import com.dhkim.timecapsule.location.domain.Place
+import com.dhkim.location.domain.Place
+import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.timecapsule.domain.BaseTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.MyTimeCapsule
 import com.dhkim.timecapsule.timecapsule.domain.SendTimeCapsule

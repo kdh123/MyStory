@@ -8,11 +8,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.dhkim.location.domain.Place
 import com.dhkim.timecapsule.map.presentation.MapScreen
 import com.dhkim.timecapsule.map.presentation.MapSideEffect
 import com.dhkim.timecapsule.map.presentation.MapViewModel
 import com.dhkim.timecapsule.main.Screen
-import com.dhkim.timecapsule.location.domain.Place
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.mapNavigation(

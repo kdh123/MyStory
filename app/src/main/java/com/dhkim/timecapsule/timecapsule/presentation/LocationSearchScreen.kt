@@ -38,8 +38,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.dhkim.location.domain.Place
 import com.dhkim.timecapsule.R
-import com.dhkim.timecapsule.location.domain.Place
 import com.dhkim.timecapsule.timecapsule.presentation.add.AddTimeCapsuleUiState
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.MutableStateFlow
