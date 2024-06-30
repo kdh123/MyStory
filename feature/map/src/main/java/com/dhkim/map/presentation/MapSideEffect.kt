@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.map.presentation
+package com.dhkim.map.presentation
 
 sealed interface MapSideEffect {
 

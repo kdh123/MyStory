@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class, ExperimentalNaverMapApi::class)
 
-package com.dhkim.timecapsule.map.presentation
+package com.dhkim.map.presentation
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -70,7 +70,7 @@ import androidx.paging.compose.itemKey
 import com.dhkim.common.Constants
 import com.dhkim.location.domain.Category
 import com.dhkim.location.domain.Place
-import com.dhkim.timecapsule.R
+import com.dhkim.map.R
 import com.dhkim.ui.LoadingProgressBar
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted

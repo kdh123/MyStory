@@ -79,6 +79,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature:map"))
     implementation(project(":feature:friend"))
     implementation(project(":feature:location"))
     implementation(project(":feature:setting"))

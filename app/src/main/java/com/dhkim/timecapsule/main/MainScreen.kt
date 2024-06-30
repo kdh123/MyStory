@@ -41,7 +41,7 @@ import com.dhkim.setting.presentation.navigation.settingNavigation
 import com.dhkim.timecapsule.R
 import com.dhkim.friend.presentation.navigation.friendNavigation
 import com.dhkim.friend.presentation.navigation.navigateToFriend
-import com.dhkim.timecapsule.map.presentation.navigation.mapNavigation
+import com.dhkim.map.presentation.navigation.mapNavigation
 import com.dhkim.timecapsule.notification.navigation.navigateToNotification
 import com.dhkim.timecapsule.notification.navigation.notificationNavigation
 import com.dhkim.timecapsule.timecapsule.presentation.navigation.addTimeCapsuleNavigation
@@ -67,10 +67,10 @@ fun MainScreen(
     )
     val scaffoldState = rememberBottomSheetScaffoldState(state)
     val navController = rememberNavController()
-    val items = listOf(Screen.TimeCapsule, Screen.AddTimeCapsule, Screen.Home, Screen.Friend)
+    val items = listOf(Screen.TimeCapsule, Screen.AddTimeCapsule, Screen.Map, Screen.Friend)
     val isBottomNavShow = navController
         .currentBackStackEntryAsState()
-        .value?.destination?.route in listOf(Screen.Home.route, Screen.TimeCapsule.route, Screen.Friend.route)
+        .value?.destination?.route in listOf(Screen.Map.route, Screen.TimeCapsule.route, Screen.Friend.route)
     var selectedPlace: Place? by remember {
         mutableStateOf(null)
     }
@@ -258,7 +258,7 @@ fun MainScreen(
 sealed class Screen(
     val title: String, val selected: Int, val unSelected: Int, val route: String
 ) {
-    data object Home : Screen("홈", R.drawable.ic_map_primary, R.drawable.ic_map_black, "home")
+    data object Map : Screen("홈", R.drawable.ic_map_primary, R.drawable.ic_map_black, "map")
     data object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, "addTimeCapsule")
     data object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, "timeCapsule")
     data object Friend : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, "friend")

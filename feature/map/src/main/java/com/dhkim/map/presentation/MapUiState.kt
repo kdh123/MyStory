@@ -1,4 +1,4 @@
-package com.dhkim.timecapsule.map.presentation
+package com.dhkim.map.presentation
 
 import androidx.compose.runtime.Stable
 import androidx.paging.PagingData
