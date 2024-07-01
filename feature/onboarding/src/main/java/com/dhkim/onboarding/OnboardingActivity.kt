@@ -28,14 +28,6 @@ fun OnboardingScreen() {
         navController = navController,
         startDestination = "splash"
     ) {
-        onboardingNavigation(
-            onNavigateToSignUp = {
-                navController.navigate("signUp") {
-                    popUpTo("splash") {
-                        inclusive = true
-                    }
-                }
-            }
-        )
+        onboardingNavigation()
     }
 }

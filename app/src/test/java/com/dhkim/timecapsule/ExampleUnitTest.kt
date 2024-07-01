@@ -69,8 +69,24 @@ class ExampleUnitTest {
     @Test
     fun `랜덤 테스트` () {
         val random = (0..100_000_000_000).random()
-        repeat(100) {
+        /*repeat(100) {
             println("random : ${(0..1_000_000_000).random()}")
+        }*/
+
+        val words = listOf("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "k", "L", "M", "N", "O", "P",
+            "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i",
+            "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1",
+            "2", "3", "4", "5", "6", "7", "8", "9")
+
+        val userId = StringBuilder().apply {
+            append(words[words.indices.random()])
+            append(words[words.indices.random()])
+            append(words[words.indices.random()])
+            append(words[words.indices.random()])
+            append(words[words.indices.random()])
+            append(words[words.indices.random()])
         }
+
+        println("userId: $userId")
     }
 }

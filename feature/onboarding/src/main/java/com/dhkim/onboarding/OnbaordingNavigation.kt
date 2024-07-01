@@ -9,19 +9,18 @@ import com.dhkim.signUp.SignUpScreen
 import com.dhkim.signUp.SignUpSideEffect
 import com.dhkim.signUp.SignUpViewModel
 import com.dhkim.splash.SplashScreen
+import com.dhkim.splash.SplashSideEffect
 import com.dhkim.splash.SplashViewModel
 
-fun NavGraphBuilder.onboardingNavigation(
-    onNavigateToSignUp: () -> Unit
-) {
+fun NavGraphBuilder.onboardingNavigation() {
     composable("splash") {
         val viewModel = hiltViewModel<SplashViewModel>()
-        val isSignedUp by viewModel.isSignUp.collectAsStateWithLifecycle()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = SplashSideEffect.None)
 
         SplashScreen(
-            isSignedUp = isSignedUp,
-            onCheckSignedUp = viewModel::checkSignedUp,
-            onNavigateToSignUp = onNavigateToSignUp
+            uiState = uiState,
+            sideEffect = sideEffect
         )
     }
 
