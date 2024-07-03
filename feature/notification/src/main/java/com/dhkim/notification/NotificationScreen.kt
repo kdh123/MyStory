@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dhkim.common.profileImage
 import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.domain.ReceivedTimeCapsule
 
@@ -77,7 +76,7 @@ fun NotificationItem(
     timeCapsule: ReceivedTimeCapsule,
     onNavigateToTimeCapsule: () -> Unit
 ) {
-    val profileImage = timeCapsule.profileImage.profileImage()
+    val profileImage = timeCapsule.profileImage.toInt()
 
     Row(
         modifier = Modifier

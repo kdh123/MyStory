@@ -28,6 +28,7 @@ class TimeCapsuleDetailViewModel @Inject constructor(
     fun init(timeCapsuleId: String, isReceived: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             val myId = userRepository.getMyId()
+            val myProfileImage = "${userRepository.getProfileImage()}"
             if (isReceived) {
                 timeCapsuleRepository.getReceivedTimeCapsule(id = timeCapsuleId)?.let {
                     timeCapsuleRepository.updateReceivedTimeCapsule(it.copy(isOpened = true))
@@ -36,7 +37,7 @@ class TimeCapsuleDetailViewModel @Inject constructor(
             } else {
                 timeCapsuleRepository.getMyTimeCapsule(id = timeCapsuleId)?.let {
                     timeCapsuleRepository.editMyTimeCapsule(it.copy(isOpened = true))
-                    _uiState.value = _uiState.value.copy(isReceived = false, timeCapsule = it.toTimeCapsule(myId))
+                    _uiState.value = _uiState.value.copy(isReceived = false, timeCapsule = it.toTimeCapsule(myId, myProfileImage))
                 }
             }
         }

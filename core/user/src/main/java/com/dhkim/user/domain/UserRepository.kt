@@ -6,6 +6,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
 
+    fun getAllFriend(): Flow<List<LocalFriend>>
+    fun getFriend(id: String): LocalFriend?
+    fun saveFriend(localFriend: LocalFriend)
+    fun updateFriend(localFriend: LocalFriend)
+    fun deleteLocalFriend(id: String)
+
     suspend fun getMyInfo(): Flow<User>
     suspend fun getMyId(): String
     suspend fun signUp(userId: String, profileImage: String, fcmToken: String): isSuccessful

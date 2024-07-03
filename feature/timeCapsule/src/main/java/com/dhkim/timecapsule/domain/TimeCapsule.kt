@@ -4,7 +4,7 @@ import com.dhkim.common.Constants
 
 data class Host(
     val id: String = "",
-    val profileImage: String = ""
+    val profileImage: String = "0"
 )
 
 data class TimeCapsule(

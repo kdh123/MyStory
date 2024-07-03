@@ -3,15 +3,18 @@ package com.dhkim.friend.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.CommonResult
-import com.dhkim.common.profileImage
 import com.dhkim.user.domain.Friend
+import com.dhkim.user.domain.LocalFriend
 import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,20 +32,40 @@ class FriendViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val myId = userRepository.getMyId()
-            val myProfileImage = userRepository.getProfileImage().profileImage()
+            val myProfileImage = userRepository.getProfileImage().toString()
             val user = _uiState.value.user
+
             _uiState.value = _uiState.value.copy(user = user.copy(id = myId, profileImage = myProfileImage))
         }
 
-        viewModelScope.launch {
-            userRepository.getMyInfo()
-                .catch { }
-                .collect {
-                    if (it.id.isNotEmpty()) {
-                        _uiState.value = _uiState.value.copy(isLoading = false, user = it)
-                    } else {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
+        viewModelScope.launch(Dispatchers.IO) {
+            combine(userRepository.getMyInfo(), userRepository.getAllFriend()) { user, friends ->
+                val remoteFriends = user.friends
+                val pendingFriends = user.friends.filter { it.isPending }
+                val localFriends = userRepository.getAllFriend().first()
+
+                remoteFriends
+                    .filter { !it.isPending }
+                    .map { it.id }
+                    .filter { id -> !localFriends.map { it.id }.contains(id) }
+                    .forEach { id ->
+                        val friend = user.friends.first { it.id == id }
+                        val localFriend = LocalFriend(
+                            id = friend.id,
+                            nickname = friend.id,
+                            profileImage = friend.profileImage,
+                            uuid = friend.uuid
+                        )
+                        userRepository.saveFriend(localFriend)
                     }
+
+                user.copy(friends = friends.map { it.toFriend() } + pendingFriends)
+            }.catch { }
+                .collect {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        user = it
+                    )
                 }
         }
     }
@@ -72,13 +95,14 @@ class FriendViewModel @Inject constructor(
     }
 
     fun deleteFriend(userId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             userRepository.deleteFriend(userId = userId)
                 .catch {
                     _sideEffect.emit(FriendSideEffect.ShowDialog(show = false))
                     _sideEffect.emit(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
                 }.collect { isSuccessful ->
                     if (isSuccessful) {
+                        userRepository.deleteLocalFriend(userId)
                         _sideEffect.emit(FriendSideEffect.ShowKeyboard(show = false))
                         _sideEffect.emit(FriendSideEffect.ShowDialog(show = false))
                     } else {
@@ -131,6 +155,7 @@ class FriendViewModel @Inject constructor(
                                 )
                             }
                         }
+
                         is CommonResult.Error -> {
                             _uiState.value = _uiState.value.copy(isLoading = false)
                             _sideEffect.emit(FriendSideEffect.Message(message = "친구 찾기에 실패하였습니다."))

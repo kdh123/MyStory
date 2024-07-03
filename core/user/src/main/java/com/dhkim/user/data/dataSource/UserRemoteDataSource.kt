@@ -3,6 +3,7 @@ package com.dhkim.user.data.dataSource
 import android.util.Log
 import com.dhkim.common.CommonResult
 import com.dhkim.network.di.FirebaseModule
+import com.dhkim.user.R
 import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.User
 import com.google.firebase.database.DataSnapshot
@@ -41,7 +42,7 @@ class UserRemoteDataSource @Inject constructor(
 
                         Friend(
                             id = data["id"] as? String ?: "",
-                            profileImage = data["profileImage"] as? String ?: "0",
+                            profileImage = data["profileImage"] as? String ?: "${R.drawable.ic_smile_blue}",
                             uuid = data["uuid"] as? String ?: "",
                             isPending = data["pending"] as? Boolean ?: true,
                         )
@@ -52,7 +53,7 @@ class UserRemoteDataSource @Inject constructor(
 
                         Friend(
                             id = data["id"] as? String ?: "",
-                            profileImage = data["profileImage"] as? String ?: "0",
+                            profileImage = data["profileImage"] as? String ?: "${R.drawable.ic_smile_blue}",
                             uuid = data["uuid"] as? String ?: "",
                             isPending = data["pending"] as? Boolean ?: true,
                         )

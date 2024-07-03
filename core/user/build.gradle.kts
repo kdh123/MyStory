@@ -45,6 +45,7 @@ android {
 dependencies {
 
     implementation(project(":core:common"))
+    implementation(project(":core:database"))
     implementation(project(":core:datastore"))
     implementation(project(":core:network"))
 
@@ -52,6 +53,8 @@ dependencies {
     implementation(libs.bundles.androidx.datastore)
     implementation(libs.bundles.firebase)
     implementation(platform(libs.google.firebase.bom))
+    implementation(libs.bundles.androidx.room)
+    kapt(libs.androidx.room.compiler)
 
     implementation(libs.hilt)
     kapt(libs.androidx.hilt.compiler)

@@ -17,10 +17,14 @@ data class MyTimeCapsule(
     val sharedFriends: List<UserId>
 ) : BaseTimeCapsule {
 
-    fun toTimeCapsule(myId: String): TimeCapsule {
+    fun toTimeCapsule(myId: String, profileImage: String): TimeCapsule {
         return TimeCapsule(
             id = id,
             date = date,
+            host = Host(
+                id = id,
+                profileImage = profileImage
+            ),
             openDate = openDate,
             lat = lat,
             lng = lng,

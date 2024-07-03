@@ -1,7 +1,6 @@
 package com.dhkim.timecapsule.data.repository
 
 import com.dhkim.common.CommonResult
-import com.dhkim.timecapsule.R
 import com.dhkim.timecapsule.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.timecapsule.data.dataSource.remote.TimeCapsuleRemoteDataSource
 import com.dhkim.timecapsule.data.dataSource.remote.Uuid
@@ -37,13 +36,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         checkLocation: Boolean
     ): isSuccessful {
         val myId = userRepository.getMyId()
-        val myProfileImage = when (userRepository.getProfileImage()) {
-            R.drawable.ic_smile_blue -> "0"
-            R.drawable.ic_smile_violet -> "1"
-            R.drawable.ic_smile_green -> "2"
-            R.drawable.ic_smile_orange -> "3"
-            else -> "0"
-        }
+        val myProfileImage = "${userRepository.getProfileImage()}"
 
         return remoteDataSource.shareTimeCapsule(
             timeCapsuleId = timeCapsuleId,

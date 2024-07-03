@@ -1,15 +1,18 @@
 package com.dhkim.user.data
 
 import com.dhkim.common.CommonResult
-import com.dhkim.common.profileImage
 import com.dhkim.user.data.dataSource.UserLocalDataSource
 import com.dhkim.user.data.dataSource.UserRemoteDataSource
 import com.dhkim.user.data.dataSource.isSuccessful
+import com.dhkim.user.data.dataSource.toEntity
+import com.dhkim.user.data.dataSource.toLocalFriend
+import com.dhkim.user.domain.LocalFriend
 import com.dhkim.user.domain.User
 import com.dhkim.user.domain.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
@@ -17,6 +20,30 @@ class UserRepositoryImpl @Inject constructor(
     private val localDataSource: UserLocalDataSource,
     private val remoteDataSource: UserRemoteDataSource
 ) : UserRepository {
+
+    override fun getAllFriend(): Flow<List<LocalFriend>> {
+        return localDataSource.getAllFriend().map { friends ->
+            friends?.map {
+                it.toLocalFriend()
+            } ?: listOf()
+        }
+    }
+
+    override fun getFriend(id: String): LocalFriend? {
+        return localDataSource.getFriend(id)?.toLocalFriend()
+    }
+
+    override fun saveFriend(localFriend: LocalFriend) {
+        localDataSource.saveFriend(localFriend.toEntity())
+    }
+
+    override fun updateFriend(localFriend: LocalFriend) {
+        localDataSource.updateFriend(localFriend.toEntity())
+    }
+
+    override fun deleteLocalFriend(id: String) {
+        localDataSource.deleteFriend(id)
+    }
 
     override suspend fun getMyInfo(): Flow<User> {
         return remoteDataSource.getMyInfo(myId = localDataSource.getUserId())
@@ -65,7 +92,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun addFriend(userId: String, userProfileImage: String): Flow<isSuccessful> {
         return remoteDataSource.addFriend(
             myId = getMyId(),
-            myProfileImage = getProfileImage().profileImage(),
+            myProfileImage = "${getProfileImage()}",
             myUuid = getMyUuid(),
             userId = userId,
             userProfileImage = userProfileImage
@@ -79,19 +106,19 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun addRequests(userId: String): Flow<isSuccessful> {
         return remoteDataSource.addRequest(
             myId = getMyId(),
-            myProfileImage = getProfileImage().profileImage(),
+            myProfileImage = "${getProfileImage()}",
             userId = userId
         )
     }
 
     override suspend fun acceptFriend(userId: String, userProfileImage: String, userUuid: String): Flow<isSuccessful> {
         val myId = getMyId()
-        val myProfileImage = getProfileImage().profileImage()
+        val myProfileImage = getProfileImage()
         val myUuid = getMyUuid()
 
         return remoteDataSource.acceptFriend(
             myId = myId,
-            myProfileImage = myProfileImage,
+            myProfileImage = "$myProfileImage",
             myUuid = myUuid,
             userId = userId,
             userProfileImage = userProfileImage,

@@ -5,19 +5,45 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.dhkim.database.AppDatabase
+import com.dhkim.database.entity.FriendEntity
 import com.dhkim.user.R
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class UserLocalDataSource @Inject constructor(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val db: AppDatabase
 ) {
 
     private val PREF_KEY_USER_ID = stringPreferencesKey("userId")
     private val PREF_KEY_USER_PROFILE_IMAGE = intPreferencesKey("userProfileImage")
     private val PREF_KEY_FCM_TOKEN = stringPreferencesKey("fcmToken")
     private val PREF_KEY_UUID = stringPreferencesKey("uuid")
+
+    private val friendService = db.friendDao()
+
+    fun getAllFriend(): Flow<List<FriendEntity>?> {
+        return friendService.getAllFriend()
+    }
+
+    fun getFriend(id: String): FriendEntity? {
+        return friendService.getFriend(id)
+    }
+
+    fun saveFriend(friendEntity: FriendEntity) {
+        friendService.saveFriend(friendEntity)
+    }
+
+    fun updateFriend(friendEntity: FriendEntity) {
+        friendService.updateFriend(friendEntity)
+    }
+
+    fun deleteFriend(id: String) {
+        friendService.deleteFriend(id)
+    }
 
     suspend fun getUserId(): String {
         return dataStore.data
@@ -40,16 +66,8 @@ class UserLocalDataSource @Inject constructor(
     }
 
     suspend fun updateProfileImage(profileImage: String) {
-        val image = when (profileImage) {
-            "0" -> R.drawable.ic_smile_blue
-            "1" -> R.drawable.ic_smile_violet
-            "2" -> R.drawable.ic_smile_green
-            "3" -> R.drawable.ic_smile_orange
-            else -> R.drawable.ic_smile_red
-        }
-
         dataStore.edit { settings ->
-            settings[PREF_KEY_USER_PROFILE_IMAGE] = image
+            settings[PREF_KEY_USER_PROFILE_IMAGE] = profileImage.toInt()
         }
     }
 

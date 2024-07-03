@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.timecapsule.R
 import com.dhkim.ui.WarningDialog
-import com.dhkim.common.profileImage
 import com.dhkim.timecapsule.domain.TimeCapsule
 import com.dhkim.ui.DefaultBackground
 import com.naver.maps.geometry.LatLng
@@ -197,7 +196,7 @@ fun TimeCapsuleDetailScreen(
                 },
                 onBack = onBack
             )
-            MenuItem(resId = uiState.timeCapsule.host.profileImage.profileImage(), title = "작성자 : $writer")
+            MenuItem(resId = uiState.timeCapsule.host.profileImage.toInt(), title = "작성자 : $writer")
             Divider(
                 color = colorResource(id = R.color.light_gray),
                 modifier = Modifier
@@ -299,15 +298,18 @@ fun MenuItem(resId: Int, title: String) {
             .padding(vertical = 30.dp, horizontal = 20.dp)
             .fillMaxWidth()
     ) {
-        Image(
-            painter = painterResource(id = resId),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(end = 10.dp)
-                .width(24.dp)
-                .height(24.dp)
-                .align(Alignment.CenterVertically)
-        )
+        if (resId != 0) {
+            Image(
+                painter = painterResource(id = resId),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = 10.dp)
+                    .width(24.dp)
+                    .height(24.dp)
+                    .align(Alignment.CenterVertically)
+            )
+        }
+
         Text(
             text = title,
             modifier = Modifier

@@ -35,9 +35,10 @@ class TimeCapsuleViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             val myId = userRepository.getMyId()
+            val myProfileImage = "${userRepository.getProfileImage()}"
             timeCapsuleRepository.getMyAllTimeCapsule()
                 .combine(timeCapsuleRepository.getReceivedAllTimeCapsule()) { myTimeCapsules, receivedTimeCapsules ->
-                    myTimeCapsules.map { it.toTimeCapsule(myId) } + receivedTimeCapsules.map { it.toTimeCapsule() }
+                    myTimeCapsules.map { it.toTimeCapsule(myId, myProfileImage) } + receivedTimeCapsules.map { it.toTimeCapsule() }
                 }.catch { }
                 .collect { timeCapsules ->
                     val timeCapsuleItems = mutableListOf<TimeCapsuleItem>()
