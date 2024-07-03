@@ -121,6 +121,8 @@ fun ProfileScreen(
 
             is FriendSideEffect.ShowDialog -> {
                 if (!sideEffect.show) {
+                    showDeleteDialog = false
+                    showMenuDialog = false
                     selectedUserId = ""
                 }
             }
@@ -212,6 +214,7 @@ fun ProfileScreen(
                 selectedUserId = ""
             },
             onConfirmation = {
+                showDeleteDialog = false
                 onDeleteFriend(selectedUserId)
             },
             dialogTitle = "삭제",

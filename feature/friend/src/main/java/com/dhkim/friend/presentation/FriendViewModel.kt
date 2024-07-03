@@ -42,6 +42,11 @@ class FriendViewModel @Inject constructor(
             combine(userRepository.getMyInfo(), userRepository.getAllFriend()) { user, friends ->
                 val remoteFriends = user.friends
                 val pendingFriends = user.friends.filter { it.isPending }
+
+                friends.map { it.id }.filter { id -> !remoteFriends.map { it.id }.contains(id) }.forEach {  id ->
+                    userRepository.deleteLocalFriend(id)
+                }
+
                 val localFriends = userRepository.getAllFriend().first()
 
                 remoteFriends
@@ -59,7 +64,7 @@ class FriendViewModel @Inject constructor(
                         userRepository.saveFriend(localFriend)
                     }
 
-                user.copy(friends = friends.map { it.toFriend() } + pendingFriends)
+                user.copy(friends = localFriends.map { it.toFriend() } + pendingFriends)
             }.catch { }
                 .collect {
                     _uiState.value = _uiState.value.copy(
