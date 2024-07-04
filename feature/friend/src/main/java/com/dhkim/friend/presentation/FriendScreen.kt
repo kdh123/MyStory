@@ -82,6 +82,7 @@ fun ProfileScreen(
     onAddFriend: () -> Unit,
     onAcceptFriend: (Friend) -> Unit,
     onDeleteFriend: (String) -> Unit,
+    onNavigateToChangeInfo: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -100,7 +101,10 @@ fun ProfileScreen(
         mutableStateOf("")
     }
     val focusManager = LocalFocusManager.current
-    var showMenuDialog by remember {
+    var showFriendMenuDialog by remember {
+        mutableStateOf(false)
+    }
+    var showPendingFriendMenuDialog by remember {
         mutableStateOf(false)
     }
     var showDeleteDialog by remember {
@@ -122,7 +126,8 @@ fun ProfileScreen(
             is FriendSideEffect.ShowDialog -> {
                 if (!sideEffect.show) {
                     showDeleteDialog = false
-                    showMenuDialog = false
+                    showFriendMenuDialog = false
+                    showPendingFriendMenuDialog = false
                     selectedUserId = ""
                 }
             }
@@ -168,11 +173,11 @@ fun ProfileScreen(
         }
     }
 
-    if (showMenuDialog) {
+    if (showFriendMenuDialog) {
         Dialog(
             onDismissRequest = {
                 selectedUserId = ""
-                showMenuDialog = false
+                showFriendMenuDialog = false
             }
         ) {
             Card(
@@ -188,7 +193,7 @@ fun ProfileScreen(
                     Text(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        text = selectedUserId,
+                        text = "메뉴",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -198,7 +203,57 @@ fun ProfileScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                showMenuDialog = false
+                                showFriendMenuDialog = false
+                                showDeleteDialog = true
+                            }
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "정보 변경",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showFriendMenuDialog = false
+                                onNavigateToChangeInfo(selectedUserId)
+                            }
+                    )
+                }
+            }
+        }
+    }
+
+    if (showPendingFriendMenuDialog) {
+        Dialog(
+            onDismissRequest = {
+                selectedUserId = ""
+                showPendingFriendMenuDialog = false
+            }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        text = "메뉴",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "삭제",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showPendingFriendMenuDialog = false
                                 showDeleteDialog = true
                             }
                     )
@@ -326,9 +381,13 @@ fun ProfileScreen(
                                 onClick = {
                                     showInfoBottomSheet = true
                                 },
-                                onLongClick = {
+                                onFriendLongClick = {
                                     selectedUserId = it
-                                    showMenuDialog = true
+                                    showFriendMenuDialog = true
+                                },
+                                onPendingFriendLongClick = {
+                                    selectedUserId = it
+                                    showPendingFriendMenuDialog = true
                                 }
                             )
                         }
@@ -577,7 +636,12 @@ fun RequestScreen(uiState: ProfileUiState, onClick: (Friend) -> Unit) {
 }
 
 @Composable
-fun FriendScreen(uiState: ProfileUiState, onClick: () -> Unit, onLongClick: (userId: String) -> Unit) {
+fun FriendScreen(
+    uiState: ProfileUiState,
+    onClick: () -> Unit,
+    onFriendLongClick: (userId: String) -> Unit,
+    onPendingFriendLongClick: (userId: String) -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -591,10 +655,11 @@ fun FriendScreen(uiState: ProfileUiState, onClick: () -> Unit, onLongClick: (use
             )
             FriendItem(
                 userId = uiState.user.id,
+                nickname = uiState.user.id,
                 isMe = true,
                 profileImage = uiState.user.profileImage.toInt(),
                 onClick = onClick,
-                onLongClick = onLongClick
+                onLongClick = onFriendLongClick
             )
         }
         FriendList(
@@ -603,7 +668,7 @@ fun FriendScreen(uiState: ProfileUiState, onClick: () -> Unit, onLongClick: (use
             title = "서로 승낙한 친구",
             modifier = Modifier.fillMaxWidth(),
             onClick = onClick,
-            onDeleteClick = onLongClick
+            onLongClick = onFriendLongClick
         )
         FriendList(
             uiState = uiState,
@@ -611,7 +676,7 @@ fun FriendScreen(uiState: ProfileUiState, onClick: () -> Unit, onLongClick: (use
             title = "내가 요청한 친구",
             modifier = Modifier.fillMaxSize(),
             onClick = onClick,
-            onDeleteClick = onLongClick
+            onLongClick = onPendingFriendLongClick
         )
     }
 }
@@ -655,7 +720,7 @@ fun FriendList(
     title: String,
     isFriend: Boolean,
     onClick: () -> Unit,
-    onDeleteClick: (userId: String) -> Unit,
+    onLongClick: (userId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val friends = if (isFriend) {
@@ -681,16 +746,18 @@ fun FriendList(
                     if (index == friends.size - 1) {
                         FriendItem(
                             userId = item.id,
+                            nickname = item.nickname,
                             profileImage = item.profileImage.toInt(),
                             onClick = onClick,
-                            onLongClick = onDeleteClick
+                            onLongClick = onLongClick
                         )
                     } else {
                         FriendItem(
                             userId = item.id,
+                            nickname = item.nickname,
                             profileImage = item.profileImage.toInt(),
                             onClick = onClick,
-                            onLongClick = onDeleteClick
+                            onLongClick = onLongClick
                         )
                     }
                 }
@@ -746,6 +813,7 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
 @Composable
 fun FriendItem(
     userId: String,
+    nickname: String,
     profileImage: Int,
     isMe: Boolean = false,
     onClick: () -> Unit,
@@ -773,7 +841,7 @@ fun FriendItem(
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
-                text = userId,
+                text = nickname,
                 modifier = Modifier
                     .width(0.dp)
                     .weight(1f)
@@ -787,7 +855,7 @@ fun FriendItem(
 @Preview(showBackground = true)
 @Composable
 private fun FriendItemPreview() {
-    FriendItem(userId = "", 0, onClick = {} ) {
+    FriendItem(userId = "", "", 0, onClick = {}) {
 
     }
 }

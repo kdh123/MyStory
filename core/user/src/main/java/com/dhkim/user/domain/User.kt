@@ -12,6 +12,7 @@ data class User(
 
 data class Friend(
     val id: String = "",
+    val nickname: String = id,
     val profileImage: String = "",
     val uuid: String = "",
     val isPending: Boolean = true

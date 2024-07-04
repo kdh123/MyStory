@@ -9,6 +9,7 @@ data class LocalFriend(
     fun toFriend(): Friend {
         return Friend(
             id = id,
+            nickname = nickname,
             profileImage = profileImage,
             uuid = uuid,
             isPending = false

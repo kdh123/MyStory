@@ -35,7 +35,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.dhkim.camera.navigation.cameraNavigation
 import com.dhkim.friend.presentation.navigation.FRIEND_ROUTE
+import com.dhkim.friend.presentation.navigation.changeFriendInfoNavigation
 import com.dhkim.friend.presentation.navigation.friendNavigation
+import com.dhkim.friend.presentation.navigation.navigateToChangeFriendInfo
 import com.dhkim.friend.presentation.navigation.navigateToFriend
 import com.dhkim.location.domain.Place
 import com.dhkim.location.presentation.navigation.searchNavigation
@@ -251,7 +253,15 @@ fun MainScreen(
                     ?.savedStateHandle
                     ?.set("place", it)
             }
-            friendNavigation {
+            friendNavigation(
+                onNavigateToChangeInfo = {
+                    navController.navigateToChangeFriendInfo(it)
+                },
+                onBack = {
+                    navController.navigateUp()
+                }
+            )
+            changeFriendInfoNavigation {
                 navController.navigateUp()
             }
         }
