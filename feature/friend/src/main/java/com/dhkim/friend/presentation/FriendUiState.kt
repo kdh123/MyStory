@@ -6,7 +6,7 @@ import com.dhkim.user.domain.User
 @Stable
 data class ProfileUiState(
     val isLoading: Boolean = true,
-    val user: User = User(),
+    val myInfo: User = User(),
     val searchResult: SearchResult = SearchResult()
 )
 

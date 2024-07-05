@@ -105,6 +105,7 @@ fun AddTimeCapsuleScreen(
     sideEffect: AddTimeCapsuleSideEffect,
     imageUrl: String,
     place: Place,
+    friendId: String,
     onSaveTimeCapsule: () -> Unit,
     onSetCheckShare: (Boolean) -> Unit,
     onSetCheckLocation: (Boolean) -> Unit,
@@ -117,6 +118,7 @@ fun AddTimeCapsuleScreen(
     onSearchAddress: (lat: String, lng: String) -> Unit,
     onInitPlace: (Place) -> Unit,
     onAddImage: (imageUrl: String) -> Unit,
+    onAddFriend: (friendId: String) -> Unit,
     onNavigateToCamera: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -223,6 +225,12 @@ fun AddTimeCapsuleScreen(
             }
         } else {
             onBack()
+        }
+    }
+
+    LaunchedEffect(friendId) {
+        if (friendId.isNotEmpty()) {
+            onAddFriend(friendId)
         }
     }
 
@@ -959,6 +967,7 @@ private fun AddTimeCapsuleScreenPreview() {
         sideEffect = AddTimeCapsuleSideEffect.None,
         imageUrl = "imageUrl2",
         place = Place(),
+        friendId = "",
         onSaveTimeCapsule = { },
         onSetCheckShare = { },
         onSetCheckLocation = { },
@@ -969,6 +978,7 @@ private fun AddTimeCapsuleScreenPreview() {
         onQuery = { },
         onPlaceClick = { },
         onSearchAddress = { _, _ -> },
+        onAddFriend = { },
         onInitPlace = { },
         onAddImage = { },
         onNavigateToCamera = { },

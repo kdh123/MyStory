@@ -52,6 +52,7 @@ import com.dhkim.home.presentation.navigation.TIME_CAPSULE_ROUTE
 import com.dhkim.home.presentation.navigation.addTimeCapsuleNavigation
 import com.dhkim.home.presentation.navigation.imageDetailNavigation
 import com.dhkim.home.presentation.navigation.moreTimeCapsuleNavigation
+import com.dhkim.home.presentation.navigation.navigateToAddTimeCapsule
 import com.dhkim.home.presentation.navigation.navigateToImageDetail
 import com.dhkim.home.presentation.navigation.navigateToMore
 import com.dhkim.home.presentation.navigation.timeCapsuleDetailNavigation
@@ -110,7 +111,14 @@ fun MainScreen(
                                 },
                                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                 onClick = {
-                                    navController.navigate(screen.route) {
+                                    val route = if (screen.route == ADD_TIME_CAPSULE_ROUTE) {
+                                        val friendId = " "
+                                        "$ADD_TIME_CAPSULE_ROUTE/$friendId"
+                                    } else {
+                                        screen.route
+                                    }
+
+                                    navController.navigate(route) {
                                         popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
                                         }
@@ -158,7 +166,8 @@ fun MainScreen(
                         ?.set("place", null)
                 },
                 onNavigateToAdd = { place ->
-                    navController.navigate("addTimeCapsule")
+                    val friendId = " "
+                    navController.navigate("$ADD_TIME_CAPSULE_ROUTE/$friendId")
                     navController.currentBackStackEntry
                         ?.savedStateHandle
                         ?.set("place", place)
@@ -192,7 +201,8 @@ fun MainScreen(
             )
             timeCapsuleNavigation(
                 onNavigateToAdd = {
-                    navController.navigate(ADD_TIME_CAPSULE_ROUTE)
+                    val friendId = " "
+                    navController.navigate("$ADD_TIME_CAPSULE_ROUTE/$friendId")
                 },
                 onNavigateToOpen = { id, isReceived ->
                     navController.navigate("timeCapsuleOpen/$id/${isReceived}")
@@ -254,6 +264,9 @@ fun MainScreen(
                     ?.set("place", it)
             }
             friendNavigation(
+                onAddTimeCapsule = {
+                    navController.navigateToAddTimeCapsule(friendId = it)
+                },
                 onNavigateToChangeInfo = {
                     navController.navigateToChangeFriendInfo(it)
                 },

@@ -7,11 +7,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.dhkim.common.CommonResult
 import com.dhkim.common.DateUtil
-import com.dhkim.location.domain.LocationRepository
-import com.dhkim.location.domain.Place
 import com.dhkim.home.domain.MyTimeCapsule
 import com.dhkim.home.domain.SharedFriend
 import com.dhkim.home.domain.TimeCapsuleRepository
+import com.dhkim.location.domain.LocationRepository
+import com.dhkim.location.domain.Place
 import com.dhkim.user.domain.UserId
 import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -47,20 +48,25 @@ class AddTimeCapsuleViewModel @Inject constructor(
     private var selectImageIndex = -1
 
     private val query = MutableStateFlow("")
+    private val checkedFriend = MutableStateFlow("")
 
     init {
         viewModelScope.launch {
-            userRepository.getAllFriend().catch { }
-                .collect { friends ->
-                    val sharedFriends = friends
-                        .map {
-                            SharedFriend(
-                                userId = it.id,
-                                nickname = it.nickname,
-                                uuid = it.uuid
-                            )
-                        }
-                    _uiState.value = _uiState.value.copy(sharedFriends = sharedFriends)
+            combine(
+                userRepository.getAllFriend(),
+                checkedFriend
+            ) { friends, checkedFriendId ->
+                friends.map {
+                    SharedFriend(
+                        isChecked = it.id == checkedFriendId,
+                        userId = it.id,
+                        nickname = it.nickname,
+                        uuid = it.uuid
+                    )
+                }
+            }.catch { }
+                .collect {
+                    _uiState.value = _uiState.value.copy(isShare = it.any { it.isChecked }, sharedFriends = it)
                 }
         }
 
@@ -88,6 +94,10 @@ class AddTimeCapsuleViewModel @Inject constructor(
             address = place.address,
             checkLocation = true
         )
+    }
+
+    fun addFriend(friendId: String) {
+        checkedFriend.value = friendId
     }
 
     fun onQuery(s: String) {
@@ -206,7 +216,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
             }
         }
 
-        _uiState.value = _uiState.value.copy(sharedFriends = sharedFriends)
+        _uiState.value = _uiState.value.copy(isShare = true, sharedFriends = sharedFriends)
     }
 
     fun typing(str: String) {
@@ -228,7 +238,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(checkLocation = isChecked)
     }
 
-    fun setCheckSend(isChecked: Boolean) {
+    fun setCheckShare(isChecked: Boolean) {
         _uiState.value = _uiState.value.copy(isShare = isChecked)
     }
 

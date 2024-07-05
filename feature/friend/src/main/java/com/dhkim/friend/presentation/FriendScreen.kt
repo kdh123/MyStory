@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
@@ -74,7 +73,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(
+fun FriendScreen(
     uiState: ProfileUiState,
     sideEffect: FriendSideEffect,
     onQuery: (String) -> Unit,
@@ -82,6 +81,7 @@ fun ProfileScreen(
     onAddFriend: () -> Unit,
     onAcceptFriend: (Friend) -> Unit,
     onDeleteFriend: (String) -> Unit,
+    onAddTimeCapsule: (friendId: String) -> Unit,
     onNavigateToChangeInfo: (String) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -97,8 +97,8 @@ fun ProfileScreen(
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(state)
     val scope = rememberCoroutineScope()
     var showBottomSheet = false
-    var selectedUserId by remember {
-        mutableStateOf("")
+    var selectedFriend by remember {
+        mutableStateOf(Friend())
     }
     val focusManager = LocalFocusManager.current
     var showFriendMenuDialog by remember {
@@ -128,7 +128,7 @@ fun ProfileScreen(
                     showDeleteDialog = false
                     showFriendMenuDialog = false
                     showPendingFriendMenuDialog = false
-                    selectedUserId = ""
+                    selectedFriend = Friend()
                 }
             }
 
@@ -153,30 +153,10 @@ fun ProfileScreen(
         }
     }
 
-    if (false && showInfoBottomSheet) {
-        ModalBottomSheet(
-            sheetState = infoBottomSheetState,
-            onDismissRequest = {
-                showInfoBottomSheet = false
-            },
-            modifier = Modifier
-                .fillMaxHeight(0.9f)
-        ) {
-            Column {
-                MenuItem(resId = com.dhkim.common.R.drawable.ic_time_primary, title = "타임캡슐 공유") {
-
-                }
-                MenuItem(resId = com.dhkim.user.R.drawable.ic_smile_green, title = "정보 변경") {
-
-                }
-            }
-        }
-    }
-
     if (showFriendMenuDialog) {
         Dialog(
             onDismissRequest = {
-                selectedUserId = ""
+                selectedFriend = Friend()
                 showFriendMenuDialog = false
             }
         ) {
@@ -215,7 +195,7 @@ fun ProfileScreen(
                             .fillMaxWidth()
                             .clickable {
                                 showFriendMenuDialog = false
-                                onNavigateToChangeInfo(selectedUserId)
+                                onNavigateToChangeInfo(selectedFriend.id)
                             }
                     )
                 }
@@ -226,7 +206,7 @@ fun ProfileScreen(
     if (showPendingFriendMenuDialog) {
         Dialog(
             onDismissRequest = {
-                selectedUserId = ""
+                selectedFriend = Friend()
                 showPendingFriendMenuDialog = false
             }
         ) {
@@ -266,14 +246,14 @@ fun ProfileScreen(
         WarningDialog(
             onDismissRequest = {
                 showDeleteDialog = false
-                selectedUserId = ""
+                selectedFriend = Friend()
             },
             onConfirmation = {
                 showDeleteDialog = false
-                onDeleteFriend(selectedUserId)
+                onDeleteFriend(selectedFriend.id)
             },
             dialogTitle = "삭제",
-            dialogText = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedUserId}님을 정말 삭제하시겠습니까?",
+            dialogText = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedFriend}님을 정말 삭제하시겠습니까?",
         )
     }
 
@@ -379,14 +359,15 @@ fun ProfileScreen(
                             FriendScreen(
                                 uiState = uiState,
                                 onClick = {
-                                    //showInfoBottomSheet = true
+                                    selectedFriend = it
+                                    showInfoBottomSheet = true
                                 },
                                 onFriendLongClick = {
-                                    selectedUserId = it
+                                    selectedFriend = it
                                     showFriendMenuDialog = true
                                 },
                                 onPendingFriendLongClick = {
-                                    selectedUserId = it
+                                    selectedFriend = it
                                     showPendingFriendMenuDialog = true
                                 }
                             )
@@ -397,6 +378,43 @@ fun ProfileScreen(
                         }
                     }
                     currentTab = pos
+                }
+            }
+
+            if (showInfoBottomSheet) {
+                ModalBottomSheet(
+                    sheetState = infoBottomSheetState,
+                    onDismissRequest = {
+                        showInfoBottomSheet = false
+                    },
+                    modifier = Modifier
+                        .padding(bottom = it.calculateBottomPadding())
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(bottom = 48.dp)
+                    ) {
+                        Text(
+                            text = selectedFriend.nickname,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            modifier = Modifier
+                                .padding(10.dp)
+                        )
+                        MenuItem(
+                            resId = R.drawable.ic_time_primary,
+                            title = "타임캡슐 공유",
+                            onClick = {
+                                onAddTimeCapsule(selectedFriend.id)
+                            })
+                        MenuItem(
+                            resId = R.drawable.ic_smile_blue,
+                            title = "정보 변경",
+                            onClick = {
+                                onNavigateToChangeInfo(selectedFriend.id)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -410,27 +428,31 @@ private fun MenuItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Row(
+    Box(
         modifier = modifier
-            .wrapContentHeight()
             .fillMaxWidth()
             .clickable {
                 onClick()
             }
     ) {
-        Image(
-            painter = painterResource(
-                id = resId
-            ),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(end = 10.dp)
-        )
-        Text(
-            text = title,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Row(
+            modifier = modifier
+                .padding(10.dp)
+        ) {
+            Image(
+                painter = painterResource(
+                    id = resId
+                ),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = 10.dp)
+            )
+            Text(
+                text = title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
@@ -452,11 +474,11 @@ fun BottomSheetScreen(
     onAddFriend: () -> Unit
 ) {
     val userId = uiState.searchResult.userId
-    val friendsIds = uiState.user.friends.map { it.id }
-    val requestIds = uiState.user.requests.map { it.id }
+    val friendsIds = uiState.myInfo.friends.map { it.id }
+    val requestIds = uiState.myInfo.requests.map { it.id }
 
     val isInMyFriendsOrRequests = friendsIds.contains(userId) || requestIds.contains(userId)
-    val isMyFriend = uiState.user.friends.map { it.id }.contains(userId)
+    val isMyFriend = uiState.myInfo.friends.map { it.id }.contains(userId)
 
     val friendMetaInfoText = when {
         uiState.searchResult.isMe -> {
@@ -467,7 +489,7 @@ fun BottomSheetScreen(
             "친구로 등록된 사용자입니다."
         }
 
-        uiState.user.friends.firstOrNull()?.isPending == true && isInMyFriendsOrRequests -> {
+        uiState.myInfo.friends.firstOrNull()?.isPending == true && isInMyFriendsOrRequests -> {
             "내가 친구 요청을 한 사용자입니다."
         }
 
@@ -616,7 +638,7 @@ private fun ProfileScreenPreview() {
 
 @Composable
 fun RequestScreen(uiState: ProfileUiState, onClick: (Friend) -> Unit) {
-    val requests = uiState.user.requests
+    val requests = uiState.myInfo.requests
     if (requests.isNotEmpty()) {
         RequestList(
             friends = requests,
@@ -638,9 +660,9 @@ fun RequestScreen(uiState: ProfileUiState, onClick: (Friend) -> Unit) {
 @Composable
 fun FriendScreen(
     uiState: ProfileUiState,
-    onClick: () -> Unit,
-    onFriendLongClick: (userId: String) -> Unit,
-    onPendingFriendLongClick: (userId: String) -> Unit,
+    onClick: (Friend) -> Unit,
+    onFriendLongClick: (Friend) -> Unit,
+    onPendingFriendLongClick: (Friend) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -654,11 +676,12 @@ fun FriendScreen(
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp)
             )
             FriendItem(
-                userId = uiState.user.id,
-                nickname = uiState.user.id,
+                friend = Friend(id = uiState.myInfo.id),
                 isMe = true,
-                profileImage = uiState.user.profileImage.toInt(),
-                onClick = onClick,
+                profileImage = uiState.myInfo.profileImage.toInt(),
+                onClick = {
+                    onClick(it)
+                },
                 onLongClick = onFriendLongClick
             )
         }
@@ -675,7 +698,6 @@ fun FriendScreen(
             isFriend = false,
             title = "내가 요청한 친구",
             modifier = Modifier.fillMaxSize(),
-            onClick = onClick,
             onLongClick = onPendingFriendLongClick
         )
     }
@@ -719,14 +741,14 @@ fun FriendList(
     uiState: ProfileUiState,
     title: String,
     isFriend: Boolean,
-    onClick: () -> Unit,
-    onLongClick: (userId: String) -> Unit,
+    onClick: ((Friend) -> Unit)? = null,
+    onLongClick: (Friend) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val friends = if (isFriend) {
-        uiState.user.friends.filter { !it.isPending }
+        uiState.myInfo.friends.filter { !it.isPending }
     } else {
-        uiState.user.friends.filter { it.isPending }
+        uiState.myInfo.friends.filter { it.isPending }
     }
 
     if (friends.isNotEmpty()) {
@@ -745,18 +767,20 @@ fun FriendList(
                 ) { index, item ->
                     if (index == friends.size - 1) {
                         FriendItem(
-                            userId = item.id,
-                            nickname = item.nickname,
+                            friend = item,
                             profileImage = item.profileImage.toInt(),
-                            onClick = onClick,
+                            onClick = {
+                                onClick?.invoke(item)
+                            },
                             onLongClick = onLongClick
                         )
                     } else {
                         FriendItem(
-                            userId = item.id,
-                            nickname = item.nickname,
+                            friend = item,
                             profileImage = item.profileImage.toInt(),
-                            onClick = onClick,
+                            onClick = {
+                                onClick?.invoke(item)
+                            },
                             onLongClick = onLongClick
                         )
                     }
@@ -812,20 +836,23 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
 
 @Composable
 fun FriendItem(
-    userId: String,
-    nickname: String,
+    friend: Friend,
     profileImage: Int,
     isMe: Boolean = false,
-    onClick: () -> Unit,
-    onLongClick: (userId: String) -> Unit
+    onClick: (Friend) -> Unit,
+    onLongClick: (Friend) -> Unit
 ) {
     Box(
         modifier = Modifier
             .combinedClickable(
-                onClick = onClick,
+                onClick = {
+                    if (!isMe) {
+                        onClick(friend)
+                    }
+                },
                 onLongClick = {
                     if (!isMe) {
-                        onLongClick(userId)
+                        onLongClick(friend)
                     }
                 }
             )
@@ -841,7 +868,7 @@ fun FriendItem(
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
-                text = nickname,
+                text = friend.nickname,
                 modifier = Modifier
                     .width(0.dp)
                     .weight(1f)
@@ -855,7 +882,7 @@ fun FriendItem(
 @Preview(showBackground = true)
 @Composable
 private fun FriendItemPreview() {
-    FriendItem(userId = "", "", 0, onClick = {}) {
+    FriendItem(friend = Friend(), 0, false, onClick = {}) {
 
     }
 }

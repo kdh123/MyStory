@@ -44,6 +44,10 @@ fun NavController.navigateToMore() {
     navigate(MORE_TIME_CAPSULE)
 }
 
+fun NavController.navigateToAddTimeCapsule(friendId: String) {
+    navigate("$ADD_TIME_CAPSULE_ROUTE/$friendId")
+}
+
 fun NavGraphBuilder.moreTimeCapsuleNavigation(
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onBack: () -> Unit
@@ -136,20 +140,22 @@ fun NavGraphBuilder.addTimeCapsuleNavigation(
     onNavigateToCamera: () -> Unit,
     onBack: () -> Unit,
 ) {
-    composable("addTimeCapsule") { backStackEntry ->
+    composable("addTimeCapsule/{friendId}") { backStackEntry ->
         val viewModel = hiltViewModel<AddTimeCapsuleViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = AddTimeCapsuleSideEffect.None)
         val place = backStackEntry.savedStateHandle.get<Place>("place") ?: Place()
         val imageUrl = backStackEntry.savedStateHandle.get<String>("imageUrl") ?: ""
+        val friendId = backStackEntry.arguments?.getString("friendId") ?: ""
 
         AddTimeCapsuleScreen(
             uiState = uiState,
             sideEffect = sideEffect,
             imageUrl = imageUrl,
             place = place,
+            friendId = friendId.ifBlank { "" },
             onSaveTimeCapsule = viewModel::saveTimeCapsule,
-            onSetCheckShare = viewModel::setCheckSend,
+            onSetCheckShare = viewModel::setCheckShare,
             onSetCheckLocation = viewModel::setCheckLocation,
             onSetSelectImageIndex = viewModel::setSelectImageIndex,
             onSetOpenDate = viewModel::setOpenDate,
@@ -159,6 +165,7 @@ fun NavGraphBuilder.addTimeCapsuleNavigation(
             onPlaceClick = viewModel::onPlaceClick,
             onSearchAddress = viewModel::searchAddress,
             onInitPlace = viewModel::initPlace,
+            onAddFriend = viewModel::addFriend,
             onAddImage = viewModel::addImage,
             onNavigateToCamera = onNavigateToCamera,
             onBack = onBack

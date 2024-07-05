@@ -33,9 +33,9 @@ class FriendViewModel @Inject constructor(
         viewModelScope.launch {
             val myId = userRepository.getMyId()
             val myProfileImage = userRepository.getProfileImage().toString()
-            val user = _uiState.value.user
+            val user = _uiState.value.myInfo
 
-            _uiState.value = _uiState.value.copy(user = user.copy(id = myId, profileImage = myProfileImage))
+            _uiState.value = _uiState.value.copy(myInfo = user.copy(id = myId, profileImage = myProfileImage))
         }
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -69,7 +69,7 @@ class FriendViewModel @Inject constructor(
                 .collect {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        user = it
+                        myInfo = it
                     )
                 }
         }
@@ -134,7 +134,7 @@ class FriendViewModel @Inject constructor(
 
     fun searchUser() {
         viewModelScope.launch {
-            val myId = uiState.value.user.id
+            val myId = uiState.value.myInfo.id
             val searchResult = uiState.value.searchResult
 
             userRepository.searchUser(searchResult.query)

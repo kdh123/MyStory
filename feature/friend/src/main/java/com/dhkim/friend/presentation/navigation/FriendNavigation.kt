@@ -9,7 +9,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.dhkim.friend.presentation.FriendSideEffect
 import com.dhkim.friend.presentation.FriendViewModel
-import com.dhkim.friend.presentation.ProfileScreen
+import com.dhkim.friend.presentation.FriendScreen
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoScreen
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoSideEffect
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoViewModel
@@ -33,6 +33,7 @@ fun NavController.navigateToChangeFriendInfo(userId: String) {
 
 fun NavGraphBuilder.friendNavigation(
     onNavigateToChangeInfo: (String) -> Unit,
+    onAddTimeCapsule: (friendId: String) -> Unit,
     onBack: () -> Unit
 ) {
     composable(FRIEND_ROUTE) {
@@ -40,7 +41,7 @@ fun NavGraphBuilder.friendNavigation(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = FriendSideEffect.None)
 
-        ProfileScreen(
+        FriendScreen(
             uiState = uiState,
             sideEffect = sideEffect,
             onQuery = viewModel::onQuery,
@@ -48,6 +49,7 @@ fun NavGraphBuilder.friendNavigation(
             onAddFriend = viewModel::addFriend,
             onAcceptFriend = viewModel::acceptFriend,
             onDeleteFriend = viewModel::deleteFriend,
+            onAddTimeCapsule = onAddTimeCapsule,
             onNavigateToChangeInfo = onNavigateToChangeInfo,
             onBack = onBack
         )
