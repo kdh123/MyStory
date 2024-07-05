@@ -633,7 +633,7 @@ fun LocationDialog(
                 if (timeCapsule.isReceived && timeCapsule.sender.isNotEmpty()) {
                     Text(
                         fontWeight = FontWeight.Bold,
-                        text = "공유한 친구 : ${timeCapsule.sender}",
+                        text = "공유한 친구 : ${timeCapsule.host.nickname}",
                         modifier = Modifier
                             .padding(start = 16.dp, end = 16.dp, top = 10.dp)
                     )

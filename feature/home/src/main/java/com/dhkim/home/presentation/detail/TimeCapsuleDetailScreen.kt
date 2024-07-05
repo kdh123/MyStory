@@ -186,7 +186,7 @@ fun TimeCapsuleDetailScreen(
             val writer = if (!isReceived) {
                 "${uiState.timeCapsule.sender} (나)"
             } else {
-                "${uiState.timeCapsule.sender} (친구)"
+                "${uiState.timeCapsule.host.nickname} (친구)"
             }
             TimeCapsulePager(
                 uiState = uiState,

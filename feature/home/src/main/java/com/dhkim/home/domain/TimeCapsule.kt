@@ -4,6 +4,7 @@ import com.dhkim.common.Constants
 
 data class Host(
     val id: String = "",
+    val nickname: String = id,
     val profileImage: String = "0"
 )
 
@@ -23,25 +24,4 @@ data class TimeCapsule(
     val sharedFriends: List<String> = listOf(),
     val isReceived: Boolean = false,
     val sender: String = ""
-) {
-    fun toMyTimeCapsule(): MyTimeCapsule {
-        return MyTimeCapsule(
-            id, date, openDate, lat, lng, placeName, address, content, medias, checkLocation, isOpened, sharedFriends
-        )
-    }
-
-    fun toReceivedCapsule(): ReceivedTimeCapsule {
-        return ReceivedTimeCapsule(
-            id = id,
-            date = date,
-            openDate = openDate,
-            sender = sender,
-            lat = lat,
-            lng = lng,
-            address = address,
-            content = content,
-            checkLocation = checkLocation,
-            isOpened = isOpened
-        )
-    }
-}
+)

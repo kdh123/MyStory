@@ -1,6 +1,7 @@
 package com.dhkim.home.domain
 
 import com.dhkim.user.domain.UserId
+import com.dhkim.user.domain.Nickname
 
 data class MyTimeCapsule(
     val id: String,
@@ -17,7 +18,7 @@ data class MyTimeCapsule(
     val sharedFriends: List<UserId>
 ) : BaseTimeCapsule {
 
-    fun toTimeCapsule(myId: String, profileImage: String): TimeCapsule {
+    fun toTimeCapsule(myId: String, profileImage: String, sharedFriends: List<Nickname>): TimeCapsule {
         return TimeCapsule(
             id = id,
             date = date,

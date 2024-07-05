@@ -28,7 +28,15 @@ class MoreTimeCapsuleViewModel @Inject constructor(
             val myProfileImage = "${userRepository.getProfileImage()}"
             timeCapsuleRepository.getMyAllTimeCapsule()
                 .combine(timeCapsuleRepository.getReceivedAllTimeCapsule()) { myTimeCapsules, receivedTimeCapsules ->
-                    myTimeCapsules.map { it.toTimeCapsule(myId, myProfileImage) } + receivedTimeCapsules.map { it.toTimeCapsule() }
+                    myTimeCapsules.map {
+                        val sharedFriends = it.sharedFriends.map { userId ->
+                            userRepository.getFriend(userId)?.nickname ?: userId
+                        }
+                        it.toTimeCapsule(myId, myProfileImage, sharedFriends)
+                    } + receivedTimeCapsules.map {
+                        val nickname = userRepository.getFriend(it.sender)?.id ?: it.sender
+                        it.toTimeCapsule(nickname)
+                    }
                 }.catch { }
                 .collect { timeCapsules ->
                     val openedTimeCapsules = timeCapsules.filter { it.isOpened }

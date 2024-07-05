@@ -38,7 +38,15 @@ class TimeCapsuleViewModel @Inject constructor(
             val myProfileImage = "${userRepository.getProfileImage()}"
             timeCapsuleRepository.getMyAllTimeCapsule()
                 .combine(timeCapsuleRepository.getReceivedAllTimeCapsule()) { myTimeCapsules, receivedTimeCapsules ->
-                    myTimeCapsules.map { it.toTimeCapsule(myId, myProfileImage) } + receivedTimeCapsules.map { it.toTimeCapsule() }
+                    myTimeCapsules.map {
+                        val sharedFriends = it.sharedFriends.map { userId ->
+                            userRepository.getFriend(userId)?.nickname ?: userId
+                        }
+                        it.toTimeCapsule(myId, myProfileImage, sharedFriends)
+                    } + receivedTimeCapsules.map {
+                        val nickname = userRepository.getFriend(it.sender)?.nickname ?: it.sender
+                        it.toTimeCapsule(nickname)
+                    }
                 }.catch { }
                 .collect { timeCapsules ->
                     val timeCapsuleItems = mutableListOf<TimeCapsuleItem>()
@@ -149,46 +157,6 @@ class TimeCapsuleViewModel @Inject constructor(
                     } else {
                         deleteMyTimeCapsule(timeCapsuleId)
                     }
-                }
-            }
-        }
-    }
-
-    fun onAction(action: TimeCapsuleAction) {
-        viewModelScope.launch(Dispatchers.IO) {
-            when (action) {
-                is TimeCapsuleAction.SaveMyTimeCapsule -> {
-                    timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = action.timeCapsule)
-                }
-
-                is TimeCapsuleAction.EditMyTimeCapsule -> {
-                    timeCapsuleRepository.editMyTimeCapsule(timeCapsule = action.timeCapsule)
-                }
-
-                is TimeCapsuleAction.DeleteMyTimeCapsule -> {
-                    timeCapsuleRepository.deleteMyTimeCapsule(id = action.id)
-                }
-
-
-                is TimeCapsuleAction.SaveSenderTimeCapsule -> {
-                    timeCapsuleRepository.saveSendTimeCapsule(timeCapsule = action.timeCapsule)
-                }
-
-                is TimeCapsuleAction.EditSenderTimeCapsule -> {
-                    timeCapsuleRepository.editSendTimeCapsule(timeCapsule = action.timeCapsule)
-                }
-
-                is TimeCapsuleAction.DeleteSenderTimeCapsule -> {
-                    timeCapsuleRepository.deleteSendTimeCapsule(id = action.id)
-                }
-
-
-                is TimeCapsuleAction.SaveReceivedTimeCapsule -> {
-                    timeCapsuleRepository.saveReceivedTimeCapsule(timeCapsule = action.timeCapsule)
-                }
-
-                is TimeCapsuleAction.DeleteReceivedTimeCapsule -> {
-                    timeCapsuleRepository.deleteReceivedTimeCapsule(id = action.id)
                 }
             }
         }

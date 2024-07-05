@@ -32,12 +32,19 @@ class TimeCapsuleDetailViewModel @Inject constructor(
             if (isReceived) {
                 timeCapsuleRepository.getReceivedTimeCapsule(id = timeCapsuleId)?.let {
                     timeCapsuleRepository.updateReceivedTimeCapsule(it.copy(isOpened = true))
-                    _uiState.value = _uiState.value.copy(isReceived = true, timeCapsule = it.toTimeCapsule())
+                    val nickname = userRepository.getFriend(it.sender)?.nickname ?: it.sender
+                    _uiState.value = _uiState.value.copy(isReceived = true, timeCapsule = it.toTimeCapsule(nickname))
                 }
             } else {
                 timeCapsuleRepository.getMyTimeCapsule(id = timeCapsuleId)?.let {
                     timeCapsuleRepository.editMyTimeCapsule(it.copy(isOpened = true))
-                    _uiState.value = _uiState.value.copy(isReceived = false, timeCapsule = it.toTimeCapsule(myId, myProfileImage))
+                    val sharedFriends = it.sharedFriends.map { userId ->
+                        userRepository.getFriend(userId)?.nickname ?: userId
+                    }
+                    _uiState.value = _uiState.value.copy(
+                        isReceived = false,
+                        timeCapsule = it.toTimeCapsule(myId, myProfileImage, sharedFriends)
+                    )
                 }
             }
         }

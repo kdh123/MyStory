@@ -1,6 +1,7 @@
 package com.dhkim.user.domain
 
 typealias UserId = String
+typealias Nickname = String
 
 data class User(
     val id: String = "",

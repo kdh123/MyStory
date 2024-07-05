@@ -15,12 +15,13 @@ data class ReceivedTimeCapsule(
     val isOpened: Boolean = false
 ) : BaseTimeCapsule {
 
-    fun toTimeCapsule(): TimeCapsule {
+    fun toTimeCapsule(nickname: String): TimeCapsule {
         return TimeCapsule(
             id = id,
             date = date,
             host = Host(
                 id = sender,
+                nickname = nickname,
                 profileImage = profileImage
             ),
             openDate = openDate,
