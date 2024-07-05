@@ -1,6 +1,6 @@
 package com.dhkim.notification
 
-import com.dhkim.timecapsule.domain.ReceivedTimeCapsule
+import com.dhkim.home.domain.ReceivedTimeCapsule
 
 data class NotificationUiState(
     val isLoading: Boolean = false,

@@ -49,7 +49,7 @@ dependencies {
     implementation(project(":feature:map"))
     implementation(project(":feature:notification"))
     implementation(project(":feature:setting"))
-    implementation(project(":feature:timeCapsule"))
+    implementation(project(":feature:home"))
 
 
 

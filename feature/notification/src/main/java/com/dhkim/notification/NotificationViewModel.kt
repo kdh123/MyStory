@@ -2,7 +2,7 @@ package com.dhkim.notification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.timecapsule.domain.TimeCapsuleRepository
+import com.dhkim.home.domain.TimeCapsuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

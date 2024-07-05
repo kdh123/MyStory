@@ -41,7 +41,7 @@ android {
 dependencies {
 
     implementation(project(":core:common"))
-    implementation(project(":feature:timeCapsule"))
+    implementation(project(":feature:home"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)

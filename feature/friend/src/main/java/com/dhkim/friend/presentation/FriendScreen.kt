@@ -153,7 +153,7 @@ fun ProfileScreen(
         }
     }
 
-    if (showInfoBottomSheet) {
+    if (false && showInfoBottomSheet) {
         ModalBottomSheet(
             sheetState = infoBottomSheetState,
             onDismissRequest = {
@@ -379,7 +379,7 @@ fun ProfileScreen(
                             FriendScreen(
                                 uiState = uiState,
                                 onClick = {
-                                    showInfoBottomSheet = true
+                                    //showInfoBottomSheet = true
                                 },
                                 onFriendLongClick = {
                                     selectedUserId = it

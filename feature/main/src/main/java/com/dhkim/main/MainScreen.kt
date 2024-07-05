@@ -47,16 +47,16 @@ import com.dhkim.notification.navigation.navigateToNotification
 import com.dhkim.notification.navigation.notificationNavigation
 import com.dhkim.setting.presentation.navigation.navigateToSetting
 import com.dhkim.setting.presentation.navigation.settingNavigation
-import com.dhkim.timecapsule.presentation.navigation.ADD_TIME_CAPSULE_ROUTE
-import com.dhkim.timecapsule.presentation.navigation.TIME_CAPSULE_ROUTE
-import com.dhkim.timecapsule.presentation.navigation.addTimeCapsuleNavigation
-import com.dhkim.timecapsule.presentation.navigation.imageDetailNavigation
-import com.dhkim.timecapsule.presentation.navigation.moreTimeCapsuleNavigation
-import com.dhkim.timecapsule.presentation.navigation.navigateToImageDetail
-import com.dhkim.timecapsule.presentation.navigation.navigateToMore
-import com.dhkim.timecapsule.presentation.navigation.timeCapsuleDetailNavigation
-import com.dhkim.timecapsule.presentation.navigation.timeCapsuleNavigation
-import com.dhkim.timecapsule.presentation.navigation.timeCapsuleOpenNavigation
+import com.dhkim.home.presentation.navigation.ADD_TIME_CAPSULE_ROUTE
+import com.dhkim.home.presentation.navigation.TIME_CAPSULE_ROUTE
+import com.dhkim.home.presentation.navigation.addTimeCapsuleNavigation
+import com.dhkim.home.presentation.navigation.imageDetailNavigation
+import com.dhkim.home.presentation.navigation.moreTimeCapsuleNavigation
+import com.dhkim.home.presentation.navigation.navigateToImageDetail
+import com.dhkim.home.presentation.navigation.navigateToMore
+import com.dhkim.home.presentation.navigation.timeCapsuleDetailNavigation
+import com.dhkim.home.presentation.navigation.timeCapsuleNavigation
+import com.dhkim.home.presentation.navigation.timeCapsuleOpenNavigation
 import com.dhkim.ui.WarningDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
