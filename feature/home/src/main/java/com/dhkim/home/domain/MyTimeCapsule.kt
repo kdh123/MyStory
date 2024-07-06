@@ -4,18 +4,19 @@ import com.dhkim.user.domain.UserId
 import com.dhkim.user.domain.Nickname
 
 data class MyTimeCapsule(
-    val id: String,
-    val date: String,
-    val openDate: String,
-    val lat: String,
-    val lng: String,
-    val placeName: String,
-    val address: String,
-    val content: String,
-    val medias: List<String>,
-    val checkLocation: Boolean,
-    val isOpened: Boolean,
-    val sharedFriends: List<UserId>
+    val id: String = "",
+    val date: String = "",
+    val openDate: String = "",
+    val lat: String = "0.0",
+    val lng: String = "0.0",
+    val placeName: String = "",
+    val address: String = "",
+    val content: String = "",
+    val images: List<String> = listOf(),
+    val videos: List<String> = listOf(),
+    val checkLocation: Boolean = false,
+    val isOpened: Boolean = false,
+    val sharedFriends: List<UserId> = listOf()
 ) : BaseTimeCapsule {
 
     fun toTimeCapsule(myId: String, profileImage: String, sharedFriends: List<Nickname>): TimeCapsule {
@@ -32,7 +33,8 @@ data class MyTimeCapsule(
             placeName = placeName,
             address = address,
             content = content,
-            medias = medias,
+            images = images,
+            videos = videos,
             checkLocation = checkLocation,
             isOpened = isOpened,
             sharedFriends = sharedFriends,

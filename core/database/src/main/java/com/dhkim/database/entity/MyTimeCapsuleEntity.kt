@@ -14,7 +14,8 @@ data class MyTimeCapsuleEntity(
     @ColumnInfo(name = "placeName") val placeName: String,
     @ColumnInfo(name = "address") val address: String,
     @ColumnInfo(name = "content") val content: String,
-    @ColumnInfo(name = "media") val medias: List<String>,
+    @ColumnInfo(name = "images") val images: List<String>,
+    @ColumnInfo(name = "videos") val videos: List<String>,
     @ColumnInfo(name = "checkLocation") val checkLocation: Boolean,
     @ColumnInfo(name = "isOpened") val isOpened: Boolean,
     @ColumnInfo(name = "sharedFriends") val sharedFriends: List<String>

@@ -30,7 +30,7 @@ data class ReceivedTimeCapsule(
             placeName = placeName,
             address = address,
             content = content,
-            medias = listOf(),
+            images = listOf(),
             checkLocation = checkLocation,
             isOpened = isOpened,
             sharedFriends = listOf(),

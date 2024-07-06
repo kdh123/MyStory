@@ -171,7 +171,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
                             lng = lng,
                             placeName = placeName,
                             address = address,
-                            medias = imageUrls,
+                            images = imageUrls,
                             content = content,
                             checkLocation = checkLocation,
                             isOpened = false,

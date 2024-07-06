@@ -356,7 +356,7 @@ fun TimeCapsulePager(
     onOptionClick: (Boolean) -> Unit
 ) {
     val timeCapsule = uiState.timeCapsule
-    val images: List<String> = timeCapsule.medias
+    val images: List<String> = timeCapsule.images
     val pagerState = rememberPagerState(pageCount = {
         images.size
     })
@@ -384,7 +384,7 @@ fun TimeCapsulePager(
                         .aspectRatio(1f)
                         .clickable {
                             val images = URLEncoder.encode(
-                                uiState.timeCapsule.medias.joinToString(separator = ","),
+                                uiState.timeCapsule.images.joinToString(separator = ","),
                                 StandardCharsets.UTF_8.toString()
                             )
                             onNavigateToImageDetail("$page", images)

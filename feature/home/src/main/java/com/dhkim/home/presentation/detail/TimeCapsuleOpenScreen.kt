@@ -157,17 +157,17 @@ private fun TimeCapsuleOpenScreenPreview() {
 @Composable
 fun LoadedScreen(uiState: TimeCapsuleDetailUiState, onNavigateToDetail: (String, Boolean) -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
-    val medias = uiState.timeCapsule.medias
+    val images = uiState.timeCapsule.images
     var imageUrl by remember {
         mutableStateOf("")
     }
 
     val imageFlow = remember {
         flow {
-            repeat(medias.size) {
-                val index = it / medias.size
+            repeat(images.size) {
+                val index = it / images.size
                 delay(1000L)
-                emit(medias[index])
+                emit(images[index])
             }
         }
     }
@@ -178,7 +178,7 @@ fun LoadedScreen(uiState: TimeCapsuleDetailUiState, onNavigateToDetail: (String,
         }
     }
 
-    if (uiState.timeCapsule.medias.isNotEmpty()) {
+    if (uiState.timeCapsule.images.isNotEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -305,7 +305,7 @@ private fun Test() {
 @Composable
 private fun TimeCapsuleSlideImages(uiState: TimeCapsuleDetailUiState) {
     val interactionSource = remember { MutableInteractionSource() }
-    val imageUrls = uiState.timeCapsule.medias
+    val imageUrls = uiState.timeCapsule.images
     var index by remember {
         mutableIntStateOf(0)
     }
@@ -370,7 +370,7 @@ private fun LoadedScreenPreview() {
     val timeCapsule = TimeCapsule(
         id = "id1",
         content = "안녕하세요",
-        medias = listOf("")
+        images = listOf("")
     )
     val uiState = TimeCapsuleDetailUiState(
         timeCapsule = timeCapsule
@@ -432,7 +432,7 @@ private fun LoadingScreenPreview() {
 @Composable
 fun FilmLayout(uiState: TimeCapsuleDetailUiState, onClick: (String, Boolean) -> Unit) {
     val state = rememberScrollState()
-    val imageUrls = uiState.timeCapsule.medias
+    val imageUrls = uiState.timeCapsule.images
 
     Row(
         modifier = Modifier
@@ -516,7 +516,7 @@ fun FilmLayout(uiState: TimeCapsuleDetailUiState, onClick: (String, Boolean) -> 
 @Composable
 private fun FilmLayoutPreview() {
     val timeCapsuleDetailUiState = TimeCapsuleDetailUiState().copy(
-        timeCapsule = TimeCapsule(medias = listOf("", "", "", ""))
+        timeCapsule = TimeCapsule(images = listOf("", "", "", ""))
     )
 
     FilmLayout(timeCapsuleDetailUiState, onClick = { _, _ ->

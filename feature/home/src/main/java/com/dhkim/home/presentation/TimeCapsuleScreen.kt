@@ -537,7 +537,7 @@ private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
                 Text(
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
+                    fontSize = 18.sp,
                     text = "친구 추가",
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -761,11 +761,11 @@ private fun TimeCapsuleScreenPreview() {
 
     repeat(5) {
         if (it % 2 == 0) {
-            openedList.add(TimeCapsule(id = "$it", date = "2024-06-28", openDate = "2024-06-28", medias = listOf("")))
-            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", medias = listOf("")))
+            openedList.add(TimeCapsule(id = "$it", date = "2024-06-28", openDate = "2024-06-28", images = listOf("")))
+            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", images = listOf("")))
         } else {
-            openedList.add(TimeCapsule(id = "$it", date = "2024-06-28", openDate = "2024-06-28", checkLocation = true, medias = listOf("")))
-            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", checkLocation = true, medias = listOf("")))
+            openedList.add(TimeCapsule(id = "$it", date = "2024-06-28", openDate = "2024-06-28", checkLocation = true, images = listOf("")))
+            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", checkLocation = true, images = listOf("")))
         }
     }
 
@@ -806,9 +806,9 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongCl
                 )
         ) {
             Box {
-                if (timeCapsule.medias.isNotEmpty()) {
+                if (timeCapsule.images.isNotEmpty()) {
                     GlideImage(
-                        imageModel = timeCapsule.medias[0],
+                        imageModel = timeCapsule.images[0],
                         previewPlaceholder = R.drawable.ic_launcher_background,
                         error = painterResource(id = R.drawable.ic_launcher_background),
                         modifier = Modifier
@@ -870,7 +870,7 @@ private fun OpenedBoxPreview() {
         lng = "",
         address = "",
         content = "",
-        medias = listOf(""),
+        images = listOf(""),
         checkLocation = false,
         isOpened = true,
         sharedFriends = listOf(),
@@ -937,9 +937,9 @@ private fun LockTimeCapsule(
             Box(
                 modifier = Modifier
             ) {
-                if (timeCapsule.medias.isNotEmpty()) {
+                if (timeCapsule.images.isNotEmpty()) {
                     GlideImage(
-                        imageModel = timeCapsule.medias[0],
+                        imageModel = timeCapsule.images[0],
                         previewPlaceholder = R.drawable.ic_launcher_background,
                         error = painterResource(id = R.drawable.ic_launcher_background),
                         modifier = modifier
@@ -1027,7 +1027,7 @@ private fun LockTimeCapsule(
 @Composable
 private fun LockTimeCapsulePreview() {
     val timeCapsule = TimeCapsule(
-        medias = listOf("")
+        images = listOf("")
     )
 
     LockTimeCapsule(timeCapsule = timeCapsule, onLongClick = {

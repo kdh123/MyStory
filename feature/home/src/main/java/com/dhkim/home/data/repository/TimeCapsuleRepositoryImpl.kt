@@ -81,7 +81,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun saveMyTimeCapsule(timeCapsule: MyTimeCapsule) {
         val entity = timeCapsule.run {
             com.dhkim.database.entity.MyTimeCapsuleEntity(
-                id, date, openDate, lat, lng, placeName, address, content, medias, checkLocation, isOpened, sharedFriends
+                id, date, openDate, lat, lng, placeName, address, content, images, videos, checkLocation, isOpened, sharedFriends
             )
         }
 
@@ -91,7 +91,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
     override suspend fun editMyTimeCapsule(timeCapsule: MyTimeCapsule) {
         val entity = timeCapsule.run {
             com.dhkim.database.entity.MyTimeCapsuleEntity(
-                id, date, openDate, lat, lng, placeName, address, content, medias, checkLocation, isOpened, sharedFriends
+                id, date, openDate, lat, lng, placeName, address, content, images, videos, checkLocation, isOpened, sharedFriends
             )
         }
 

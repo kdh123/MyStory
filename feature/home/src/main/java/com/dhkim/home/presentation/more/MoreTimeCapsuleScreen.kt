@@ -61,9 +61,9 @@ fun MoreTimeCapsuleScreen(
                 items(items = uiState.timeCapsules, key = {
                     it.id
                 }) {
-                    if (it.medias.isNotEmpty()) {
+                    if (it.images.isNotEmpty()) {
                         GlideImage(
-                            imageModel = it.medias[0],
+                            imageModel = it.images[0],
                             contentScale = ContentScale.FillWidth,
                             modifier = Modifier
                                 .fillMaxWidth()

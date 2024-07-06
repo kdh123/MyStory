@@ -17,7 +17,8 @@ fun MyTimeCapsuleEntity.toMyTimeCapsule(): MyTimeCapsule {
         placeName = placeName,
         address = address,
         content = content,
-        medias = medias,
+        images = images,
+        videos = videos,
         checkLocation = checkLocation,
         isOpened = isOpened,
         sharedFriends = sharedFriends
