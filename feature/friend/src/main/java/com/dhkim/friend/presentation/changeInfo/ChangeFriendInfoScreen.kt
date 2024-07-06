@@ -109,7 +109,7 @@ fun ChangeFriendInfoScreen(
                     .padding(top = 5.dp)
             )
             Text(
-                text = "원래 닉네임 : ${uiState.id}",
+                text = "개인 코드 : ${uiState.id}",
                 modifier = Modifier
                     .padding(top = 10.dp)
             )

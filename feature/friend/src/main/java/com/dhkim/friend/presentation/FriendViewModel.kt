@@ -138,7 +138,7 @@ class FriendViewModel @Inject constructor(
 
                     if (isSuccessful) {
                         getMyInfo()
-                        _sideEffect.emit(FriendSideEffect.Message(message = "코드 생성 성공!!"))
+                        //_sideEffect.emit(FriendSideEffect.Message(message = "코드 생성 성공!!"))
                     } else {
                         _uiState.value = _uiState.value.copy(isCreatingCode = false)
                         _sideEffect.emit(FriendSideEffect.Message(message = "코드 생성에 실패하였습니다. 다시 시도해주세요."))

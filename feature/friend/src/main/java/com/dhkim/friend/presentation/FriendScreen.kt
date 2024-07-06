@@ -266,6 +266,8 @@ fun FriendScreen(
                 showCodeGuideDialog = false
                 onCreateCode()
             },
+            negativeText = "취소",
+            positiveText = "확인",
             dialogTitle = "알림",
             dialogText = "개인 코드는 타임캡슐 공유 목적 외 다른 목적으로 사용되지 않습니다. 또한 코드 생성시 사용자의 이름, 전화번호, 주소 등 어떠한 개인정보도 사용되지 않습니다.",
         )
@@ -351,9 +353,10 @@ fun FriendScreen(
                         ShareTimeCapsuleAnim()
 
                         Text(
+                            textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            text = "개인 코드를 생성하면 친구 맺은 사용자와 타임캡슐을 공유할 수 있습니다.",
+                            fontSize = 24.sp,
+                            text = "개인 코드 생성하고 \n 친구와 타임캡슐 공유하자!",
                             modifier = Modifier
                                 .padding(10.dp)
                                 .align(Alignment.CenterHorizontally)
@@ -362,7 +365,7 @@ fun FriendScreen(
 
                     Box(
                         modifier = Modifier
-                            .padding(10.dp)
+                            .padding(start = 10.dp, end = 10.dp, bottom = 20.dp)
                             .clip(RoundedCornerShape(10.dp))
                             .fillMaxWidth()
                             .height(48.dp)
@@ -415,6 +418,7 @@ fun FriendScreen(
                                 },
                                 modifier = Modifier
                                     .padding(start = 10.dp)
+                                    .align(Alignment.CenterVertically)
                             )
                         }
                     }
@@ -677,7 +681,7 @@ fun BottomSheetScreen(
                     singleLine = true,
                     value = uiState.searchResult.query,
                     label = {
-                        Text(text = "닉네임 검색")
+                        Text(text = "친구 코드 입력")
                     },
                     onValueChange = {
                         onQuery(it)
