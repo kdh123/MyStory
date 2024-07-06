@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -280,7 +282,7 @@ fun FriendScreen(
                 onDeleteFriend(selectedFriend.id)
             },
             dialogTitle = "삭제",
-            dialogText = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedFriend}님을 정말 삭제하시겠습니까?",
+            dialogText = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedFriend.nickname}님을 정말 삭제하시겠습니까?",
         )
     }
 
@@ -340,6 +342,8 @@ fun FriendScreen(
                             .align(Alignment.Center)
                     )
                 } else {
+                    val interactionSource = remember { MutableInteractionSource() }
+
                     Column(
                         modifier = Modifier
                             .padding(10.dp)
@@ -361,21 +365,58 @@ fun FriendScreen(
                             .padding(10.dp)
                             .clip(RoundedCornerShape(10.dp))
                             .fillMaxWidth()
-                            .background(color = colorResource(id = R.color.primary))
+                            .height(48.dp)
+                            .background(
+                                color = if (uiState.isCreatingCode) {
+                                    colorResource(id = R.color.light_gray)
+                                } else {
+                                    colorResource(id = R.color.primary)
+                                }
+                            )
                             .align(Alignment.BottomCenter)
-                            .clickable {
-                                showCodeGuideDialog = true
+                            .clickable(
+                                interactionSource = interactionSource,
+                                indication = null
+                            ) {
+                                if (!uiState.isCreatingCode) {
+                                    showCodeGuideDialog = true
+                                }
                             }
                     ) {
-                        Text(
-                            text = "개인 코드 생성하기",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                        Row(
                             modifier = Modifier
                                 .padding(10.dp)
+                                .height(48.dp)
                                 .align(Alignment.Center)
-                        )
+                        ) {
+                            if (uiState.isCreatingCode) {
+                                CircularProgressIndicator(
+                                    color = colorResource(id = R.color.gray),
+                                    trackColor = Color.Transparent,
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .aspectRatio(1f)
+                                        .align(Alignment.CenterVertically)
+                                )
+                            }
+
+                            Text(
+                                text = if (uiState.isCreatingCode) {
+                                    "개인 코드 생성 중..."
+                                } else {
+                                    "개인 코드 생성하기"
+                                },
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (uiState.isCreatingCode) {
+                                    colorResource(id = R.color.gray)
+                                } else {
+                                    Color.White
+                                },
+                                modifier = Modifier
+                                    .padding(start = 10.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -709,6 +750,7 @@ fun BottomSheetScreen(
                                 containerColor = colorResource(id = R.color.primary)
                             ),
                             modifier = Modifier
+                                .height(48.dp)
                                 .align(Alignment.CenterVertically),
                             onClick = {
                                 onAddFriend()
@@ -806,8 +848,9 @@ fun FriendScreen(
         Box(
             modifier = Modifier
                 .padding(10.dp)
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(10.dp))
                 .fillMaxWidth()
+                .height(48.dp)
                 .background(color = colorResource(id = R.color.primary))
                 .clickable {
                     showAddFriendBottomSheet()

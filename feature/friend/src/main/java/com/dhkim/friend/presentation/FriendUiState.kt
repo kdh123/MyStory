@@ -6,6 +6,7 @@ import com.dhkim.user.domain.User
 @Stable
 data class FriendUiState(
     val isLoading: Boolean = true,
+    val isCreatingCode: Boolean = false,
     val myInfo: User = User(),
     val searchResult: SearchResult = SearchResult()
 )

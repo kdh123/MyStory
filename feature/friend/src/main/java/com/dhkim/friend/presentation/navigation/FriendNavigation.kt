@@ -52,7 +52,7 @@ fun NavGraphBuilder.friendNavigation(
             onAcceptFriend = viewModel::acceptFriend,
             onDeleteFriend = viewModel::deleteFriend,
             onAddTimeCapsule = onAddTimeCapsule,
-            onCreateCode = viewModel::checkSignedUp,
+            onCreateCode = viewModel::createCode,
             onNavigateToChangeInfo = onNavigateToChangeInfo,
             onBack = onBack,
             modifier = modifier

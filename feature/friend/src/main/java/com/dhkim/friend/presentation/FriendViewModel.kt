@@ -92,18 +92,23 @@ class FriendViewModel @Inject constructor(
                     profileImage = myProfileImage,
                     friends = localFriends.map { it.toFriend() } + pendingFriends
                 )
-            }.catch { }
-                .collect {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        myInfo = it
-                    )
-                }
+            }.catch {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    isCreatingCode = false
+                )
+            }.collect {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    isCreatingCode = false,
+                    myInfo = it
+                )
+            }
         }
     }
 
-    fun checkSignedUp() {
-        _uiState.value = _uiState.value.copy(isLoading = true)
+    fun createCode() {
+        _uiState.value = _uiState.value.copy(isCreatingCode = true)
 
         viewModelScope.launch {
             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -131,13 +136,11 @@ class FriendViewModel @Inject constructor(
                         fcmToken = fcmToken
                     )
 
-                    val myInfo = _uiState.value.myInfo
-
                     if (isSuccessful) {
                         getMyInfo()
                         _sideEffect.emit(FriendSideEffect.Message(message = "코드 생성 성공!!"))
                     } else {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _uiState.value = _uiState.value.copy(isCreatingCode = false)
                         _sideEffect.emit(FriendSideEffect.Message(message = "코드 생성에 실패하였습니다. 다시 시도해주세요."))
                     }
                 }
