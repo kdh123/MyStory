@@ -8,11 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -21,8 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.dhkim.main.MainActivity
 import com.dhkim.onboarding.R
 import com.dhkim.ui.DefaultBackground
-import com.dhkim.ui.LoadingProgressBar
-import com.dhkim.ui.WarningDialog
+import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
@@ -30,8 +24,13 @@ fun SplashScreen(
     sideEffect: SplashSideEffect
 ) {
     val context = LocalContext.current
-    var showWarningDialog by remember {
-        mutableStateOf(false)
+
+    LaunchedEffect(true) {
+        delay(500L)
+        Intent(context, MainActivity::class.java).run {
+            context.startActivity(this)
+        }
+        (context as? Activity)?.finish()
     }
 
     Box(
@@ -49,47 +48,6 @@ fun SplashScreen(
                     .padding(70.dp)
                     .fillMaxSize()
             )
-
-            if (uiState.isLoading) {
-                LoadingProgressBar(
-                    modifier = Modifier
-                        .padding(bottom = 80.dp)
-                        .align(Alignment.BottomCenter)
-                )
-            }
-        }
-    }
-
-    if (showWarningDialog) {
-        WarningDialog(
-            dialogTitle = "에러",
-            dialogText = "앱 실행에 실패하였습니다.",
-            choice = false,
-            onConfirmation = {
-                (context as? Activity)?.finish()
-            },
-            onDismissRequest = {
-                (context as? Activity)?.finish()
-            }
-        )
-    }
-
-    LaunchedEffect(sideEffect) {
-        when (sideEffect) {
-            is SplashSideEffect.Completed -> {
-                if (sideEffect.isCompleted) {
-                    Intent(context, MainActivity::class.java).run {
-                        context.startActivity(this)
-                    }
-                    (context as? Activity)?.finish()
-                }
-            }
-
-            is SplashSideEffect.ShowPopup -> {
-                showWarningDialog = true
-            }
-
-            is SplashSideEffect.None -> {}
         }
     }
 }

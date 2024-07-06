@@ -1,11 +1,15 @@
 package com.dhkim.friend.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.CommonResult
+import com.dhkim.friend.R
 import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.LocalFriend
 import com.dhkim.user.domain.UserRepository
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,27 +27,46 @@ class FriendViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ProfileUiState())
+    private val _uiState = MutableStateFlow(FriendUiState())
     val uiState = _uiState.asStateFlow()
 
     private val _sideEffect = MutableSharedFlow<FriendSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
+    private val words = listOf(
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "k", "L", "M", "N", "O", "P",
+        "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i",
+        "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1",
+        "2", "3", "4", "5", "6", "7", "8", "9"
+    )
+
+    private val profileImages = listOf(
+        R.drawable.ic_smile_blue,
+        R.drawable.ic_smile_violet,
+        R.drawable.ic_smile_green,
+        R.drawable.ic_smile_orange
+    )
+
     init {
-        viewModelScope.launch {
-            val myId = userRepository.getMyId()
-            val myProfileImage = userRepository.getProfileImage().toString()
-            val user = _uiState.value.myInfo
+        getMyInfo()
+    }
 
-            _uiState.value = _uiState.value.copy(myInfo = user.copy(id = myId, profileImage = myProfileImage))
-        }
-
+    private fun getMyInfo() {
         viewModelScope.launch(Dispatchers.IO) {
-            combine(userRepository.getMyInfo(), userRepository.getAllFriend()) { user, friends ->
-                val remoteFriends = user.friends
-                val pendingFriends = user.friends.filter { it.isPending }
+            val myId = userRepository.getMyId()
 
-                friends.map { it.id }.filter { id -> !remoteFriends.map { it.id }.contains(id) }.forEach {  id ->
+            if (myId.isEmpty()) {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                return@launch
+            }
+
+            val myProfileImage = userRepository.getProfileImage().toString()
+
+            combine(userRepository.getMyInfo(), userRepository.getAllFriend()) { myInfo, friends ->
+                val remoteFriends = myInfo.friends
+                val pendingFriends = myInfo.friends.filter { it.isPending }
+
+                friends.map { it.id }.filter { id -> !remoteFriends.map { it.id }.contains(id) }.forEach { id ->
                     userRepository.deleteLocalFriend(id)
                 }
 
@@ -54,7 +77,7 @@ class FriendViewModel @Inject constructor(
                     .map { it.id }
                     .filter { id -> !localFriends.map { it.id }.contains(id) }
                     .forEach { id ->
-                        val friend = user.friends.first { it.id == id }
+                        val friend = myInfo.friends.first { it.id == id }
                         val localFriend = LocalFriend(
                             id = friend.id,
                             nickname = friend.id,
@@ -64,7 +87,11 @@ class FriendViewModel @Inject constructor(
                         userRepository.saveFriend(localFriend)
                     }
 
-                user.copy(friends = localFriends.map { it.toFriend() } + pendingFriends)
+                myInfo.copy(
+                    id = myId,
+                    profileImage = myProfileImage,
+                    friends = localFriends.map { it.toFriend() } + pendingFriends
+                )
             }.catch { }
                 .collect {
                     _uiState.value = _uiState.value.copy(
@@ -72,6 +99,53 @@ class FriendViewModel @Inject constructor(
                         myInfo = it
                     )
                 }
+        }
+    }
+
+    fun checkSignedUp() {
+        _uiState.value = _uiState.value.copy(isLoading = true)
+
+        viewModelScope.launch {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.e("fcm", "Fetching FCM registration token failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                viewModelScope.launch {
+                    val fcmToken = task.result
+                    val profileImage = profileImages[(0..3).random()]
+
+                    val userId = StringBuilder().apply {
+                        append(words[words.indices.random()])
+                        append(words[words.indices.random()])
+                        append(words[words.indices.random()])
+                        append(words[words.indices.random()])
+                        append(words[words.indices.random()])
+                        append(words[words.indices.random()])
+                    }
+
+                    val isSuccessful = userRepository.signUp(
+                        userId = "$userId",
+                        profileImage = "$profileImage",
+                        fcmToken = fcmToken
+                    )
+
+                    val myInfo = _uiState.value.myInfo
+
+                    if (isSuccessful) {
+                        getMyInfo()
+                        _sideEffect.emit(FriendSideEffect.Message(message = "코드 생성 성공!!"))
+                    } else {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _sideEffect.emit(FriendSideEffect.Message(message = "코드 생성에 실패하였습니다. 다시 시도해주세요."))
+                    }
+                }
+            }).addOnFailureListener {
+                viewModelScope.launch {
+                    _sideEffect.emit(FriendSideEffect.Message(message = "코드 생성에 실패하였습니다. 다시 시도해주세요."))
+                }
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package com.dhkim.friend.presentation.navigation
 
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -34,7 +35,8 @@ fun NavController.navigateToChangeFriendInfo(userId: String) {
 fun NavGraphBuilder.friendNavigation(
     onNavigateToChangeInfo: (String) -> Unit,
     onAddTimeCapsule: (friendId: String) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     composable(FRIEND_ROUTE) {
         val viewModel = hiltViewModel<FriendViewModel>()
@@ -50,8 +52,10 @@ fun NavGraphBuilder.friendNavigation(
             onAcceptFriend = viewModel::acceptFriend,
             onDeleteFriend = viewModel::deleteFriend,
             onAddTimeCapsule = onAddTimeCapsule,
+            onCreateCode = viewModel::checkSignedUp,
             onNavigateToChangeInfo = onNavigateToChangeInfo,
-            onBack = onBack
+            onBack = onBack,
+            modifier = modifier
         )
     }
 }

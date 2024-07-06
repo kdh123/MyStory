@@ -47,6 +47,7 @@ hiltCompiler = "1.0.0"
 jetbrainsKotlinJvm = "1.9.0"
 gson = "2.8.6"
 composeFoundation = "1.7.0-alpha02"
+airbnbLottieCompose = "4.0.0"
 
 [libraries]
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
@@ -113,6 +114,8 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+airbnb-lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "airbnbLottieCompose" }
+
 
 [bundles]
 androidx-camera = [
@@ -145,6 +148,16 @@ androidx-compose-main = [
     "androidx-compose-foundation"
 ]
 
+androidx-compose-side = [
+    "compose-glide",
+    "androidx-lifecycle-compose",
+    "androidx-compose-animation",
+    "compose-navigation",
+    "compose-hilt-navigation",
+    "androidx-compose-material",
+    "airbnb-lottie-compose"
+]
+
 android-ui-test = [
     "androidx-junit",
     "androidx-espresso-core",
@@ -156,14 +169,7 @@ debug-ui-test = [
     "androidx-ui-test-manifest"
 ]
 
-androidx-compose-side = [
-    "compose-glide",
-    "androidx-lifecycle-compose",
-    "androidx-compose-animation",
-    "compose-navigation",
-    "compose-hilt-navigation",
-    "androidx-compose-material"
-]
+
 
 google-location = [
     "play-services-location"

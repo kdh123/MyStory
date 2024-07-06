@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kapt)
+    alias(libs.plugins.google.service)
 }
 
 android {
@@ -46,6 +47,8 @@ dependencies {
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)
+    implementation(libs.bundles.firebase)
+    implementation(platform(libs.google.firebase.bom))
 
     implementation(libs.hilt)
     kapt(libs.androidx.hilt.compiler)

@@ -12,6 +12,7 @@ import com.dhkim.user.domain.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -46,7 +47,13 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getMyInfo(): Flow<User> {
-        return remoteDataSource.getMyInfo(myId = localDataSource.getUserId())
+        val myId = localDataSource.getUserId()
+
+        return if (myId.isNotEmpty()) {
+            remoteDataSource.getMyInfo(myId = localDataSource.getUserId())
+        } else {
+            flowOf(User())
+        }
     }
 
     override suspend fun getMyId(): String {

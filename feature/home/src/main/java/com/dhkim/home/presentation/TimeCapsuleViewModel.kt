@@ -115,8 +115,9 @@ class TimeCapsuleViewModel @Inject constructor(
 
                     if (timeCapsuleItems.isEmpty()) {
                         timeCapsuleItems.run {
-                            add(TimeCapsuleItem(id = 8, type = TimeCapsuleType.Title, "나의 첫 타임캡슐을 만들어보세요."))
+                            add(TimeCapsuleItem(id = 8, type = TimeCapsuleType.Title, "첫 타임캡슐을 만들어보세요"))
                             add(TimeCapsuleItem(id = 9, type = TimeCapsuleType.NoneTimeCapsule))
+                            add(TimeCapsuleItem(id = spaceId++, type = TimeCapsuleType.Line))
                         }
                     }
 

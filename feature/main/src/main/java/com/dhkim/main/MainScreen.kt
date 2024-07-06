@@ -272,7 +272,9 @@ fun MainScreen(
                 },
                 onBack = {
                     navController.navigateUp()
-                }
+                },
+                modifier = Modifier
+                    .padding(bottom = innerPadding.calculateBottomPadding())
             )
             changeFriendInfoNavigation {
                 navController.navigateUp()

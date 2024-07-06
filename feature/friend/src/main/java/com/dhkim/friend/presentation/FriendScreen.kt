@@ -7,6 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -52,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -65,16 +67,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dhkim.friend.R
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.WarningDialog
 import com.dhkim.user.domain.Friend
+import com.dhkim.user.domain.User
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendScreen(
-    uiState: ProfileUiState,
+    uiState: FriendUiState,
     sideEffect: FriendSideEffect,
     onQuery: (String) -> Unit,
     onSearchUser: () -> Unit,
@@ -82,8 +90,10 @@ fun FriendScreen(
     onAcceptFriend: (Friend) -> Unit,
     onDeleteFriend: (String) -> Unit,
     onAddTimeCapsule: (friendId: String) -> Unit,
+    onCreateCode: () -> Unit,
     onNavigateToChangeInfo: (String) -> Unit,
     onBack: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     var currentTab by remember { mutableIntStateOf(0) }
@@ -96,7 +106,7 @@ fun FriendScreen(
     )
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(state)
     val scope = rememberCoroutineScope()
-    var showBottomSheet = false
+    var showAddFriendBottomSheet = false
     var selectedFriend by remember {
         mutableStateOf(Friend())
     }
@@ -111,6 +121,9 @@ fun FriendScreen(
         mutableStateOf(false)
     }
     var showInfoBottomSheet by remember {
+        mutableStateOf(false)
+    }
+    var showCodeGuideDialog by remember {
         mutableStateOf(false)
     }
     val infoBottomSheetState = rememberModalBottomSheetState()
@@ -143,11 +156,11 @@ fun FriendScreen(
     }
 
     BackHandler {
-        if (showBottomSheet) {
+        if (showAddFriendBottomSheet) {
             scope.launch {
                 bottomSheetScaffoldState.bottomSheetState.hide()
             }
-            showBottomSheet = false
+            showAddFriendBottomSheet = false
         } else {
             onBack()
         }
@@ -242,6 +255,20 @@ fun FriendScreen(
         }
     }
 
+    if (showCodeGuideDialog) {
+        WarningDialog(
+            onDismissRequest = {
+                showCodeGuideDialog = false
+            },
+            onConfirmation = {
+                showCodeGuideDialog = false
+                onCreateCode()
+            },
+            dialogTitle = "알림",
+            dialogText = "개인 코드는 타임캡슐 공유 목적 외 다른 목적으로 사용되지 않습니다. 또한 코드 생성시 사용자의 이름, 전화번호, 주소 등 어떠한 개인정보도 사용되지 않습니다.",
+        )
+    }
+
     if (showDeleteDialog) {
         WarningDialog(
             onDismissRequest = {
@@ -258,6 +285,7 @@ fun FriendScreen(
     }
 
     BottomSheetScaffold(
+        modifier = modifier,
         scaffoldState = bottomSheetScaffoldState,
         sheetPeekHeight = 0.dp,
         sheetContent = {
@@ -296,16 +324,6 @@ fun FriendScreen(
                             fontSize = 18.sp
                         )
                     }
-                    AddFriend(
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .clickable {
-                                scope.launch {
-                                    bottomSheetScaffoldState.bottomSheetState.expand()
-                                    showBottomSheet = true
-                                }
-                            }
-                    )
                 }
                 Divider(
                     thickness = 1.dp,
@@ -314,6 +332,57 @@ fun FriendScreen(
             }
         }
     ) {
+        if (uiState.myInfo.id.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (uiState.isLoading) {
+                    LoadingProgressBar(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                    )
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(10.dp)
+                    ) {
+                        ShareTimeCapsuleAnim()
+
+                        Text(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            text = "개인 코드를 생성하면 친구 맺은 사용자와 타임캡슐을 공유할 수 있습니다.",
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .align(Alignment.CenterHorizontally)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .fillMaxWidth()
+                            .background(color = colorResource(id = R.color.primary))
+                            .align(Alignment.BottomCenter)
+                            .clickable {
+                                showCodeGuideDialog = true
+                            }
+                    ) {
+                        Text(
+                            text = "개인 코드 생성하기",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .align(Alignment.Center)
+                        )
+                    }
+                }
+            }
+
+            return@BottomSheetScaffold
+        }
+
         Column(modifier = Modifier.fillMaxSize()) {
             TabRow(
                 selectedTabIndex = currentTab,
@@ -358,9 +427,15 @@ fun FriendScreen(
                         0 -> {
                             FriendScreen(
                                 uiState = uiState,
-                                onClick = {
+                                showInfoBottomSheet = {
                                     selectedFriend = it
                                     showInfoBottomSheet = true
+                                },
+                                showAddFriendBottomSheet = {
+                                    scope.launch {
+                                        bottomSheetScaffoldState.bottomSheetState.expand()
+                                    }
+                                    showAddFriendBottomSheet = true
                                 },
                                 onFriendLongClick = {
                                     selectedFriend = it
@@ -379,6 +454,7 @@ fun FriendScreen(
                     }
                     currentTab = pos
                 }
+
             }
 
             if (showInfoBottomSheet) {
@@ -418,6 +494,36 @@ fun FriendScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ShareTimeCapsuleAnim() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        val preloaderLottieComposition by rememberLottieComposition(
+            LottieCompositionSpec.RawRes(
+                R.raw.share_anim
+            )
+        )
+
+        val preloaderProgress by animateLottieCompositionAsState(
+            preloaderLottieComposition,
+            iterations = LottieConstants.IterateForever,
+            isPlaying = true
+        )
+
+
+        LottieAnimation(
+            composition = preloaderLottieComposition,
+            progress = preloaderProgress,
+            modifier = Modifier
+                .width(300.dp)
+                .aspectRatio(1f)
+                .align(Alignment.Center)
+        )
     }
 }
 
@@ -468,7 +574,7 @@ fun AddFriend(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetScreen(
-    uiState: ProfileUiState,
+    uiState: FriendUiState,
     onQuery: (String) -> Unit,
     onSearch: () -> Unit,
     onAddFriend: () -> Unit
@@ -625,19 +731,29 @@ fun BottomSheetScreen(
 @Preview(showBackground = true)
 @Composable
 private fun SearchScreenPreview() {
-    BottomSheetScreen(ProfileUiState(), {}, {}, {})
+    BottomSheetScreen(FriendUiState(), {}, {}, {})
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun ProfileScreenPreview() {
-    /*ProfileScreen {
+private fun FriendScreenPreview() {
+    FriendScreen(
+        uiState = FriendUiState(
+            myInfo = User(
+                id = "홍길동",
+                profileImage = "${R.drawable.ic_smile_blue}"
+            )
+        ),
+        showInfoBottomSheet = {},
+        showAddFriendBottomSheet = { /*TODO*/ },
+        onFriendLongClick = {}
+    ) {
 
-    }*/
+    }
 }
 
 @Composable
-fun RequestScreen(uiState: ProfileUiState, onClick: (Friend) -> Unit) {
+fun RequestScreen(uiState: FriendUiState, onClick: (Friend) -> Unit) {
     val requests = uiState.myInfo.requests
     if (requests.isNotEmpty()) {
         RequestList(
@@ -659,8 +775,9 @@ fun RequestScreen(uiState: ProfileUiState, onClick: (Friend) -> Unit) {
 
 @Composable
 fun FriendScreen(
-    uiState: ProfileUiState,
-    onClick: (Friend) -> Unit,
+    uiState: FriendUiState,
+    showInfoBottomSheet: (Friend) -> Unit,
+    showAddFriendBottomSheet: () -> Unit,
     onFriendLongClick: (Friend) -> Unit,
     onPendingFriendLongClick: (Friend) -> Unit,
 ) {
@@ -680,17 +797,37 @@ fun FriendScreen(
                 isMe = true,
                 profileImage = uiState.myInfo.profileImage.toInt(),
                 onClick = {
-                    onClick(it)
+                    showInfoBottomSheet(it)
                 },
                 onLongClick = onFriendLongClick
             )
         }
+
+        Box(
+            modifier = Modifier
+                .padding(10.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .fillMaxWidth()
+                .background(color = colorResource(id = R.color.primary))
+                .clickable {
+                    showAddFriendBottomSheet()
+                }
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_person_add_white),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .align(Alignment.Center)
+            )
+        }
+
         FriendList(
             uiState = uiState,
             isFriend = true,
             title = "서로 승낙한 친구",
             modifier = Modifier.fillMaxWidth(),
-            onClick = onClick,
+            onClick = showInfoBottomSheet,
             onLongClick = onFriendLongClick
         )
         FriendList(
@@ -738,7 +875,7 @@ fun RequestList(
 
 @Composable
 fun FriendList(
-    uiState: ProfileUiState,
+    uiState: FriendUiState,
     title: String,
     isFriend: Boolean,
     onClick: ((Friend) -> Unit)? = null,
@@ -834,6 +971,7 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FriendItem(
     friend: Friend,
@@ -882,7 +1020,15 @@ fun FriendItem(
 @Preview(showBackground = true)
 @Composable
 private fun FriendItemPreview() {
-    FriendItem(friend = Friend(), 0, false, onClick = {}) {
+    FriendItem(
+        friend = Friend(
+            nickname = "홍길동",
+            profileImage = "${R.drawable.ic_smile_blue}"
+        ),
+        profileImage = R.drawable.ic_smile_blue,
+        isMe = false,
+        onClick = {}
+    ) {
 
     }
 }

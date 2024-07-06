@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import com.dhkim.user.domain.User
 
 @Stable
-data class ProfileUiState(
+data class FriendUiState(
     val isLoading: Boolean = true,
     val myInfo: User = User(),
     val searchResult: SearchResult = SearchResult()
