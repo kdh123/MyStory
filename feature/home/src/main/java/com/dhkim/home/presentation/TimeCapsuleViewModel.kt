@@ -32,6 +32,7 @@ class TimeCapsuleViewModel @Inject constructor(
 
     private var spaceId = 100
 
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             val myId = userRepository.getMyId()
