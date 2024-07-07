@@ -19,9 +19,15 @@ android {
     defaultConfig {
         minSdk = 26
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.dhkim.home.CustomTestRunner"
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "KAKAO_ADMIN_KEY", localProperties["KAKAO_ADMIN_KEY"] as String)
+
+        testOptions {
+            unitTests {
+                isIncludeAndroidResources = true
+            }
+        }
     }
 
     buildTypes {
@@ -74,10 +80,18 @@ dependencies {
     kapt(libs.androidx.hilt.compiler)
     kapt(libs.hilt.compiler)
 
+    //test
+    testImplementation(libs.bundles.test)
+    kaptTest(libs.hilt.compiler)
+    testAnnotationProcessor(libs.hilt.compiler)
+    androidTestImplementation(libs.bundles.androidx.ui.test)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    kaptAndroidTest(libs.hilt.compiler)
+    androidTestAnnotationProcessor(libs.hilt.compiler)
+    debugImplementation(libs.bundles.debug.ui.test)
+
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }

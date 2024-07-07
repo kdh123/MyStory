@@ -1,92 +1,33 @@
 package com.dhkim.home.data.dataSource.local
 
-import com.dhkim.database.AppDatabase
 import com.dhkim.database.entity.MyTimeCapsuleEntity
 import com.dhkim.database.entity.ReceivedTimeCapsuleEntity
 import com.dhkim.database.entity.SendTimeCapsuleEntity
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-class TimeCapsuleLocalDataSource @Inject constructor(
-    private val db: AppDatabase
-) {
+interface TimeCapsuleLocalDataSource {
 
-    private val myTimeCapsuleService = db.myTimeCapsuleDao()
-    private val sendTimeCapsuleService = db.sendTimeCapsuleDao()
-    private val receivedTimeCapsuleService = db.receivedTimeCapsuleDao()
-
-    fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsuleEntity>?> {
-        return myTimeCapsuleService.getAllTimeCapsule()
-    }
-
-    fun getMyTimeCapsule(id: String): MyTimeCapsuleEntity? {
-        return myTimeCapsuleService.getTimeCapsule(id)
-    }
-
-    fun getMyTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<MyTimeCapsuleEntity>?> {
-        return myTimeCapsuleService.getTimeCapsulesInDate(startDate, endDate)
-    }
-
-    fun saveMyTimeCapsule(timeCapsule: MyTimeCapsuleEntity) {
-        return myTimeCapsuleService.saveTimeCapsule(timeCapsule)
-    }
-
-    fun updateMyTimeCapsule(timeCapsule: MyTimeCapsuleEntity) {
-        myTimeCapsuleService.updateTimeCapsule(timeCapsule)
-    }
-
-    fun deleteMyTimeCapsule(id: String) {
-        myTimeCapsuleService.deleteTimeCapsule(id)
-    }
+    fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsuleEntity>?>
+    fun getMyTimeCapsule(id: String): MyTimeCapsuleEntity?
+    fun getMyTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<MyTimeCapsuleEntity>?>
+    fun saveMyTimeCapsule(timeCapsule: MyTimeCapsuleEntity)
+    fun updateMyTimeCapsule(timeCapsule: MyTimeCapsuleEntity)
+    fun deleteMyTimeCapsule(id: String)
 
 
 
-    fun getSendAllTimeCapsule(): Flow<List<SendTimeCapsuleEntity>?> {
-        return sendTimeCapsuleService.getAllTimeCapsule()
-    }
-
-    fun getSendTimeCapsule(id: String): SendTimeCapsuleEntity? {
-        return sendTimeCapsuleService.getTimeCapsule(id)
-    }
-
-    fun getSendTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<SendTimeCapsuleEntity>?> {
-        return sendTimeCapsuleService.getTimeCapsulesInDate(startDate, endDate)
-    }
-
-    fun saveSendTimeCapsule(timeCapsule: SendTimeCapsuleEntity) {
-        return sendTimeCapsuleService.saveTimeCapsule(timeCapsule)
-    }
-
-    fun updateSendTimeCapsule(timeCapsule: SendTimeCapsuleEntity) {
-        sendTimeCapsuleService.updateTimeCapsule(timeCapsule)
-    }
-
-    fun deleteSendTimeCapsule(id: String) {
-        sendTimeCapsuleService.deleteTimeCapsule(id)
-    }
+    fun getSendAllTimeCapsule(): Flow<List<SendTimeCapsuleEntity>?>
+    fun getSendTimeCapsule(id: String): SendTimeCapsuleEntity?
+    fun getSendTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<SendTimeCapsuleEntity>?>
+    fun saveSendTimeCapsule(timeCapsule: SendTimeCapsuleEntity)
+    fun updateSendTimeCapsule(timeCapsule: SendTimeCapsuleEntity)
+    fun deleteSendTimeCapsule(id: String)
 
 
-    fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsuleEntity>?> {
-        return receivedTimeCapsuleService.getAllTimeCapsule()
-    }
-
-    fun getReceivedTimeCapsule(id: String): ReceivedTimeCapsuleEntity? {
-        return receivedTimeCapsuleService.getTimeCapsule(id)
-    }
-
-    fun getReceivedTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<ReceivedTimeCapsuleEntity>?> {
-        return receivedTimeCapsuleService.getTimeCapsulesInDate(startDate, endDate)
-    }
-
-    fun saveReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsuleEntity) {
-        return receivedTimeCapsuleService.saveTimeCapsule(timeCapsule)
-    }
-
-    fun updateReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsuleEntity) {
-        receivedTimeCapsuleService.updateTimeCapsule(timeCapsule)
-    }
-
-    fun deleteReceivedTimeCapsule(id: String) {
-        receivedTimeCapsuleService.deleteTimeCapsule(id)
-    }
+    fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsuleEntity>?>
+    fun getReceivedTimeCapsule(id: String): ReceivedTimeCapsuleEntity?
+    fun getReceivedTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<ReceivedTimeCapsuleEntity>?>
+    fun saveReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsuleEntity)
+    fun updateReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsuleEntity)
+    fun deleteReceivedTimeCapsule(id: String)
 }

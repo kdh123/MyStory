@@ -48,12 +48,17 @@ jetbrainsKotlinJvm = "1.9.0"
 gson = "2.8.6"
 composeFoundation = "1.7.0-alpha02"
 airbnbLottieCompose = "4.0.0"
+roboletric = "4.12"
+coroutineTest = "1.8.1"
 
 [libraries]
+robolectric = { module = "org.robolectric:robolectric", version.ref = "roboletric" }
+coroutine-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutineTest" }
+
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWorkManager" }
 androidx-work = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
-android-joda = { module = "net.danlew:android.joda", version.ref = "jodaTime" }
+
 
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "composeFoundation" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
@@ -91,6 +96,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
+hilt-test = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 androidx-lifecycle-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "composeFlowState" }
 compose-hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "composeHilt" }
 compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
@@ -115,6 +121,8 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 airbnb-lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "airbnbLottieCompose" }
+
+
 
 
 [bundles]
@@ -158,10 +166,22 @@ androidx-compose-side = [
     "airbnb-lottie-compose"
 ]
 
-android-ui-test = [
+androidx-ui-test = [
     "androidx-junit",
     "androidx-espresso-core",
-    "androidx-ui-test-junit4"
+    "androidx-ui-test-junit4",
+    "coroutine-test",
+    "hilt-test"
+]
+
+test = [
+    "junit",
+    "robolectric",
+    "coroutine-test",
+    "androidx-junit",
+    "androidx-espresso-core",
+    "androidx-ui-test-junit4",
+    "hilt-test"
 ]
 
 debug-ui-test = [
