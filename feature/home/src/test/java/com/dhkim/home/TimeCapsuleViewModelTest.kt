@@ -13,9 +13,7 @@ import com.dhkim.home.presentation.TimeCapsuleType
 import com.dhkim.home.presentation.TimeCapsuleViewModel
 import com.dhkim.user.data.UserRepositoryImpl
 import com.dhkim.user.data.dataSource.UserLocalDataSource
-import com.dhkim.user.data.dataSource.UserLocalDataSourceImpl
 import com.dhkim.user.data.dataSource.UserRemoteDataSource
-import com.dhkim.user.data.dataSource.UserRemoteDataSourceImpl
 import com.dhkim.user.data.di.UserModule
 import com.dhkim.user.domain.UserRepository
 import dagger.Binds
@@ -116,5 +114,18 @@ class TimeCapsuleViewModelTest {
 
         assertEquals(unopenedTimeCapsules.data.size, 15)
         assertEquals(unopenedTimeCapsules.data[0].id, "id1")
+    }
+
+    @Test
+    fun `삭제 테스트`() = runBlocking {
+        viewModel.deleteTimeCapsule("receivedId1", isReceived = true)
+        delay(500L)
+
+        val timeCapsules = viewModel.uiState.value.timeCapsules
+        val unopenedTimeCapsules = timeCapsules
+            .firstOrNull { it.type == TimeCapsuleType.UnopenedTimeCapsule }
+            ?.data as? StableList<TimeCapsule> ?: StableList()
+
+        assertEquals(unopenedTimeCapsules.data.size, 14)
     }
 }

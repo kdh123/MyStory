@@ -5,12 +5,12 @@ import com.dhkim.database.entity.ReceivedTimeCapsuleEntity
 import com.dhkim.database.entity.SendTimeCapsuleEntity
 import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 class FakeTimeCapsuleLocalDataSource @Inject constructor() : TimeCapsuleLocalDataSource {
 
-    private var myTimeCapsules: MutableList<MyTimeCapsuleEntity> = mutableListOf<MyTimeCapsuleEntity>().apply {
+    private val myTimeCapsules = MutableStateFlow(mutableListOf<MyTimeCapsuleEntity>().apply {
         repeat(10) {
             val openDate = if (it % 2 == 0) {
                 "2024-06-07"
@@ -37,9 +37,9 @@ class FakeTimeCapsuleLocalDataSource @Inject constructor() : TimeCapsuleLocalDat
             )
             add(myTimeCapsuleEntity)
         }
-    }
+    })
 
-    private var receivedTimeCapsules: MutableList<ReceivedTimeCapsuleEntity> = mutableListOf<ReceivedTimeCapsuleEntity>().apply {
+    private val receivedTimeCapsules = MutableStateFlow(mutableListOf<ReceivedTimeCapsuleEntity>().apply {
         repeat(10) {
             val receivedTimeCapsuleEntity = ReceivedTimeCapsuleEntity(
                 id = "receivedId$it",
@@ -57,14 +57,14 @@ class FakeTimeCapsuleLocalDataSource @Inject constructor() : TimeCapsuleLocalDat
             )
             add(receivedTimeCapsuleEntity)
         }
-    }
+    })
 
     override fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsuleEntity>?> {
-        return flowOf(myTimeCapsules)
+        return myTimeCapsules
     }
 
     override fun getMyTimeCapsule(id: String): MyTimeCapsuleEntity? {
-        return myTimeCapsules.firstOrNull { it.id == id }
+        return myTimeCapsules.value.firstOrNull { it.id == id }
     }
 
     override fun getMyTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<MyTimeCapsuleEntity>?> {
@@ -72,24 +72,34 @@ class FakeTimeCapsuleLocalDataSource @Inject constructor() : TimeCapsuleLocalDat
     }
 
     override fun saveMyTimeCapsule(timeCapsule: MyTimeCapsuleEntity) {
-        myTimeCapsules.add(timeCapsule)
+        val data = myTimeCapsules.value.apply {
+            add(timeCapsule)
+        }
+        myTimeCapsules.value = data
     }
 
     override fun updateMyTimeCapsule(timeCapsule: MyTimeCapsuleEntity) {
-        val index = myTimeCapsules.indexOfFirst { it.id == timeCapsule.id }
-        myTimeCapsules[index] = timeCapsule
+        val index = myTimeCapsules.value.indexOfFirst { it.id == timeCapsule.id }
+        val data = myTimeCapsules.value.apply {
+            set(index, timeCapsule)
+        }
+        myTimeCapsules.value = data
     }
 
     override fun deleteMyTimeCapsule(id: String) {
-        myTimeCapsules.removeIf { it.id == id }
+        val data = myTimeCapsules.value.apply {
+            removeIf { it.id == id }
+        }
+        println("data 22 : $data")
+        myTimeCapsules.value = data
     }
 
     override fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsuleEntity>?> {
-        return flowOf(receivedTimeCapsules)
+        return receivedTimeCapsules
     }
 
     override fun getReceivedTimeCapsule(id: String): ReceivedTimeCapsuleEntity? {
-        return receivedTimeCapsules.firstOrNull { it.id == id }
+        return receivedTimeCapsules.value.firstOrNull { it.id == id }
     }
 
     override fun getReceivedTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<ReceivedTimeCapsuleEntity>?> {
@@ -97,16 +107,25 @@ class FakeTimeCapsuleLocalDataSource @Inject constructor() : TimeCapsuleLocalDat
     }
 
     override fun saveReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsuleEntity) {
-        receivedTimeCapsules.add(timeCapsule)
+        val data = receivedTimeCapsules.value.apply {
+            add(timeCapsule)
+        }
+        receivedTimeCapsules.value = data
     }
 
     override fun updateReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsuleEntity) {
-        val index = receivedTimeCapsules.indexOfFirst { it.id == timeCapsule.id }
-        receivedTimeCapsules[index] = timeCapsule
+        val index = receivedTimeCapsules.value.indexOfFirst { it.id == timeCapsule.id }
+        val data = receivedTimeCapsules.value.apply {
+            set(index, timeCapsule)
+        }
+        receivedTimeCapsules.value = data
     }
 
     override fun deleteReceivedTimeCapsule(id: String) {
-        receivedTimeCapsules.removeIf { it.id == id }
+        val data = receivedTimeCapsules.value.apply {
+            removeIf { it.id == id }
+        }
+        receivedTimeCapsules.value = data
     }
 
     override fun getSendAllTimeCapsule(): Flow<List<SendTimeCapsuleEntity>?> {
