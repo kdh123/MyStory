@@ -54,6 +54,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -317,7 +318,10 @@ fun TimeCapsuleScreen(
             if (uiState.isLoading) {
                 LoadingScreen()
             } else {
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier
+                        .testTag("timeCapsuleItems")
+                ) {
                     items(uiState.timeCapsules, key = {
                         it.id
                     }) {
@@ -706,6 +710,7 @@ private fun OpenableTimeCapsules(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 10.dp)
+            .testTag("openableTimeCapsules")
     ) {
         items(items = timeCapsules.data, key = {
             it.id
@@ -739,6 +744,7 @@ private fun UnopenedTimeCapsules(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 10.dp)
+            .testTag("unopenedTimeCapsules")
     ) {
         items(items = timeCapsules.data, key = {
             it.id
@@ -902,6 +908,7 @@ private fun LockTimeCapsule(
         modifier = Modifier
             .width(165.dp)
             .padding(bottom = 10.dp, end = 10.dp)
+            .testTag("lockTimeCapsule${timeCapsule.id}")
     ) {
         val modifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Modifier

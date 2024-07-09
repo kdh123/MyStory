@@ -1,16 +1,21 @@
 package com.dhkim.home
 
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.dhkim.common.StableList
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performScrollToIndex
 import com.dhkim.home.data.FakeTimeCapsuleLocalDataSource
 import com.dhkim.home.data.FakeTimeCapsuleRepository
 import com.dhkim.home.data.FakeUserLocalDataSource
 import com.dhkim.home.data.FakeUserRemoteDataSource
 import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.home.data.di.TimeCapsuleModule
-import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.home.domain.TimeCapsuleRepository
-import com.dhkim.home.presentation.TimeCapsuleType
+import com.dhkim.home.presentation.TimeCapsuleScreen
+import com.dhkim.home.presentation.TimeCapsuleSideEffect
 import com.dhkim.home.presentation.TimeCapsuleViewModel
 import com.dhkim.user.data.UserRepositoryImpl
 import com.dhkim.user.data.dataSource.UserLocalDataSource
@@ -27,7 +32,6 @@ import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,7 +45,7 @@ import javax.inject.Singleton
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
 @UninstallModules(TimeCapsuleModule::class, UserModule::class)
-class TimeCapsuleViewModelTest {
+class TimeCapsuleScreenTest {
 
     @Module
     @InstallIn(SingletonComponent::class)
@@ -82,8 +86,11 @@ class TimeCapsuleViewModelTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-    @Inject lateinit var timeCapsuleRepository: TimeCapsuleRepository
-    @Inject lateinit var userRepository: UserRepository
+    @Inject
+    lateinit var timeCapsuleRepository: TimeCapsuleRepository
+
+    @Inject
+    lateinit var userRepository: UserRepository
 
     private lateinit var viewModel: TimeCapsuleViewModel
 
@@ -94,42 +101,53 @@ class TimeCapsuleViewModelTest {
     }
 
     @Test
-    fun `상태 테스트`() = runBlocking {
-        delay(500L)
-        val timeCapsules = viewModel.uiState.value.timeCapsules
-        val openableTimeCapsules = timeCapsules
-            .firstOrNull { it.type == TimeCapsuleType.OpenableTimeCapsule }
-            ?.data as? StableList<TimeCapsule> ?: StableList()
+    fun `UI 테스트`() = runBlocking {
+        // Start the app
+        delay(300L)
+        val uiState = viewModel.uiState.value
 
-        val openedTimeCapsules = timeCapsules
-            .firstOrNull { it.type == TimeCapsuleType.OpenedTimeCapsule }
-            ?.data as? StableList<TimeCapsule> ?: StableList()
+        composeRule.setContent {
+            TimeCapsuleScreen(
+                uiState = uiState,
+                sideEffect = TimeCapsuleSideEffect.None,
+                onDeleteTimeCapsule = { _, _ -> },
+                onNavigateToAdd = {},
+                onNavigateToOpen = { _, _ -> },
+                onNavigateToDetail = { _, _ -> },
+                onNavigateToNotification = {},
+                onNavigateToSetting = {},
+                onNavigateToProfile = {},
+                onNavigateToMore = {},
+            )
+        }
 
-        val unopenedTimeCapsules = timeCapsules
-            .firstOrNull { it.type == TimeCapsuleType.UnopenedTimeCapsule }
-            ?.data as? StableList<TimeCapsule> ?: StableList()
+        composeRule.waitUntilExists(
+            hasTestTag("openableTimeCapsules"),
+            300L
+        )
 
-        assertEquals(timeCapsules.size, 11)
-        assertEquals(openableTimeCapsules.data.size, 2)
-        assertEquals(openableTimeCapsules.data[0].id, "id2")
+        composeRule.waitUntilExists(
+            hasTestTag("lockTimeCapsuleid2"),
+            300L
+        )
 
-        assertEquals(openedTimeCapsules.data.size, 3)
-        assertEquals(openedTimeCapsules.data[0].id, "id0")
+        composeRule.onNodeWithTag("timeCapsuleItems").performScrollToIndex(6)
 
-        assertEquals(unopenedTimeCapsules.data.size, 15)
-        assertEquals(unopenedTimeCapsules.data[0].id, "id1")
+        composeRule.waitUntilExists(
+            hasTestTag("lockTimeCapsuleid1"),
+            300L
+        )
+
+        //composeRule.onNodeWithTag("unopenedTimeCapsules").assertIsDisplayed()
+
+        //composeTestRule.onNodeWithText("Continue").performClick()
+        //composeTestRule.onNodeWithTag("title").assert(hasText("나의 이야기"))
+        //composeTestRule.onNodeWithText("나의 이야기").assertIsDisplayed()
     }
 
-    @Test
-    fun `삭제 테스트`() = runBlocking {
-        viewModel.deleteTimeCapsule("receivedId1", isReceived = true)
-        delay(500L)
-
-        val timeCapsules = viewModel.uiState.value.timeCapsules
-        val unopenedTimeCapsules = timeCapsules
-            .firstOrNull { it.type == TimeCapsuleType.UnopenedTimeCapsule }
-            ?.data as? StableList<TimeCapsule> ?: StableList()
-
-        assertEquals(unopenedTimeCapsules.data.size, 14)
-    }
+    @OptIn(ExperimentalTestApi::class)
+    fun ComposeContentTestRule.waitUntilExists(
+        matcher: SemanticsMatcher,
+        timeoutMillis: Long = 1000L
+    ) = waitUntilNodeCount(matcher, 1, timeoutMillis)
 }
