@@ -112,6 +112,8 @@ google-permission = { module = "com.google.accompanist:accompanist-permissions",
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 androidx-paging-common = { module = "androidx.paging:paging-common", version.ref = "paging3" }
+androidx-paging-testing = { module = "androidx.paging:paging-testing", version.ref = "paging3" }
+
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
@@ -203,7 +205,8 @@ naver-map = [
 
 androidx-paging3 = [
     "androidx-paging-common",
-    "androidx-paging-compose"
+    "androidx-paging-compose",
+    "androidx-paging-testing"
 ]
 
 google-permission = [

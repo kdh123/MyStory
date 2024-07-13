@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -119,6 +120,7 @@ fun SearchBar(query: String, onQuery: (String) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .focusRequester(focusRequester)
+            .testTag("searchBar")
     )
 
     LaunchedEffect(true) {
@@ -136,7 +138,11 @@ fun PlaceList(places: LazyPagingItems<Place>, onBack: (Place) -> Unit) {
         }
         Log.e("errr", "err")
     }
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("searchResult")
+    ) {
         items(
             count = places.itemCount,
             key = places.itemKey(key = {
