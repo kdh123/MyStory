@@ -1,15 +1,18 @@
 package com.dhkim.location
 
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
+import androidx.paging.testing.TestPager
 import androidx.paging.testing.asSnapshot
 import com.dhkim.location.data.dataSource.remote.LocationApi
 import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
 import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSourceImpl
+import com.dhkim.location.data.dataSource.remote.SearchPlaceByKeywordPagingSource
 import com.dhkim.location.data.di.LocationApiModule
 import com.dhkim.location.data.di.LocationModule
 import com.dhkim.location.data.model.PlaceDocument
 import com.dhkim.location.data.repository.LocationRepositoryImpl
 import com.dhkim.location.domain.LocationRepository
-import com.dhkim.location.presentation.SearchViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -18,10 +21,10 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
-import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,7 +38,7 @@ import javax.inject.Singleton
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
 @UninstallModules(LocationModule::class, LocationApiModule::class)
-class SearchViewModelTest {
+class LocationRepositoryTest {
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
@@ -43,24 +46,22 @@ class SearchViewModelTest {
     @Inject
     lateinit var locationRepository: LocationRepository
 
-    private lateinit var viewModel: SearchViewModel
-
-    @get:Rule
-    var mainDispatcherRule = MainDispatcherRule()
-
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = SearchViewModel(locationRepository)
     }
 
     @Module
     @InstallIn(SingletonComponent::class)
-    abstract class FakeLocationModule {
+    abstract class FakeTimeCapsuleModule {
 
         @Binds
         @Singleton
         abstract fun bindLocationRepository(locationRepositoryImpl: LocationRepositoryImpl): LocationRepository
+
+        /*@Binds
+        @Singleton
+        abstract fun bindLocationRemoteDataSource(fakeLocationRemoteDataSource: FakeLocationRemoteDataSource): LocationRemoteDataSource*/
 
         @Binds
         @Singleton
@@ -69,16 +70,17 @@ class SearchViewModelTest {
         @Binds
         @Singleton
         abstract fun bindFakeLocationApi(fakeLocationApi: FakeLocationApi): LocationApi
+
+        //아래와 같이 LocationRemoteDataSourceImpl(상용 데이터 소스)를 사용하면 실제 서버에서 데이터 가져옴
+        /*@Binds
+        @Singleton
+        abstract fun bindLocationRemoteDataSource(locationRemoteDataSourceImpl: LocationRemoteDataSourceImpl): LocationRemoteDataSource*/
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `UI 상태 테스트`() = runTest {
-        viewModel.onQuery("롯데타워")
-        advanceTimeBy(1500L)
 
-        val uiState = viewModel.uiState.value
-        val places = uiState.places.asSnapshot()
+    @Test
+    fun `데이터 체크`() = runBlocking {
+        val data = locationRepository.getPlaceByKeyword("롯데타워").asSnapshot()
         val documents = mutableListOf<PlaceDocument>().apply {
             repeat(15) {
                 add(
@@ -103,9 +105,28 @@ class SearchViewModelTest {
         }
 
         val isContain = documents.map {
-            places.contains(it)
+            data.contains(it)
         }.firstOrNull { !it }
 
         assertEquals(isContain, null)
+    }
+
+    @Test
+    fun `에러 테스트`() = runTest {
+        val pagingSource = SearchPlaceByKeywordPagingSource(
+            FakeLocationApi().apply {
+                setReturnsError()
+            },
+            "대한민국",
+            isNear = true
+        )
+
+        val pager = TestPager(
+            config = PagingConfig(pageSize = 30),
+            pagingSource = pagingSource
+        )
+
+        val result = pager.refresh()
+        Assert.assertTrue(result is PagingSource.LoadResult.Error)
     }
 }
