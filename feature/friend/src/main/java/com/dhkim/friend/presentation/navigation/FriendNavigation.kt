@@ -14,6 +14,7 @@ import com.dhkim.friend.presentation.FriendScreen
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoScreen
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoSideEffect
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoViewModel
+import com.dhkim.user.domain.Friend
 
 const val FRIEND_ROUTE = "friend"
 const val CHANGE_FRIEND_INFO_ROUTE = "changeFriendInfo"
@@ -28,12 +29,14 @@ fun NavController.navigateToFriend() {
     }
 }
 
-fun NavController.navigateToChangeFriendInfo(userId: String) {
-    navigate("$CHANGE_FRIEND_INFO_ROUTE/$userId")
+fun NavController.navigateToChangeFriendInfo(friend: Friend) {
+    friend.run {
+        navigate("$CHANGE_FRIEND_INFO_ROUTE/$id/$nickname/$profileImage/$uuid/$isPending")
+    }
 }
 
 fun NavGraphBuilder.friendNavigation(
-    onNavigateToChangeInfo: (String) -> Unit,
+    onNavigateToChangeInfo: (Friend) -> Unit,
     onAddTimeCapsule: (friendId: String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -63,17 +66,23 @@ fun NavGraphBuilder.friendNavigation(
 fun NavGraphBuilder.changeFriendInfoNavigation(
     onBack: () -> Unit
 ) {
-    composable("$CHANGE_FRIEND_INFO_ROUTE/{userId}") {
+    composable("$CHANGE_FRIEND_INFO_ROUTE/{id}/{nickname}/{profileImage}/{uuid}/{isPending}") {
+        val id = it.arguments?.getString("id") ?: ""
+        val nickname = it.arguments?.getString("nickname") ?: ""
+        val profileImage = it.arguments?.getString("profileImage") ?: ""
+        val uuid = it.arguments?.getString("uuid") ?: ""
+        val isPending = it.arguments?.getString("isPending") ?: ""
+        val friend = Friend(id, nickname, profileImage, uuid, isPending.toBoolean())
+
         val viewModel = hiltViewModel<ChangeFriendInfoViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = ChangeFriendInfoSideEffect.None)
-        val userId = it.arguments?.getString("userId") ?: ""
 
         ChangeFriendInfoScreen(
-            userId = userId,
+            friend = friend,
             uiState = uiState,
             sideEffect = sideEffect,
-            onInit = viewModel::initInfo,
+            initInfo = viewModel::initInfo,
             onEditNickname = viewModel::onEdit,
             onSave = viewModel::editFriendInfo,
             onBack = onBack

@@ -93,7 +93,7 @@ fun FriendScreen(
     onDeleteFriend: (String) -> Unit,
     onAddTimeCapsule: (friendId: String) -> Unit,
     onCreateCode: () -> Unit,
-    onNavigateToChangeInfo: (String) -> Unit,
+    onNavigateToChangeInfo: (Friend) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -188,7 +188,7 @@ fun FriendScreen(
                     Text(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        text = "메뉴",
+                        text = selectedFriend.nickname,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -210,7 +210,7 @@ fun FriendScreen(
                             .fillMaxWidth()
                             .clickable {
                                 showFriendMenuDialog = false
-                                onNavigateToChangeInfo(selectedFriend.id)
+                                onNavigateToChangeInfo(selectedFriend)
                             }
                     )
                 }
@@ -532,7 +532,7 @@ fun FriendScreen(
                             resId = R.drawable.ic_smile_blue,
                             title = "정보 변경",
                             onClick = {
-                                onNavigateToChangeInfo(selectedFriend.id)
+                                onNavigateToChangeInfo(selectedFriend)
                             }
                         )
                     }

@@ -42,6 +42,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
 
                         Friend(
                             id = data["id"] as? String ?: "",
+                            nickname = data["nickname"] as? String ?: "",
                             profileImage = data["profileImage"] as? String ?: "${R.drawable.ic_smile_blue}",
                             uuid = data["uuid"] as? String ?: "",
                             isPending = data["pending"] as? Boolean ?: true,
@@ -53,6 +54,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
 
                         Friend(
                             id = data["id"] as? String ?: "",
+                            nickname = data["nickname"] as? String ?: "",
                             profileImage = data["profileImage"] as? String ?: "${R.drawable.ic_smile_blue}",
                             uuid = data["uuid"] as? String ?: "",
                             isPending = data["pending"] as? Boolean ?: true,
@@ -143,6 +145,24 @@ class UserRemoteDataSourceImpl @Inject constructor(
             val childUpdates = hashMapOf<String, Any>(
                 "/users/$myId/friends/$userId" to Friend(id = userId, profileImage = userProfileImage, isPending = true),
                 "/users/$userId/requests/$myId" to Friend(id = myId, profileImage = myProfileImage, uuid = myUuid, isPending = true),
+            )
+
+            database.updateChildren(childUpdates)
+                .addOnSuccessListener {
+                    trySend(true)
+                }.addOnFailureListener {
+                    trySend(false)
+                }
+
+            awaitClose()
+        }
+    }
+
+    override fun updateFriend(myId: String, friend: Friend): Flow<isSuccessful> {
+        val a = ""
+        return callbackFlow {
+            val childUpdates = hashMapOf<String, Any>(
+                "/users/$myId/friends/${friend.id}" to friend,
             )
 
             database.updateChildren(childUpdates)

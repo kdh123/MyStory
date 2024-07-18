@@ -2,6 +2,7 @@ package com.dhkim.friend.presentation.changeInfo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.LocalFriend
 import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,20 +25,13 @@ class ChangeFriendInfoViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ChangeFriendInfoSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    private val friend = MutableStateFlow(LocalFriend())
-
-    fun initInfo(userId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            userRepository.getFriend(userId)?.let {
-                friend.value = it
-                _uiState.value = _uiState.value.copy(id = it.id, nickname = it.nickname)
-            }
-        }
+    fun initInfo(friend: Friend) {
+        _uiState.value = _uiState.value.copy(friend = friend)
     }
 
     fun editFriendInfo() {
         viewModelScope.launch(Dispatchers.IO) {
-            val nickname = _uiState.value.nickname
+            val nickname = _uiState.value.friend.nickname
 
             when {
                 nickname.isEmpty() || nickname.isBlank() -> {
@@ -49,7 +43,7 @@ class ChangeFriendInfoViewModel @Inject constructor(
                 }
 
                 else -> {
-                    userRepository.updateFriend(localFriend = friend.value.copy(nickname = nickname))
+                    userRepository.updateFriend(_uiState.value.friend)
                     _sideEffect.emit(ChangeFriendInfoSideEffect.Completed(isCompleted = true))
                 }
             }
@@ -57,7 +51,8 @@ class ChangeFriendInfoViewModel @Inject constructor(
     }
 
     fun onEdit(str: String) {
-        _uiState.value = _uiState.value.copy(nickname = str)
+        val friend = _uiState.value.friend
+        _uiState.value = _uiState.value.copy(friend = friend.copy(nickname = str))
     }
 
     private fun containSpace(input: String): Boolean {

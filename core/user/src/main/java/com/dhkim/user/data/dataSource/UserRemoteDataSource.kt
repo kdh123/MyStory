@@ -1,6 +1,7 @@
 package com.dhkim.user.data.dataSource
 
 import com.dhkim.common.CommonResult
+import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.User
 import kotlinx.coroutines.flow.Flow
 
@@ -24,6 +25,8 @@ interface UserRemoteDataSource {
     fun addFriend(myId: String, myProfileImage: String, myUuid: String, userId: String, userProfileImage: String): Flow<isSuccessful>
 
     fun deleteFriend(myId: String, userId: String): Flow<isSuccessful>
+
+    fun updateFriend(myId: String, friend: Friend): Flow<isSuccessful>
 
     fun addRequest(myId: String, myProfileImage: String, userId: String): Flow<isSuccessful>
 

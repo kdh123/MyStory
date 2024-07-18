@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
-class FakeUserLocalDataSource @Inject constructor() : UserLocalDataSource {
+class FakeFriendUserLocalDataSource @Inject constructor() : UserLocalDataSource {
 
     private val friends = MutableStateFlow<MutableList<FriendEntity>>(mutableListOf())
-    private var myInfo = User(id = "id0")
+    private var myInfo = User(id = "id0", profileImage = "2131230936")
     private var fcmToken = ""
 
 
@@ -23,10 +23,9 @@ class FakeUserLocalDataSource @Inject constructor() : UserLocalDataSource {
     }
 
     override fun saveFriend(friendEntity: FriendEntity) {
-        val list = friends.value.apply {
+        friends.value = friends.value.apply {
             add(friendEntity)
         }
-        friends.value = list
     }
 
     override fun updateFriend(friendEntity: FriendEntity) {

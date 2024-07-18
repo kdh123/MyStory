@@ -22,22 +22,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.friend.R
+import com.dhkim.user.domain.Friend
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ChangeFriendInfoScreen(
-    userId: String,
+    friend: Friend,
     uiState: ChangeFriendInfoUiState,
     sideEffect: ChangeFriendInfoSideEffect,
-    onInit: (String) -> Unit,
+    initInfo: (Friend) -> Unit,
     onEditNickname: (String) -> Unit,
     onSave: () -> Unit,
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
 
-    LaunchedEffect(userId) {
-        onInit(userId)
+    LaunchedEffect(friend) {
+        initInfo(friend)
     }
 
     LaunchedEffect(sideEffect) {
@@ -97,7 +98,7 @@ fun ChangeFriendInfoScreen(
             BasicTextField(
                 maxLines = 1,
                 singleLine = true,
-                value = uiState.nickname,
+                value = uiState.friend.nickname,
                 onValueChange = {
                     onEditNickname(it)
                 },
@@ -109,7 +110,7 @@ fun ChangeFriendInfoScreen(
                     .padding(top = 5.dp)
             )
             Text(
-                text = "개인 코드 : ${uiState.id}",
+                text = "개인 코드 : ${uiState.friend.id}",
                 modifier = Modifier
                     .padding(top = 10.dp)
             )
@@ -121,13 +122,12 @@ fun ChangeFriendInfoScreen(
 @Composable
 private fun ChangeFriendInfoScreenPreview() {
     ChangeFriendInfoScreen(
-        userId = "",
+        friend = Friend(),
         uiState = ChangeFriendInfoUiState(
-            id = "ABCdef",
-            nickname = "홍길동"
+            friend = Friend(id = "id00", nickname = "홍길동")
         ),
         sideEffect = ChangeFriendInfoSideEffect.None,
-        onInit = {},
+        initInfo = {},
         onEditNickname = {},
         onSave = {},
         onBack = {}

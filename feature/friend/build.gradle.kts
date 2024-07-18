@@ -15,6 +15,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        testOptions {
+            unitTests {
+                isIncludeAndroidResources = true
+            }
+        }
     }
 
     buildTypes {
@@ -44,6 +50,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:user"))
     implementation(project(":feature:home"))
+    testImplementation(project(":core:database"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)
@@ -54,10 +61,17 @@ dependencies {
     kapt(libs.androidx.hilt.compiler)
     kapt(libs.hilt.compiler)
 
+    //test
+    testImplementation(libs.bundles.test)
+    kaptTest(libs.hilt.compiler)
+    testAnnotationProcessor(libs.hilt.compiler)
+    androidTestImplementation(libs.bundles.androidx.ui.test)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    kaptAndroidTest(libs.hilt.compiler)
+    androidTestAnnotationProcessor(libs.hilt.compiler)
+    debugImplementation(libs.bundles.debug.ui.test)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }

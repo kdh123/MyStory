@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.dhkim.common.CommonResult
 import com.dhkim.friend.R
 import com.dhkim.user.domain.Friend
-import com.dhkim.user.domain.LocalFriend
 import com.dhkim.user.domain.UserRepository
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -17,8 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -60,39 +57,7 @@ class FriendViewModel @Inject constructor(
                 return@launch
             }
 
-            val myProfileImage = userRepository.getProfileImage().toString()
-
-            combine(userRepository.getMyInfo(), userRepository.getAllFriend()) { myInfo, friends ->
-                val remoteFriends = myInfo.friends
-                val pendingFriends = myInfo.friends.filter { it.isPending }
-
-                friends.map { it.id }.filter { id -> !remoteFriends.map { it.id }.contains(id) }.forEach { id ->
-                    userRepository.deleteLocalFriend(id)
-                }
-
-                val localFriends = userRepository.getAllFriend().first()
-
-                remoteFriends
-                    .filter { !it.isPending }
-                    .map { it.id }
-                    .filter { id -> !localFriends.map { it.id }.contains(id) }
-                    .forEach { id ->
-                        val friend = myInfo.friends.first { it.id == id }
-                        val localFriend = LocalFriend(
-                            id = friend.id,
-                            nickname = friend.id,
-                            profileImage = friend.profileImage,
-                            uuid = friend.uuid
-                        )
-                        userRepository.saveFriend(localFriend)
-                    }
-
-                myInfo.copy(
-                    id = myId,
-                    profileImage = myProfileImage,
-                    friends = localFriends.map { it.toFriend() } + pendingFriends
-                )
-            }.catch {
+            userRepository.getMyInfo().catch {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     isCreatingCode = false

@@ -6,11 +6,13 @@ import com.dhkim.user.data.dataSource.UserRemoteDataSource
 import com.dhkim.user.data.dataSource.isSuccessful
 import com.dhkim.user.data.dataSource.toEntity
 import com.dhkim.user.data.dataSource.toLocalFriend
+import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.LocalFriend
 import com.dhkim.user.domain.User
 import com.dhkim.user.domain.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -38,8 +40,10 @@ class UserRepositoryImpl @Inject constructor(
         localDataSource.saveFriend(localFriend.toEntity())
     }
 
-    override fun updateFriend(localFriend: LocalFriend) {
-        localDataSource.updateFriend(localFriend.toEntity())
+    override suspend fun updateFriend(friend: Friend) {
+        val myId = localDataSource.getUserId()
+        remoteDataSource.updateFriend(myId, friend).first()
+        //localDataSource.updateFriend(localFriend.toEntity())
     }
 
     override fun deleteLocalFriend(id: String) {

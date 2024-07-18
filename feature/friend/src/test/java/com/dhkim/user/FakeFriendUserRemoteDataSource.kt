@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class FakeUserRemoteDataSource @Inject constructor() : UserRemoteDataSource {
+class FakeFriendUserRemoteDataSource @Inject constructor() : UserRemoteDataSource {
 
     private val rawMyFriends = mutableListOf(
         Friend(
@@ -37,6 +37,7 @@ class FakeUserRemoteDataSource @Inject constructor() : UserRemoteDataSource {
                 rawMyFriends.forEach {
                     val info = mutableMapOf<String, Any>().apply {
                         put("id", it.id)
+                        put("nickname", it.nickname)
                         put("profileImage", it.profileImage)
                         put("uuid", it.uuid)
                         put("pending", it.isPending)
@@ -48,6 +49,7 @@ class FakeUserRemoteDataSource @Inject constructor() : UserRemoteDataSource {
                 rawMyRequests.forEach {
                     val info = mutableMapOf<String, Any>().apply {
                         put("id", it.id)
+                        put("nickname", it.nickname)
                         put("profileImage", it.profileImage)
                         put("uuid", it.uuid)
                         put("pending", it.isPending)
@@ -101,6 +103,7 @@ class FakeUserRemoteDataSource @Inject constructor() : UserRemoteDataSource {
 
                 Friend(
                     id = data["id"] as? String ?: "",
+                    nickname = data["nickname"] as? String ?: "no1",
                     profileImage = data["profileImage"] as? String ?: "${R.drawable.ic_smile_blue}",
                     uuid = data["uuid"] as? String ?: "",
                     isPending = data["pending"] as? Boolean ?: true,
@@ -112,6 +115,7 @@ class FakeUserRemoteDataSource @Inject constructor() : UserRemoteDataSource {
 
                 Friend(
                     id = data["id"] as? String ?: "",
+                    nickname = data["nickname"] as? String ?: "no2",
                     profileImage = data["profileImage"] as? String ?: "${R.drawable.ic_smile_blue}",
                     uuid = data["uuid"] as? String ?: "",
                     isPending = data["pending"] as? Boolean ?: true,
@@ -174,6 +178,10 @@ class FakeUserRemoteDataSource @Inject constructor() : UserRemoteDataSource {
     }
 
     override fun updateFriend(myId: String, friend: Friend): Flow<isSuccessful> {
+        val index = rawMyFriends.indexOfFirst { it.id == friend.id }
+        rawMyFriends[index] = friend
+        rawMyInfo.value = convertedData()
+
         return flowOf(true)
     }
 

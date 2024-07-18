@@ -9,7 +9,7 @@ interface UserRepository {
     fun getAllFriend(): Flow<List<LocalFriend>>
     fun getFriend(id: String): LocalFriend?
     fun saveFriend(localFriend: LocalFriend)
-    fun updateFriend(localFriend: LocalFriend)
+    suspend fun updateFriend(friend: Friend)
     fun deleteLocalFriend(id: String)
 
     suspend fun getMyInfo(): Flow<User>
