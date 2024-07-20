@@ -43,7 +43,6 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun updateFriend(friend: Friend) {
         val myId = localDataSource.getUserId()
         remoteDataSource.updateFriend(myId, friend).first()
-        //localDataSource.updateFriend(localFriend.toEntity())
     }
 
     override fun deleteLocalFriend(id: String) {

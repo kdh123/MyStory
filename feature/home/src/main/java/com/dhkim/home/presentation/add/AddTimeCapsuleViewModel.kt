@@ -53,10 +53,10 @@ class AddTimeCapsuleViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             combine(
-                userRepository.getAllFriend(),
+                userRepository.getMyInfo(),
                 checkedFriend
-            ) { friends, checkedFriendId ->
-                friends.map {
+            ) { myInfo, checkedFriendId ->
+                myInfo.friends.map {
                     SharedFriend(
                         isChecked = it.id == checkedFriendId,
                         userId = it.id,
@@ -64,10 +64,11 @@ class AddTimeCapsuleViewModel @Inject constructor(
                         uuid = it.uuid
                     )
                 }
-            }.catch { }
-                .collect {
-                    _uiState.value = _uiState.value.copy(isShare = it.any { it.isChecked }, sharedFriends = it)
-                }
+            }.catch {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+            }.collect {
+                _uiState.value = _uiState.value.copy(isShare = it.any { it.isChecked }, sharedFriends = it)
+            }
         }
 
         viewModelScope.launch {

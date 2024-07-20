@@ -50,6 +50,7 @@ composeFoundation = "1.7.0-alpha02"
 airbnbLottieCompose = "4.0.0"
 roboletric = "4.12"
 coroutineTest = "1.8.1"
+collectionImmutable = "0.3.7"
 
 [libraries]
 robolectric = { module = "org.robolectric:robolectric", version.ref = "roboletric" }
@@ -59,7 +60,7 @@ androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref =
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWorkManager" }
 androidx-work = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
 
-
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collectionImmutable" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "composeFoundation" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test", version.ref = "composeTest" }
@@ -155,7 +156,8 @@ androidx-compose-main = [
     "androidx-ui-tooling-preview",
     "androidx-ui-tooling",
     "androidx-material3",
-    "androidx-compose-foundation"
+    "androidx-compose-foundation",
+    "kotlinx-collections-immutable"
 ]
 
 androidx-compose-side = [

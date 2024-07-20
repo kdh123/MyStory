@@ -95,6 +95,8 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.google.android.gms.location.LocationServices
 import com.naver.maps.geometry.LatLng
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -350,7 +352,7 @@ fun AddTimeCapsuleScreen(
             ) {
                 SharedFriendList(
                     modifier = Modifier.padding(bottom = 50.dp),
-                    sharedFriends = uiState.sharedFriends,
+                    sharedFriends = uiState.sharedFriends.toImmutableList(),
                     onClickCheckBox = onCheckSharedFriend
                 )
             }
@@ -505,7 +507,7 @@ fun AddTimeCapsuleScreen(
 @Composable
 private fun SharedFriendList(
     modifier: Modifier = Modifier,
-    sharedFriends: List<SharedFriend>,
+    sharedFriends: ImmutableList<SharedFriend>,
     onClickCheckBox: (String) -> Unit
 ) {
     if (sharedFriends.isNotEmpty()) {
