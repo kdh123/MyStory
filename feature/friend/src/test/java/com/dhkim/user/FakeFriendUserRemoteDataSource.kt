@@ -16,13 +16,15 @@ class FakeFriendUserRemoteDataSource @Inject constructor() : UserRemoteDataSourc
     private val rawMyFriends = mutableListOf(
         Friend(
             id = "id13",
-            profileImage = "158",
+            nickname = "nickname1",
+            profileImage = "${R.drawable.ic_smile_blue}",
             uuid = "15608465",
             isPending = false
         ),
         Friend(
             id = "id7",
-            profileImage = "84561",
+            nickname = "nickname2",
+            profileImage = "${R.drawable.ic_smile_blue}",
             uuid = "84561",
             isPending = true
         ),
@@ -59,7 +61,7 @@ class FakeFriendUserRemoteDataSource @Inject constructor() : UserRemoteDataSourc
             }
 
             put("id", "id0")
-            put("profileImage", "1230")
+            put("profileImage", "${R.drawable.ic_smile_blue}")
             put("uuid", "1236508")
             put("friends", friends)
             put("request", requests)
@@ -72,12 +74,12 @@ class FakeFriendUserRemoteDataSource @Inject constructor() : UserRemoteDataSourc
                 if (it == 0) {
                     User(
                         id = "id$it",
-                        profileImage = "1230",
+                        profileImage = "${R.drawable.ic_smile_blue}",
                         uuid = "1236508",
                         friends = listOf(
                             Friend(
                                 id = "id13",
-                                profileImage = "158",
+                                profileImage = "${R.drawable.ic_smile_blue}",
                                 uuid = "15608465",
                                 isPending = false
                             )

@@ -1,6 +1,12 @@
 package com.dhkim.friend
 
-import com.dhkim.MainDispatcherRule
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dhkim.friend.presentation.FriendScreen
+import com.dhkim.friend.presentation.FriendSideEffect
 import com.dhkim.friend.presentation.FriendViewModel
 import com.dhkim.user.FakeFriendUserLocalDataSource
 import com.dhkim.user.FakeFriendUserRemoteDataSource
@@ -17,9 +23,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -30,11 +34,12 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@OptIn(ExperimentalTestApi::class)
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
 @UninstallModules(UserModule::class)
-class FriendViewModelTest {
+class FriendScreenTest {
 
     @Module
     @InstallIn(SingletonComponent::class)
@@ -56,6 +61,9 @@ class FriendViewModelTest {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
+    @get:Rule
+    var composeTestRule = createComposeRule()
+
     @Inject
     lateinit var userRepository: UserRepository
 
@@ -67,13 +75,40 @@ class FriendViewModelTest {
         viewModel = FriendViewModel(userRepository = userRepository)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `UiState 테스트`() = runTest {
-        advanceTimeBy(300)
-        val uiState = viewModel.uiState.value
+    fun `친구 화면 목록 테스트`() = runTest {
+        composeTestRule.setContent {
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = FriendSideEffect.None)
 
-        assertEquals(uiState.myInfo.friends.size, 2)
-        assertEquals(uiState.myInfo.requests.size, 0)
+            FriendScreen(
+                uiState = uiState,
+                sideEffect = sideEffect,
+                onQuery = viewModel::onQuery,
+                onSearchUser = viewModel::searchUser,
+                onAddFriend = viewModel::addFriend,
+                onAcceptFriend = viewModel::acceptFriend,
+                onDeleteFriend = viewModel::deleteFriend,
+                onAddTimeCapsule = {},
+                onCreateCode = viewModel::createCode,
+                onNavigateToChangeInfo = {},
+                onBack = {}
+            )
+        }
+
+        composeTestRule.waitUntilAtLeastOneExists(
+            hasText("id0"),
+            300
+        )
+
+        composeTestRule.waitUntilAtLeastOneExists(
+            hasText("nickname1"),
+            300
+        )
+
+        composeTestRule.waitUntilAtLeastOneExists(
+            hasText("nickname2"),
+            300
+        )
     }
 }
