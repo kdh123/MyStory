@@ -67,7 +67,6 @@ import androidx.compose.ui.window.Dialog
 import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
 import com.dhkim.common.DistanceManager
-import com.dhkim.common.StableList
 import com.dhkim.home.R
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.ui.DefaultBackground
@@ -90,6 +89,8 @@ import com.naver.maps.map.compose.MarkerState
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberCameraPositionState
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class)
@@ -376,7 +377,7 @@ fun TimeCapsuleScreen(
 
                             TimeCapsuleType.OpenableTimeCapsule -> {
                                 OpenableTimeCapsules(
-                                    timeCapsules = it.data as? StableList<TimeCapsule> ?: StableList(),
+                                    timeCapsules = (it.data as? List<TimeCapsule> ?: listOf()).toImmutableList(),
                                     currentLat = currentLocation.latitude,
                                     currentLng = currentLocation.longitude,
                                     onShowLocationDialog = {
@@ -400,7 +401,7 @@ fun TimeCapsuleScreen(
 
                             TimeCapsuleType.UnopenedTimeCapsule -> {
                                 UnopenedTimeCapsules(
-                                    timeCapsules = it.data as? StableList<TimeCapsule> ?: StableList(),
+                                    timeCapsules = (it.data as? List<TimeCapsule> ?: listOf()).toImmutableList(),
                                     onClick = {
                                         selectedTimeCapsule = it
                                         showLocationDialog = true
@@ -414,7 +415,7 @@ fun TimeCapsuleScreen(
 
                             TimeCapsuleType.OpenedTimeCapsule -> {
                                 OpenedTimeCapsules(
-                                    timeCapsules = it.data as? StableList<TimeCapsule> ?: StableList(),
+                                    timeCapsules = (it.data as? List<TimeCapsule> ?: listOf()).toImmutableList(),
                                     onLongClick = {
                                         selectedTimeCapsule = it
                                         showMenuDialog = true
@@ -553,11 +554,11 @@ private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
 
 @Composable
 private fun OpenedTimeCapsules(
-    timeCapsules: StableList<TimeCapsule>,
+    timeCapsules: ImmutableList<TimeCapsule>,
     onLongClick: (TimeCapsule) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit
 ) {
-    if (timeCapsules.data.isEmpty()) {
+    if (timeCapsules.isEmpty()) {
         return
     }
 
@@ -568,7 +569,7 @@ private fun OpenedTimeCapsules(
             .padding(vertical = 10.dp)
             .fillMaxWidth()
     ) {
-        items(items = timeCapsules.data, key = {
+        items(items = timeCapsules, key = {
             it.id
         }) {
             OpenedBox(
@@ -694,16 +695,17 @@ fun LocationDialog(
 
 @Composable
 private fun OpenableTimeCapsules(
-    timeCapsules: StableList<TimeCapsule>,
+    timeCapsules: ImmutableList<TimeCapsule>,
     currentLat: Double,
     currentLng: Double,
     onShowLocationDialog: (TimeCapsule) -> Unit,
     onShowOpenDialog: (TimeCapsule) -> Unit,
     onLongClick: (TimeCapsule) -> Unit
 ) {
-    if (timeCapsules.data.isEmpty()) {
+    if (timeCapsules.isEmpty()) {
         return
     }
+
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(horizontal = 20.dp),
@@ -712,7 +714,7 @@ private fun OpenableTimeCapsules(
             .padding(vertical = 10.dp)
             .testTag("openableTimeCapsules")
     ) {
-        items(items = timeCapsules.data, key = {
+        items(items = timeCapsules, key = {
             it.id
         }) {
             LockTimeCapsule(
@@ -731,11 +733,11 @@ private fun OpenableTimeCapsules(
 
 @Composable
 private fun UnopenedTimeCapsules(
-    timeCapsules: StableList<TimeCapsule>,
+    timeCapsules: ImmutableList<TimeCapsule>,
     onClick: (TimeCapsule) -> Unit,
     onLongClick: (TimeCapsule) -> Unit
 ) {
-    if (timeCapsules.data.isEmpty()) {
+    if (timeCapsules.isEmpty()) {
         return
     }
     LazyRow(
@@ -746,7 +748,7 @@ private fun UnopenedTimeCapsules(
             .padding(vertical = 10.dp)
             .testTag("unopenedTimeCapsules")
     ) {
-        items(items = timeCapsules.data, key = {
+        items(items = timeCapsules, key = {
             it.id
         }) {
             LockTimeCapsule(

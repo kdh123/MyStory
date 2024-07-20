@@ -3,6 +3,7 @@ package com.dhkim.home.data
 import com.dhkim.common.CommonResult
 import com.dhkim.user.data.dataSource.UserRemoteDataSource
 import com.dhkim.user.data.dataSource.isSuccessful
+import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -37,6 +38,10 @@ class FakeUserRemoteDataSource @Inject constructor() : UserRemoteDataSource {
     }
 
     override fun deleteFriend(myId: String, userId: String): Flow<isSuccessful> {
+        return flowOf(true)
+    }
+
+    override fun updateFriend(myId: String, friend: Friend): Flow<isSuccessful> {
         return flowOf(true)
     }
 

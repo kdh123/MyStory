@@ -1,7 +1,6 @@
 package com.dhkim.home
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.dhkim.common.StableList
 import com.dhkim.home.data.FakeTimeCapsuleLocalDataSource
 import com.dhkim.home.data.FakeTimeCapsuleRepository
 import com.dhkim.home.data.FakeUserLocalDataSource
@@ -99,25 +98,25 @@ class TimeCapsuleViewModelTest {
         val timeCapsules = viewModel.uiState.value.timeCapsules
         val openableTimeCapsules = timeCapsules
             .firstOrNull { it.type == TimeCapsuleType.OpenableTimeCapsule }
-            ?.data as? StableList<TimeCapsule> ?: StableList()
+            ?.data as? List<TimeCapsule> ?: listOf()
 
         val openedTimeCapsules = timeCapsules
             .firstOrNull { it.type == TimeCapsuleType.OpenedTimeCapsule }
-            ?.data as? StableList<TimeCapsule> ?: StableList()
+            ?.data as? List<TimeCapsule> ?: listOf()
 
         val unopenedTimeCapsules = timeCapsules
             .firstOrNull { it.type == TimeCapsuleType.UnopenedTimeCapsule }
-            ?.data as? StableList<TimeCapsule> ?: StableList()
+            ?.data as? List<TimeCapsule> ?: listOf()
 
         assertEquals(timeCapsules.size, 11)
-        assertEquals(openableTimeCapsules.data.size, 2)
-        assertEquals(openableTimeCapsules.data[0].id, "id2")
+        assertEquals(openableTimeCapsules.size, 2)
+        assertEquals(openableTimeCapsules[0].id, "id2")
 
-        assertEquals(openedTimeCapsules.data.size, 3)
-        assertEquals(openedTimeCapsules.data[0].id, "id0")
+        assertEquals(openedTimeCapsules.size, 3)
+        assertEquals(openedTimeCapsules[0].id, "id0")
 
-        assertEquals(unopenedTimeCapsules.data.size, 15)
-        assertEquals(unopenedTimeCapsules.data[0].id, "id1")
+        assertEquals(unopenedTimeCapsules.size, 15)
+        assertEquals(unopenedTimeCapsules[0].id, "id1")
     }
 
     @Test
@@ -128,8 +127,8 @@ class TimeCapsuleViewModelTest {
         val timeCapsules = viewModel.uiState.value.timeCapsules
         val unopenedTimeCapsules = timeCapsules
             .firstOrNull { it.type == TimeCapsuleType.UnopenedTimeCapsule }
-            ?.data as? StableList<TimeCapsule> ?: StableList()
+            ?.data as? List<TimeCapsule> ?: listOf()
 
-        assertEquals(unopenedTimeCapsules.data.size, 14)
+        assertEquals(unopenedTimeCapsules.size, 14)
     }
 }

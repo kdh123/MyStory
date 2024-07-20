@@ -2,6 +2,7 @@ package com.dhkim.home
 
 import com.dhkim.common.CommonResult
 import com.dhkim.user.data.dataSource.isSuccessful
+import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.LocalFriend
 import com.dhkim.user.domain.User
 import com.dhkim.user.domain.UserRepository
@@ -21,7 +22,7 @@ class FakeUserRepository : UserRepository {
         TODO("Not yet implemented")
     }
 
-    override fun updateFriend(localFriend: LocalFriend) {
+    override suspend fun updateFriend(friend: Friend) {
         TODO("Not yet implemented")
     }
 

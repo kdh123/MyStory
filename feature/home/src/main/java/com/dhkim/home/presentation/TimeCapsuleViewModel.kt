@@ -3,7 +3,6 @@ package com.dhkim.home.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.DateUtil
-import com.dhkim.common.StableList
 import com.dhkim.home.domain.TimeCapsuleRepository
 import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -79,7 +78,7 @@ class TimeCapsuleViewModel @Inject constructor(
                                 TimeCapsuleItem(
                                     id = 1,
                                     type = TimeCapsuleType.OpenableTimeCapsule,
-                                    data = StableList(data = openableTimeCapsules)
+                                    data = openableTimeCapsules
                                 )
                             )
                             add(TimeCapsuleItem(id = spaceId++, type = TimeCapsuleType.Line))
@@ -93,7 +92,7 @@ class TimeCapsuleViewModel @Inject constructor(
                                 TimeCapsuleItem(
                                     id = 7,
                                     type = TimeCapsuleType.OpenedTimeCapsule,
-                                    data = StableList(data = openedTimeCapsules)
+                                    data = openedTimeCapsules
                                 )
                             )
                             add(TimeCapsuleItem(id = spaceId++, type = TimeCapsuleType.Line))
@@ -107,7 +106,7 @@ class TimeCapsuleViewModel @Inject constructor(
                                 TimeCapsuleItem(
                                     id = 3,
                                     type = TimeCapsuleType.UnopenedTimeCapsule,
-                                    data = StableList(data = unOpenedMyTimeCapsules + unOpenedReceivedTimeCapsules)
+                                    data = unOpenedMyTimeCapsules + unOpenedReceivedTimeCapsules
                                 )
                             )
                             add(TimeCapsuleItem(id = spaceId++, type = TimeCapsuleType.Line))
