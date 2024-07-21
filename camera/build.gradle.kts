@@ -41,7 +41,10 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:common"))
+    implementation(project(":feature:location"))
 
+    implementation(libs.bundles.google.location)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
@@ -64,6 +67,7 @@ dependencies {
     implementation(libs.compose.hilt.navigation)
     implementation(libs.androidx.lifecycle.compose)
     implementation(libs.hilt)
+    debugImplementation(libs.ui.tooling)
     kapt(libs.hilt.compiler)
     implementation(libs.google.permission)
     implementation(libs.androidx.paging.common)

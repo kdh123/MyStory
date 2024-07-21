@@ -6,6 +6,11 @@ plugins {
 }
 
 android {
+
+    lintOptions {
+        disable.add("Instantiatable")
+    }
+
     namespace = "com.dhkim.main"
     compileSdk = 34
 

@@ -26,6 +26,8 @@ fun NavGraphBuilder.cameraNavigation(
             uiState = uiState,
             sideEffect = sideEffect,
             folderName = folderName,
+            initAddress = viewModel::initAddress,
+            onSetTimeStampMode = viewModel::setTimeStampMode,
             onSavingPhoto = viewModel::onSavingPhoto,
             onSavedPhoto = viewModel::onSavedPhoto,
             onTakePhoto = viewModel::onTakePhoto,

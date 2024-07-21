@@ -3,14 +3,17 @@
 package com.dhkim.camera
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -34,9 +37,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +53,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -64,8 +70,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -75,14 +83,17 @@ import java.util.Locale
 
 typealias savedUrl = String
 
+@SuppressLint("MissingPermission")
 @Composable
 fun CameraScreen(
     uiState: CameraUiState,
     sideEffect: CameraSideEffect,
     folderName: String = "",
+    initAddress: (String, String) -> Unit,
+    onSetTimeStampMode: () -> Unit,
     onSavingPhoto: () -> Unit,
     onSavedPhoto: (String) -> Unit,
-    onTakePhoto: (Bitmap) -> Unit,
+    onTakePhoto: (Bitmap, ImageBitmap) -> Unit,
     onNext: ((savedUrl) -> Unit)? = null,
     onBack: (() -> Unit)? = null
 ) {
@@ -96,7 +107,6 @@ fun CameraScreen(
             )
         }
     }
-    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -106,17 +116,58 @@ fun CameraScreen(
             // Handle permission denial
         }
     }
-    val graphicsLayer = rememberGraphicsLayer()
-    var backgroundImageBitmap by remember {
-        mutableStateOf<ImageBitmap?>(null)
+    var currentLocation by remember {
+        mutableStateOf(Pair(37.572389, 126.9769117))
     }
+
+    val fusedLocationClient = remember {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+    val permissionState = rememberMultiplePermissionsState(
+        listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+    )
+    val requestLocationPermission = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    currentLocation = Pair(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+                    initAddress("${currentLocation.first}", "${currentLocation.second}")
+                }
+        } else {
+            Toast.makeText(context, "카메라 권한이 없습니다.", Toast.LENGTH_SHORT).show()
+            onBack?.invoke()
+        }
+    }
+
+    val graphicsLayer = rememberGraphicsLayer()
     val resultGraphicsLayer = rememberGraphicsLayer()
 
-    LaunchedEffect(cameraPermissionState) {
-        if (!cameraPermissionState.status.isGranted && cameraPermissionState.status.shouldShowRationale) {
-            // Show rationale if needed
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+    LaunchedEffect(permissionState) {
+        permissionState.permissions.forEach {
+            when (it.permission) {
+                Manifest.permission.CAMERA -> {
+                    if (!it.status.isGranted) {
+                        requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    }
+                }
+
+                Manifest.permission.ACCESS_FINE_LOCATION -> {
+                    if (it.status.isGranted) {
+                        fusedLocationClient.lastLocation
+                            .addOnSuccessListener { location: Location? ->
+                                currentLocation = Pair(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+                                initAddress("${currentLocation.first}", "${currentLocation.second}")
+                            }
+                    } else {
+                        requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
+                }
+            }
         }
     }
 
@@ -140,7 +191,7 @@ fun CameraScreen(
                     .height(0.dp)
                     .weight(1f)
             ) {
-                if (uiState.bitmap != null && backgroundImageBitmap != null) {
+                if (uiState.bitmap != null && uiState.backgroundBitmap != null) {
                     Box(modifier = Modifier
                         .drawWithContent {
                             resultGraphicsLayer.record {
@@ -150,14 +201,14 @@ fun CameraScreen(
                         }
                     ) {
                         Image(
-                            bitmap = uiState.bitmap!!.asImageBitmap(),
+                            bitmap = uiState.bitmap.asImageBitmap(),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxSize()
                         )
                         Image(
-                            bitmap = backgroundImageBitmap!!,
+                            bitmap = uiState.backgroundBitmap,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -191,12 +242,14 @@ fun CameraScreen(
                                 .fillMaxSize()
                         )
 
-                        Image(
-                            painter = painterResource(id = com.google.android.material.R.drawable.ic_call_answer),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                        )
+                        if (uiState.isTimeStampMode) {
+                            TimeStampBackground(
+                                timeStamp = uiState.timeStamp,
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(10.dp)
+                            )
+                        }
                     }
 
                     Icon(
@@ -214,6 +267,26 @@ fun CameraScreen(
                                     } else CameraSelector.DEFAULT_BACK_CAMERA
                             }
                     )
+
+                    if (uiState.isTimeStampMode) {
+                        SettingButton(
+                            resId = R.drawable.time_stamp_mode_white,
+                            text = "타임스탬프",
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .align(Alignment.CenterStart),
+                            onClick = onSetTimeStampMode
+                        )
+                    } else {
+                        SettingButton(
+                            resId = R.drawable.none_mode_white,
+                            text = "일반",
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .align(Alignment.CenterStart),
+                            onClick = onSetTimeStampMode
+                        )
+                    }
                 }
             }
             Box(
@@ -222,7 +295,7 @@ fun CameraScreen(
                     .height(120.dp)
                     .background(color = Color.White)
             ) {
-                if (backgroundImageBitmap != null && uiState.bitmap != null) {
+                if (uiState.backgroundBitmap != null && uiState.bitmap != null) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier
@@ -230,25 +303,48 @@ fun CameraScreen(
                             .align(Alignment.Center)
                     ) {
                         Button(
+                            colors = ButtonColors(
+                                containerColor = colorResource(id = R.color.primary),
+                                contentColor = colorResource(id = R.color.primary),
+                                disabledContentColor = colorResource(id = R.color.primary),
+                                disabledContainerColor = colorResource(id = R.color.primary),
+                            ),
                             onClick = {
                                 onBack?.invoke()
                             }
                         ) {
-                            Text(text = "이전")
+                            Text(
+                                text = "이전",
+                                color = Color.White,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                            )
                         }
 
-                        Button(onClick = {
-                            scope.launch {
-                                savePhoto(
-                                    bitmap = resultGraphicsLayer.toImageBitmap(),
-                                    folderName = folderName.ifEmpty { "DHPicture" },
-                                    context = context,
-                                    onSavingPhoto = onSavingPhoto,
-                                    onSavedPhoto = onSavedPhoto
-                                )
-                            }
-                        }) {
-                            Text(text = "다음")
+                        Button(
+                            colors = ButtonColors(
+                                containerColor = colorResource(id = R.color.primary),
+                                contentColor = colorResource(id = R.color.primary),
+                                disabledContentColor = colorResource(id = R.color.primary),
+                                disabledContainerColor = colorResource(id = R.color.primary),
+                            ),
+                            onClick = {
+                                scope.launch {
+                                    savePhoto(
+                                        bitmap = resultGraphicsLayer.toImageBitmap(),
+                                        folderName = folderName.ifEmpty { "DHPicture" },
+                                        context = context,
+                                        onSavingPhoto = onSavingPhoto,
+                                        onSavedPhoto = onSavedPhoto
+                                    )
+                                }
+                            }) {
+                            Text(
+                                text = "다음",
+                                color = Color.White,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                            )
                         }
                     }
                 } else {
@@ -257,10 +353,10 @@ fun CameraScreen(
                             .align(Alignment.Center)
                     ) {
                         scope.launch {
-                            backgroundImageBitmap = graphicsLayer.toImageBitmap()
                             takePhoto(
                                 context = context,
                                 controller = controller,
+                                backgroundImageBitmap = graphicsLayer.toImageBitmap(),
                                 onPhotoTaken = onTakePhoto,
                             )
                         }
@@ -270,6 +366,69 @@ fun CameraScreen(
         }
     }
 }
+
+@Composable
+fun SettingButton(
+    resId: Int,
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .clickable {
+                onClick()
+            }
+    ) {
+        Image(
+            painter = painterResource(id = resId),
+            contentDescription = null,
+            modifier = Modifier
+                .width(36.dp)
+                .height(36.dp)
+        )
+        /*Text(
+            text = text,
+            color = Color.White
+        )*/
+    }
+}
+
+@Composable
+private fun TimeStampBackground(
+    timeStamp: TimeStamp,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(color = colorResource(id = R.color.black_40))
+            .padding(10.dp)
+    ) {
+        Text(
+            text = timeStamp.address,
+            color = Color.White,
+            modifier = Modifier
+                .padding(bottom = 10.dp)
+
+        )
+
+        Text(
+            text = timeStamp.date,
+            color = Color.White,
+            modifier = Modifier
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TimeStampBackgroundPreview() {
+    TimeStampBackground(
+        timeStamp = TimeStamp(date = "2024-07-28", address = "대한민국 서울")
+    )
+}
+
 
 @Composable
 fun CameraButton(modifier: Modifier = Modifier, onPhotoTaken: () -> Unit) {
@@ -285,7 +444,7 @@ fun CameraButton(modifier: Modifier = Modifier, onPhotoTaken: () -> Unit) {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun CameraButtonPreview() {
     CameraButton(modifier = Modifier) {
@@ -349,7 +508,8 @@ private suspend fun saveBitmap(context: Context, bitmap: ImageBitmap, folderName
 private fun takePhoto(
     context: Context,
     controller: LifecycleCameraController,
-    onPhotoTaken: (Bitmap) -> Unit,
+    backgroundImageBitmap: ImageBitmap,
+    onPhotoTaken: (Bitmap, ImageBitmap) -> Unit,
 ) {
     controller.takePicture(
         ContextCompat.getMainExecutor(context),
@@ -369,7 +529,7 @@ private fun takePhoto(
                     matrix,
                     true
                 )
-                onPhotoTaken(rotatedBitmap)
+                onPhotoTaken(rotatedBitmap, backgroundImageBitmap)
             }
 
             override fun onError(exception: ImageCaptureException) {

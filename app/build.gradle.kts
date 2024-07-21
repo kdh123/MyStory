@@ -19,6 +19,10 @@ val apiProperties = Properties().apply {
 }
 
 android {
+    lintOptions {
+        disable.add("Instantiatable")
+    }
+
     namespace = "com.dhkim.timecapsule"
     compileSdk = 34
 

@@ -60,6 +60,13 @@ object DateUtil {
         }
     }
 
+    fun currentTime(): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+        val now = Date()
+
+        return sdf.format(now)
+    }
+
     fun isAfter(strDate: String): Boolean {
         val today = convertStringToDate(todayDate())
         val date = convertStringToDate(strDate)
