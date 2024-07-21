@@ -255,7 +255,8 @@ fun MainScreen(
                     navController.currentBackStackEntry
                         ?.savedStateHandle
                         ?.set("imageUrl", imageUrl)
-                }
+                },
+                onBack = navController::navigateUp
             )
             searchNavigation {
                 navController.navigateUp()

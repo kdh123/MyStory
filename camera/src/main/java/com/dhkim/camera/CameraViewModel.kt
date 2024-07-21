@@ -18,7 +18,11 @@ class CameraViewModel : ViewModel() {
     val sideEffect = _sideEffect.asSharedFlow()
 
     fun onTakePhoto(bitmap: Bitmap) {
-        _uiState.value = _uiState.value.copy(isLoading = true, bitmap = bitmap)
+        _uiState.value = _uiState.value.copy(bitmap = bitmap)
+    }
+
+    fun onSavingPhoto() {
+        _uiState.value = _uiState.value.copy(isLoading = true)
     }
 
     fun onSavedPhoto(savedUrl: String) {
