@@ -69,6 +69,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -180,6 +181,7 @@ fun AddTimeCapsuleScreen(
         mutableStateOf(0.dp)
     }
     val density = LocalDensity.current
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(sideEffect) {
         when (sideEffect) {
@@ -232,23 +234,6 @@ fun AddTimeCapsuleScreen(
         }
     }
 
-    if (showLocationBottomSheet) {
-        ModalBottomSheet(
-            sheetState = locationBottomSheetState,
-            onDismissRequest = {
-                showLocationBottomSheet = false
-            },
-            modifier = Modifier
-                .fillMaxHeight(0.9f)
-        ) {
-            LocationSearchScreen(
-                uiState = uiState,
-                onQuery = onQuery,
-                onClick = onPlaceClick
-            )
-        }
-    }
-
     Scaffold(
         topBar = {
             Column {
@@ -296,7 +281,26 @@ fun AddTimeCapsuleScreen(
             }
         }
     ) {
+        if (showLocationBottomSheet) {
+            focusManager.clearFocus()
+            ModalBottomSheet(
+                sheetState = locationBottomSheetState,
+                onDismissRequest = {
+                    showLocationBottomSheet = false
+                },
+                modifier = Modifier
+                    .fillMaxHeight(0.9f)
+            ) {
+                LocationSearchScreen(
+                    uiState = uiState,
+                    onQuery = onQuery,
+                    onClick = onPlaceClick
+                )
+            }
+        }
+
         if (showSharedFriendsBottomSheet) {
+            focusManager.clearFocus()
             ModalBottomSheet(
                 onDismissRequest = {
                     showSharedFriendsBottomSheet = false
@@ -311,6 +315,7 @@ fun AddTimeCapsuleScreen(
         }
 
         if (showImagePickBottomSheet) {
+            focusManager.clearFocus()
             ModalBottomSheet(
                 onDismissRequest = {
                     showImagePickBottomSheet = false
