@@ -26,10 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dhkim.home.R
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
@@ -85,11 +85,10 @@ fun ImageDetailScreen(currentIndex: Int, images: List<String>) {
                 .fillMaxSize()
         ) { page ->
             GlideImage(
-                error = painterResource(id = R.drawable.ic_launcher_background),
-                imageModel = images[page],
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                previewPlaceholder = R.drawable.ic_launcher_background
+                imageModel = { images[page] },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.FillWidth
+                )
             )
         }
         Text(

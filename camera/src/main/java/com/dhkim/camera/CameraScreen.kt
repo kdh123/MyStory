@@ -11,6 +11,7 @@ import android.graphics.Matrix
 import android.location.Location
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -26,6 +27,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,16 +70,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -432,13 +436,17 @@ private fun TimeStampBackgroundPreview() {
 
 @Composable
 fun CameraButton(modifier: Modifier = Modifier, onPhotoTaken: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier
             .width(76.dp)
             .aspectRatio(1f)
             .border(color = Color.Black, width = 3.dp, shape = CircleShape)
             .padding(10.dp)
-            .clickable {
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) {
                 onPhotoTaken()
             }
     )
@@ -499,6 +507,23 @@ private suspend fun saveBitmap(context: Context, bitmap: ImageBitmap, folderName
                 }
             }
             savedUrl = uri
+        } else {
+            val imageFileFolder = File(Environment.getExternalStorageDirectory().toString() + '/' + folderName)
+            if (!imageFileFolder.exists()) {
+                imageFileFolder.mkdirs()
+            }
+            val mImageName = "$timestamp.png"
+            val imageFile = File(imageFileFolder, mImageName)
+            try {
+                val outputStream: OutputStream = FileOutputStream(imageFile)
+
+                bitmap.asAndroidBitmap().compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                outputStream.close()
+
+                values.put(MediaStore.Images.Media.DATA, imageFile.absolutePath)
+                context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            } catch (_: Exception) { }
+            savedUrl = imageFile.toUri()
         }
     }
 

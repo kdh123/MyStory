@@ -92,7 +92,13 @@ class TimeCapsuleViewModel @Inject constructor(
                                 TimeCapsuleItem(
                                     id = 7,
                                     type = TimeCapsuleType.OpenedTimeCapsule,
-                                    data = openedTimeCapsules
+                                    data = openedTimeCapsules.run {
+                                        if (size > 10) {
+                                            subList(0, 10)
+                                        } else {
+                                            this
+                                        }
+                                    }
                                 )
                             )
                             add(TimeCapsuleItem(id = spaceId++, type = TimeCapsuleType.Line))

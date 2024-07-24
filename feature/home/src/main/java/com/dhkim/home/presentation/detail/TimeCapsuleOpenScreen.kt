@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import com.dhkim.home.R
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.ui.drawAnimatedBorder
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -347,14 +348,13 @@ private fun TimeCapsuleImage(imageUrl: String) {
     )
 
     GlideImage(
-        imageModel = imageUrl,
+        imageModel = { imageUrl },
         modifier = Modifier
             .fillMaxSize()
             .graphicsLayer(
                 scaleX = scale,
                 scaleY = scale
-            ),
-        previewPlaceholder = R.drawable.ic_launcher_background
+            )
     )
 }
 
@@ -472,16 +472,17 @@ fun FilmLayout(uiState: TimeCapsuleDetailUiState, onClick: (String, Boolean) -> 
             ) {
                 repeat(imageUrls.size) {
                     GlideImage(
-                        contentScale = ContentScale.FillBounds,
-                        imageModel = imageUrls[it],
+                        imageOptions = ImageOptions(
+                            contentScale = ContentScale.FillBounds
+                        ),
+                        imageModel = { imageUrls[it] },
                         modifier = Modifier
                             .padding(start = 10.dp)
                             .clip(RoundedCornerShape(10.dp))
                             .width(240.dp)
                             .height(360.dp)
                             .clickable {
-                            },
-                        previewPlaceholder = R.drawable.ic_launcher_background
+                            }
                     )
                 }
             }

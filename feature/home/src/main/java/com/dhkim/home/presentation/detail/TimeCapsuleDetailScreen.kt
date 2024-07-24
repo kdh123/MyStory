@@ -377,8 +377,7 @@ fun TimeCapsulePager(
                 state = pagerState
             ) { page ->
                 GlideImage(
-                    imageModel = images[page],
-                    contentDescription = null,
+                    imageModel = { images[page] },
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)

@@ -816,9 +816,8 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongCl
             Box {
                 if (timeCapsule.images.isNotEmpty()) {
                     GlideImage(
-                        imageModel = timeCapsule.images[0],
-                        previewPlaceholder = R.drawable.ic_launcher_background,
-                        error = painterResource(id = R.drawable.ic_launcher_background),
+                        imageModel =  { timeCapsule.images[0] },
+                        previewPlaceholder = painterResource(id = R.drawable.ic_launcher_background),
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(0.8f)
@@ -948,9 +947,8 @@ private fun LockTimeCapsule(
             ) {
                 if (timeCapsule.images.isNotEmpty()) {
                     GlideImage(
-                        imageModel = timeCapsule.images[0],
-                        previewPlaceholder = R.drawable.ic_launcher_background,
-                        error = painterResource(id = R.drawable.ic_launcher_background),
+                        imageModel =  { timeCapsule.images[0] },
+                        previewPlaceholder = painterResource(id = R.drawable.ic_launcher_background),
                         modifier = modifier
                             .aspectRatio(1f)
                     )

@@ -17,6 +17,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +37,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,16 +46,15 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults.textFieldColors
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -70,7 +69,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -81,13 +79,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
-import com.dhkim.location.domain.Place
 import com.dhkim.home.R
 import com.dhkim.home.domain.BaseTimeCapsule
 import com.dhkim.home.domain.MyTimeCapsule
 import com.dhkim.home.domain.SendTimeCapsule
 import com.dhkim.home.domain.SharedFriend
 import com.dhkim.home.presentation.LocationSearchScreen
+import com.dhkim.location.domain.Place
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -124,17 +122,11 @@ fun AddTimeCapsuleScreen(
     onNavigateToCamera: () -> Unit,
     onBack: () -> Unit,
 ) {
-    val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
-    val state = rememberStandardBottomSheetState(
-        skipHiddenState = false
-    )
-    val sharedFriendsBottomSheetState = rememberModalBottomSheetState()
     var showSharedFriendsBottomSheet by remember { mutableStateOf(false) }
+    var showImagePickBottomSheet by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
-    val scaffoldState = rememberBottomSheetScaffoldState(state)
-    var showBottomMenu = false
     val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
@@ -220,11 +212,9 @@ fun AddTimeCapsuleScreen(
     }
 
     BackHandler {
-        if (showBottomMenu) {
-            scope.launch {
-                scaffoldState.bottomSheetState.hide()
-                showBottomMenu = false
-            }
+        if (showImagePickBottomSheet || showSharedFriendsBottomSheet) {
+            showImagePickBottomSheet = false
+            showSharedFriendsBottomSheet = false
         } else {
             onBack()
         }
@@ -259,44 +249,7 @@ fun AddTimeCapsuleScreen(
         }
     }
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp,
-        sheetContent = {
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-            ) {
-                BottomMenuItem(
-                    resId = R.drawable.ic_camera_graphic,
-                    title = "카메라",
-                    onClick = {
-                        scope.launch {
-                            scaffoldState.bottomSheetState.hide()
-                            showBottomMenu = false
-                            onNavigateToCamera()
-                        }
-                    }
-                )
-                BottomMenuItem(
-                    resId = R.drawable.ic_picture_graphic,
-                    title = "갤러리",
-                    onClick = {
-                        scope.launch {
-                            scaffoldState.bottomSheetState.hide()
-                            showBottomMenu = false
-                            launcher.launch(
-                                PickVisualMediaRequest(
-                                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
-                            )
-                        }
-                    }
-                )
-            }
-        },
+    Scaffold(
         topBar = {
             Column {
                 Row(
@@ -347,20 +300,57 @@ fun AddTimeCapsuleScreen(
             ModalBottomSheet(
                 onDismissRequest = {
                     showSharedFriendsBottomSheet = false
-                },
-                sheetState = sharedFriendsBottomSheetState
+                }
             ) {
                 SharedFriendList(
-                    modifier = Modifier.padding(bottom = 50.dp),
+                    modifier = Modifier.padding(bottom = 48.dp),
                     sharedFriends = uiState.sharedFriends.toImmutableList(),
                     onClickCheckBox = onCheckSharedFriend
                 )
             }
         }
 
+        if (showImagePickBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showImagePickBottomSheet = false
+                }
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                        .padding(bottom = 48.dp)
+                ) {
+                    BottomMenuItem(
+                        resId = R.drawable.ic_camera_graphic,
+                        title = "카메라",
+                        onClick = {
+                            showImagePickBottomSheet = false
+                            onNavigateToCamera()
+                        }
+                    )
+                    BottomMenuItem(
+                        resId = R.drawable.ic_picture_graphic,
+                        title = "갤러리",
+                        onClick = {
+                            showImagePickBottomSheet = false
+                            launcher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        }
+                    )
+                }
+            }
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = it.calculateTopPadding())
                 .onGloballyPositioned {
                     contentHeight = with(density) {
                         it.size.height.toDp()
@@ -391,9 +381,7 @@ fun AddTimeCapsuleScreen(
                     onSelectPicture = {
                         scope.launch {
                             onSetSelectImageIndex(it)
-                            focusManager.clearFocus()
-                            scaffoldState.bottomSheetState.expand()
-                            showBottomMenu = true
+                            showImagePickBottomSheet = true
                         }
                     }
                 )
@@ -592,7 +580,7 @@ private fun SharedFriendItemPreview() {
 private fun SaveButton(modifier: Modifier, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.primary)),
-        shape = RoundedCornerShape(50.dp),
+        shape = RoundedCornerShape(30.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
@@ -623,10 +611,15 @@ private fun SaveButtonPreview() {
 
 @Composable
 fun BottomMenuItem(resId: Int, title: String, onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Column(
         modifier = Modifier
             .padding(vertical = 10.dp)
-            .clickable {
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) {
                 onClick()
             }
     ) {
@@ -778,6 +771,8 @@ private fun MenuItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Row(
         modifier = modifier
             .wrapContentHeight()
@@ -828,7 +823,10 @@ private fun MenuItem(
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .clickable {
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) {
                     onClick()
                 }
         )
@@ -897,13 +895,15 @@ private fun ImageView(imageUrl: String, modifier: Modifier = Modifier, onClick: 
         modifier = modifier
     ) {
         GlideImage(
-            imageModel = imageUrl,
-            placeHolder = painterResource(id = R.drawable.ic_add_gray),
+            imageModel = {
+                imageUrl.ifEmpty {
+                    R.drawable.ic_add_gray
+                }
+            },
             modifier = Modifier
                 .width(98.dp)
                 .height(98.dp),
-            previewPlaceholder = R.drawable.ic_add_gray,
-            error = painterResource(id = R.drawable.ic_add_gray)
+            previewPlaceholder = painterResource(id = R.drawable.ic_add_gray),
         )
     }
 }
@@ -919,7 +919,6 @@ private fun ImageViewPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ContentsView(
-    modifier: Modifier = Modifier,
     content: String,
     onType: (String) -> Unit
 ) {

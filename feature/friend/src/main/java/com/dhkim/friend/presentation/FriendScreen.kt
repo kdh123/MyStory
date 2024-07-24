@@ -27,7 +27,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,13 +34,13 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
@@ -106,9 +105,7 @@ fun FriendScreen(
     val state = rememberStandardBottomSheetState(
         skipHiddenState = false
     )
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(state)
     val scope = rememberCoroutineScope()
-    var showAddFriendBottomSheet = false
     var selectedFriend by remember {
         mutableStateOf(Friend())
     }
@@ -123,6 +120,9 @@ fun FriendScreen(
         mutableStateOf(false)
     }
     var showInfoBottomSheet by remember {
+        mutableStateOf(false)
+    }
+    var showFriendsBottomSheet by remember {
         mutableStateOf(false)
     }
     var showCodeGuideDialog by remember {
@@ -148,7 +148,7 @@ fun FriendScreen(
             }
 
             is FriendSideEffect.ShowBottomSheet -> {
-                bottomSheetScaffoldState.bottomSheetState.hide()
+                showFriendsBottomSheet = false
             }
 
             is FriendSideEffect.ShowKeyboard -> {
@@ -158,11 +158,8 @@ fun FriendScreen(
     }
 
     BackHandler {
-        if (showAddFriendBottomSheet) {
-            scope.launch {
-                bottomSheetScaffoldState.bottomSheetState.hide()
-            }
-            showAddFriendBottomSheet = false
+        if (showFriendsBottomSheet) {
+            showFriendsBottomSheet = false
         } else {
             onBack()
         }
@@ -288,18 +285,8 @@ fun FriendScreen(
         )
     }
 
-    BottomSheetScaffold(
+    Scaffold(
         modifier = modifier,
-        scaffoldState = bottomSheetScaffoldState,
-        sheetPeekHeight = 0.dp,
-        sheetContent = {
-            BottomSheetScreen(
-                uiState = uiState,
-                onSearch = onSearchUser,
-                onQuery = onQuery,
-                onAddFriend = onAddFriend
-            )
-        },
         topBar = {
             Column {
                 Row(
@@ -337,7 +324,11 @@ fun FriendScreen(
         }
     ) {
         if (uiState.myInfo.id.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = it.calculateTopPadding())
+            ) {
                 if (uiState.isLoading) {
                     LoadingProgressBar(
                         modifier = Modifier
@@ -424,11 +415,14 @@ fun FriendScreen(
                     }
                 }
             }
-
-            return@BottomSheetScaffold
+            return@Scaffold
         }
 
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = it.calculateTopPadding())
+        ) {
             TabRow(
                 selectedTabIndex = currentTab,
                 indicator = { tabPositions ->
@@ -477,10 +471,7 @@ fun FriendScreen(
                                     showInfoBottomSheet = true
                                 },
                                 showAddFriendBottomSheet = {
-                                    scope.launch {
-                                        bottomSheetScaffoldState.bottomSheetState.expand()
-                                    }
-                                    showAddFriendBottomSheet = true
+                                    showFriendsBottomSheet = true
                                 },
                                 onFriendLongClick = {
                                     selectedFriend = it
@@ -499,7 +490,6 @@ fun FriendScreen(
                     }
                     currentTab = pos
                 }
-
             }
 
             if (showInfoBottomSheet) {
@@ -536,6 +526,23 @@ fun FriendScreen(
                             }
                         )
                     }
+                }
+            }
+
+            if (showFriendsBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        showFriendsBottomSheet = false
+                    },
+                    modifier = Modifier
+                        .padding(bottom = it.calculateBottomPadding())
+                ) {
+                    BottomSheetScreen(
+                        uiState = uiState,
+                        onSearch = onSearchUser,
+                        onQuery = onQuery,
+                        onAddFriend = onAddFriend
+                    )
                 }
             }
         }
