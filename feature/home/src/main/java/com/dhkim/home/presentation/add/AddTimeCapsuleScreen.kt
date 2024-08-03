@@ -4,6 +4,7 @@ package com.dhkim.home.presentation.add
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.net.Uri
@@ -80,6 +81,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
+import com.dhkim.dhcamera.camera.BackgroundText
+import com.dhkim.dhcamera.camera.DhCamera
 import com.dhkim.home.R
 import com.dhkim.home.domain.BaseTimeCapsule
 import com.dhkim.home.domain.MyTimeCapsule
@@ -164,8 +167,12 @@ fun AddTimeCapsuleScreen(
                 .addOnSuccessListener { location: Location? ->
                     // Got last known location. In some rare situations this can be null.
                     if (place.lat == "" || place.lng == "") {
-                        currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-                        onSearchAddress("${currentLocation.latitude}", "${currentLocation.longitude}")
+                        currentLocation =
+                            LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+                        onSearchAddress(
+                            "${currentLocation.latitude}",
+                            "${currentLocation.longitude}"
+                        )
                     } else {
                         onInitPlace(place)
                     }
@@ -333,7 +340,11 @@ fun AddTimeCapsuleScreen(
                         title = "카메라",
                         onClick = {
                             showImagePickBottomSheet = false
-                            onNavigateToCamera()
+                            startCamera(
+                                context = context,
+                                uiState = uiState,
+                                onAddImage = onAddImage
+                            )
                         }
                     )
                     BottomMenuItem(
@@ -528,6 +539,68 @@ private fun SharedFriendList(
                 .fillMaxWidth()
         )
     }
+}
+
+private fun startCamera(
+    context: Context,
+    uiState: AddTimeCapsuleUiState,
+    onAddImage: (imageUrl: String) -> Unit
+) {
+    val backgroundItems = listOf(
+        BackgroundText.Builder(context)
+            .text("${uiState.placeName}\n${DateUtil.currentTime()}")
+            .textAlign(DhCamera.TEXT_START)
+            .align(DhCamera.BOTTOM_START)
+            .padding(start = 10, bottom = 10)
+            .showTextBackground()
+            .build(),
+        BackgroundText.Builder(context)
+            .text(DateUtil.currentTime())
+            .textAlign(DhCamera.TEXT_START)
+            .align(DhCamera.BOTTOM_START)
+            .padding(start = 10, bottom = 10)
+            .showTextBackground()
+            .build(),
+        BackgroundText.Builder(context)
+            .text("${uiState.placeName}\n${DateUtil.currentTime()}")
+            .font(R.font.bm_dohyun_font)
+            .textAlign(DhCamera.TEXT_START)
+            .align(DhCamera.BOTTOM_START)
+            .padding(start = 10, bottom = 10)
+            .showTextBackground()
+            .build(),
+        BackgroundText.Builder(context)
+            .text(DateUtil.currentTime())
+            .font(R.font.bm_dohyun_font)
+            .textAlign(DhCamera.TEXT_START)
+            .align(DhCamera.BOTTOM_START)
+            .padding(start = 10, bottom = 10)
+            .showTextBackground()
+            .build(),
+        BackgroundText.Builder(context)
+            .text("${uiState.placeName}\n${DateUtil.currentTime()}")
+            .font(R.font.bm_euljiro_font)
+            .textAlign(DhCamera.TEXT_START)
+            .align(DhCamera.BOTTOM_START)
+            .padding(start = 10, bottom = 10)
+            .showTextBackground()
+            .build(),
+        BackgroundText.Builder(context)
+            .text(DateUtil.currentTime())
+            .font(R.font.bm_euljiro_font)
+            .textAlign(DhCamera.TEXT_START)
+            .align(DhCamera.BOTTOM_START)
+            .padding(start = 10, bottom = 10)
+            .showTextBackground()
+            .build(),
+    )
+
+    DhCamera.Builder(context)
+        .backgroundItems(backgroundItems)
+        .onCompleted(isFinishCamera = true) { savedUrl ->
+            onAddImage(savedUrl)
+        }
+        .start()
 }
 
 

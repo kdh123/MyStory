@@ -75,6 +75,7 @@ dependencies {
     implementation(platform(libs.google.firebase.bom))
     implementation(libs.bundles.androidx.room)
     kapt(libs.androidx.room.compiler)
+    implementation(libs.dhcamera)
 
     implementation(libs.hilt)
     kapt(libs.androidx.hilt.compiler)
