@@ -22,6 +22,7 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://naver.jfrog.io/artifactory/maven/")
         }
+        maven("https://jitpack.io")
     }
 
 }
