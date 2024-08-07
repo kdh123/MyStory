@@ -35,3 +35,26 @@ fun TripVideoDto.toTripVideo(): TripVideo {
         videoUrl = videoUrl
     )
 }
+
+fun Trip.toTripEntity(): TripEntity {
+    return TripEntity(
+        id = id,
+        startDate = startDate,
+        endDate = endDate,
+        places = places,
+        images = images.map { it.toTripImageDto() },
+        videos = videos.map { it.toTripVideoDto() }
+    )
+}
+
+fun TripImage.toTripImageDto(): TripImageDto {
+    return TripImageDto(
+        date, address, imageUrl
+    )
+}
+
+fun TripVideo.toTripVideoDto(): TripVideoDto {
+    return TripVideoDto(
+        date, address, videoUrl
+    )
+}

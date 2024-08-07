@@ -58,6 +58,7 @@ import com.dhkim.home.presentation.navigation.navigateToMore
 import com.dhkim.home.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.home.presentation.navigation.timeCapsuleNavigation
 import com.dhkim.home.presentation.navigation.timeCapsuleOpenNavigation
+import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
 import com.dhkim.trip.presentation.navigation.tripNavigation
 import com.dhkim.ui.WarningDialog
 
@@ -83,7 +84,7 @@ fun MainScreen(
     )
     val isBottomNavShow = navController
         .currentBackStackEntryAsState()
-        .value?.destination?.route in listOf(TIME_CAPSULE_ROUTE, MAP_ROUTE, FRIEND_ROUTE)
+        .value?.destination?.route in listOf(TIME_CAPSULE_ROUTE, MAP_ROUTE, FRIEND_ROUTE, TRIP_ROUTE)
     var selectedPlace: Place? by remember {
         mutableStateOf(null)
     }
@@ -319,5 +320,5 @@ sealed class Screen(
         Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, FRIEND_ROUTE)
 
     data object Trip :
-        Screen("여행", R.drawable.ic_trip_primary, R.drawable.ic_trip_black, FRIEND_ROUTE)
+        Screen("여행", R.drawable.ic_trip_primary, R.drawable.ic_trip_black, TRIP_ROUTE)
 }

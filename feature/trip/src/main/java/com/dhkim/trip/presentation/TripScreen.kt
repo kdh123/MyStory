@@ -43,7 +43,7 @@ fun TripScreen(
     Scaffold(
         topBar = {
             Column(
-                modifier = modifier
+                modifier = Modifier
             ) {
                 Row(
                     modifier = Modifier
@@ -158,6 +158,10 @@ private fun TripSchedules(
     title: String,
     trips: ImmutableList<Trip>
 ) {
+    if (trips.isEmpty()) {
+        return
+    }
+
     Column {
         Text(
             text = title,
