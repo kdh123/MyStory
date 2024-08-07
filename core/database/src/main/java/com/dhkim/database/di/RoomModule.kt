@@ -2,6 +2,8 @@ package com.dhkim.database.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.dhkim.database.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -16,10 +18,25 @@ object RoomModule {
 
     @Provides
     @Singleton
-    fun roomBuilder(@ApplicationContext context: Context): com.dhkim.database.AppDatabase {
+    fun roomBuilder(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(
             context,
-            com.dhkim.database.AppDatabase::class.java, "timeCapsule"
-        ).build()
+            AppDatabase::class.java, "timeCapsule"
+        ).addMigrations(MIGRATION_1_2)
+            .build()
+    }
+
+    private val MIGRATION_1_2 = object : Migration(1, 2) {
+        val SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS 'trip' (" +
+                "'id' TEXT PRIMARY KEY NOT NULL default '', " +
+                "'startData' TEXT NOT NULL default '', " +
+                "'endData' TEXT NOT NULL default '', " +
+                "'places' TEXT NOT NULL default '', " +
+                "'images' TEXT NOT NULL default '', " +
+                "'videos' TEXT NOT NULL default '')"
+
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(SQL_CREATE_TABLE)
+        }
     }
 }

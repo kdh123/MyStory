@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":feature:notification"))
     implementation(project(":feature:setting"))
     implementation(project(":feature:home"))
+    implementation(project(":feature:trip"))
 
 
 

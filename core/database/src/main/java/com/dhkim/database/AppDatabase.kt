@@ -7,10 +7,12 @@ import com.dhkim.database.dao.FriendDao
 import com.dhkim.database.dao.MyTimeCapsuleDao
 import com.dhkim.database.dao.ReceivedTimeCapsuleDao
 import com.dhkim.database.dao.SendTimeCapsuleDao
+import com.dhkim.database.dao.TripDao
 import com.dhkim.database.entity.FriendEntity
 import com.dhkim.database.entity.MyTimeCapsuleEntity
 import com.dhkim.database.entity.ReceivedTimeCapsuleEntity
 import com.dhkim.database.entity.SendTimeCapsuleEntity
+import com.dhkim.database.entity.TripEntity
 
 
 @Database(
@@ -18,9 +20,10 @@ import com.dhkim.database.entity.SendTimeCapsuleEntity
         MyTimeCapsuleEntity::class,
         SendTimeCapsuleEntity::class,
         ReceivedTimeCapsuleEntity::class,
-        FriendEntity::class
+        FriendEntity::class,
+        TripEntity::class
     ],
-    version = 1
+    version = 2
 )
 @TypeConverters(RoomConverter::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -28,4 +31,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun sendTimeCapsuleDao(): SendTimeCapsuleDao
     abstract fun receivedTimeCapsuleDao(): ReceivedTimeCapsuleDao
     abstract fun friendDao(): FriendDao
+    abstract fun tripDao(): TripDao
 }

@@ -49,6 +49,7 @@ coroutineTest = "1.8.1"
 collectionImmutable = "0.3.7"
 uiTooling = "1.6.8"
 dhcamera = "1.0.0-alpha02"
+ksp = "1.8.10-1.0.9"
 
 [libraries]
 dhcamera = { module = "com.github.kdh123:DhCamera", version.ref = "dhcamera" }
@@ -248,6 +249,7 @@ kotlinx-serialization = [
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
