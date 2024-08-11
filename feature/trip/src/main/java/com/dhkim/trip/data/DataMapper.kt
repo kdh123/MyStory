@@ -6,9 +6,16 @@ import com.dhkim.database.TripVideoDto
 import com.dhkim.database.entity.TripEntity
 import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.domain.model.TripImage
+import com.dhkim.trip.domain.model.TripPlace
 import com.dhkim.trip.domain.model.TripVideo
 
 fun TripEntity.toTrip(): Trip {
+    val isDomestic = places.firstOrNull { place ->
+        TripPlace.AbroadPlace.entries.map {
+            it.placeName
+        }.contains(place)
+    } == null
+
     return Trip(
         id = id,
         startDate = startDate,
@@ -16,13 +23,15 @@ fun TripEntity.toTrip(): Trip {
         places = places,
         images = images.map { it.toTripImage() },
         videos = videos.map { it.toTripVideo() },
-        isNextTrip = !DateUtil.isAfter(startDate)
+        isNextTrip = !DateUtil.isAfter(startDate),
+        isDomestic = isDomestic
     )
 }
 
 fun TripImageDto.toTripImage(): TripImage {
     return TripImage(
         date = date,
+        memo = memo,
         address = address,
         imageUrl = imageUrl
     )
@@ -31,6 +40,7 @@ fun TripImageDto.toTripImage(): TripImage {
 fun TripVideoDto.toTripVideo(): TripVideo {
     return TripVideo(
         date = date,
+        memo = memo,
         address = address,
         videoUrl = videoUrl
     )
@@ -39,6 +49,7 @@ fun TripVideoDto.toTripVideo(): TripVideo {
 fun Trip.toTripEntity(): TripEntity {
     return TripEntity(
         id = id,
+        type = type,
         startDate = startDate,
         endDate = endDate,
         places = places,
@@ -49,12 +60,12 @@ fun Trip.toTripEntity(): TripEntity {
 
 fun TripImage.toTripImageDto(): TripImageDto {
     return TripImageDto(
-        date, address, imageUrl
+        date, memo, address, imageUrl
     )
 }
 
 fun TripVideo.toTripVideoDto(): TripVideoDto {
     return TripVideoDto(
-        date, address, videoUrl
+        date, memo, address, videoUrl
     )
 }

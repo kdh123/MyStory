@@ -9,23 +9,23 @@ class TripRepositoryImpl @Inject constructor(
     private val localDataSource: TripLocalDataSource
 ) : TripRepository {
 
-    override fun getAllTrip(): Flow<List<Trip>> {
+    override suspend fun getAllTrip(): Flow<List<Trip>> {
         return localDataSource.getAllTrip()
     }
 
-    override fun getTrip(id: String): Trip? {
+    override suspend fun getTrip(id: String): Trip? {
         return localDataSource.getTrip(id)
     }
 
-    override fun saveTrip(trip: Trip) {
+    override suspend fun saveTrip(trip: Trip) {
         localDataSource.saveTrip(trip)
     }
 
-    override fun updateTrip(trip: Trip) {
+    override suspend fun updateTrip(trip: Trip) {
         localDataSource.updateTrip(trip)
     }
 
-    override fun deleteTrip(id: String) {
+    override suspend fun deleteTrip(id: String) {
         localDataSource.deleteTrip(id)
     }
 }

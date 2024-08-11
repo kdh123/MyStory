@@ -159,7 +159,6 @@ class UserRemoteDataSourceImpl @Inject constructor(
     }
 
     override fun updateFriend(myId: String, friend: Friend): Flow<isSuccessful> {
-        val a = ""
         return callbackFlow {
             val childUpdates = hashMapOf<String, Any>(
                 "/users/$myId/friends/${friend.id}" to friend,

@@ -1,10 +1,17 @@
-package com.dhkim.trip
+package com.dhkim.trip.tripHome
 
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dhkim.trip.FakeTripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
 import com.dhkim.trip.data.di.TripModule
 import com.dhkim.trip.domain.TripRepository
-import com.dhkim.trip.presentation.TripViewModel
+import com.dhkim.trip.presentation.tripHome.TripScreen
+import com.dhkim.trip.presentation.tripHome.TripViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -13,9 +20,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
-import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,7 +34,7 @@ import javax.inject.Singleton
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
 @UninstallModules(TripModule::class)
-class TripViewModelTest {
+class TripScreenTest {
 
     @Module
     @InstallIn(SingletonComponent::class)
@@ -47,8 +52,12 @@ class TripViewModelTest {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
     private lateinit var viewModel: TripViewModel
-    @Inject lateinit var tripRepository: TripRepository
+    @Inject
+    lateinit var tripRepository: TripRepository
 
     @Before
     fun setup() {
@@ -56,16 +65,27 @@ class TripViewModelTest {
         viewModel = TripViewModel(tripRepository = tripRepository)
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
-    fun `uiState 테스트`() = runBlocking {
-        delay(300)
-        assertEquals(viewModel.uiState.value.nextTrips.size, 2)
-        assertEquals(viewModel.uiState.value.prevTrips.size, 4)
+    fun `Screen 테스트`() = runTest {
+        composeTestRule.setContent {
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            TripScreen(
+                uiState = uiState,
+                onAction = viewModel::onAction,
+                onNavigateToSchedule = {}
+            )
+        }
+
+        composeTestRule.waitUntilAtLeastOneExists(
+            hasText("서울 - 부산 여행"),
+            300
+        )
+
+        composeTestRule.waitUntilAtLeastOneExists(
+            hasText("2024-09-04 - 2024-09-10"),
+            300
+        )
     }
-
-    @Test
-    fun `여행 아이템 삭제 테스트`() = runBlocking {
-
-    }
-
 }

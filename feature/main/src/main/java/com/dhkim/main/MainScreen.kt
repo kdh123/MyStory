@@ -59,7 +59,9 @@ import com.dhkim.home.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.home.presentation.navigation.timeCapsuleNavigation
 import com.dhkim.home.presentation.navigation.timeCapsuleOpenNavigation
 import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
+import com.dhkim.trip.presentation.navigation.navigateToTripSchedule
 import com.dhkim.trip.presentation.navigation.tripNavigation
+import com.dhkim.trip.presentation.navigation.tripScheduleNavigation
 import com.dhkim.ui.WarningDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,7 +86,12 @@ fun MainScreen(
     )
     val isBottomNavShow = navController
         .currentBackStackEntryAsState()
-        .value?.destination?.route in listOf(TIME_CAPSULE_ROUTE, MAP_ROUTE, FRIEND_ROUTE, TRIP_ROUTE)
+        .value?.destination?.route in listOf(
+        TIME_CAPSULE_ROUTE,
+        MAP_ROUTE,
+        FRIEND_ROUTE,
+        TRIP_ROUTE
+    )
     var selectedPlace: Place? by remember {
         mutableStateOf(null)
     }
@@ -299,7 +306,11 @@ fun MainScreen(
             )
             tripNavigation(
                 modifier = Modifier
-                    .padding(bottom = innerPadding.calculateBottomPadding())
+                    .padding(bottom = innerPadding.calculateBottomPadding()),
+                onNavigateToSchedule = navController::navigateToTripSchedule
+            )
+            tripScheduleNavigation(
+                onBack = navController::navigateUp
             )
         }
     }

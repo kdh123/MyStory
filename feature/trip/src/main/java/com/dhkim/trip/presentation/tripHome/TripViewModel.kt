@@ -1,10 +1,11 @@
-package com.dhkim.trip.presentation
+package com.dhkim.trip.presentation.tripHome
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.trip.domain.TripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -30,6 +31,20 @@ class TripViewModel @Inject constructor(
                         prevTrips = partition.second.toImmutableList(),
                     )
                 }
+        }
+    }
+
+    fun onAction(action: TripAction) {
+        when (action) {
+            is TripAction.DeleteTrip -> {
+                deleteTrip(tripId = action.tripId)
+            }
+        }
+    }
+
+    private fun deleteTrip(tripId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            tripRepository.deleteTrip(id = tripId)
         }
     }
 }

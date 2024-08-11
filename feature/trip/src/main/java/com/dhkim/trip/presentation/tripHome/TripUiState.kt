@@ -1,4 +1,4 @@
-package com.dhkim.trip.presentation
+package com.dhkim.trip.presentation.tripHome
 
 import androidx.compose.runtime.Stable
 import com.dhkim.trip.domain.model.Trip

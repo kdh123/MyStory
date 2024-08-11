@@ -74,6 +74,27 @@ object DateUtil {
         return (today?.after(date) ?: false) || strDate == todayDate()
     }
 
+    fun isBefore(strDate: String): Boolean {
+        val today = convertStringToDate(todayDate())
+        val date = convertStringToDate(strDate)
+
+        return (today?.before(date) ?: false) || strDate == todayDate()
+    }
+
+    fun isAfter(strDate1: String, strDate2: String): Boolean {
+        val date1 = convertStringToDate(strDate1)
+        val date2 = convertStringToDate(strDate2)
+
+        return (date1?.after(date2) ?: false) || date1 == date2
+    }
+
+    fun isBefore(strDate1: String, strDate2: String): Boolean {
+        val date1 = convertStringToDate(strDate1)
+        val date2 = convertStringToDate(strDate2)
+
+        return (date1?.before(date2) ?: false) || date1 == date2
+    }
+
     fun todayDate(): String {
         val calendar: Calendar = Calendar.getInstance()
         return sdf.format(calendar.time)

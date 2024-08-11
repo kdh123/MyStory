@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface TripLocalDataSource {
 
-    fun getAllTrip(): Flow<List<Trip>>
-    fun getTrip(id: String): Trip?
-    fun saveTrip(trip: Trip)
-    fun updateTrip(trip: Trip)
-    fun deleteTrip(id: String)
+    suspend fun getAllTrip(): Flow<List<Trip>>
+    suspend fun getTrip(id: String): Trip?
+    suspend fun saveTrip(trip: Trip)
+    suspend fun updateTrip(trip: Trip)
+    suspend fun deleteTrip(id: String)
 }

@@ -29,6 +29,7 @@ object RoomModule {
     private val MIGRATION_1_2 = object : Migration(1, 2) {
         val SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS 'trip' (" +
                 "'id' TEXT PRIMARY KEY NOT NULL default '', " +
+                "'type' INTEGER NOT NULL default 0, " +
                 "'startDate' TEXT NOT NULL default '', " +
                 "'endDate' TEXT NOT NULL default '', " +
                 "'places' TEXT NOT NULL default '', " +

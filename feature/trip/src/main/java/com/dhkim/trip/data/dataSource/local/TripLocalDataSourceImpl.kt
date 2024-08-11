@@ -14,25 +14,25 @@ class TripLocalDataSourceImpl @Inject constructor(
 
     private val service = db.tripDao()
 
-    override fun getAllTrip(): Flow<List<Trip>> {
+    override suspend fun getAllTrip(): Flow<List<Trip>> {
         return service.getAllTrip().map { trips ->
             trips?.map { it.toTrip() } ?: listOf()
         }
     }
 
-    override fun getTrip(id: String): Trip? {
+    override suspend fun getTrip(id: String): Trip? {
         return service.getTrip(id)?.toTrip()
     }
 
-    override fun saveTrip(trip: Trip) {
+    override suspend fun saveTrip(trip: Trip) {
         service.saveTrip(tripEntity = trip.toTripEntity())
     }
 
-    override fun updateTrip(trip: Trip) {
+    override suspend fun updateTrip(trip: Trip) {
         service.updateTrip(tripEntity = trip.toTripEntity())
     }
 
-    override fun deleteTrip(id: String) {
+    override suspend fun deleteTrip(id: String) {
         service.deleteTrip(id)
     }
 }

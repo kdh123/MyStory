@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":feature:setting"))
     implementation(project(":feature:location"))
     implementation(project(":core:common"))
+    implementation(project(":core:ui"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

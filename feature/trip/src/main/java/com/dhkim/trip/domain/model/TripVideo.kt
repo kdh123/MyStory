@@ -5,6 +5,7 @@ import androidx.compose.runtime.Stable
 @Stable
 data class TripVideo(
     val date: String = "",
+    val memo: String = "",
     val address: String = "",
     val videoUrl: String = ""
 )
