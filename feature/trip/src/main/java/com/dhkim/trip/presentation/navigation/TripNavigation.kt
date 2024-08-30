@@ -10,14 +10,18 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.dhkim.trip.presentation.detail.TripDetailScreen
 import com.dhkim.trip.presentation.detail.TripDetailViewModel
-import com.dhkim.trip.presentation.tripHome.TripScreen
-import com.dhkim.trip.presentation.tripHome.TripViewModel
+import com.dhkim.trip.presentation.imageDetail.TripImageDetailScreen
 import com.dhkim.trip.presentation.schedule.TripScheduleScreen
 import com.dhkim.trip.presentation.schedule.TripScheduleViewModel
+import com.dhkim.trip.presentation.tripHome.TripScreen
+import com.dhkim.trip.presentation.tripHome.TripViewModel
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 const val TRIP_ROUTE = "trip"
 const val TRIP_SCHEDULE_ROUTE = "trip_schedule"
 const val TRIP_DETAIL_ROUTE = "trip_route"
+const val TRIP_IMAGE_DETAIL_ROUTE = "trip_image_detail_route"
 
 fun NavGraphBuilder.tripNavigation(
     modifier: Modifier = Modifier,
@@ -66,6 +70,7 @@ fun NavController.navigateToTripDetail(tripId: String) {
 }
 
 fun NavGraphBuilder.tripDetailNavigation(
+    onNavigateToImageDetail: (String) -> Unit,
     onBack: () -> Unit
 ) {
     composable("$TRIP_DETAIL_ROUTE/{tripId}") {
@@ -81,7 +86,20 @@ fun NavGraphBuilder.tripDetailNavigation(
             uiState = uiState,
             sideEffect = sideEffect,
             onAction = viewModel::onAction,
+            onNavigateToImageDetail = onNavigateToImageDetail,
             onBack = onBack
         )
     }
+}
+
+fun NavGraphBuilder.tripImageDetailNavigation() {
+    composable("${TRIP_IMAGE_DETAIL_ROUTE}/{imageUrl}") {
+        val imageUrl = it.arguments?.getString("imageUrl") ?: ""
+        val realImageUrl = URLDecoder.decode(imageUrl, StandardCharsets.UTF_8.toString())
+        TripImageDetailScreen(imageUrl = realImageUrl)
+    }
+}
+
+fun NavController.navigateToTripImageDetail(imageUrl: String) {
+    navigate("$TRIP_IMAGE_DETAIL_ROUTE/$imageUrl")
 }

@@ -30,7 +30,9 @@ class TripDetailViewModel @Inject constructor(
     fun onAction(action: TripDetailAction) {
         when (action) {
             is TripDetailAction.InitTrip -> {
-                initTrip(tripId = action.tripId)
+                if (uiState.value.tripDates.isEmpty()) {
+                    initTrip(tripId = action.tripId)
+                }
             }
 
             is TripDetailAction.LoadImages -> {

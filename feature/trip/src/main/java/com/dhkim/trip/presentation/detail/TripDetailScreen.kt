@@ -16,6 +16,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -62,6 +63,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.withContext
 import java.io.InputStream
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -71,6 +75,7 @@ fun TripDetailScreen(
     uiState: TripDetailUiState,
     sideEffect: SharedFlow<TripDetailSideEffect>,
     onAction: (TripDetailAction) -> Unit,
+    onNavigateToImageDetail: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -85,7 +90,9 @@ fun TripDetailScreen(
             if (state[it] == false) {
                 showPermissionDialog = true
             } else {
-                onAction(TripDetailAction.InitTrip(tripId = tripId))
+                if (it == Manifest.permission.READ_MEDIA_IMAGES) {
+                    onAction(TripDetailAction.InitTrip(tripId = tripId))
+                }
             }
         }
     }
@@ -146,8 +153,8 @@ fun TripDetailScreen(
             DateHeader(
                 uiState = uiState,
                 onAction = onAction
-                )
-            TripDetails(uiState = uiState)
+            )
+            TripDetails(uiState = uiState, onNavigateToImageDetail = onNavigateToImageDetail)
         }
     }
 }
@@ -216,14 +223,14 @@ private fun DateHeader(
                     )
                 }
             }
-
         }
     }
 }
 
 @Composable
 private fun TripDetails(
-    uiState: TripDetailUiState
+    uiState: TripDetailUiState,
+    onNavigateToImageDetail: (String) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -231,7 +238,6 @@ private fun TripDetails(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier
-            //.padding(top = it.calculateTopPadding())
             .fillMaxSize()
     ) {
         items(items = uiState.images, key = {
@@ -242,6 +248,13 @@ private fun TripDetails(
                 imageModel = { it.imageUrl },
                 modifier = Modifier
                     .aspectRatio(1f)
+                    .clickable {
+                        val imageUrl = URLEncoder.encode(
+                            it.imageUrl,
+                            StandardCharsets.UTF_8.toString()
+                        )
+                        onNavigateToImageDetail(imageUrl)
+                    }
             )
         }
     }
@@ -365,6 +378,7 @@ private fun TripDetailScreenPreview() {
         uiState = uiState,
         sideEffect = MutableSharedFlow(),
         onAction = {},
+        onNavigateToImageDetail = { },
         onBack = {}
     )
 }

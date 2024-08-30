@@ -39,14 +39,6 @@ import com.dhkim.friend.presentation.navigation.changeFriendInfoNavigation
 import com.dhkim.friend.presentation.navigation.friendNavigation
 import com.dhkim.friend.presentation.navigation.navigateToChangeFriendInfo
 import com.dhkim.friend.presentation.navigation.navigateToFriend
-import com.dhkim.location.domain.Place
-import com.dhkim.location.presentation.navigation.searchNavigation
-import com.dhkim.map.presentation.navigation.MAP_ROUTE
-import com.dhkim.map.presentation.navigation.mapNavigation
-import com.dhkim.notification.navigation.navigateToNotification
-import com.dhkim.notification.navigation.notificationNavigation
-import com.dhkim.setting.presentation.navigation.navigateToSetting
-import com.dhkim.setting.presentation.navigation.settingNavigation
 import com.dhkim.home.presentation.navigation.ADD_TIME_CAPSULE_ROUTE
 import com.dhkim.home.presentation.navigation.TIME_CAPSULE_ROUTE
 import com.dhkim.home.presentation.navigation.addTimeCapsuleNavigation
@@ -58,10 +50,20 @@ import com.dhkim.home.presentation.navigation.navigateToMore
 import com.dhkim.home.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.home.presentation.navigation.timeCapsuleNavigation
 import com.dhkim.home.presentation.navigation.timeCapsuleOpenNavigation
+import com.dhkim.location.domain.Place
+import com.dhkim.location.presentation.navigation.searchNavigation
+import com.dhkim.map.presentation.navigation.MAP_ROUTE
+import com.dhkim.map.presentation.navigation.mapNavigation
+import com.dhkim.notification.navigation.navigateToNotification
+import com.dhkim.notification.navigation.notificationNavigation
+import com.dhkim.setting.presentation.navigation.navigateToSetting
+import com.dhkim.setting.presentation.navigation.settingNavigation
 import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
 import com.dhkim.trip.presentation.navigation.navigateToTripDetail
+import com.dhkim.trip.presentation.navigation.navigateToTripImageDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripSchedule
 import com.dhkim.trip.presentation.navigation.tripDetailNavigation
+import com.dhkim.trip.presentation.navigation.tripImageDetailNavigation
 import com.dhkim.trip.presentation.navigation.tripNavigation
 import com.dhkim.trip.presentation.navigation.tripScheduleNavigation
 import com.dhkim.ui.WarningDialog
@@ -316,8 +318,12 @@ fun MainScreen(
                 onBack = navController::navigateUp
             )
             tripDetailNavigation(
+                onNavigateToImageDetail = { imageUrl ->
+                    navController.navigateToTripImageDetail(imageUrl)
+                },
                 onBack = navController::navigateUp
             )
+            tripImageDetailNavigation()
         }
     }
 }
