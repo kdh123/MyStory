@@ -56,7 +56,7 @@ import com.dhkim.trip.domain.model.TripPlace
 import com.dhkim.trip.domain.model.TripType
 import com.dhkim.trip.domain.model.toTripType
 import com.dhkim.trip.presentation.tripHome.TripScheduleSideEffect
-import com.dhkim.ui.noRiffleClick
+import com.dhkim.ui.noRippleClick
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -207,11 +207,11 @@ fun Calender(
     val context = LocalContext.current
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = DateUtil.dateToMills(DateUtil.dateAfterDays(1)),
-        selectableDates = object : SelectableDates {
+        /*selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return utcTimeMillis >= DateUtil.dateToMills(DateUtil.todayDate())
             }
-        }
+        }*/
     )
 
     DatePickerDialog(
@@ -339,7 +339,7 @@ private fun TripTypeScreen(
                             }
                         )
                         .padding(vertical = 14.dp)
-                        .noRiffleClick {
+                        .noRippleClick {
                             selectedIndex = index
                         }
                         .testTag("tripType$index")
@@ -358,7 +358,7 @@ private fun TripTypeScreen(
                 .fillMaxWidth()
                 .background(color = colorResource(id = R.color.primary))
                 .padding(10.dp)
-                .noRiffleClick {
+                .noRippleClick {
                     onAction(TripScheduleAction.UpdateType(selectedIndex.toTripType()))
                     onMoveToNextPage(1)
                     onAction(TripScheduleAction.UpdateProgress(0.66f))
@@ -432,7 +432,7 @@ private fun TripPlaceScreen(
                         }
                     }
                     .padding(horizontal = 10.dp, vertical = 8.dp)
-                    .noRiffleClick {
+                    .noRippleClick {
                         selectedPlaceTypeIndex = 0
                     }
                     .testTag("domestic")
@@ -471,7 +471,7 @@ private fun TripPlaceScreen(
                         }
                     }
                     .padding(horizontal = 10.dp, vertical = 8.dp)
-                    .noRiffleClick {
+                    .noRippleClick {
                         selectedPlaceTypeIndex = 1
                     }
                     .testTag("abroad")
@@ -525,7 +525,7 @@ private fun TripPlaceScreen(
                 .fillMaxWidth()
                 .background(color = backgroundColor)
                 .padding(10.dp)
-                .noRiffleClick {
+                .noRippleClick {
                     if (isCompleted) {
                         onMoveToNextPage(2)
                         onAction(TripScheduleAction.UpdateProgress(1f))
@@ -599,7 +599,7 @@ private fun DomesticPlaces(
                         }
                         .align(Alignment.CenterVertically)
                         .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .noRiffleClick {
+                        .noRippleClick {
                             onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.entries[index]))
                         }
                         .testTag(item.placeName)
@@ -672,7 +672,7 @@ private fun AbroadPlaces(
                         }
                         .align(Alignment.CenterVertically)
                         .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .noRiffleClick {
+                        .noRippleClick {
                             onAction(TripScheduleAction.UpdatePlaces(TripPlace.AbroadPlace.entries[index]))
                         }
                 )
@@ -719,7 +719,7 @@ private fun TripDateScreen(
                         shape = RoundedCornerShape(10.dp)
                     )
                     .padding(10.dp)
-                    .noRiffleClick {
+                    .noRippleClick {
                         onShowStartDateDialog()
                     }
             )
@@ -743,7 +743,7 @@ private fun TripDateScreen(
                         shape = RoundedCornerShape(10.dp)
                     )
                     .padding(10.dp)
-                    .noRiffleClick {
+                    .noRippleClick {
                         onShowEndDateDialog()
                     }
             )
@@ -772,7 +772,7 @@ private fun TripDateScreen(
                 .fillMaxWidth()
                 .background(backgroundColor)
                 .padding(10.dp)
-                .noRiffleClick {
+                .noRippleClick {
                     if (isCompleted) {
                         onAction(TripScheduleAction.SaveTrip)
                     }

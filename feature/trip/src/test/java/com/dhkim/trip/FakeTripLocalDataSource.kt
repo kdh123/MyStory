@@ -1,5 +1,6 @@
 package com.dhkim.trip
 
+import com.dhkim.database.TripImageDto
 import com.dhkim.database.entity.TripEntity
 import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.trip.data.toTrip
@@ -14,6 +15,28 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
     private val trips = MutableStateFlow(listOf<Trip>())
 
     init {
+        val images = mutableListOf<TripImageDto>().apply {
+            repeat(20) {
+                add(
+                    TripImageDto(
+                        id = "trip$it",
+                        date = if(it % 3 == 0) {
+                            "2024-03-01"
+                        } else if (it % 7 == 0) {
+                            "2024-03-02"
+                        } else {
+                            "2024-03-03"
+                        },
+                        memo = "good trip$it",
+                        lat = 37.572389,
+                        lng = 126.9769117,
+                        address = "",
+                        imageUrl = "imageUrl$it"
+                    )
+                )
+            }
+        }
+
         val trips = mutableListOf<TripEntity>().apply {
             repeat(6) {
                 add(
@@ -21,20 +44,20 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
                         TripEntity(
                             id = "id$it",
                             type = TripType.Alone.type,
-                            startDate = "2024-09-04",
-                            endDate = "2024-09-10",
+                            startDate = "2024-03-01",
+                            endDate = "2024-03-03",
                             places = listOf("서울", "부산"),
-                            images = listOf(),
+                            images = images,
                             videos = listOf()
                         )
                     } else {
                         TripEntity(
                             id = "id$it",
                             type = TripType.Alone.type,
-                            startDate = "2024-05-04",
-                            endDate = "2024-05-10",
+                            startDate = "2024-03-01",
+                            endDate = "2024-03-03",
                             places = listOf("서울", "부산"),
-                            images = listOf(),
+                            images = images,
                             videos = listOf()
                         )
                     }

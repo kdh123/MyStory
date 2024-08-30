@@ -1,7 +1,6 @@
 package com.dhkim.ui
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.renderscript.Allocation
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
@@ -35,7 +34,6 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 
 val gradientColors = listOf(
@@ -86,7 +84,7 @@ fun LegacyBlurImage(
     BlurImage(bitmap, modifier)
 }
 
-fun Modifier.noRiffleClick(
+fun Modifier.noRippleClick(
     onClick: () -> Unit
 ) = composed {
     val interactionSource = remember { MutableInteractionSource() }

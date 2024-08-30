@@ -30,6 +30,7 @@ fun TripEntity.toTrip(): Trip {
 
 fun TripImageDto.toTripImage(): TripImage {
     return TripImage(
+        id = id,
         date = date,
         memo = memo,
         address = address,
@@ -60,12 +61,12 @@ fun Trip.toTripEntity(): TripEntity {
 
 fun TripImage.toTripImageDto(): TripImageDto {
     return TripImageDto(
-        date, memo, address, imageUrl
+        id, date, memo, lat, lng, address, imageUrl
     )
 }
 
 fun TripVideo.toTripVideoDto(): TripVideoDto {
     return TripVideoDto(
-        date, memo, address, videoUrl
+        date, memo, lat, lng, address, videoUrl
     )
 }

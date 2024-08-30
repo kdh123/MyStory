@@ -8,6 +8,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.dhkim.trip.presentation.detail.TripDetailScreen
+import com.dhkim.trip.presentation.detail.TripDetailViewModel
 import com.dhkim.trip.presentation.tripHome.TripScreen
 import com.dhkim.trip.presentation.tripHome.TripViewModel
 import com.dhkim.trip.presentation.schedule.TripScheduleScreen
@@ -15,10 +17,12 @@ import com.dhkim.trip.presentation.schedule.TripScheduleViewModel
 
 const val TRIP_ROUTE = "trip"
 const val TRIP_SCHEDULE_ROUTE = "trip_schedule"
+const val TRIP_DETAIL_ROUTE = "trip_route"
 
 fun NavGraphBuilder.tripNavigation(
     modifier: Modifier = Modifier,
-    onNavigateToSchedule: () -> Unit
+    onNavigateToSchedule: () -> Unit,
+    onNavigateToDetail: (String) -> Unit
 ) {
     composable(TRIP_ROUTE) {
         val viewModel = hiltViewModel<TripViewModel>()
@@ -28,7 +32,8 @@ fun NavGraphBuilder.tripNavigation(
             uiState = uiState,
             onAction = viewModel::onAction,
             modifier = modifier,
-            onNavigateToSchedule = onNavigateToSchedule
+            onNavigateToSchedule = onNavigateToSchedule,
+            onNavigateToDetail = onNavigateToDetail
         )
     }
 }
@@ -48,6 +53,31 @@ fun NavGraphBuilder.tripScheduleNavigation(
         }
 
         TripScheduleScreen(
+            uiState = uiState,
+            sideEffect = sideEffect,
+            onAction = viewModel::onAction,
+            onBack = onBack
+        )
+    }
+}
+
+fun NavController.navigateToTripDetail(tripId: String) {
+    navigate("$TRIP_DETAIL_ROUTE/$tripId")
+}
+
+fun NavGraphBuilder.tripDetailNavigation(
+    onBack: () -> Unit
+) {
+    composable("$TRIP_DETAIL_ROUTE/{tripId}") {
+        val tripId = it.arguments?.getString("tripId") ?: ""
+        val viewModel = hiltViewModel<TripDetailViewModel>()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val sideEffect = remember {
+            viewModel.sideEffect
+        }
+
+        TripDetailScreen(
+            tripId = tripId,
             uiState = uiState,
             sideEffect = sideEffect,
             onAction = viewModel::onAction,

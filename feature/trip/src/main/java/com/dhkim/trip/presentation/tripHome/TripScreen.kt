@@ -34,13 +34,14 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.trip.R
 import com.dhkim.trip.domain.model.Trip
 import com.dhkim.ui.WarningDialog
-import com.dhkim.ui.noRiffleClick
+import com.dhkim.ui.noRippleClick
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -50,7 +51,8 @@ fun TripScreen(
     uiState: TripUiState,
     onAction: (TripAction) -> Unit,
     modifier: Modifier = Modifier,
-    onNavigateToSchedule: () -> Unit
+    onNavigateToSchedule: () -> Unit,
+    onNavigateToDetail: (String) -> Unit
 ) {
     var showDeleteDialog by remember {
         mutableStateOf(false)
@@ -113,7 +115,8 @@ fun TripScreen(
                 showDeleteDialog = {
                     selectedTripId = it
                     showDeleteDialog = true
-                }
+                },
+                onNavigateToDetail = onNavigateToDetail
             )
             TripSchedules(
                 title = "지난 여행",
@@ -121,7 +124,8 @@ fun TripScreen(
                 showDeleteDialog = {
                     selectedTripId = it
                     showDeleteDialog = true
-                }
+                },
+                onNavigateToDetail = onNavigateToDetail
             )
         }
 
@@ -237,7 +241,7 @@ private fun EmptyTripScheduleLayout(
                     .background(color = colorResource(id = R.color.primary))
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 10.dp, horizontal = 16.dp)
-                    .noRiffleClick {
+                    .noRippleClick {
                         onNavigateToSchedule()
                     }
             )
@@ -258,7 +262,8 @@ private fun AddTripScheduleLayoutPreview() {
 private fun TripSchedules(
     title: String,
     trips: ImmutableList<Trip>,
-    showDeleteDialog: (String) -> Unit
+    showDeleteDialog: (String) -> Unit,
+    onNavigateToDetail: (String) -> Unit
 ) {
     if (trips.isEmpty()) {
         return
@@ -304,7 +309,7 @@ private fun TripSchedules(
                                     showDeleteDialog(it.id)
                                 },
                                 onClick = {
-
+                                    onNavigateToDetail(it.id)
                                 }
                             )
                     ) {
@@ -335,6 +340,8 @@ private fun TripSchedules(
                                 text = "$title",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 2,
                                 modifier = Modifier
                                     .padding(start = 10.dp)
                             )
@@ -382,6 +389,7 @@ private fun TripScreenPreview() {
     TripScreen(
         uiState = uiState,
         onNavigateToSchedule = {},
+        onNavigateToDetail = {},
         onAction = {}
     )
 }

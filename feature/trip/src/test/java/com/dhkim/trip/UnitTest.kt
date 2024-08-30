@@ -28,4 +28,30 @@ class UnitTest {
 
         assertEquals(isDomestic, false)
     }
+
+    @Test
+    fun `다음 날짜 값 가져오기`() {
+        val date = DateUtil.dateAfterDays(date = "2024-12-31", days = 0)
+
+        println("${date.first} : ${date.second} : ${date.third}")
+    }
+
+    @Test
+    fun `날짜 목록 가져오기`() {
+        val startDate = "2024-03-25"
+        val endDate = "2024-03-25"
+
+        val tripDate = mutableListOf<Pair<String, String>>().apply {
+            var date = startDate
+
+            while (DateUtil.isBefore(date, endDate)) {
+                val dateValue = DateUtil.dateAfterDays(date, 0)
+                add(Pair(dateValue.second, dateValue.third))
+                val value2 = DateUtil.dateAfterDays(date, 1)
+                date = "${value2.first}-${value2.second}-${value2.third}"
+            }
+        }
+
+        println(tripDate)
+    }
 }

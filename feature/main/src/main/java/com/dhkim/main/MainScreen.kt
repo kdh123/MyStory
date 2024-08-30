@@ -59,7 +59,9 @@ import com.dhkim.home.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.home.presentation.navigation.timeCapsuleNavigation
 import com.dhkim.home.presentation.navigation.timeCapsuleOpenNavigation
 import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
+import com.dhkim.trip.presentation.navigation.navigateToTripDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripSchedule
+import com.dhkim.trip.presentation.navigation.tripDetailNavigation
 import com.dhkim.trip.presentation.navigation.tripNavigation
 import com.dhkim.trip.presentation.navigation.tripScheduleNavigation
 import com.dhkim.ui.WarningDialog
@@ -307,9 +309,13 @@ fun MainScreen(
             tripNavigation(
                 modifier = Modifier
                     .padding(bottom = innerPadding.calculateBottomPadding()),
-                onNavigateToSchedule = navController::navigateToTripSchedule
+                onNavigateToSchedule = navController::navigateToTripSchedule,
+                onNavigateToDetail = navController::navigateToTripDetail
             )
             tripScheduleNavigation(
+                onBack = navController::navigateUp
+            )
+            tripDetailNavigation(
                 onBack = navController::navigateUp
             )
         }
