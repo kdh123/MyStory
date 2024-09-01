@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.dhkim.trip.domain.TripRepository
 import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.domain.model.TripPlace
+import com.dhkim.trip.domain.model.toTripType
 import com.dhkim.trip.presentation.tripHome.TripScheduleSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,10 @@ class TripScheduleViewModel @Inject constructor(
 
     fun onAction(action: TripScheduleAction) {
         when (action) {
+            is TripScheduleAction.Init -> {
+                init(tripId = action.tripId)
+            }
+
             is TripScheduleAction.UpdateProgress -> {
                 _uiState.value = _uiState.value.copy(progress = action.progress)
             }
@@ -50,6 +55,30 @@ class TripScheduleViewModel @Inject constructor(
 
             TripScheduleAction.SaveTrip -> {
                 saveTrip()
+            }
+        }
+    }
+
+    private fun init(tripId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val trip = tripRepository.getTrip(tripId)
+
+            trip?.run {
+                val domesticPlaces = TripPlace.DomesticPlace.entries.map { it.placeName }
+                val updatePlaces = places.map { place ->
+                    if (domesticPlaces.contains(place)) {
+                        TripPlace.DomesticPlace.entries.first { it.placeName == place }
+                    } else {
+                        TripPlace.AbroadPlace.entries.first { it.placeName == place }
+                    }
+                }
+
+                _uiState.value = _uiState.value.copy(
+                    type = type.toTripType(),
+                    startDate = startDate,
+                    endDate = endDate,
+                    tripPlaces = updatePlaces
+                )
             }
         }
     }

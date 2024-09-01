@@ -79,6 +79,7 @@ class TripScheduleScreenTest {
             }
 
             TripScheduleScreen(
+                tripId = "",
                 uiState = uiState,
                 sideEffect = sideEffect,
                 onAction = viewModel::onAction,
@@ -126,6 +127,7 @@ class TripScheduleScreenTest {
             }
 
             TripScheduleScreen(
+                tripId = "",
                 uiState = uiState,
                 sideEffect = sideEffect,
                 onAction = viewModel::onAction,

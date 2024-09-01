@@ -18,6 +18,7 @@ fun TripEntity.toTrip(): Trip {
 
     return Trip(
         id = id,
+        type = type,
         startDate = startDate,
         endDate = endDate,
         places = places,

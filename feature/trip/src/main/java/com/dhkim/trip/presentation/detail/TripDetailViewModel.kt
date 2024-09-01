@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.trip.domain.TripRepository
 import com.dhkim.trip.domain.model.TripImage
+import com.dhkim.trip.domain.model.toTripType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
@@ -65,12 +66,48 @@ class TripDetailViewModel @Inject constructor(
             val currentTrip = tripRepository.getTrip(id = tripId)
 
             if (currentTrip != null) {
-                _sideEffect.emit(
-                    TripDetailSideEffect.LoadImages(
-                        startDate = currentTrip.startDate,
-                        endDate = currentTrip.endDate
+                val title = StringBuilder()
+                currentTrip.places.forEachIndexed { index, place ->
+                    title.append(place)
+                    if (index < currentTrip.places.size - 1) {
+                        title.append(", ")
+                    }
+                }
+                title.append(" 여행")
+
+                if (currentTrip.images.isEmpty()) {
+                    with(currentTrip) {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = true,
+                            title = "$title",
+                            startDate = startDate,
+                            endDate = endDate,
+                            type = type.toTripType().desc
+                        )
+                    }
+
+                    _sideEffect.emit(
+                        TripDetailSideEffect.LoadImages(
+                            startDate = currentTrip.startDate,
+                            endDate = currentTrip.endDate
+                        )
                     )
-                )
+                } else {
+                    with(currentTrip) {
+                        tripAllImages.value = currentTrip.images
+
+                        val strDate = currentTrip.startDate
+                        val images = tripAllImages.value.filter { it.date == strDate }.toImmutableList()
+
+                        _uiState.value = _uiState.value.copy(
+                            title = "$title",
+                            type = currentTrip.type.toTripType().desc,
+                            startDate = startDate,
+                            endDate = endDate,
+                            images = images
+                        )
+                    }
+                }
             }
         }
     }
@@ -80,16 +117,28 @@ class TripDetailViewModel @Inject constructor(
             val currentTrip = tripRepository.getTrip(id = tripId)
 
             if (currentTrip != null) {
-                tripRepository.saveTrip(trip = currentTrip.copy(images = images))
                 tripAllImages.value = images
+                val title = StringBuilder()
+                currentTrip.places.forEachIndexed { index, place ->
+                    title.append(place)
+                    if (index < currentTrip.places.size - 1) {
+                        title.append(", ")
+                    }
+                }
+                title.append(" 여행")
+
                 with(currentTrip) {
                     _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        title = "$title",
+                        type = currentTrip.type.toTripType().desc,
                         startDate = startDate,
                         endDate = endDate,
                         selectedIndex = 0,
                     )
                 }
                 selectDate(0)
+                tripRepository.updateTrip(currentTrip.copy(images = tripAllImages.value))
             }
         }
     }

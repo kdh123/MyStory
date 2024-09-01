@@ -25,7 +25,7 @@ const val TRIP_IMAGE_DETAIL_ROUTE = "trip_image_detail_route"
 
 fun NavGraphBuilder.tripNavigation(
     modifier: Modifier = Modifier,
-    onNavigateToSchedule: () -> Unit,
+    onNavigateToSchedule: (String) -> Unit,
     onNavigateToDetail: (String) -> Unit
 ) {
     composable(TRIP_ROUTE) {
@@ -42,14 +42,18 @@ fun NavGraphBuilder.tripNavigation(
     }
 }
 
-fun NavController.navigateToTripSchedule() {
-    navigate(TRIP_SCHEDULE_ROUTE)
+fun NavController.navigateToTripSchedule(tripId: String) {
+    navigate("$TRIP_SCHEDULE_ROUTE/$tripId")
 }
 
 fun NavGraphBuilder.tripScheduleNavigation(
     onBack: () -> Unit
 ) {
-    composable(TRIP_SCHEDULE_ROUTE) {
+    composable("$TRIP_SCHEDULE_ROUTE/{tripId}") {
+        var tripId = it.arguments?.getString("tripId") ?: ""
+        if (tripId.isBlank()) {
+            tripId = ""
+        }
         val viewModel = hiltViewModel<TripScheduleViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val sideEffect = remember {
@@ -57,6 +61,7 @@ fun NavGraphBuilder.tripScheduleNavigation(
         }
 
         TripScheduleScreen(
+            tripId = tripId,
             uiState = uiState,
             sideEffect = sideEffect,
             onAction = viewModel::onAction,
@@ -71,6 +76,7 @@ fun NavController.navigateToTripDetail(tripId: String) {
 
 fun NavGraphBuilder.tripDetailNavigation(
     onNavigateToImageDetail: (String) -> Unit,
+    onNavigateToSchedule: (String) -> Unit,
     onBack: () -> Unit
 ) {
     composable("$TRIP_DETAIL_ROUTE/{tripId}") {
@@ -87,6 +93,7 @@ fun NavGraphBuilder.tripDetailNavigation(
             sideEffect = sideEffect,
             onAction = viewModel::onAction,
             onNavigateToImageDetail = onNavigateToImageDetail,
+            onNavigateToSchedule = onNavigateToSchedule,
             onBack = onBack
         )
     }

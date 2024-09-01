@@ -15,13 +15,17 @@ import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -33,6 +37,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,13 +53,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import com.dhkim.common.DateUtil
 import com.dhkim.trip.R
 import com.dhkim.trip.domain.model.TripImage
+import com.dhkim.trip.domain.model.TripType
+import com.dhkim.ui.LoadingProgressBar
+import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.WarningDialog
 import com.dhkim.ui.noRippleClick
 import com.skydoves.landscapist.glide.GlideImage
@@ -63,11 +75,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.withContext
 import java.io.InputStream
-import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TripDetailScreen(
@@ -76,10 +88,17 @@ fun TripDetailScreen(
     sideEffect: SharedFlow<TripDetailSideEffect>,
     onAction: (TripDetailAction) -> Unit,
     onNavigateToImageDetail: (String) -> Unit,
+    onNavigateToSchedule: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
     var showPermissionDialog by remember {
+        mutableStateOf(false)
+    }
+    var showMenuBottom by remember {
+        mutableStateOf(false)
+    }
+    var showDeletePopup by remember {
         mutableStateOf(false)
     }
 
@@ -116,6 +135,49 @@ fun TripDetailScreen(
         )
     }
 
+    if (showMenuBottom) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showMenuBottom = false
+            }
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(bottom = 48.dp)
+            ) {
+                MenuItem(
+                    resId = R.drawable.ic_edit_black,
+                    title = "수정",
+                    onClick = {
+                        onNavigateToSchedule(tripId)
+                    }
+                )
+
+                MenuItem(
+                    resId = R.drawable.ic_delete_black,
+                    title = "삭제",
+                    onClick = {
+                        showMenuBottom = false
+                        showDeletePopup = true
+                    }
+                )
+            }
+        }
+    }
+
+    if (showDeletePopup) {
+        WarningDialog(
+            dialogTitle = "삭제",
+            dialogText = "정말 삭제하겠습니까?",
+            onConfirmation = {
+                onAction(TripDetailAction.DeleteTrip(tripId))
+            },
+            onDismissRequest = {
+                showDeletePopup = false
+            }
+        )
+    }
+
     LaunchedEffect(Unit) {
         requestPermissionLauncher.launch(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -148,14 +210,154 @@ fun TripDetailScreen(
         }
     }
 
-    Scaffold { padding ->
-        Column {
+    Scaffold(
+        topBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_back_black),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .align(Alignment.CenterStart)
+                        .clickable {
+                            onBack()
+                        }
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.ic_option_black),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .align(Alignment.CenterEnd)
+                        .clickable {
+                            showMenuBottom = true
+                        }
+                )
+            }
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(top = padding.calculateTopPadding())
+        ) {
+            TripInfo(uiState = uiState)
             DateHeader(
                 uiState = uiState,
                 onAction = onAction
             )
-            TripDetails(uiState = uiState, onNavigateToImageDetail = onNavigateToImageDetail)
+            if (uiState.isLoading) {
+                ImageLoadingScreen()
+            } else {
+                TripDetails(uiState = uiState, onNavigateToImageDetail = onNavigateToImageDetail)
+            }
         }
+    }
+}
+
+@Composable
+private fun ImageLoadingScreen() {
+    val dummyList = mutableListOf<Int>().apply {
+        repeat(21) {
+            add(it)
+        }
+    }
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        items(items = dummyList, key = {
+            it
+        }) {
+            Box(
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .background(
+                        brush = ShimmerBrush(targetValue = 1300f)
+                    )
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoadingScreenPreview() {
+    ImageLoadingScreen()
+}
+
+@Composable
+private fun MenuItem(
+    resId: Int,
+    title: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
+    ) {
+        Row(
+            modifier = modifier
+                .padding(10.dp)
+        ) {
+            Image(
+                painter = painterResource(
+                    id = resId
+                ),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = 10.dp)
+            )
+            Text(
+                text = title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun TripInfo(uiState: TripDetailUiState) {
+    Column(
+        modifier = Modifier
+            .padding(start = 20.dp, end = 20.dp)
+    ) {
+        Row(
+
+        ) {
+            Text(
+                text = uiState.title,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 2,
+                modifier = Modifier
+                    .padding(bottom = 5.dp)
+            )
+        }
+
+        Text(
+            text = "${uiState.startDate} - ${uiState.endDate}",
+            color = colorResource(id = R.color.gray),
+            modifier = Modifier
+                .padding(bottom = 5.dp)
+        )
+        Text(
+            text = uiState.type,
+            color = colorResource(id = R.color.gray),
+            modifier = Modifier
+        )
     }
 }
 
@@ -232,9 +434,33 @@ private fun TripDetails(
     uiState: TripDetailUiState,
     onNavigateToImageDetail: (String) -> Unit
 ) {
+    if (uiState.endDate.isNotEmpty() && DateUtil.isBefore(uiState.endDate)) {
+        Text(
+            text = "여행이 끝난 후 여행 기간 중에 찍었던 사진이 노출됩니다.",
+            color = colorResource(id = R.color.gray),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 10.dp)
+        )
+
+        return
+    }
+
+    if (uiState.images.isEmpty()) {
+        Text(
+            text = "이 날 찍었던 사진이 존재하지 않습니다.",
+            color = colorResource(id = R.color.gray),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 10.dp)
+        )
+
+        return
+    }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(horizontal = 20.dp),
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier
@@ -368,6 +594,8 @@ private fun TripDetailScreenPreview() {
     }
 
     val uiState = TripDetailUiState(
+        title = "서울, 경기 여행",
+        type = TripType.Family.desc,
         startDate = "2024-03-03",
         endDate = "2024-03-10",
         images = images.toImmutableList()
@@ -379,6 +607,7 @@ private fun TripDetailScreenPreview() {
         sideEffect = MutableSharedFlow(),
         onAction = {},
         onNavigateToImageDetail = { },
+        onNavigateToSchedule = {},
         onBack = {}
     )
 }

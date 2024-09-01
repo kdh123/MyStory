@@ -26,7 +26,6 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -65,6 +64,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TripScheduleScreen(
+    tripId: String,
     uiState: TripScheduleUiState,
     sideEffect: SharedFlow<TripScheduleSideEffect>,
     onAction: (TripScheduleAction) -> Unit,
@@ -91,6 +91,12 @@ fun TripScheduleScreen(
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             currentPage = page + 1
+        }
+    }
+
+    LaunchedEffect(tripId) {
+        if (tripId.isNotEmpty()) {
+            onAction(TripScheduleAction.Init(tripId))
         }
     }
 
@@ -131,6 +137,7 @@ fun TripScheduleScreen(
                 when (page) {
                     0 -> {
                         TripTypeScreen(
+                            uiState = uiState,
                             onAction = onAction,
                             onMoveToNextPage = {
                                 scope.launch {
@@ -144,7 +151,7 @@ fun TripScheduleScreen(
                         TripPlaceScreen(
                             uiState = uiState,
                             onAction = onAction,
-                            onMoveToNextPage = {
+                            onMoveToPage = {
                                 scope.launch {
                                     pagerState.scrollToPage(it)
                                 }
@@ -156,6 +163,11 @@ fun TripScheduleScreen(
                         TripDateScreen(
                             uiState = uiState,
                             onAction = onAction,
+                            onMoveToPage = {
+                                scope.launch {
+                                    pagerState.scrollToPage(it)
+                                }
+                            },
                             onShowStartDateDialog = {
                                 showStartDateDialog = true
                             },
@@ -270,6 +282,7 @@ fun Calender(
 @Composable
 private fun TripScheduleScreenPreview() {
     TripScheduleScreen(
+        tripId = "",
         uiState = TripScheduleUiState(),
         sideEffect = MutableSharedFlow(),
         onAction = {},
@@ -279,11 +292,12 @@ private fun TripScheduleScreenPreview() {
 
 @Composable
 private fun TripTypeScreen(
+    uiState: TripScheduleUiState,
     onAction: (TripScheduleAction) -> Unit,
     onMoveToNextPage: (Int) -> Unit
 ) {
     var selectedIndex by remember {
-        mutableIntStateOf(0)
+        mutableIntStateOf(uiState.type.type)
     }
 
     Column(
@@ -372,6 +386,7 @@ private fun TripTypeScreen(
 @Composable
 private fun TripTypeScreenPreview() {
     TripTypeScreen(
+        uiState = TripScheduleUiState(),
         onAction = {},
         onMoveToNextPage = {}
     )
@@ -381,7 +396,7 @@ private fun TripTypeScreenPreview() {
 private fun TripPlaceScreen(
     uiState: TripScheduleUiState,
     onAction: (TripScheduleAction) -> Unit,
-    onMoveToNextPage: (Int) -> Unit
+    onMoveToPage: (Int) -> Unit
 ) {
     var selectedPlaceTypeIndex by remember {
         mutableIntStateOf(0)
@@ -483,7 +498,7 @@ private fun TripPlaceScreen(
                 uiState = uiState,
                 onAction = onAction,
                 modifier = Modifier
-                    .padding(top = 10.dp)
+                    .padding(vertical = 10.dp)
                     .fillMaxWidth()
                     .height(0.dp)
                     .weight(1f)
@@ -493,7 +508,7 @@ private fun TripPlaceScreen(
                 uiState = uiState,
                 onAction = onAction,
                 modifier = Modifier
-                    .padding(top = 10.dp)
+                    .padding(vertical = 10.dp)
                     .fillMaxWidth()
                     .height(0.dp)
                     .weight(1f)
@@ -514,25 +529,46 @@ private fun TripPlaceScreen(
             colorResource(id = R.color.light_gray)
         }
 
-        Text(
-            text = "다음",
-            fontSize = 16.sp,
-            color = textColor,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .fillMaxWidth()
-                .background(color = backgroundColor)
-                .padding(10.dp)
-                .noRippleClick {
-                    if (isCompleted) {
-                        onMoveToNextPage(2)
-                        onAction(TripScheduleAction.UpdateProgress(1f))
+        Column {
+            Text(
+                text = "이전",
+                fontSize = 16.sp,
+                color = colorResource(id = R.color.white),
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(bottom = 10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .fillMaxWidth()
+                    .background(color = colorResource(id = R.color.primary))
+                    .padding(10.dp)
+                    .noRippleClick {
+                        onMoveToPage(0)
+                        onAction(TripScheduleAction.UpdateProgress(0.33f))
                     }
-                }
-                .testTag("tripPlaceNextBtn")
-        )
+                    .testTag("tripPlacePrevBtn")
+            )
+
+            Text(
+                text = "다음",
+                fontSize = 16.sp,
+                color = textColor,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .fillMaxWidth()
+                    .background(color = backgroundColor)
+                    .padding(10.dp)
+                    .noRippleClick {
+                        if (isCompleted) {
+                            onMoveToPage(2)
+                            onAction(TripScheduleAction.UpdateProgress(1f))
+                        }
+                    }
+                    .testTag("tripPlaceNextBtn")
+            )
+        }
     }
 }
 
@@ -685,6 +721,7 @@ private fun AbroadPlaces(
 private fun TripDateScreen(
     uiState: TripScheduleUiState,
     onAction: (TripScheduleAction) -> Unit,
+    onMoveToPage: (Int) -> Unit,
     onShowStartDateDialog: () -> Unit,
     onShowEndDateDialog: () -> Unit
 ) {
@@ -708,7 +745,11 @@ private fun TripDateScreen(
         ) {
             Text(
                 text = uiState.startDate.ifEmpty { "시작일" },
-                color = colorResource(id = R.color.gray),
+                color = if (uiState.startDate.isEmpty()) {
+                    colorResource(id = R.color.gray)
+                } else {
+                    colorResource(id = R.color.black)
+                },
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .width(0.dp)
@@ -732,7 +773,11 @@ private fun TripDateScreen(
             )
             Text(
                 text = uiState.endDate.ifEmpty { "종료일" },
-                color = colorResource(id = R.color.gray),
+                color = if (uiState.endDate.isEmpty()) {
+                    colorResource(id = R.color.gray)
+                } else {
+                    colorResource(id = R.color.black)
+                },
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .width(0.dp)
@@ -761,23 +806,44 @@ private fun TripDateScreen(
             colorResource(id = R.color.light_gray)
         }
 
-        Text(
-            text = "완료",
-            fontSize = 16.sp,
-            color = textColor,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .fillMaxWidth()
-                .background(backgroundColor)
-                .padding(10.dp)
-                .noRippleClick {
-                    if (isCompleted) {
-                        onAction(TripScheduleAction.SaveTrip)
+        Column {
+            Text(
+                text = "이전",
+                fontSize = 16.sp,
+                color = colorResource(id = R.color.white),
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(bottom = 10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .fillMaxWidth()
+                    .background(color = colorResource(id = R.color.primary))
+                    .padding(10.dp)
+                    .noRippleClick {
+                        onMoveToPage(1)
+                        onAction(TripScheduleAction.UpdateProgress(0.66f))
                     }
-                }
-        )
+                    .testTag("tripPlacePrevBtn")
+            )
+
+            Text(
+                text = "완료",
+                fontSize = 16.sp,
+                color = textColor,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .fillMaxWidth()
+                    .background(backgroundColor)
+                    .padding(10.dp)
+                    .noRippleClick {
+                        if (isCompleted) {
+                            onAction(TripScheduleAction.SaveTrip)
+                        }
+                    }
+            )
+        }
     }
 }
 
@@ -787,6 +853,7 @@ private fun TripDateScreenPreview() {
     TripDateScreen(
         uiState = TripScheduleUiState(),
         onAction = {},
+        onMoveToPage = {},
         onShowStartDateDialog = {},
         onShowEndDateDialog = {}
     )
@@ -798,6 +865,6 @@ private fun TripPlaceScreenPreview() {
     TripPlaceScreen(
         uiState = TripScheduleUiState(),
         onAction = {},
-        onMoveToNextPage = {}
+        onMoveToPage = {}
     )
 }

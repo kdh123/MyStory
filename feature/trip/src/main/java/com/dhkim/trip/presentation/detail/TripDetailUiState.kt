@@ -14,6 +14,8 @@ typealias Day = String
 @Stable
 data class TripDetailUiState(
     val isLoading: Boolean = false,
+    val title: String = "",
+    val type: String = "",
     val startDate: String = "",
     val endDate: String = "",
     val selectedIndex: Int = 0,

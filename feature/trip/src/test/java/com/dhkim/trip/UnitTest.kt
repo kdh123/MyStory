@@ -54,4 +54,10 @@ class UnitTest {
 
         println(tripDate)
     }
+
+    @Test
+    fun `TripPlace 전환`() {
+        val place = TripPlace.DomesticPlace.entries.first { it.placeName == "서울" }
+        println(place)
+    }
 }

@@ -321,6 +321,7 @@ fun MainScreen(
                 onNavigateToImageDetail = { imageUrl ->
                     navController.navigateToTripImageDetail(imageUrl)
                 },
+                onNavigateToSchedule = navController::navigateToTripSchedule,
                 onBack = navController::navigateUp
             )
             tripImageDetailNavigation()

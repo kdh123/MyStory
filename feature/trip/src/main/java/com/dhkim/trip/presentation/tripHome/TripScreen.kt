@@ -51,7 +51,7 @@ fun TripScreen(
     uiState: TripUiState,
     onAction: (TripAction) -> Unit,
     modifier: Modifier = Modifier,
-    onNavigateToSchedule: () -> Unit,
+    onNavigateToSchedule: (String) -> Unit,
     onNavigateToDetail: (String) -> Unit
 ) {
     var showDeleteDialog by remember {
@@ -95,7 +95,9 @@ fun TripScreen(
     ) { paddingValues ->
         if (uiState.prevTrips.isEmpty() && uiState.nextTrips.isEmpty()) {
             EmptyTripScheduleLayout(
-                onNavigateToSchedule = onNavigateToSchedule
+                onNavigateToSchedule = {
+                    onNavigateToSchedule(" ")
+                }
             )
             return@Scaffold
         }
@@ -108,7 +110,11 @@ fun TripScreen(
                     end = 10.dp
                 )
         ) {
-            AddTripScheduleLayout(onNavigateToSchedule = onNavigateToSchedule)
+            AddTripScheduleLayout(
+                onNavigateToSchedule = {
+                    onNavigateToSchedule(" ")
+                }
+            )
             TripSchedules(
                 title = "다음 여행",
                 trips = uiState.nextTrips,
