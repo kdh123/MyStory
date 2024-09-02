@@ -12,4 +12,5 @@ sealed interface TripScheduleAction {
     data class UpdateEndDate(val endDate: String): TripScheduleAction
     data class UpdatePlaces(val place: TripPlace): TripScheduleAction
     data object SaveTrip : TripScheduleAction
+    data class UpdateTrip(val tripId: String) : TripScheduleAction
 }

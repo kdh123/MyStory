@@ -161,6 +161,7 @@ fun TripScheduleScreen(
 
                     2 -> {
                         TripDateScreen(
+                            tripId = tripId,
                             uiState = uiState,
                             onAction = onAction,
                             onMoveToPage = {
@@ -296,7 +297,7 @@ private fun TripTypeScreen(
     onAction: (TripScheduleAction) -> Unit,
     onMoveToNextPage: (Int) -> Unit
 ) {
-    var selectedIndex by remember {
+    var selectedIndex by remember(uiState.type.type) {
         mutableIntStateOf(uiState.type.type)
     }
 
@@ -719,6 +720,7 @@ private fun AbroadPlaces(
 
 @Composable
 private fun TripDateScreen(
+    tripId: String,
     uiState: TripScheduleUiState,
     onAction: (TripScheduleAction) -> Unit,
     onMoveToPage: (Int) -> Unit,
@@ -839,7 +841,12 @@ private fun TripDateScreen(
                     .padding(10.dp)
                     .noRippleClick {
                         if (isCompleted) {
-                            onAction(TripScheduleAction.SaveTrip)
+                            if (tripId.isNotEmpty()) {
+                                onAction(TripScheduleAction.UpdateTrip(tripId = tripId))
+                            } else {
+                                onAction(TripScheduleAction.SaveTrip)
+                            }
+
                         }
                     }
             )
@@ -851,6 +858,7 @@ private fun TripDateScreen(
 @Composable
 private fun TripDateScreenPreview() {
     TripDateScreen(
+        tripId = "",
         uiState = TripScheduleUiState(),
         onAction = {},
         onMoveToPage = {},

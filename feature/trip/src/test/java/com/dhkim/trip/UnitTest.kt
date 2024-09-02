@@ -2,6 +2,7 @@ package com.dhkim.trip
 
 import com.dhkim.common.DateUtil
 import com.dhkim.trip.domain.model.TripPlace
+import com.dhkim.trip.domain.model.TripType
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
@@ -59,5 +60,22 @@ class UnitTest {
     fun `TripPlace 전환`() {
         val place = TripPlace.DomesticPlace.entries.first { it.placeName == "서울" }
         println(place)
+    }
+
+    @Test
+    fun `Trip Type 전환`() {
+        val type = 2.toTripType()
+        println("type : $type")
+    }
+}
+
+fun Int.toTripType(): TripType {
+    return when (this) {
+        0 -> TripType.Alone
+        1 -> TripType.Family
+        2 -> TripType.Lover
+        3 -> TripType.Friend
+        4 -> TripType.Acquaintance
+        else -> TripType.Stranger
     }
 }

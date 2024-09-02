@@ -13,7 +13,7 @@ class TripRepositoryImpl @Inject constructor(
         return localDataSource.getAllTrip()
     }
 
-    override suspend fun getTrip(id: String): Trip? {
+    override suspend fun getTrip(id: String): Flow<Trip?> {
         return localDataSource.getTrip(id)
     }
 

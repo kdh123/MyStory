@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -56,14 +57,18 @@ class TripScheduleViewModel @Inject constructor(
             TripScheduleAction.SaveTrip -> {
                 saveTrip()
             }
+
+            is TripScheduleAction.UpdateTrip -> {
+                updateTrip(tripId = action.tripId)
+            }
         }
     }
 
     private fun init(tripId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val trip = tripRepository.getTrip(tripId)
+            val trip = tripRepository.getTrip(tripId).firstOrNull() ?: return@launch
 
-            trip?.run {
+            trip.run {
                 val domesticPlaces = TripPlace.DomesticPlace.entries.map { it.placeName }
                 val updatePlaces = places.map { place ->
                     if (domesticPlaces.contains(place)) {
@@ -120,6 +125,33 @@ class TripScheduleViewModel @Inject constructor(
             }
 
             tripRepository.saveTrip(trip)
+            _sideEffect.emit(TripScheduleSideEffect.Complete)
+        }
+    }
+
+    private fun updateTrip(tripId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val trip = with(_uiState.value) {
+                Trip(
+                    id = tripId,
+                    type = type.type,
+                    startDate = startDate,
+                    endDate = endDate,
+                    places = tripPlaces.map {
+                        when (it) {
+                            is TripPlace.DomesticPlace -> {
+                                it.placeName
+                            }
+
+                            is TripPlace.AbroadPlace -> {
+                                it.placeName
+                            }
+                        }
+                    },
+                )
+            }
+
+            tripRepository.updateTrip(trip = trip.copy(images = listOf(), videos = listOf()))
             _sideEffect.emit(TripScheduleSideEffect.Complete)
         }
     }

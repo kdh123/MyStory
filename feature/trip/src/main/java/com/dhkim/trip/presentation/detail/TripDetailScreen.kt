@@ -45,7 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,13 +58,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import com.dhkim.common.DateUtil
 import com.dhkim.trip.R
 import com.dhkim.trip.domain.model.TripImage
 import com.dhkim.trip.domain.model.TripType
-import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.WarningDialog
 import com.dhkim.ui.noRippleClick
@@ -92,13 +90,13 @@ fun TripDetailScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    var showPermissionDialog by remember {
+    var showPermissionDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showMenuBottom by remember {
+    var showMenuBottom by rememberSaveable {
         mutableStateOf(false)
     }
-    var showDeletePopup by remember {
+    var showDeletePopup by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -150,6 +148,7 @@ fun TripDetailScreen(
                     title = "수정",
                     onClick = {
                         onNavigateToSchedule(tripId)
+                        showMenuBottom = false
                     }
                 )
 
@@ -171,6 +170,7 @@ fun TripDetailScreen(
             dialogText = "정말 삭제하겠습니까?",
             onConfirmation = {
                 onAction(TripDetailAction.DeleteTrip(tripId))
+                onBack()
             },
             onDismissRequest = {
                 showDeletePopup = false

@@ -20,8 +20,8 @@ class TripLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTrip(id: String): Trip? {
-        return service.getTrip(id)?.toTrip()
+    override suspend fun getTrip(id: String): Flow<Trip?> {
+        return service.getTrip(id).map { it?.toTrip() }
     }
 
     override suspend fun saveTrip(trip: Trip) {

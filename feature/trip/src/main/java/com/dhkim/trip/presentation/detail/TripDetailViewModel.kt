@@ -3,6 +3,7 @@ package com.dhkim.trip.presentation.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.trip.domain.TripRepository
+import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.domain.model.TripImage
 import com.dhkim.trip.domain.model.toTripType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +13,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,14 +44,34 @@ class TripDetailViewModel @Inject constructor(
             }
 
             is TripDetailAction.UpdateTrip -> {
-
+                updateTrip(trip = action.trip)
             }
 
-            is TripDetailAction.DeleteTrip -> {}
+            is TripDetailAction.DeleteTrip -> {
+                deleteTrip(tripId = action.tripId)
+            }
 
             is TripDetailAction.SelectDate -> {
                 selectDate(selectedIndex = action.selectedIndex)
             }
+        }
+    }
+
+    private fun updateTrip(trip: Trip) {
+        viewModelScope.launch(Dispatchers.IO) {
+            tripRepository.updateTrip(trip = trip.copy(images = listOf(), videos = listOf()))
+            _sideEffect.emit(
+                TripDetailSideEffect.LoadImages(
+                    startDate = trip.startDate,
+                    endDate = trip.endDate
+                )
+            )
+        }
+    }
+
+    private fun deleteTrip(tripId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            tripRepository.deleteTrip(id = tripId)
         }
     }
 
@@ -63,83 +86,84 @@ class TripDetailViewModel @Inject constructor(
 
     private fun initTrip(tripId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentTrip = tripRepository.getTrip(id = tripId)
+            tripRepository.getTrip(id = tripId)
+                .catch { }
+                .collect { currentTrip ->
+                    if (currentTrip != null) {
+                        val title = StringBuilder()
+                        currentTrip.places.forEachIndexed { index, place ->
+                            title.append(place)
+                            if (index < currentTrip.places.size - 1) {
+                                title.append(", ")
+                            }
+                        }
+                        title.append(" 여행")
 
-            if (currentTrip != null) {
-                val title = StringBuilder()
-                currentTrip.places.forEachIndexed { index, place ->
-                    title.append(place)
-                    if (index < currentTrip.places.size - 1) {
-                        title.append(", ")
+                        if (currentTrip.images.isEmpty()) {
+                            with(currentTrip) {
+                                _uiState.value = _uiState.value.copy(
+                                    isLoading = true,
+                                    title = "$title",
+                                    startDate = startDate,
+                                    endDate = endDate,
+                                    type = type.toTripType().desc
+                                )
+                            }
+
+                            _sideEffect.emit(
+                                TripDetailSideEffect.LoadImages(
+                                    startDate = currentTrip.startDate,
+                                    endDate = currentTrip.endDate
+                                )
+                            )
+                        } else {
+                            with(currentTrip) {
+                                tripAllImages.value = currentTrip.images
+
+                                val strDate = currentTrip.startDate
+                                val images = tripAllImages.value.filter { it.date == strDate }
+                                    .toImmutableList()
+
+                                _uiState.value = _uiState.value.copy(
+                                    title = "$title",
+                                    type = currentTrip.type.toTripType().desc,
+                                    startDate = startDate,
+                                    endDate = endDate,
+                                    images = images
+                                )
+                            }
+                        }
                     }
                 }
-                title.append(" 여행")
-
-                if (currentTrip.images.isEmpty()) {
-                    with(currentTrip) {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = true,
-                            title = "$title",
-                            startDate = startDate,
-                            endDate = endDate,
-                            type = type.toTripType().desc
-                        )
-                    }
-
-                    _sideEffect.emit(
-                        TripDetailSideEffect.LoadImages(
-                            startDate = currentTrip.startDate,
-                            endDate = currentTrip.endDate
-                        )
-                    )
-                } else {
-                    with(currentTrip) {
-                        tripAllImages.value = currentTrip.images
-
-                        val strDate = currentTrip.startDate
-                        val images = tripAllImages.value.filter { it.date == strDate }.toImmutableList()
-
-                        _uiState.value = _uiState.value.copy(
-                            title = "$title",
-                            type = currentTrip.type.toTripType().desc,
-                            startDate = startDate,
-                            endDate = endDate,
-                            images = images
-                        )
-                    }
-                }
-            }
         }
     }
 
     private fun loadImages(tripId: String, images: List<TripImage>) {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentTrip = tripRepository.getTrip(id = tripId)
+            val currentTrip = tripRepository.getTrip(id = tripId).firstOrNull() ?: return@launch
 
-            if (currentTrip != null) {
-                tripAllImages.value = images
-                val title = StringBuilder()
-                currentTrip.places.forEachIndexed { index, place ->
-                    title.append(place)
-                    if (index < currentTrip.places.size - 1) {
-                        title.append(", ")
-                    }
+            tripAllImages.value = images
+            val title = StringBuilder()
+            currentTrip.places.forEachIndexed { index, place ->
+                title.append(place)
+                if (index < currentTrip.places.size - 1) {
+                    title.append(", ")
                 }
-                title.append(" 여행")
-
-                with(currentTrip) {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        title = "$title",
-                        type = currentTrip.type.toTripType().desc,
-                        startDate = startDate,
-                        endDate = endDate,
-                        selectedIndex = 0,
-                    )
-                }
-                selectDate(0)
-                tripRepository.updateTrip(currentTrip.copy(images = tripAllImages.value))
             }
+            title.append(" 여행")
+
+            with(currentTrip) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    title = "$title",
+                    type = currentTrip.type.toTripType().desc,
+                    startDate = startDate,
+                    endDate = endDate,
+                    selectedIndex = 0,
+                )
+            }
+            selectDate(0)
+            tripRepository.updateTrip(currentTrip.copy(images = tripAllImages.value))
         }
     }
 }

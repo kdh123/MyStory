@@ -15,7 +15,7 @@ interface TripDao {
     fun getAllTrip(): Flow<List<TripEntity>?>
 
     @Query("SELECT * FROM trip WHERE id = :id")
-    fun getTrip(id: String): TripEntity?
+    fun getTrip(id: String): Flow<TripEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveTrip(tripEntity: TripEntity)

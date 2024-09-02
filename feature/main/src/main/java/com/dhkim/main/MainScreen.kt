@@ -83,10 +83,10 @@ fun MainScreen(
     val navController = rememberNavController()
     val items = listOf(
         Screen.TimeCapsule,
-        Screen.AddTimeCapsule,
         Screen.Map,
+        Screen.AddTimeCapsule,
+        Screen.Trip,
         Screen.Friend,
-        Screen.Trip
     )
     val isBottomNavShow = navController
         .currentBackStackEntryAsState()
@@ -338,7 +338,7 @@ sealed class Screen(
         Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, ADD_TIME_CAPSULE_ROUTE)
 
     data object TimeCapsule :
-        Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, TIME_CAPSULE_ROUTE)
+        Screen("타임캡슐", R.drawable.ic_home_primary, R.drawable.ic_home_black, TIME_CAPSULE_ROUTE)
 
     data object Friend :
         Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, FRIEND_ROUTE)
