@@ -64,10 +64,10 @@ class TripDetailViewModel @Inject constructor(
 
     private fun deleteImage(tripId: String, imageId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val updateImages = _uiState.value.images.filter { it.id != imageId }.toImmutableList()
-            val updateTrip = tripRepository.getTrip(id = tripId).first()?.copy(images = updateImages) ?: return@launch
+            tripAllImages.value = tripAllImages.value.filter { it.id != imageId }
+            val updateTrip = tripRepository.getTrip(id = tripId).first()?.copy(images = tripAllImages.value) ?: return@launch
             tripRepository.updateTrip(updateTrip)
-
+            val updateImages = _uiState.value.images.filter { it.id != imageId }.toImmutableList()
             _uiState.value = _uiState.value.copy(images = updateImages)
         }
     }
@@ -134,8 +134,12 @@ class TripDetailViewModel @Inject constructor(
                         } else {
                             with(currentTrip) {
                                 tripAllImages.value = currentTrip.images
-
-                                val strDate = currentTrip.startDate
+                                val strDate: String = if (_uiState.value.selectedIndex <= 0) {
+                                    currentTrip.startDate
+                                } else {
+                                   val date = _uiState.value.tripDates[_uiState.value.selectedIndex].date
+                                    "${date.first}-${date.second}-${date.third}"
+                                }
                                 val images = tripAllImages.value.filter { it.date == strDate }
                                     .toImmutableList()
 

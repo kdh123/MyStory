@@ -8,6 +8,7 @@ import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.domain.model.TripType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
@@ -72,8 +73,8 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
         return trips
     }
 
-    override suspend fun getTrip(id: String): Trip? {
-        return trips.value[0]
+    override suspend fun getTrip(id: String): Flow<Trip?> {
+        return flowOf(trips.value.first { it.id == id })
     }
 
     override suspend fun saveTrip(trip: Trip) {
