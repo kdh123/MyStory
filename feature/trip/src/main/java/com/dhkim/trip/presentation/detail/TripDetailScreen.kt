@@ -15,14 +15,17 @@ import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -59,6 +62,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.dhkim.common.DateUtil
 import com.dhkim.trip.R
 import com.dhkim.trip.domain.model.TripImage
@@ -99,6 +103,12 @@ fun TripDetailScreen(
     var showDeletePopup by rememberSaveable {
         mutableStateOf(false)
     }
+    var showImageMenuPopup by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var selectedImageId by rememberSaveable {
+        mutableStateOf("")
+    }
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -109,6 +119,50 @@ fun TripDetailScreen(
             } else {
                 if (it == Manifest.permission.READ_MEDIA_IMAGES) {
                     onAction(TripDetailAction.InitTrip(tripId = tripId))
+                }
+            }
+        }
+    }
+
+    if (showImageMenuPopup) {
+        Dialog(
+            onDismissRequest = {
+                showImageMenuPopup = false
+            }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        text = "메뉴",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "삭제",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onAction(
+                                    TripDetailAction.DeleteImage(
+                                        tripId = tripId,
+                                        imageId = selectedImageId
+                                    )
+                                )
+                                selectedImageId = ""
+                                showImageMenuPopup = false
+                            }
+                    )
                 }
             }
         }
@@ -251,7 +305,14 @@ fun TripDetailScreen(
             if (uiState.isLoading) {
                 ImageLoadingScreen()
             } else {
-                TripDetails(uiState = uiState, onNavigateToImageDetail = onNavigateToImageDetail)
+                TripDetails(
+                    uiState = uiState,
+                    onShowImageMenuPopup = {
+                        selectedImageId = it
+                        showImageMenuPopup = true
+                    },
+                    onNavigateToImageDetail = onNavigateToImageDetail
+                )
             }
         }
     }
@@ -429,9 +490,11 @@ private fun DateHeader(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TripDetails(
     uiState: TripDetailUiState,
+    onShowImageMenuPopup: (String) -> Unit,
     onNavigateToImageDetail: (String) -> Unit
 ) {
     if (uiState.endDate.isNotEmpty() && DateUtil.isBefore(uiState.endDate)) {
@@ -474,13 +537,18 @@ private fun TripDetails(
                 imageModel = { it.imageUrl },
                 modifier = Modifier
                     .aspectRatio(1f)
-                    .clickable {
-                        val imageUrl = URLEncoder.encode(
-                            it.imageUrl,
-                            StandardCharsets.UTF_8.toString()
-                        )
-                        onNavigateToImageDetail(imageUrl)
-                    }
+                    .combinedClickable(
+                        onLongClick = {
+                            onShowImageMenuPopup(it.id)
+                        },
+                        onClick = {
+                            val imageUrl = URLEncoder.encode(
+                                it.imageUrl,
+                                StandardCharsets.UTF_8.toString()
+                            )
+                            onNavigateToImageDetail(imageUrl)
+                        }
+                    )
             )
         }
     }

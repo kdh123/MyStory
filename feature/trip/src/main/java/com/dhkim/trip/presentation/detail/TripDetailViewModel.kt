@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -54,6 +55,20 @@ class TripDetailViewModel @Inject constructor(
             is TripDetailAction.SelectDate -> {
                 selectDate(selectedIndex = action.selectedIndex)
             }
+
+            is TripDetailAction.DeleteImage -> {
+                deleteImage(tripId = action.tripId, imageId = action.imageId)
+            }
+        }
+    }
+
+    private fun deleteImage(tripId: String, imageId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val updateImages = _uiState.value.images.filter { it.id != imageId }.toImmutableList()
+            val updateTrip = tripRepository.getTrip(id = tripId).first()?.copy(images = updateImages) ?: return@launch
+            tripRepository.updateTrip(updateTrip)
+
+            _uiState.value = _uiState.value.copy(images = updateImages)
         }
     }
 
