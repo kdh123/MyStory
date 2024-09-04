@@ -30,7 +30,8 @@ class TripDetailViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<TripDetailSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    private val tripAllImages = MutableStateFlow<List<TripImage>>(listOf())
+    var tripAllImages = MutableStateFlow<List<TripImage>>(listOf())
+        private set
 
     fun onAction(action: TripDetailAction) {
         when (action) {
@@ -65,7 +66,9 @@ class TripDetailViewModel @Inject constructor(
     private fun deleteImage(tripId: String, imageId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             tripAllImages.value = tripAllImages.value.filter { it.id != imageId }
-            val updateTrip = tripRepository.getTrip(id = tripId).first()?.copy(images = tripAllImages.value) ?: return@launch
+            val updateTrip =
+                tripRepository.getTrip(id = tripId).first()?.copy(images = tripAllImages.value)
+                    ?: return@launch
             tripRepository.updateTrip(updateTrip)
             val updateImages = _uiState.value.images.filter { it.id != imageId }.toImmutableList()
             _uiState.value = _uiState.value.copy(images = updateImages)
@@ -137,7 +140,8 @@ class TripDetailViewModel @Inject constructor(
                                 val strDate: String = if (_uiState.value.selectedIndex <= 0) {
                                     currentTrip.startDate
                                 } else {
-                                   val date = _uiState.value.tripDates[_uiState.value.selectedIndex].date
+                                    val date =
+                                        _uiState.value.tripDates[_uiState.value.selectedIndex].date
                                     "${date.first}-${date.second}-${date.third}"
                                 }
                                 val images = tripAllImages.value.filter { it.date == strDate }
