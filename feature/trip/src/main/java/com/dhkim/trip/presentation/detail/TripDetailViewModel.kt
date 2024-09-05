@@ -9,6 +9,7 @@ import com.dhkim.trip.domain.model.toTripType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -107,54 +108,60 @@ class TripDetailViewModel @Inject constructor(
             tripRepository.getTrip(id = tripId)
                 .catch { }
                 .collect { currentTrip ->
-                    if (currentTrip != null) {
-                        val title = StringBuilder()
-                        currentTrip.places.forEachIndexed { index, place ->
-                            title.append(place)
-                            if (index < currentTrip.places.size - 1) {
-                                title.append(", ")
-                            }
+                    currentTrip ?: return@collect
+
+                    val title = StringBuilder()
+                    currentTrip.places.forEachIndexed { index, place ->
+                        title.append(place)
+                        if (index < currentTrip.places.size - 1) {
+                            title.append(", ")
                         }
-                        title.append(" 여행")
+                    }
+                    title.append(" 여행")
 
-                        if (currentTrip.images.isEmpty()) {
-                            with(currentTrip) {
-                                _uiState.value = _uiState.value.copy(
-                                    isLoading = true,
-                                    title = "$title",
-                                    startDate = startDate,
-                                    endDate = endDate,
-                                    type = type.toTripType().desc
-                                )
-                            }
-
-                            _sideEffect.emit(
-                                TripDetailSideEffect.LoadImages(
-                                    startDate = currentTrip.startDate,
-                                    endDate = currentTrip.endDate
-                                )
+                    if (currentTrip.images.isEmpty()) {
+                        with(currentTrip) {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = true,
+                                title = "$title",
+                                startDate = startDate,
+                                endDate = endDate,
+                                type = type.toTripType().desc
                             )
-                        } else {
-                            with(currentTrip) {
-                                tripAllImages.value = currentTrip.images
-                                val strDate: String = if (_uiState.value.selectedIndex <= 0) {
-                                    currentTrip.startDate
-                                } else {
-                                    val date =
-                                        _uiState.value.tripDates[_uiState.value.selectedIndex].date
-                                    "${date.first}-${date.second}-${date.third}"
-                                }
-                                val images = tripAllImages.value.filter { it.date == strDate }
-                                    .toImmutableList()
+                        }
 
-                                _uiState.value = _uiState.value.copy(
-                                    title = "$title",
-                                    type = currentTrip.type.toTripType().desc,
-                                    startDate = startDate,
-                                    endDate = endDate,
-                                    images = images
-                                )
+                        /**
+                         * 화면이 구성된 후 emit을 하기 위해 delay 설정
+                         * 그렇지 않으면 screen에서 emit한 데이터를 collet 할 수 없음
+                         * */
+                        delay(100L)
+                        _sideEffect.emit(
+                            TripDetailSideEffect.LoadImages(
+                                startDate = currentTrip.startDate,
+                                endDate = currentTrip.endDate
+                            )
+                        )
+                    } else {
+                        with(currentTrip) {
+                            tripAllImages.value = currentTrip.images
+                            val strDate: String = if (_uiState.value.selectedIndex <= 0) {
+                                currentTrip.startDate
+                            } else {
+                                val date =
+                                    _uiState.value.tripDates[_uiState.value.selectedIndex].date
+                                "${date.first}-${date.second}-${date.third}"
                             }
+                            val images = tripAllImages.value.filter { it.date == strDate }
+                                .toImmutableList()
+
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                title = "$title",
+                                type = currentTrip.type.toTripType().desc,
+                                startDate = startDate,
+                                endDate = endDate,
+                                images = images
+                            )
                         }
                     }
                 }
@@ -186,7 +193,11 @@ class TripDetailViewModel @Inject constructor(
                 )
             }
             selectDate(0)
-            tripRepository.updateTrip(currentTrip.copy(images = tripAllImages.value))
+            if (tripAllImages.value.isNotEmpty()) {
+                tripRepository.updateTrip(currentTrip.copy(images = tripAllImages.value))
+            } else {
+                tripRepository.updateTrip(currentTrip.copy(images = listOf(TripImage())))
+            }
         }
     }
 }
