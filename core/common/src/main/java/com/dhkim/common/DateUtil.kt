@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit
 object DateUtil {
 
     private val sdf = SimpleDateFormat("yyyy-MM-dd")
+    private val sdf2 = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
 
     @SuppressLint("SimpleDateFormat")
     fun millsToDate(mills: Long): String {
@@ -32,16 +33,27 @@ object DateUtil {
         return realDate?.time ?: 0L
     }
 
+    @SuppressLint("SimpleDateFormat")
+    fun dateToMills2(date: String): Long {
+        val realDate = try {
+            sdf2.parse(date)
+        } catch (e: Exception) {
+            null
+        }
+
+        return realDate?.time ?: 0L
+    }
+
     fun getDateGap(newDate: String): Long {
         return try {
             val afterDate = convertStringToDate(newDate)
-            val gap= TimeUnit.MINUTES.convert(
+            val gap = TimeUnit.MINUTES.convert(
                 afterDate!!.time - Calendar.getInstance().time.time,
                 TimeUnit.MILLISECONDS
             ).toDouble() / 1440
-            if (gap > 0 && gap <1) {
+            if (gap > 0 && gap < 1) {
                 1
-            } else if (gap <= 0){
+            } else if (gap <= 0) {
                 0
             } else {
                 gap.toLong() + 1
@@ -74,6 +86,27 @@ object DateUtil {
         return (today?.after(date) ?: false) || strDate == todayDate()
     }
 
+    fun isBefore(strDate: String): Boolean {
+        val today = convertStringToDate(todayDate())
+        val date = convertStringToDate(strDate)
+
+        return (today?.before(date) ?: false) || strDate == todayDate()
+    }
+
+    fun isAfter(strDate1: String, strDate2: String): Boolean {
+        val date1 = convertStringToDate(strDate1)
+        val date2 = convertStringToDate(strDate2)
+
+        return (date1?.after(date2) ?: false) || date1 == date2
+    }
+
+    fun isBefore(strDate1: String, strDate2: String): Boolean {
+        val date1 = convertStringToDate(strDate1)
+        val date2 = convertStringToDate(strDate2)
+
+        return (date1?.before(date2) ?: false) || date1 == date2
+    }
+
     fun todayDate(): String {
         val calendar: Calendar = Calendar.getInstance()
         return sdf.format(calendar.time)
@@ -98,5 +131,18 @@ object DateUtil {
         calendar.add(Calendar.DATE, days)
 
         return sdf.format(calendar.time)
+    }
+
+    fun dateAfterDays(date: String, days: Int): Triple<String, String, String> {
+        val calendar: Calendar = Calendar.getInstance()
+        calendar.time = convertStringToDate(date)!!
+
+        calendar.add(Calendar.DATE, days)
+
+        val year = calendar.get(Calendar.YEAR).toString()
+        val month = (calendar.get(Calendar.MONTH) + 1).toString()
+        val day = calendar.get(Calendar.DAY_OF_MONTH).toString()
+
+        return Triple(year, month, day)
     }
 }

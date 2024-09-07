@@ -1,9 +1,12 @@
 package com.dhkim.location
 
+import android.location.Address
+import android.location.Geocoder
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.testing.TestPager
 import androidx.paging.testing.asSnapshot
+import androidx.test.core.app.ApplicationProvider
 import com.dhkim.location.data.dataSource.remote.LocationApi
 import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
 import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSourceImpl
@@ -31,13 +34,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
-@UninstallModules(LocationModule::class, LocationApiModule::class)
+//@UninstallModules(LocationModule::class, LocationApiModule::class)
 class LocationRepositoryTest {
 
     @get:Rule
@@ -51,7 +55,7 @@ class LocationRepositoryTest {
         hiltRule.inject()
     }
 
-    @Module
+/*    @Module
     @InstallIn(SingletonComponent::class)
     abstract class FakeTimeCapsuleModule {
 
@@ -59,24 +63,47 @@ class LocationRepositoryTest {
         @Singleton
         abstract fun bindLocationRepository(locationRepositoryImpl: LocationRepositoryImpl): LocationRepository
 
-        /*@Binds
+        *//*@Binds
         @Singleton
-        abstract fun bindLocationRemoteDataSource(fakeLocationRemoteDataSource: FakeLocationRemoteDataSource): LocationRemoteDataSource*/
+        abstract fun bindLocationRemoteDataSource(fakeLocationRemoteDataSource: FakeLocationRemoteDataSource): LocationRemoteDataSource*//*
 
         @Binds
         @Singleton
         abstract fun bindLocationRemoteDataSource(locationRemoteDataSource: LocationRemoteDataSourceImpl): LocationRemoteDataSource
 
-        @Binds
+        *//*@Binds
         @Singleton
-        abstract fun bindFakeLocationApi(fakeLocationApi: FakeLocationApi): LocationApi
+        abstract fun bindFakeLocationApi(fakeLocationApi: FakeLocationApi): LocationApi*//*
 
         //아래와 같이 LocationRemoteDataSourceImpl(상용 데이터 소스)를 사용하면 실제 서버에서 데이터 가져옴
-        /*@Binds
+        *//*@Binds
         @Singleton
-        abstract fun bindLocationRemoteDataSource(locationRemoteDataSourceImpl: LocationRemoteDataSourceImpl): LocationRemoteDataSource*/
+        abstract fun bindLocationRemoteDataSource(locationRemoteDataSourceImpl: LocationRemoteDataSourceImpl): LocationRemoteDataSource*//*
+    }*/
+
+    @Test
+    fun `주소 테스트`() = runBlocking {
+        //35.1913249!4d129.064287
+        //48.8737917,-69.4237225
+        val data = locationRepository.getAddress("48.8737917", "-69.4237225")
+        println("data : $data")
+
     }
 
+    @Test
+    fun `Geocorder 주소 변환`() {
+        val geocoder = Geocoder(ApplicationProvider.getApplicationContext(), Locale.KOREA)
+
+        var getAddress: Address? = null
+
+        getAddress = try {
+            geocoder.getFromLocation(35.1913249, 129.064287, 1)?.get(0)
+        } catch (_: Exception) {
+            null
+        }
+
+        println("address : $getAddress")
+    }
 
     @Test
     fun `데이터 체크`() = runBlocking {

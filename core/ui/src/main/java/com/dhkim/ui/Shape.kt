@@ -1,7 +1,6 @@
 package com.dhkim.ui
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.renderscript.Allocation
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
@@ -12,9 +11,12 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
@@ -32,7 +34,6 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 
 val gradientColors = listOf(
@@ -81,6 +82,19 @@ fun LegacyBlurImage(
     renderScript.destroy()
 
     BlurImage(bitmap, modifier)
+}
+
+fun Modifier.noRippleClick(
+    onClick: () -> Unit
+) = composed {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Modifier.clickable(
+        interactionSource = interactionSource,
+        indication = null
+    ) {
+        onClick()
+    }
 }
 
 fun Modifier.drawAnimatedBorder(

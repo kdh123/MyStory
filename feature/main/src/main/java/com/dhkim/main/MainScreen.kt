@@ -39,14 +39,6 @@ import com.dhkim.friend.presentation.navigation.changeFriendInfoNavigation
 import com.dhkim.friend.presentation.navigation.friendNavigation
 import com.dhkim.friend.presentation.navigation.navigateToChangeFriendInfo
 import com.dhkim.friend.presentation.navigation.navigateToFriend
-import com.dhkim.location.domain.Place
-import com.dhkim.location.presentation.navigation.searchNavigation
-import com.dhkim.map.presentation.navigation.MAP_ROUTE
-import com.dhkim.map.presentation.navigation.mapNavigation
-import com.dhkim.notification.navigation.navigateToNotification
-import com.dhkim.notification.navigation.notificationNavigation
-import com.dhkim.setting.presentation.navigation.navigateToSetting
-import com.dhkim.setting.presentation.navigation.settingNavigation
 import com.dhkim.home.presentation.navigation.ADD_TIME_CAPSULE_ROUTE
 import com.dhkim.home.presentation.navigation.TIME_CAPSULE_ROUTE
 import com.dhkim.home.presentation.navigation.addTimeCapsuleNavigation
@@ -58,6 +50,22 @@ import com.dhkim.home.presentation.navigation.navigateToMore
 import com.dhkim.home.presentation.navigation.timeCapsuleDetailNavigation
 import com.dhkim.home.presentation.navigation.timeCapsuleNavigation
 import com.dhkim.home.presentation.navigation.timeCapsuleOpenNavigation
+import com.dhkim.location.domain.Place
+import com.dhkim.location.presentation.navigation.searchNavigation
+import com.dhkim.map.presentation.navigation.MAP_ROUTE
+import com.dhkim.map.presentation.navigation.mapNavigation
+import com.dhkim.notification.navigation.navigateToNotification
+import com.dhkim.notification.navigation.notificationNavigation
+import com.dhkim.setting.presentation.navigation.navigateToSetting
+import com.dhkim.setting.presentation.navigation.settingNavigation
+import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
+import com.dhkim.trip.presentation.navigation.navigateToTripDetail
+import com.dhkim.trip.presentation.navigation.navigateToTripImageDetail
+import com.dhkim.trip.presentation.navigation.navigateToTripSchedule
+import com.dhkim.trip.presentation.navigation.tripDetailNavigation
+import com.dhkim.trip.presentation.navigation.tripImageDetailNavigation
+import com.dhkim.trip.presentation.navigation.tripNavigation
+import com.dhkim.trip.presentation.navigation.tripScheduleNavigation
 import com.dhkim.ui.WarningDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,10 +81,21 @@ fun MainScreen(
     )
     val scaffoldState = rememberBottomSheetScaffoldState(state)
     val navController = rememberNavController()
-    val items = listOf(Screen.TimeCapsule, Screen.AddTimeCapsule, Screen.Map, Screen.Friend)
+    val items = listOf(
+        Screen.TimeCapsule,
+        Screen.Map,
+        Screen.AddTimeCapsule,
+        Screen.Trip,
+        Screen.Friend,
+    )
     val isBottomNavShow = navController
         .currentBackStackEntryAsState()
-        .value?.destination?.route in listOf(TIME_CAPSULE_ROUTE, MAP_ROUTE, FRIEND_ROUTE)
+        .value?.destination?.route in listOf(
+        TIME_CAPSULE_ROUTE,
+        MAP_ROUTE,
+        FRIEND_ROUTE,
+        TRIP_ROUTE
+    )
     var selectedPlace: Place? by remember {
         mutableStateOf(null)
     }
@@ -99,14 +118,23 @@ fun MainScreen(
                         val currentDestination = navBackStackEntry?.destination
 
                         items.forEach { screen ->
-                            val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+                            val isSelected =
+                                currentDestination?.hierarchy?.any { it.route == screen.route } == true
 
                             NavigationBarItem(
                                 icon = {
                                     if (isSelected) {
-                                        Icon(painterResource(id = screen.selected), contentDescription = null, tint = Color.Unspecified)
+                                        Icon(
+                                            painterResource(id = screen.selected),
+                                            contentDescription = null,
+                                            tint = Color.Unspecified
+                                        )
                                     } else {
-                                        Icon(painterResource(id = screen.unSelected), contentDescription = null, tint = Color.Unspecified)
+                                        Icon(
+                                            painterResource(id = screen.unSelected),
+                                            contentDescription = null,
+                                            tint = Color.Unspecified
+                                        )
                                     }
                                 },
                                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
@@ -277,9 +305,26 @@ fun MainScreen(
                 modifier = Modifier
                     .padding(bottom = innerPadding.calculateBottomPadding())
             )
-            changeFriendInfoNavigation {
-                navController.navigateUp()
-            }
+            changeFriendInfoNavigation(
+                onBack = navController::navigateUp
+            )
+            tripNavigation(
+                modifier = Modifier
+                    .padding(bottom = innerPadding.calculateBottomPadding()),
+                onNavigateToSchedule = navController::navigateToTripSchedule,
+                onNavigateToDetail = navController::navigateToTripDetail
+            )
+            tripScheduleNavigation(
+                onBack = navController::navigateUp
+            )
+            tripDetailNavigation(
+                onNavigateToImageDetail = { imageUrl ->
+                    navController.navigateToTripImageDetail(imageUrl)
+                },
+                onNavigateToSchedule = navController::navigateToTripSchedule,
+                onBack = navController::navigateUp
+            )
+            tripImageDetailNavigation()
         }
     }
 }
@@ -289,7 +334,15 @@ sealed class Screen(
     val title: String, val selected: Int, val unSelected: Int, val route: String
 ) {
     data object Map : Screen("홈", R.drawable.ic_map_primary, R.drawable.ic_map_black, MAP_ROUTE)
-    data object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, ADD_TIME_CAPSULE_ROUTE)
-    data object TimeCapsule : Screen("타임캡슐", R.drawable.ic_time_primary, R.drawable.ic_time_black, TIME_CAPSULE_ROUTE)
-    data object Friend : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, FRIEND_ROUTE)
+    data object AddTimeCapsule :
+        Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, ADD_TIME_CAPSULE_ROUTE)
+
+    data object TimeCapsule :
+        Screen("타임캡슐", R.drawable.ic_home_primary, R.drawable.ic_home_black, TIME_CAPSULE_ROUTE)
+
+    data object Friend :
+        Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, FRIEND_ROUTE)
+
+    data object Trip :
+        Screen("여행", R.drawable.ic_trip_primary, R.drawable.ic_trip_black, TRIP_ROUTE)
 }

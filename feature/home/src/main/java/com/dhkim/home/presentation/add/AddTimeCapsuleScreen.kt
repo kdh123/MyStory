@@ -81,8 +81,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
-import com.dhkim.dhcamera.camera.BackgroundText
 import com.dhkim.dhcamera.camera.DhCamera
+import com.dhkim.dhcamera.model.BackgroundText
+import com.dhkim.dhcamera.model.FontElement
 import com.dhkim.home.R
 import com.dhkim.home.domain.BaseTimeCapsule
 import com.dhkim.home.domain.MyTimeCapsule
@@ -595,8 +596,34 @@ private fun startCamera(
             .build(),
     )
 
+    val fontsIds = listOf(
+        R.font.bm_dohyun,
+        R.font.bm_euljiro_10,
+        R.font.bm_euljiro_orae,
+        R.font.bm_hanna_10,
+        R.font.bm_hanna_pro,
+        R.font.bm_jiro,
+        R.font.bm_jua,
+        R.font.bm_kirang,
+        R.font.bm_yeonsun
+    )
+
+    val fonts = mutableListOf<FontElement>().apply {
+        fontsIds.forEachIndexed { index, font ->
+            add(
+                FontElement.Builder()
+                    .text("font $index")
+                    .font(font)
+                    .build()
+            )
+        }
+    }
+
     DhCamera.Builder(context)
         .backgroundItems(backgroundItems)
+        .enableInputText(true)
+        .fontElements(fonts)
+        .enableAddGalleryImage(true)
         .onCompleted(isFinishCamera = true) { savedUrl ->
             onAddImage(savedUrl)
         }
