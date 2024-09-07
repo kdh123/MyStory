@@ -63,6 +63,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -72,6 +73,7 @@ import com.dhkim.location.domain.Category
 import com.dhkim.location.domain.Place
 import com.dhkim.map.R
 import com.dhkim.ui.LoadingProgressBar
+import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -89,6 +91,7 @@ import com.naver.maps.map.compose.MarkerState
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberCameraPositionState
 import com.naver.maps.map.compose.rememberFusedLocationSource
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -97,7 +100,7 @@ import retrofit2.HttpException
 @Composable
 fun MapScreen(
     uiState: MapUiState,
-    sideEffect: MapSideEffect,
+    sideEffect: Flow<MapSideEffect>,
     scaffoldState: BottomSheetScaffoldState,
     place: Place?,
     onSelectPlace: (Place) -> Unit,
@@ -109,6 +112,7 @@ fun MapScreen(
     onHideBottomNav: (Place?) -> Unit,
     onInitSavedState: () -> Unit
 ) {
+    val lifecycle = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val places = uiState.places.collectAsLazyPagingItems()
@@ -137,13 +141,11 @@ fun MapScreen(
         )
     }
 
-    LaunchedEffect(sideEffect) {
-        when (sideEffect) {
-            is MapSideEffect.None -> {}
-
+    lifecycle.onStartCollect(sideEffect) {
+        when (it) {
             is MapSideEffect.BottomSheet -> {
                 scope.launch {
-                    if (sideEffect.isHide) {
+                    if (it.isHide) {
                         scaffoldState.bottomSheetState.hide()
                     } else {
                         scaffoldState.bottomSheetState.expand()

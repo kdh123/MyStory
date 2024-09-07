@@ -10,7 +10,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.dhkim.location.domain.Place
 import com.dhkim.map.presentation.MapScreen
-import com.dhkim.map.presentation.MapSideEffect
 import com.dhkim.map.presentation.MapViewModel
 
 const val MAP_ROUTE = "map"
@@ -26,7 +25,9 @@ fun NavGraphBuilder.mapNavigation(
     composable(MAP_ROUTE) {
         val viewModel = hiltViewModel<MapViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = MapSideEffect.None)
+        val sideEffect = remember {
+            viewModel.sideEffect
+        }
         val place = it.savedStateHandle.get<Place>("place")
 
         MapScreen(

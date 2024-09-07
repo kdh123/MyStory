@@ -8,11 +8,11 @@ import com.dhkim.location.domain.Category
 import com.dhkim.location.domain.LocationRepository
 import com.dhkim.location.domain.Place
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,8 +25,8 @@ class MapViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<MapSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
+    private val _sideEffect = Channel<MapSideEffect>()
+    val sideEffect = _sideEffect.receiveAsFlow()
 
     fun searchPlacesByCategory(category: Category, lat: String, lng: String) {
         viewModelScope.launch {
@@ -43,7 +43,7 @@ class MapViewModel @Inject constructor(
                         places = flowOf(it).stateIn(viewModelScope),
                         selectedPlace = null
                     )
-                    _sideEffect.emit(MapSideEffect.BottomSheet(isHide = false))
+                    _sideEffect.send(MapSideEffect.BottomSheet(isHide = false))
                 }
         }
     }
@@ -63,7 +63,7 @@ class MapViewModel @Inject constructor(
                         places = flowOf(it).stateIn(viewModelScope),
                         selectedPlace = null
                     )
-                    _sideEffect.emit(MapSideEffect.BottomSheet(isHide = false))
+                    _sideEffect.send(MapSideEffect.BottomSheet(isHide = false))
                 }
         }
     }
@@ -77,7 +77,7 @@ class MapViewModel @Inject constructor(
                 places = MutableStateFlow(PagingData.empty())
             )
 
-            _sideEffect.emit(MapSideEffect.BottomSheet(isHide = true))
+            _sideEffect.send(MapSideEffect.BottomSheet(isHide = true))
         }
     }
 
@@ -97,7 +97,7 @@ class MapViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _sideEffect.emit(MapSideEffect.BottomSheet(isHide = true))
+            _sideEffect.send(MapSideEffect.BottomSheet(isHide = true))
         }
     }
 }
