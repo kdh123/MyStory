@@ -42,14 +42,13 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,6 +67,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -76,15 +76,17 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dhkim.friend.R
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.WarningDialog
+import com.dhkim.ui.onStartCollect
 import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.User
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendScreen(
     uiState: FriendUiState,
-    sideEffect: FriendSideEffect,
+    sideEffect: Flow<FriendSideEffect>,
     onQuery: (String) -> Unit,
     onSearchUser: () -> Unit,
     onAddFriend: () -> Unit,
@@ -96,15 +98,13 @@ fun FriendScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
     var currentTab by remember { mutableIntStateOf(0) }
     val titles = listOf("친구", "요청")
     val pagerState = rememberPagerState(pageCount = {
         2
     })
-    val state = rememberStandardBottomSheetState(
-        skipHiddenState = false
-    )
     val scope = rememberCoroutineScope()
     var selectedFriend by remember {
         mutableStateOf(Friend())
@@ -113,33 +113,33 @@ fun FriendScreen(
     var showFriendMenuDialog by remember {
         mutableStateOf(false)
     }
-    var showPendingFriendMenuDialog by remember {
+    var showPendingFriendMenuDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showDeleteDialog by remember {
+    var showDeleteDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showInfoBottomSheet by remember {
+    var showInfoBottomSheet by rememberSaveable {
         mutableStateOf(false)
     }
-    var showFriendsBottomSheet by remember {
+    var showFriendsBottomSheet by rememberSaveable {
         mutableStateOf(false)
     }
-    var showCodeGuideDialog by remember {
+    var showCodeGuideDialog by rememberSaveable {
         mutableStateOf(false)
     }
     val infoBottomSheetState = rememberModalBottomSheetState()
 
-    LaunchedEffect(sideEffect) {
-        when (sideEffect) {
+    lifecycle.onStartCollect(sideEffect) {
+        when (it) {
             is FriendSideEffect.None -> {}
 
             is FriendSideEffect.Message -> {
-                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
             }
 
             is FriendSideEffect.ShowDialog -> {
-                if (!sideEffect.show) {
+                if (!it.show) {
                     showDeleteDialog = false
                     showFriendMenuDialog = false
                     showPendingFriendMenuDialog = false
@@ -517,12 +517,14 @@ fun FriendScreen(
                             title = "타임캡슐 공유",
                             onClick = {
                                 onAddTimeCapsule(selectedFriend.id)
+                                showInfoBottomSheet = false
                             })
                         MenuItem(
                             resId = R.drawable.ic_smile_blue,
                             title = "정보 변경",
                             onClick = {
                                 onNavigateToChangeInfo(selectedFriend)
+                                showInfoBottomSheet = false
                             }
                         )
                     }

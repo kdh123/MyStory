@@ -21,34 +21,39 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.friend.R
+import com.dhkim.ui.onStartCollect
 import com.dhkim.user.domain.Friend
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ChangeFriendInfoScreen(
     friend: Friend,
     uiState: ChangeFriendInfoUiState,
-    sideEffect: ChangeFriendInfoSideEffect,
+    sideEffect: Flow<ChangeFriendInfoSideEffect>,
     initInfo: (Friend) -> Unit,
     onEditNickname: (String) -> Unit,
     onSave: () -> Unit,
     onBack: () -> Unit,
 ) {
+    val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
 
     LaunchedEffect(friend) {
         initInfo(friend)
     }
 
-    LaunchedEffect(sideEffect) {
-        when (sideEffect) {
+    lifecycle.onStartCollect(sideEffect) {
+        when (it) {
             is ChangeFriendInfoSideEffect.Completed -> {
                 onBack()
             }
 
             is ChangeFriendInfoSideEffect.Message -> {
-                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
             }
 
             is ChangeFriendInfoSideEffect.None -> {}
@@ -126,7 +131,7 @@ private fun ChangeFriendInfoScreenPreview() {
         uiState = ChangeFriendInfoUiState(
             friend = Friend(id = "id00", nickname = "홍길동")
         ),
-        sideEffect = ChangeFriendInfoSideEffect.None,
+        sideEffect = flowOf(),
         initInfo = {},
         onEditNickname = {},
         onSave = {},

@@ -11,11 +11,11 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,8 +27,8 @@ class FriendViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(FriendUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<FriendSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
+    private val _sideEffect = Channel<FriendSideEffect>()
+    val sideEffect = _sideEffect.receiveAsFlow()
 
     private val words = listOf(
         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "k", "L", "M", "N", "O", "P",
@@ -103,15 +103,15 @@ class FriendViewModel @Inject constructor(
 
                     if (isSuccessful) {
                         getMyInfo()
-                        //_sideEffect.emit(FriendSideEffect.Message(message = "코드 생성 성공!!"))
+                        //_sideEffect.send(FriendSideEffect.Message(message = "코드 생성 성공!!"))
                     } else {
                         _uiState.value = _uiState.value.copy(isCreatingCode = false)
-                        _sideEffect.emit(FriendSideEffect.Message(message = "코드 생성에 실패하였습니다. 다시 시도해주세요."))
+                        _sideEffect.send(FriendSideEffect.Message(message = "코드 생성에 실패하였습니다. 다시 시도해주세요."))
                     }
                 }
             }).addOnFailureListener {
                 viewModelScope.launch {
-                    _sideEffect.emit(FriendSideEffect.Message(message = "코드 생성에 실패하였습니다. 다시 시도해주세요."))
+                    _sideEffect.send(FriendSideEffect.Message(message = "코드 생성에 실패하였습니다. 다시 시도해주세요."))
                 }
             }
         }
@@ -129,13 +129,13 @@ class FriendViewModel @Inject constructor(
 
             userRepository.addFriend(searchUserId, searchUserProfileImage)
                 .catch {
-                    _sideEffect.emit(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+                    _sideEffect.send(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
                 }
                 .collect { isSuccessful ->
                     if (isSuccessful) {
-                        _sideEffect.emit(FriendSideEffect.ShowKeyboard(show = false))
+                        _sideEffect.send(FriendSideEffect.ShowKeyboard(show = false))
                     } else {
-                        _sideEffect.emit(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+                        _sideEffect.send(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
                     }
                 }
         }
@@ -145,16 +145,16 @@ class FriendViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             userRepository.deleteFriend(userId = userId)
                 .catch {
-                    _sideEffect.emit(FriendSideEffect.ShowDialog(show = false))
-                    _sideEffect.emit(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
+                    _sideEffect.send(FriendSideEffect.ShowDialog(show = false))
+                    _sideEffect.send(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
                 }.collect { isSuccessful ->
                     if (isSuccessful) {
                         userRepository.deleteLocalFriend(userId)
-                        _sideEffect.emit(FriendSideEffect.ShowKeyboard(show = false))
-                        _sideEffect.emit(FriendSideEffect.ShowDialog(show = false))
+                        _sideEffect.send(FriendSideEffect.ShowKeyboard(show = false))
+                        _sideEffect.send(FriendSideEffect.ShowDialog(show = false))
                     } else {
-                        _sideEffect.emit(FriendSideEffect.ShowDialog(show = false))
-                        _sideEffect.emit(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
+                        _sideEffect.send(FriendSideEffect.ShowDialog(show = false))
+                        _sideEffect.send(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
                     }
                 }
         }
@@ -164,11 +164,11 @@ class FriendViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.acceptFriend(friend.id, friend.profileImage, friend.uuid)
                 .catch {
-                    _sideEffect.emit(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+                    _sideEffect.send(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
                 }
                 .collect { isSuccessful ->
                     if (!isSuccessful) {
-                        _sideEffect.emit(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+                        _sideEffect.send(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
                     }
                 }
         }
@@ -181,7 +181,7 @@ class FriendViewModel @Inject constructor(
 
             userRepository.searchUser(searchResult.query)
                 .catch {
-                    _sideEffect.emit(FriendSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
+                    _sideEffect.send(FriendSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
                     _uiState.value = _uiState.value.copy(isLoading = false)
                 }
                 .collect { result ->
@@ -205,7 +205,7 @@ class FriendViewModel @Inject constructor(
 
                         is CommonResult.Error -> {
                             _uiState.value = _uiState.value.copy(isLoading = false)
-                            _sideEffect.emit(FriendSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
+                            _sideEffect.send(FriendSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 package com.dhkim.friend.presentation.navigation
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -8,11 +9,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.dhkim.friend.presentation.FriendSideEffect
-import com.dhkim.friend.presentation.FriendViewModel
 import com.dhkim.friend.presentation.FriendScreen
+import com.dhkim.friend.presentation.FriendViewModel
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoScreen
-import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoSideEffect
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoViewModel
 import com.dhkim.user.domain.Friend
 
@@ -44,7 +43,9 @@ fun NavGraphBuilder.friendNavigation(
     composable(FRIEND_ROUTE) {
         val viewModel = hiltViewModel<FriendViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = FriendSideEffect.None)
+        val sideEffect = remember {
+            viewModel.sideEffect
+        }
 
         FriendScreen(
             uiState = uiState,
@@ -76,7 +77,9 @@ fun NavGraphBuilder.changeFriendInfoNavigation(
 
         val viewModel = hiltViewModel<ChangeFriendInfoViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = ChangeFriendInfoSideEffect.None)
+        val sideEffect = remember {
+            viewModel.sideEffect
+        }
 
         ChangeFriendInfoScreen(
             friend = friend,
