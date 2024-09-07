@@ -9,14 +9,13 @@ import com.dhkim.trip.domain.model.toTripType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,8 +27,8 @@ class TripDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TripDetailUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<TripDetailSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
+    private val _sideEffect = Channel<TripDetailSideEffect>()
+    val sideEffect = _sideEffect.receiveAsFlow()
 
     var tripAllImages = MutableStateFlow<List<TripImage>>(listOf())
         private set
@@ -79,7 +78,7 @@ class TripDetailViewModel @Inject constructor(
     private fun updateTrip(trip: Trip) {
         viewModelScope.launch(Dispatchers.IO) {
             tripRepository.updateTrip(trip = trip.copy(images = listOf(), videos = listOf()))
-            _sideEffect.emit(
+            _sideEffect.send(
                 TripDetailSideEffect.LoadImages(
                     startDate = trip.startDate,
                     endDate = trip.endDate
@@ -129,13 +128,7 @@ class TripDetailViewModel @Inject constructor(
                                 type = type.toTripType().desc
                             )
                         }
-
-                        /**
-                         * 화면이 구성된 후 emit을 하기 위해 delay 설정
-                         * 그렇지 않으면 screen에서 emit한 데이터를 collet 할 수 없음
-                         * */
-                        delay(100L)
-                        _sideEffect.emit(
+                        _sideEffect.send(
                             TripDetailSideEffect.LoadImages(
                                 startDate = currentTrip.startDate,
                                 endDate = currentTrip.endDate

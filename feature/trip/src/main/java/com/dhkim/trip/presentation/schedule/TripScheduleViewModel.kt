@@ -6,14 +6,13 @@ import com.dhkim.trip.domain.TripRepository
 import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.domain.model.TripPlace
 import com.dhkim.trip.domain.model.toTripType
-import com.dhkim.trip.presentation.tripHome.TripScheduleSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,8 +24,8 @@ class TripScheduleViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TripScheduleUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<TripScheduleSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
+    private val _sideEffect = Channel<TripScheduleSideEffect>()
+    val sideEffect = _sideEffect.receiveAsFlow()
 
     fun onAction(action: TripScheduleAction) {
         when (action) {
@@ -125,7 +124,7 @@ class TripScheduleViewModel @Inject constructor(
             }
 
             tripRepository.saveTrip(trip)
-            _sideEffect.emit(TripScheduleSideEffect.Complete)
+            _sideEffect.send(TripScheduleSideEffect.Complete)
         }
     }
 
@@ -152,7 +151,7 @@ class TripScheduleViewModel @Inject constructor(
             }
 
             tripRepository.updateTrip(trip = trip.copy(images = listOf(), videos = listOf()))
-            _sideEffect.emit(TripScheduleSideEffect.Complete)
+            _sideEffect.send(TripScheduleSideEffect.Complete)
         }
     }
 }

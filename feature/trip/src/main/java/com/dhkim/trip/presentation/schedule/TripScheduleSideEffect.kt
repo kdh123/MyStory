@@ -1,4 +1,4 @@
-package com.dhkim.trip.presentation.tripHome
+package com.dhkim.trip.presentation.schedule
 
 sealed interface TripScheduleSideEffect {
 

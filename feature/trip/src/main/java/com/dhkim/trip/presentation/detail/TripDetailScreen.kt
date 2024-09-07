@@ -12,7 +12,6 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.Settings
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -63,6 +62,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
 import com.dhkim.trip.R
 import com.dhkim.trip.domain.model.TripImage
@@ -70,11 +70,12 @@ import com.dhkim.trip.domain.model.TripType
 import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.WarningDialog
 import com.dhkim.ui.noRippleClick
+import com.dhkim.ui.onStartCollect
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.net.URLEncoder
@@ -87,13 +88,14 @@ import java.util.Locale
 fun TripDetailScreen(
     tripId: String,
     uiState: TripDetailUiState,
-    sideEffect: SharedFlow<TripDetailSideEffect>,
+    sideEffect: Flow<TripDetailSideEffect>,
     onAction: (TripDetailAction) -> Unit,
     onNavigateToImageDetail: (String) -> Unit,
     onNavigateToSchedule: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val lifecycle = LocalLifecycleOwner.current
     var showPermissionDialog by rememberSaveable {
         mutableStateOf(false)
     }
@@ -248,18 +250,15 @@ fun TripDetailScreen(
         )
     }
 
-    LaunchedEffect(Unit) {
-        sideEffect.collect {
-            when (it) {
-                is TripDetailSideEffect.LoadImages -> {
-                    val images = getImagesFromDateRange(
-                        context = context,
-                        startDate = "${it.startDate} 00:00:00",
-                        endDate = "${it.endDate} 23:59:59"
-                    )
-                    onAction(TripDetailAction.LoadImages(tripId = tripId, images = images))
-                    Log.e("images", "images22 : $images")
-                }
+    lifecycle.onStartCollect(sideEffect) {
+        when (it) {
+            is TripDetailSideEffect.LoadImages -> {
+                val images = getImagesFromDateRange(
+                    context = context,
+                    startDate = "${it.startDate} 00:00:00",
+                    endDate = "${it.endDate} 23:59:59"
+                )
+                onAction(TripDetailAction.LoadImages(tripId = tripId, images = images))
             }
         }
     }
@@ -672,7 +671,7 @@ private fun TripDetailScreenPreview() {
     TripDetailScreen(
         tripId = "",
         uiState = uiState,
-        sideEffect = MutableSharedFlow(),
+        sideEffect = flowOf(),
         onAction = {},
         onNavigateToImageDetail = { },
         onNavigateToSchedule = {},

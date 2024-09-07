@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -49,16 +50,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
 import com.dhkim.trip.R
 import com.dhkim.trip.domain.model.TripPlace
 import com.dhkim.trip.domain.model.TripType
 import com.dhkim.trip.domain.model.toTripType
-import com.dhkim.trip.presentation.tripHome.TripScheduleSideEffect
 import com.dhkim.ui.noRippleClick
+import com.dhkim.ui.onStartCollect
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -66,10 +67,11 @@ import kotlinx.coroutines.launch
 fun TripScheduleScreen(
     tripId: String,
     uiState: TripScheduleUiState,
-    sideEffect: SharedFlow<TripScheduleSideEffect>,
+    sideEffect: Flow<TripScheduleSideEffect>,
     onAction: (TripScheduleAction) -> Unit,
     onBack: () -> Unit
 ) {
+    val lifecycle = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = {
         3
@@ -81,10 +83,10 @@ fun TripScheduleScreen(
         targetValue = uiState.progress,
         animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing), label = ""
     )
-    var showStartDateDialog by remember {
+    var showStartDateDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showEndDateDialog by remember {
+    var showEndDateDialog by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -100,12 +102,10 @@ fun TripScheduleScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        sideEffect.collectLatest {
-            when (it) {
-                TripScheduleSideEffect.Complete -> {
-                    onBack()
-                }
+    lifecycle.onStartCollect(sideEffect) {
+        when (it) {
+            TripScheduleSideEffect.Complete -> {
+                onBack()
             }
         }
     }
