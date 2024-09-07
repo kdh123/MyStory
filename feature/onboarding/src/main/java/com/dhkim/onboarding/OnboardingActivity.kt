@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.dhkim.splash.SplashScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -15,19 +16,8 @@ class OnboardingActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            OnboardingScreen()
+            SplashScreen()
+            //OnboardingScreen()
         }
-    }
-}
-
-@Composable
-fun OnboardingScreen() {
-    val navController = rememberNavController()
-
-    NavHost(
-        navController = navController,
-        startDestination = "splash"
-    ) {
-        onboardingNavigation()
     }
 }

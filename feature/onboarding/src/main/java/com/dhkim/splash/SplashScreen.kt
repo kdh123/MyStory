@@ -19,10 +19,7 @@ import com.dhkim.ui.DefaultBackground
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(
-    uiState: SplashUiState,
-    sideEffect: SplashSideEffect
-) {
+fun SplashScreen() {
     val context = LocalContext.current
 
     LaunchedEffect(true) {
@@ -55,8 +52,5 @@ fun SplashScreen(
 @Preview(showBackground = true)
 @Composable
 private fun SplashScreenPreview() {
-    SplashScreen(
-        uiState = SplashUiState(),
-        sideEffect = SplashSideEffect.None
-    )
+    SplashScreen()
 }
