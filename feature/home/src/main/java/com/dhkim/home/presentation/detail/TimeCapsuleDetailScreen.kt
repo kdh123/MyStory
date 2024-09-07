@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -45,10 +46,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.home.R
-import com.dhkim.ui.WarningDialog
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.ui.DefaultBackground
+import com.dhkim.ui.WarningDialog
+import com.dhkim.ui.onStartCollect
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.CameraUpdate
@@ -61,6 +64,8 @@ import com.naver.maps.map.compose.MarkerState
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberCameraPositionState
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -71,12 +76,13 @@ fun TimeCapsuleDetailScreen(
     timeCapsuleId: String,
     isReceived: Boolean,
     uiState: TimeCapsuleDetailUiState,
-    sideEffect: TimeCapsuleDetailSideEffect,
+    sideEffect: Flow<TimeCapsuleDetailSideEffect>,
     onNavigateToImageDetail: (String, String) -> Unit,
     onDelete: (String) -> Unit,
     init: (String, Boolean) -> Unit,
     onBack: () -> Unit
 ) {
+    val lifecycle = LocalLifecycleOwner.current
     val scrollState = rememberScrollState()
     val cameraPositionState = rememberCameraPositionState()
     val mapProperties by remember {
@@ -94,10 +100,10 @@ fun TimeCapsuleDetailScreen(
     var enableScroll by remember {
         mutableStateOf(true)
     }
-    var showOption by remember {
+    var showOption by rememberSaveable {
         mutableStateOf(false)
     }
-    var showDeleteDialog by remember {
+    var showDeleteDialog by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -113,10 +119,8 @@ fun TimeCapsuleDetailScreen(
         init(timeCapsuleId, isReceived)
     }
 
-    LaunchedEffect(sideEffect) {
-        when (sideEffect) {
-            is TimeCapsuleDetailSideEffect.None -> {}
-
+    lifecycle.onStartCollect(sideEffect) {
+        when (it) {
             is TimeCapsuleDetailSideEffect.Completed -> {
                 onBack()
             }
@@ -332,7 +336,7 @@ private fun TimeCapsuleDetailScreenPreview() {
         timeCapsuleId = "",
         isReceived = false,
         uiState = TimeCapsuleDetailUiState(timeCapsule = timeCapsule),
-        sideEffect = TimeCapsuleDetailSideEffect.None,
+        sideEffect = flowOf(),
         init = { _, _ ->
 
         },

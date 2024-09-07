@@ -269,9 +269,6 @@ fun MainScreen(
                 }
             )
             addTimeCapsuleNavigation(
-                onNavigateToCamera = {
-                    navController.navigate("camera")
-                },
                 onBack = {
                     navController.navigateUp()
                 }

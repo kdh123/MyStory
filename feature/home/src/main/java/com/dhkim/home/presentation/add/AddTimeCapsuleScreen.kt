@@ -62,6 +62,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,6 +80,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
 import com.dhkim.dhcamera.camera.DhCamera
@@ -91,6 +93,7 @@ import com.dhkim.home.domain.SendTimeCapsule
 import com.dhkim.home.domain.SharedFriend
 import com.dhkim.home.presentation.LocationSearchScreen
 import com.dhkim.location.domain.Place
+import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -100,6 +103,8 @@ import com.naver.maps.geometry.LatLng
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -107,7 +112,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddTimeCapsuleScreen(
     uiState: AddTimeCapsuleUiState,
-    sideEffect: AddTimeCapsuleSideEffect,
+    sideEffect: Flow<AddTimeCapsuleSideEffect>,
     imageUrl: String,
     place: Place,
     friendId: String,
@@ -124,9 +129,9 @@ fun AddTimeCapsuleScreen(
     onInitPlace: (Place) -> Unit,
     onAddImage: (imageUrl: String) -> Unit,
     onAddFriend: (friendId: String) -> Unit,
-    onNavigateToCamera: () -> Unit,
     onBack: () -> Unit,
 ) {
+    val lifecycle = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
     var showSharedFriendsBottomSheet by remember { mutableStateOf(false) }
     var showImagePickBottomSheet by remember { mutableStateOf(false) }
@@ -145,10 +150,10 @@ fun AddTimeCapsuleScreen(
             onAddImage("$it")
         }
     }
-    var showLocationBottomSheet by remember {
+    var showLocationBottomSheet by rememberSaveable {
         mutableStateOf(false)
     }
-    var showDateDialog by remember {
+    var showDateDialog by rememberSaveable {
         mutableStateOf(false)
     }
     var currentLocation by remember {
@@ -179,7 +184,6 @@ fun AddTimeCapsuleScreen(
                     }
                 }
         } else {
-            // Handle permission denial
         }
     }
     var contentHeight by remember {
@@ -191,22 +195,20 @@ fun AddTimeCapsuleScreen(
     val density = LocalDensity.current
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(sideEffect) {
-        when (sideEffect) {
-            is AddTimeCapsuleSideEffect.None -> {}
-
+    lifecycle.onStartCollect(sideEffect) {
+        when (it) {
             is AddTimeCapsuleSideEffect.Message -> {
-                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
             }
 
             is AddTimeCapsuleSideEffect.Completed -> {
-                if (sideEffect.isCompleted) {
+                if (it.isCompleted) {
                     onBack()
                 }
             }
 
             is AddTimeCapsuleSideEffect.ShowPlaceBottomSheet -> {
-                if (!sideEffect.show) {
+                if (!it.show) {
                     showLocationBottomSheet = false
                 }
             }
@@ -1070,7 +1072,7 @@ private fun ContentViewPreview() {
 private fun AddTimeCapsuleScreenPreview() {
     AddTimeCapsuleScreen(
         uiState = AddTimeCapsuleUiState(),
-        sideEffect = AddTimeCapsuleSideEffect.None,
+        sideEffect = flowOf(),
         imageUrl = "imageUrl2",
         place = Place(),
         friendId = "",
@@ -1087,7 +1089,6 @@ private fun AddTimeCapsuleScreenPreview() {
         onAddFriend = { },
         onInitPlace = { },
         onAddImage = { },
-        onNavigateToCamera = { },
         onBack = { }
     )
 }

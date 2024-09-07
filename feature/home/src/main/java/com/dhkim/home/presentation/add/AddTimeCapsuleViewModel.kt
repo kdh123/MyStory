@@ -18,9 +18,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -28,6 +27,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,8 +42,8 @@ class AddTimeCapsuleViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AddTimeCapsuleUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<AddTimeCapsuleSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
+    private val _sideEffect = Channel<AddTimeCapsuleSideEffect>()
+    val sideEffect = _sideEffect.receiveAsFlow()
 
     private var selectImageIndex = -1
 
@@ -117,7 +117,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
                 placeName = place.name,
                 address = place.address
             )
-            _sideEffect.emit(AddTimeCapsuleSideEffect.ShowPlaceBottomSheet(show = false))
+            _sideEffect.send(AddTimeCapsuleSideEffect.ShowPlaceBottomSheet(show = false))
         }
     }
 
@@ -151,15 +151,15 @@ class AddTimeCapsuleViewModel @Inject constructor(
             with(_uiState.value) {
                 when {
                     openDate.isEmpty() -> {
-                        _sideEffect.emit(AddTimeCapsuleSideEffect.Message("개봉 날짜를 선택해주세요."))
+                        _sideEffect.send(AddTimeCapsuleSideEffect.Message("개봉 날짜를 선택해주세요."))
                     }
 
                     content.isEmpty() || content.isBlank() -> {
-                        _sideEffect.emit(AddTimeCapsuleSideEffect.Message("내용을 입력해주세요."))
+                        _sideEffect.send(AddTimeCapsuleSideEffect.Message("내용을 입력해주세요."))
                     }
 
                     isShare && sharedFriends.isEmpty() -> {
-                        _sideEffect.emit(AddTimeCapsuleSideEffect.Message("친구를 선택해주세요."))
+                        _sideEffect.send(AddTimeCapsuleSideEffect.Message("친구를 선택해주세요."))
                     }
 
                     else -> {
@@ -181,7 +181,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
                         if (sharedFriends.none { it.isChecked }) {
                             timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = timeCapsule)
-                            _sideEffect.emit(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
+                            _sideEffect.send(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
                         } else {
                             val isSuccessful = timeCapsuleRepository.shareTimeCapsule(
                                 timeCapsuleId = timeCapsuleId,
@@ -197,9 +197,9 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
                             if (isSuccessful) {
                                 timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = timeCapsule)
-                                _sideEffect.emit(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
+                                _sideEffect.send(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
                             } else {
-                                _sideEffect.emit(AddTimeCapsuleSideEffect.Message(message = "저장에 실패하였습니다."))
+                                _sideEffect.send(AddTimeCapsuleSideEffect.Message(message = "저장에 실패하였습니다."))
                             }
                         }
                     }

@@ -7,13 +7,13 @@ import com.dhkim.home.domain.TimeCapsuleRepository
 import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,11 +26,10 @@ class TimeCapsuleViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TimeCapsuleUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<TimeCapsuleSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
+    private val _sideEffect = Channel<TimeCapsuleSideEffect>()
+    val sideEffect = _sideEffect.receiveAsFlow()
 
     private var spaceId = 100
-
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -159,7 +158,7 @@ class TimeCapsuleViewModel @Inject constructor(
                         if (isSuccessful) {
                             deleteMyTimeCapsule(timeCapsuleId)
                         } else {
-                            _sideEffect.emit(TimeCapsuleSideEffect.Message("삭제에 실패하였습니다."))
+                            _sideEffect.send(TimeCapsuleSideEffect.Message("삭제에 실패하였습니다."))
                         }
                     } else {
                         deleteMyTimeCapsule(timeCapsuleId)

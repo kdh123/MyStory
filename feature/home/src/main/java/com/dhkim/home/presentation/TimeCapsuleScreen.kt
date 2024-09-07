@@ -46,6 +46,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,6 +65,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
 import com.dhkim.common.DistanceManager
@@ -72,6 +74,7 @@ import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.ui.DefaultBackground
 import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.WarningDialog
+import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -91,13 +94,15 @@ import com.naver.maps.map.compose.rememberCameraPositionState
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TimeCapsuleScreen(
     uiState: TimeCapsuleUiState,
-    sideEffect: TimeCapsuleSideEffect,
+    sideEffect: Flow<TimeCapsuleSideEffect>,
     modifier: Modifier = Modifier,
     onDeleteTimeCapsule: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToAdd: () -> Unit,
@@ -108,6 +113,7 @@ fun TimeCapsuleScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToMore: () -> Unit
 ) {
+    val lifecycle = LocalLifecycleOwner.current
     var currentLocation by remember {
         mutableStateOf(Constants.defaultLocation)
     }
@@ -115,19 +121,19 @@ fun TimeCapsuleScreen(
         mutableStateOf(TimeCapsule())
     }
     val context = LocalContext.current
-    var showLocationDialog by remember {
+    var showLocationDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showOpenDialog by remember {
+    var showOpenDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showMenuDialog by remember {
+    var showMenuDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showDeleteDialog by remember {
+    var showDeleteDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showPermissionDialog by remember {
+    var showPermissionDialog by rememberSaveable {
         mutableStateOf(false)
     }
     val fusedLocationClient = remember {
@@ -248,20 +254,20 @@ fun TimeCapsuleScreen(
         }
     }
 
-    LaunchedEffect(sideEffect) {
-        when (sideEffect) {
+    lifecycle.onStartCollect(sideEffect) {
+        when (it) {
             is TimeCapsuleSideEffect.None -> {}
 
             is TimeCapsuleSideEffect.Message -> {
-                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
             }
 
             is TimeCapsuleSideEffect.NavigateToOpen -> {
-                onNavigateToOpen(sideEffect.id, sideEffect.isReceived)
+                onNavigateToOpen(it.id, it.isReceived)
             }
 
             is TimeCapsuleSideEffect.NavigateToDetail -> {
-                onNavigateToDetail(sideEffect.id, sideEffect.isReceived)
+                onNavigateToDetail(it.id, it.isReceived)
             }
         }
     }
@@ -779,7 +785,7 @@ private fun TimeCapsuleScreenPreview() {
 
     TimeCapsuleScreen(
         uiState = TimeCapsuleUiState(),
-        sideEffect = TimeCapsuleSideEffect.None,
+        sideEffect = flowOf(),
         modifier = Modifier,
         onDeleteTimeCapsule = { _, _ -> },
         onNavigateToAdd = { },
