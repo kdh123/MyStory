@@ -232,6 +232,7 @@ fun TimeCapsuleScreen(
             dialogTitle = "개봉",
             dialogText = "정말 개봉하겠습니까?",
             onConfirmation = {
+                showOpenDialog = false
                 onNavigateToOpen(selectedTimeCapsule.id, selectedTimeCapsule.isReceived)
             },
             onDismissRequest = {
