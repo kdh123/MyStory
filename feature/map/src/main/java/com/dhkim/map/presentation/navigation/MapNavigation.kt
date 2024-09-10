@@ -15,7 +15,7 @@ import com.dhkim.map.presentation.MapViewModel
 const val MAP_ROUTE = "map"
 
 @OptIn(ExperimentalMaterial3Api::class)
-fun NavGraphBuilder.mapNavigation(
+fun NavGraphBuilder.mapScreen(
     scaffoldState: BottomSheetScaffoldState,
     onNavigateToSearch: (Double, Double) -> Unit,
     onNavigateToAdd: (Place) -> Unit,

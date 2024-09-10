@@ -24,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
@@ -33,39 +32,36 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.dhkim.camera.navigation.cameraNavigation
+import com.dhkim.friend.presentation.navigation.FRIEND_MAIN_ROUTE
 import com.dhkim.friend.presentation.navigation.FRIEND_ROUTE
-import com.dhkim.friend.presentation.navigation.changeFriendInfoNavigation
-import com.dhkim.friend.presentation.navigation.friendNavigation
+import com.dhkim.friend.presentation.navigation.friendScreen
 import com.dhkim.friend.presentation.navigation.navigateToChangeFriendInfo
 import com.dhkim.friend.presentation.navigation.navigateToFriend
 import com.dhkim.home.presentation.navigation.ADD_TIME_CAPSULE_ROUTE
+import com.dhkim.home.presentation.navigation.TIME_CAPSULE_MAIN_ROUTE
 import com.dhkim.home.presentation.navigation.TIME_CAPSULE_ROUTE
-import com.dhkim.home.presentation.navigation.addTimeCapsuleNavigation
-import com.dhkim.home.presentation.navigation.imageDetailNavigation
-import com.dhkim.home.presentation.navigation.moreTimeCapsuleNavigation
+import com.dhkim.home.presentation.navigation.addTimeCapsuleScreen
 import com.dhkim.home.presentation.navigation.navigateToAddTimeCapsule
+import com.dhkim.home.presentation.navigation.navigateToDetail
+import com.dhkim.home.presentation.navigation.navigateToDetailFromOpen
 import com.dhkim.home.presentation.navigation.navigateToImageDetail
 import com.dhkim.home.presentation.navigation.navigateToMore
-import com.dhkim.home.presentation.navigation.timeCapsuleDetailNavigation
-import com.dhkim.home.presentation.navigation.timeCapsuleNavigation
-import com.dhkim.home.presentation.navigation.timeCapsuleOpenNavigation
+import com.dhkim.home.presentation.navigation.navigateToOpenTimeCapsule
+import com.dhkim.home.presentation.navigation.timeCapsuleScreen
 import com.dhkim.location.domain.Place
-import com.dhkim.location.presentation.navigation.searchNavigation
+import com.dhkim.location.presentation.navigation.navigateToSearch
+import com.dhkim.location.presentation.navigation.searchScreen
 import com.dhkim.map.presentation.navigation.MAP_ROUTE
-import com.dhkim.map.presentation.navigation.mapNavigation
+import com.dhkim.map.presentation.navigation.mapScreen
 import com.dhkim.notification.navigation.navigateToNotification
-import com.dhkim.notification.navigation.notificationNavigation
+import com.dhkim.notification.navigation.notificationScreen
 import com.dhkim.setting.presentation.navigation.navigateToSetting
-import com.dhkim.setting.presentation.navigation.settingNavigation
+import com.dhkim.setting.presentation.navigation.settingScreen
 import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
 import com.dhkim.trip.presentation.navigation.navigateToTripDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripImageDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripSchedule
-import com.dhkim.trip.presentation.navigation.tripDetailNavigation
-import com.dhkim.trip.presentation.navigation.tripImageDetailNavigation
-import com.dhkim.trip.presentation.navigation.tripNavigation
-import com.dhkim.trip.presentation.navigation.tripScheduleNavigation
+import com.dhkim.trip.presentation.navigation.tripScreen
 import com.dhkim.ui.WarningDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,7 +71,6 @@ fun MainScreen(
     onCloseGuide: () -> Unit,
     onNeverShowGuideAgain: () -> Unit
 ) {
-    val context = LocalContext.current
     val state = rememberStandardBottomSheetState(
         skipHiddenState = false
     )
@@ -178,16 +173,29 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxSize(),
             navController = navController,
-            startDestination = "timeCapsule"
+            startDestination = TIME_CAPSULE_MAIN_ROUTE
         ) {
-            mapNavigation(
+            timeCapsuleScreen(
+                onNavigateToAdd = {
+                    val friendId = " "
+                    navController.navigate("$ADD_TIME_CAPSULE_ROUTE/$friendId")
+                },
+                onNavigateToOpen = navController::navigateToOpenTimeCapsule,
+                onNavigateToDetail = navController::navigateToDetail,
+                onNavigateToDetailFromOpen = navController::navigateToDetailFromOpen,
+                onNavigateToNotification = navController::navigateToNotification,
+                onNavigateToSetting = navController::navigateToSetting,
+                onNavigateToProfile = navController::navigateToFriend,
+                onNavigateToMore = navController::navigateToMore,
+                onNavigateToImageDetail = navController::navigateToImageDetail,
+                onBack = navController::navigateUp,
+                modifier = Modifier
+                    .padding(bottom = innerPadding.calculateBottomPadding())
+            )
+            mapScreen(
                 scaffoldState = scaffoldState,
-                onNavigateToSearch = { lat, lng ->
-                    navController.navigate("search/$lat/$lng")
-                },
-                onHideBottomNav = { place ->
-                    selectedPlace = place
-                },
+                onNavigateToSearch = navController::navigateToSearch,
+                onHideBottomNav = { selectedPlace = it },
                 onInitSavedState = {
                     navController.currentBackStackEntry
                         ?.savedStateHandle
@@ -195,133 +203,47 @@ fun MainScreen(
                 },
                 onNavigateToAdd = { place ->
                     val friendId = " "
-                    navController.navigate("$ADD_TIME_CAPSULE_ROUTE/$friendId")
-                    navController.currentBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("place", place)
-                }
-            )
-            timeCapsuleDetailNavigation(
-                onNavigateToImageDetail = { index, images ->
-                    navController.navigateToImageDetail(index, images)
-                },
-                onBack = {
-                    navController.navigateUp()
-                }
-            )
-            imageDetailNavigation()
-            moreTimeCapsuleNavigation(
-                onNavigateToDetail = { id, isReceived ->
-                    navController.navigate("timeCapsuleDetail/$id/${isReceived}")
-                },
-                onBack = {
-                    navController.navigateUp()
-                }
-            )
-            timeCapsuleOpenNavigation(
-                onNavigateToDetail = { id, isReceived ->
-                    navController.navigate("timeCapsuleDetail/$id/${isReceived}") {
-                        popUpTo(navController.currentDestination?.id ?: return@navigate) {
-                            inclusive = true
-                        }
+                    navController.run {
+                        navigate("$ADD_TIME_CAPSULE_ROUTE/$friendId")
+                        currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("place", place)
                     }
                 }
             )
-            timeCapsuleNavigation(
-                onNavigateToAdd = {
-                    val friendId = " "
-                    navController.navigate("$ADD_TIME_CAPSULE_ROUTE/$friendId")
-                },
-                onNavigateToOpen = { id, isReceived ->
-                    navController.navigate("timeCapsuleOpen/$id/${isReceived}")
-                },
-                onNavigateToDetail = { id, isReceived ->
-                    navController.navigate("timeCapsuleDetail/$id/${isReceived}")
-                },
-                onNavigateToNotification = {
-                    navController.navigateToNotification()
-                },
-                onNavigateToSetting = {
-                    navController.navigateToSetting()
-                },
-                onNavigateToProfile = {
-                    navController.navigateToFriend()
-                },
-                onNavigateToMore = {
-                    navController.navigateToMore()
-                },
-                modifier = Modifier
-                    .padding(
-                        bottom = innerPadding.calculateBottomPadding()
-                    )
-            )
-            notificationNavigation(
-                onNavigateToTimeCapsule = {
-
-                },
-                onBack = {
-                    navController.navigateUp()
-                }
-            )
-            settingNavigation(
-                onBack = {
-                    navController.navigateUp()
-                }
-            )
-            addTimeCapsuleNavigation(
-                onBack = {
-                    navController.navigateUp()
-                }
-            )
-            cameraNavigation(
-                folderName = context.getString(com.dhkim.main.R.string.app_name),
-                onNext = { imageUrl ->
-                    navController.navigateUp()
-                    navController.currentBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("imageUrl", imageUrl)
-                },
+            addTimeCapsuleScreen(
                 onBack = navController::navigateUp
             )
-            searchNavigation {
-                navController.navigateUp()
-                navController.currentBackStackEntry
-                    ?.savedStateHandle
-                    ?.set("place", it)
-            }
-            friendNavigation(
-                onAddTimeCapsule = {
-                    navController.navigateToAddTimeCapsule(friendId = it)
-                },
-                onNavigateToChangeInfo = {
-                    navController.navigateToChangeFriendInfo(it)
-                },
-                onBack = {
-                    navController.navigateUp()
-                },
-                modifier = Modifier
-                    .padding(bottom = innerPadding.calculateBottomPadding())
-            )
-            changeFriendInfoNavigation(
-                onBack = navController::navigateUp
-            )
-            tripNavigation(
+            tripScreen(
                 modifier = Modifier
                     .padding(bottom = innerPadding.calculateBottomPadding()),
                 onNavigateToSchedule = navController::navigateToTripSchedule,
-                onNavigateToDetail = navController::navigateToTripDetail
-            )
-            tripScheduleNavigation(
+                onNavigateToDetail = navController::navigateToTripDetail,
+                onNavigateToImageDetail = navController::navigateToTripImageDetail,
                 onBack = navController::navigateUp
             )
-            tripDetailNavigation(
-                onNavigateToImageDetail = { imageUrl ->
-                    navController.navigateToTripImageDetail(imageUrl)
-                },
-                onNavigateToSchedule = navController::navigateToTripSchedule,
+            friendScreen(
+                onAddTimeCapsule = navController::navigateToAddTimeCapsule,
+                onNavigateToChangeInfo = navController::navigateToChangeFriendInfo,
+                onBack = navController::navigateUp,
+                modifier = Modifier
+                    .padding(bottom = innerPadding.calculateBottomPadding())
+            )
+            notificationScreen(
+                onNavigateToTimeCapsule = {},
                 onBack = navController::navigateUp
             )
-            tripImageDetailNavigation()
+            settingScreen(onBack = navController::navigateUp)
+            searchScreen(
+                onBack = {
+                    navController.run {
+                        navigateUp()
+                        currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("place", it)
+                    }
+                }
+            )
         }
     }
 }
@@ -335,10 +257,15 @@ sealed class Screen(
         Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, ADD_TIME_CAPSULE_ROUTE)
 
     data object TimeCapsule :
-        Screen("타임캡슐", R.drawable.ic_home_primary, R.drawable.ic_home_black, TIME_CAPSULE_ROUTE)
+        Screen(
+            "타임캡슐",
+            R.drawable.ic_home_primary,
+            R.drawable.ic_home_black,
+            TIME_CAPSULE_MAIN_ROUTE
+        )
 
     data object Friend :
-        Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, FRIEND_ROUTE)
+        Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, FRIEND_MAIN_ROUTE)
 
     data object Trip :
         Screen("여행", R.drawable.ic_trip_primary, R.drawable.ic_trip_black, TRIP_ROUTE)

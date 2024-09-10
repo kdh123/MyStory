@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        askPermission()
+        requestPermission()
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
         })
     }
 
-    private fun askPermission() {
+    private fun requestPermission() {
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,

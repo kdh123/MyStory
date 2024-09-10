@@ -1,7 +1,6 @@
 package com.dhkim.camera.navigation
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -12,7 +11,7 @@ import com.dhkim.camera.CameraViewModel
 
 typealias savedUrl = String
 
-fun NavGraphBuilder.cameraNavigation(
+fun NavGraphBuilder.cameraScreen(
     folderName: String = "",
     onNext: ((savedUrl) -> Unit)? = null,
     onBack: (() -> Unit)? = null,
