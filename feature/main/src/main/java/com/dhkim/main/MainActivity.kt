@@ -31,13 +31,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //enableEdgeToEdge()
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.showGuide.collect {
                     setContent {
                         MainScreen(
+                            appState = rememberMyStoryAppState(),
                             showGuide = it,
                             onCloseGuide = viewModel::closeGuideDialog,
                             onNeverShowGuideAgain = viewModel::neverShowGuideAgain

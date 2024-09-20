@@ -1,7 +1,5 @@
 package com.dhkim.map.presentation.navigation
 
-import androidx.compose.material3.BottomSheetScaffoldState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -14,9 +12,7 @@ import com.dhkim.map.presentation.MapViewModel
 
 const val MAP_ROUTE = "map"
 
-@OptIn(ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.mapScreen(
-    scaffoldState: BottomSheetScaffoldState,
     onNavigateToSearch: (Double, Double) -> Unit,
     onNavigateToAdd: (Place) -> Unit,
     onHideBottomNav: (Place?) -> Unit,
@@ -32,27 +28,16 @@ fun NavGraphBuilder.mapScreen(
 
         MapScreen(
             uiState = uiState,
-            sideEffect = sideEffect,
-            scaffoldState = scaffoldState,
-            place = remember {
-                place
-            },
+            sideEffect = { sideEffect },
+            place = { place },
             onSelectPlace = viewModel::selectPlace,
             onSearchPlaceByQuery = viewModel::searchPlacesByKeyword,
             onSearchPlaceByCategory = viewModel::searchPlacesByCategory,
             onCloseSearch = viewModel::closeSearch,
-            onNavigateToSearch = remember {
-                onNavigateToSearch
-            },
-            onHideBottomNav = remember {
-                onHideBottomNav
-            },
-            onInitSavedState = remember {
-                onInitSavedState
-            },
-            onNavigateToAddScreen = remember {
-                onNavigateToAdd
-            }
+            onNavigateToSearch = onNavigateToSearch,
+            onHideBottomNav = onHideBottomNav,
+            onInitSavedState = onInitSavedState,
+            onNavigateToAddScreen = onNavigateToAdd
         )
     }
 }

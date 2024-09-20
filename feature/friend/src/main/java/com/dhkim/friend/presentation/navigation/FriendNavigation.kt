@@ -22,7 +22,7 @@ const val CHANGE_FRIEND_INFO_ROUTE = "changeFriendInfo"
 
 fun NavGraphBuilder.friendScreen(
     onNavigateToChangeInfo: (Friend) -> Unit,
-    onAddTimeCapsule: (friendId: String) -> Unit,
+    onNavigateToAddTimeCapsule: (friendId: String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -36,14 +36,11 @@ fun NavGraphBuilder.friendScreen(
 
             FriendScreen(
                 uiState = uiState,
-                sideEffect = sideEffect,
-                onQuery = viewModel::onQuery,
-                onSearchUser = viewModel::searchUser,
-                onAddFriend = viewModel::addFriend,
-                onAcceptFriend = viewModel::acceptFriend,
-                onDeleteFriend = viewModel::deleteFriend,
-                onAddTimeCapsule = onAddTimeCapsule,
-                onCreateCode = viewModel::createCode,
+                sideEffect = { sideEffect },
+                onAction = remember(viewModel) {
+                    viewModel::onAction
+                },
+                onNavigateToAddTimeCapsule = onNavigateToAddTimeCapsule,
                 onNavigateToChangeInfo = onNavigateToChangeInfo,
                 onBack = onBack,
                 modifier = modifier
@@ -67,10 +64,16 @@ fun NavGraphBuilder.friendScreen(
             ChangeFriendInfoScreen(
                 friend = friend,
                 uiState = uiState,
-                sideEffect = sideEffect,
-                initInfo = viewModel::initInfo,
-                onEditNickname = viewModel::onEdit,
-                onSave = viewModel::editFriendInfo,
+                sideEffect = { sideEffect },
+                initInfo = remember(viewModel) {
+                    viewModel::initInfo
+                },
+                onEditNickname = remember(viewModel) {
+                    viewModel::onEdit
+                },
+                onSave = remember(viewModel) {
+                    viewModel::editFriendInfo
+                },
                 onBack = onBack
             )
         }

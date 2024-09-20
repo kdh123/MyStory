@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.flowOf
 fun ChangeFriendInfoScreen(
     friend: Friend,
     uiState: ChangeFriendInfoUiState,
-    sideEffect: Flow<ChangeFriendInfoSideEffect>,
+    sideEffect: () -> Flow<ChangeFriendInfoSideEffect>,
     initInfo: (Friend) -> Unit,
     onEditNickname: (String) -> Unit,
     onSave: () -> Unit,
@@ -46,7 +46,7 @@ fun ChangeFriendInfoScreen(
         initInfo(friend)
     }
 
-    lifecycle.onStartCollect(sideEffect) {
+    lifecycle.onStartCollect(sideEffect()) {
         when (it) {
             is ChangeFriendInfoSideEffect.Completed -> {
                 onBack()
@@ -131,7 +131,7 @@ private fun ChangeFriendInfoScreenPreview() {
         uiState = ChangeFriendInfoUiState(
             friend = Friend(id = "id00", nickname = "홍길동")
         ),
-        sideEffect = flowOf(),
+        sideEffect = { flowOf() },
         initInfo = {},
         onEditNickname = {},
         onSave = {},

@@ -1,4 +1,8 @@
-@file:OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class, ExperimentalNaverMapApi::class)
+@file:OptIn(
+    ExperimentalPermissionsApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalNaverMapApi::class
+)
 
 package com.dhkim.map.presentation
 
@@ -37,13 +41,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -100,9 +105,8 @@ import retrofit2.HttpException
 @Composable
 fun MapScreen(
     uiState: MapUiState,
-    sideEffect: Flow<MapSideEffect>,
-    scaffoldState: BottomSheetScaffoldState,
-    place: Place?,
+    sideEffect: () -> Flow<MapSideEffect>,
+    place: () -> Place?,
     onSelectPlace: (Place) -> Unit,
     onSearchPlaceByQuery: (query: String, lat: String, lng: String) -> Unit,
     onSearchPlaceByCategory: (Category, lat: String, lng: String) -> Unit,
@@ -112,6 +116,9 @@ fun MapScreen(
     onHideBottomNav: (Place?) -> Unit,
     onInitSavedState: () -> Unit
 ) {
+
+    val bottomSheetState = rememberStandardBottomSheetState(skipHiddenState = false)
+    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
     val lifecycle = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -128,7 +135,11 @@ fun MapScreen(
     val cameraPositionState = rememberCameraPositionState()
     val mapProperties by remember {
         mutableStateOf(
-            MapProperties(maxZoom = 20.0, minZoom = 5.0, locationTrackingMode = LocationTrackingMode.NoFollow)
+            MapProperties(
+                maxZoom = 20.0,
+                minZoom = 5.0,
+                locationTrackingMode = LocationTrackingMode.NoFollow
+            )
         )
     }
     val mapUiSettings by remember {
@@ -141,7 +152,7 @@ fun MapScreen(
         )
     }
 
-    lifecycle.onStartCollect(sideEffect) {
+    lifecycle.onStartCollect(sideEffect()) {
         when (it) {
             is MapSideEffect.BottomSheet -> {
                 scope.launch {
@@ -175,7 +186,7 @@ fun MapScreen(
             }
 
             uiState.selectedPlace != null -> {
-                LatLng(uiState.selectedPlace!!.lat.toDouble(), uiState.selectedPlace!!.lng.toDouble())
+                LatLng(uiState.selectedPlace.lat.toDouble(), uiState.selectedPlace!!.lng.toDouble())
             }
 
             else -> {
@@ -194,7 +205,7 @@ fun MapScreen(
     }
 
     LaunchedEffect(place) {
-        place?.let {
+        place()?.let {
             onSelectPlace(it)
         }
     }
@@ -266,17 +277,17 @@ fun MapScreen(
                         Marker(
                             state = MarkerState(
                                 position = LatLng(
-                                    uiState.selectedPlace!!.lat.toDouble(),
-                                    uiState.selectedPlace!!.lng.toDouble()
+                                    uiState.selectedPlace.lat.toDouble(),
+                                    uiState.selectedPlace.lng.toDouble()
                                 )
                             ),
                             onClick = {
-                                place?.let {
+                                place()?.let {
                                     onSelectPlace(it)
                                 }
                                 true
                             },
-                            captionText = uiState.selectedPlace?.name ?: ""
+                            captionText = uiState.selectedPlace.name ?: ""
                         )
                     } else {
                         uiState.places.collectAsLazyPagingItems().itemSnapshotList.items.forEach { place ->
@@ -324,9 +335,17 @@ fun MapScreen(
                             category = it, isSelected = it == uiState.category
                         ) { category ->
                             if (isCategory(category)) {
-                                onSearchPlaceByCategory(it, "${currentLocation.latitude}", "${currentLocation.longitude}")
+                                onSearchPlaceByCategory(
+                                    it,
+                                    "${currentLocation.latitude}",
+                                    "${currentLocation.longitude}"
+                                )
                             } else {
-                                onSearchPlaceByQuery(category.type, "${currentLocation.latitude}", "${currentLocation.longitude}")
+                                onSearchPlaceByQuery(
+                                    category.type,
+                                    "${currentLocation.latitude}",
+                                    "${currentLocation.longitude}"
+                                )
                             }
                         }
                     }

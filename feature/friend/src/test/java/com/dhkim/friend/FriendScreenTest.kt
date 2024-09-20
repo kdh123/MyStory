@@ -6,7 +6,6 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.friend.presentation.FriendScreen
-import com.dhkim.friend.presentation.FriendSideEffect
 import com.dhkim.friend.presentation.FriendViewModel
 import com.dhkim.user.FakeFriendUserLocalDataSource
 import com.dhkim.user.FakeFriendUserRemoteDataSource
@@ -79,19 +78,14 @@ class FriendScreenTest {
     fun `친구 화면 목록 테스트`() = runTest {
         composeTestRule.setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val sideEffect by viewModel.sideEffect.collectAsStateWithLifecycle(initialValue = FriendSideEffect.None)
+            val sideEffect = viewModel.sideEffect
 
             FriendScreen(
                 uiState = uiState,
-                sideEffect = sideEffect,
-                onQuery = viewModel::onQuery,
-                onSearchUser = viewModel::searchUser,
-                onAddFriend = viewModel::addFriend,
-                onAcceptFriend = viewModel::acceptFriend,
-                onDeleteFriend = viewModel::deleteFriend,
-                onAddTimeCapsule = {},
-                onCreateCode = viewModel::createCode,
+                sideEffect = { sideEffect },
+                onAction = viewModel::onAction,
                 onNavigateToChangeInfo = {},
+                onNavigateToAddTimeCapsule = {},
                 onBack = {}
             )
         }

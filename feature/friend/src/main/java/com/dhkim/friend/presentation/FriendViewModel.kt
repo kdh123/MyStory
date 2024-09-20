@@ -48,6 +48,34 @@ class FriendViewModel @Inject constructor(
         getMyInfo()
     }
 
+    fun onAction(action: FriendAction) {
+        when (action) {
+            is FriendAction.AcceptFriend -> {
+                acceptFriend(friend = action.friend)
+            }
+
+            FriendAction.AddFriend -> {
+                addFriend()
+            }
+
+            is FriendAction.DeleteFriend -> {
+                deleteFriend(userId = action.userId)
+            }
+
+            is FriendAction.Query -> {
+                onQuery(query = action.query)
+            }
+
+            FriendAction.SearchUser -> {
+                searchUser()
+            }
+
+            FriendAction.CreateCode -> {
+                createCode()
+            }
+        }
+    }
+
     private fun getMyInfo() {
         viewModelScope.launch(Dispatchers.IO) {
             val myId = userRepository.getMyId()
@@ -72,7 +100,7 @@ class FriendViewModel @Inject constructor(
         }
     }
 
-    fun createCode() {
+    private fun createCode() {
         _uiState.value = _uiState.value.copy(isCreatingCode = true)
 
         viewModelScope.launch {
@@ -117,12 +145,12 @@ class FriendViewModel @Inject constructor(
         }
     }
 
-    fun onQuery(query: String) {
+    private fun onQuery(query: String) {
         val searchResult = _uiState.value.searchResult
         _uiState.value = _uiState.value.copy(searchResult = searchResult.copy(query = query))
     }
 
-    fun addFriend() {
+    private fun addFriend() {
         viewModelScope.launch {
             val searchUserId = _uiState.value.searchResult.userId ?: ""
             val searchUserProfileImage = _uiState.value.searchResult.userProfileImage
@@ -141,7 +169,7 @@ class FriendViewModel @Inject constructor(
         }
     }
 
-    fun deleteFriend(userId: String) {
+    private fun deleteFriend(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             userRepository.deleteFriend(userId = userId)
                 .catch {
@@ -160,7 +188,7 @@ class FriendViewModel @Inject constructor(
         }
     }
 
-    fun acceptFriend(friend: Friend) {
+    private fun acceptFriend(friend: Friend) {
         viewModelScope.launch {
             userRepository.acceptFriend(friend.id, friend.profileImage, friend.uuid)
                 .catch {
@@ -174,7 +202,7 @@ class FriendViewModel @Inject constructor(
         }
     }
 
-    fun searchUser() {
+    private fun searchUser() {
         viewModelScope.launch {
             val myId = uiState.value.myInfo.id
             val searchResult = uiState.value.searchResult
@@ -193,7 +221,11 @@ class FriendViewModel @Inject constructor(
                                 val isMe = searchResult.query == myId
                                 _uiState.value = _uiState.value.copy(
                                     isLoading = false,
-                                    searchResult = searchResult.copy(userId = user.id, userProfileImage = user.profileImage, isMe = isMe)
+                                    searchResult = searchResult.copy(
+                                        userId = user.id,
+                                        userProfileImage = user.profileImage,
+                                        isMe = isMe
+                                    )
                                 )
                             } else {
                                 _uiState.value = _uiState.value.copy(

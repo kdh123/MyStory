@@ -9,6 +9,7 @@ import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -97,12 +98,13 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
+
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TimeCapsuleScreen(
     uiState: TimeCapsuleUiState,
-    sideEffect: Flow<TimeCapsuleSideEffect>,
+    sideEffect: () -> Flow<TimeCapsuleSideEffect>,
     modifier: Modifier = Modifier,
     onDeleteTimeCapsule: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToAdd: () -> Unit,
@@ -113,6 +115,7 @@ fun TimeCapsuleScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToMore: () -> Unit
 ) {
+
     val lifecycle = LocalLifecycleOwner.current
     var currentLocation by remember {
         mutableStateOf(Constants.defaultLocation)
@@ -178,7 +181,7 @@ fun TimeCapsuleScreen(
             }
         ) {
             Card(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .padding(10.dp),
                 shape = RoundedCornerShape(16.dp),
@@ -195,7 +198,7 @@ fun TimeCapsuleScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "삭제",
-                        modifier = Modifier
+                        modifier = modifier
                             .fillMaxWidth()
                             .clickable {
                                 showMenuDialog = false
@@ -208,18 +211,21 @@ fun TimeCapsuleScreen(
     }
 
     if (showDeleteDialog) {
-        val desc = if (selectedTimeCapsule.sharedFriends.isNotEmpty() && !selectedTimeCapsule.isReceived) {
-            "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
-        } else {
-            "정말 삭제하겠습니까?"
-        }
+        val desc =
+            if (selectedTimeCapsule.sharedFriends.isNotEmpty() && !selectedTimeCapsule.isReceived) {
+                "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
+            } else {
+                "정말 삭제하겠습니까?"
+            }
 
         WarningDialog(
             dialogTitle = "삭제",
             dialogText = desc,
-            onConfirmation = {
-                onDeleteTimeCapsule(selectedTimeCapsule.id, selectedTimeCapsule.isReceived)
-                showDeleteDialog = false
+            onConfirmation = remember {
+                {
+                    showDeleteDialog = false
+                    onDeleteTimeCapsule(selectedTimeCapsule.id, selectedTimeCapsule.isReceived)
+                }
             },
             onDismissRequest = {
                 showDeleteDialog = false
@@ -231,9 +237,11 @@ fun TimeCapsuleScreen(
         WarningDialog(
             dialogTitle = "개봉",
             dialogText = "정말 개봉하겠습니까?",
-            onConfirmation = {
-                showOpenDialog = false
-                onNavigateToOpen(selectedTimeCapsule.id, selectedTimeCapsule.isReceived)
+            onConfirmation = remember {
+                {
+                    showOpenDialog = false
+                    onNavigateToOpen(selectedTimeCapsule.id, selectedTimeCapsule.isReceived)
+                }
             },
             onDismissRequest = {
                 showOpenDialog = false
@@ -255,7 +263,7 @@ fun TimeCapsuleScreen(
         }
     }
 
-    lifecycle.onStartCollect(sideEffect) {
+    lifecycle.onStartCollect(sideEffect()) {
         when (it) {
             is TimeCapsuleSideEffect.None -> {}
 
@@ -275,9 +283,7 @@ fun TimeCapsuleScreen(
 
     Scaffold(
         topBar = {
-            Row(
-                modifier = Modifier
-            ) {
+            Row {
                 Text(
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
@@ -319,7 +325,7 @@ fun TimeCapsuleScreen(
         }
     ) {
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .padding(top = it.calculateTopPadding())
                 .fillMaxSize()
         ) {
@@ -327,7 +333,7 @@ fun TimeCapsuleScreen(
                 LoadingScreen()
             } else {
                 LazyColumn(
-                    modifier = Modifier
+                    modifier = modifier
                         .testTag("timeCapsuleItems")
                 ) {
                     items(uiState.timeCapsules, key = {
@@ -351,7 +357,8 @@ fun TimeCapsuleScreen(
                                     )
 
                                     if (title == "나의 이야기") {
-                                        val interactionSource = remember { MutableInteractionSource() }
+                                        val interactionSource =
+                                            remember { MutableInteractionSource() }
                                         Text(
                                             text = "더보기",
                                             modifier = Modifier
@@ -384,7 +391,8 @@ fun TimeCapsuleScreen(
 
                             TimeCapsuleType.OpenableTimeCapsule -> {
                                 OpenableTimeCapsules(
-                                    timeCapsules = (it.data as? List<TimeCapsule> ?: listOf()).toImmutableList(),
+                                    timeCapsules = (it.data as? List<TimeCapsule>
+                                        ?: listOf()).toImmutableList(),
                                     currentLat = currentLocation.latitude,
                                     currentLng = currentLocation.longitude,
                                     onShowLocationDialog = {
@@ -408,7 +416,8 @@ fun TimeCapsuleScreen(
 
                             TimeCapsuleType.UnopenedTimeCapsule -> {
                                 UnopenedTimeCapsules(
-                                    timeCapsules = (it.data as? List<TimeCapsule> ?: listOf()).toImmutableList(),
+                                    timeCapsules = (it.data as? List<TimeCapsule>
+                                        ?: listOf()).toImmutableList(),
                                     onClick = {
                                         selectedTimeCapsule = it
                                         showLocationDialog = true
@@ -422,7 +431,8 @@ fun TimeCapsuleScreen(
 
                             TimeCapsuleType.OpenedTimeCapsule -> {
                                 OpenedTimeCapsules(
-                                    timeCapsules = (it.data as? List<TimeCapsule> ?: listOf()).toImmutableList(),
+                                    timeCapsules = (it.data as? List<TimeCapsule>
+                                        ?: listOf()).toImmutableList(),
                                     onLongClick = {
                                         selectedTimeCapsule = it
                                         showMenuDialog = true
@@ -592,6 +602,7 @@ private fun OpenedTimeCapsules(
     }
 }
 
+
 @OptIn(ExperimentalNaverMapApi::class)
 @Composable
 fun LocationDialog(
@@ -601,7 +612,11 @@ fun LocationDialog(
     val cameraPositionState = rememberCameraPositionState()
     val mapProperties by remember {
         mutableStateOf(
-            MapProperties(maxZoom = 20.0, minZoom = 5.0, locationTrackingMode = LocationTrackingMode.NoFollow)
+            MapProperties(
+                maxZoom = 20.0,
+                minZoom = 5.0,
+                locationTrackingMode = LocationTrackingMode.NoFollow
+            )
         )
     }
     val mapUiSettings by remember {
@@ -776,18 +791,40 @@ private fun TimeCapsuleScreenPreview() {
 
     repeat(5) {
         if (it % 2 == 0) {
-            openedList.add(TimeCapsule(id = "$it", date = "2024-06-28", openDate = "2024-06-28", images = listOf("")))
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf("")
+                )
+            )
             unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", images = listOf("")))
         } else {
-            openedList.add(TimeCapsule(id = "$it", date = "2024-06-28", openDate = "2024-06-28", checkLocation = true, images = listOf("")))
-            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", checkLocation = true, images = listOf("")))
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
+            unOpenedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    openDate = "2024-06-28",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
         }
     }
 
     TimeCapsuleScreen(
         uiState = TimeCapsuleUiState(),
-        sideEffect = flowOf(),
-        modifier = Modifier,
+        sideEffect = { flowOf() },
+        //modifier = Modifier,
         onDeleteTimeCapsule = { _, _ -> },
         onNavigateToAdd = { },
         onNavigateToOpen = { _, _ -> },
@@ -801,7 +838,11 @@ private fun TimeCapsuleScreenPreview() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongClick: (TimeCapsule) -> Unit) {
+fun OpenedBox(
+    timeCapsule: TimeCapsule,
+    onClick: (TimeCapsule) -> Unit,
+    onLongClick: (TimeCapsule) -> Unit
+) {
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(10.dp),
@@ -823,7 +864,7 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongCl
             Box {
                 if (timeCapsule.images.isNotEmpty()) {
                     GlideImage(
-                        imageModel =  { timeCapsule.images[0] },
+                        imageModel = { timeCapsule.images[0] },
                         previewPlaceholder = painterResource(id = R.drawable.ic_launcher_background),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -907,7 +948,12 @@ private fun LockTimeCapsule(
     onLongClick: (TimeCapsule) -> Unit
 ) {
     val checkLocation = timeCapsule.checkLocation
-    val isNear = DistanceManager.getDistance(currentLat, currentLng, timeCapsule.lat.toDouble(), timeCapsule.lng.toDouble()) <= 100
+    val isNear = DistanceManager.getDistance(
+        currentLat,
+        currentLng,
+        timeCapsule.lat.toDouble(),
+        timeCapsule.lng.toDouble()
+    ) <= 100
     val canOpen = DateUtil.getDateGap(timeCapsule.openDate) <= 0
 
     Card(
@@ -954,7 +1000,7 @@ private fun LockTimeCapsule(
             ) {
                 if (timeCapsule.images.isNotEmpty()) {
                     GlideImage(
-                        imageModel =  { timeCapsule.images[0] },
+                        imageModel = { timeCapsule.images[0] },
                         previewPlaceholder = painterResource(id = R.drawable.ic_launcher_background),
                         modifier = modifier
                             .aspectRatio(1f)

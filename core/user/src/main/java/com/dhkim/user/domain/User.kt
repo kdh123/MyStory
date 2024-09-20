@@ -1,5 +1,7 @@
 package com.dhkim.user.domain
 
+import androidx.compose.runtime.Stable
+
 typealias UserId = String
 typealias Nickname = String
 
@@ -11,6 +13,7 @@ data class User(
     val requests: List<Friend> = listOf()
 )
 
+@Stable
 data class Friend(
     val id: String = "",
     val nickname: String = id,

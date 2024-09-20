@@ -31,6 +31,7 @@ import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -109,7 +110,7 @@ class TimeCapsuleScreenTest {
         composeRule.setContent {
             TimeCapsuleScreen(
                 uiState = uiState,
-                sideEffect = TimeCapsuleSideEffect.None,
+                sideEffect = { flowOf() },
                 onDeleteTimeCapsule = { _, _ -> },
                 onNavigateToAdd = {},
                 onNavigateToOpen = { _, _ -> },

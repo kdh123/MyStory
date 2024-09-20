@@ -39,7 +39,9 @@ fun NavGraphBuilder.tripScreen(
 
             TripScreen(
                 uiState = uiState,
-                onAction = viewModel::onAction,
+                onAction = remember {
+                    viewModel::onAction
+                },
                 modifier = modifier,
                 onNavigateToSchedule = onNavigateToSchedule,
                 onNavigateToDetail = onNavigateToDetail

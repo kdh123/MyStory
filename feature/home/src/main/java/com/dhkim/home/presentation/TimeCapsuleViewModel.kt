@@ -3,11 +3,11 @@ package com.dhkim.home.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.DateUtil
-import com.dhkim.home.domain.MyTimeCapsule
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.home.domain.TimeCapsuleRepository
 import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -59,7 +59,7 @@ class TimeCapsuleViewModel @Inject constructor(
         TimeCapsuleUiState(
             isLoading = false,
             isNothing = it.isEmpty(),
-            timeCapsules = it
+            timeCapsules = it.toImmutableList()
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TimeCapsuleUiState())
 
@@ -168,6 +168,10 @@ class TimeCapsuleViewModel @Inject constructor(
         }
 
         return items
+    }
+
+    fun delete2(timeCapsuleId: String, isReceived: Boolean) {
+
     }
 
     fun deleteTimeCapsule(timeCapsuleId: String, isReceived: Boolean) {

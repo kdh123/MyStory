@@ -86,14 +86,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun FriendScreen(
     uiState: FriendUiState,
-    sideEffect: Flow<FriendSideEffect>,
-    onQuery: (String) -> Unit,
-    onSearchUser: () -> Unit,
-    onAddFriend: () -> Unit,
-    onAcceptFriend: (Friend) -> Unit,
-    onDeleteFriend: (String) -> Unit,
-    onAddTimeCapsule: (friendId: String) -> Unit,
-    onCreateCode: () -> Unit,
+    sideEffect: () -> Flow<FriendSideEffect>,
+    onAction: (FriendAction) -> Unit,
+    onNavigateToAddTimeCapsule: (friendId: String) -> Unit,
     onNavigateToChangeInfo: (Friend) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -130,7 +125,7 @@ fun FriendScreen(
     }
     val infoBottomSheetState = rememberModalBottomSheetState()
 
-    lifecycle.onStartCollect(sideEffect) {
+    lifecycle.onStartCollect(sideEffect()) {
         when (it) {
             is FriendSideEffect.None -> {}
 
@@ -261,7 +256,7 @@ fun FriendScreen(
             },
             onConfirmation = {
                 showCodeGuideDialog = false
-                onCreateCode()
+                onAction(FriendAction.CreateCode)
             },
             negativeText = "취소",
             positiveText = "확인",
@@ -278,7 +273,7 @@ fun FriendScreen(
             },
             onConfirmation = {
                 showDeleteDialog = false
-                onDeleteFriend(selectedFriend.id)
+                onAction(FriendAction.DeleteFriend(selectedFriend.id))
             },
             dialogTitle = "삭제",
             dialogText = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedFriend.nickname}님을 정말 삭제하시겠습니까?",
@@ -485,7 +480,12 @@ fun FriendScreen(
                         }
 
                         else -> {
-                            RequestScreen(uiState = uiState, onClick = onAcceptFriend)
+                            RequestScreen(
+                                uiState = uiState,
+                                onClick = {
+                                    onAction(FriendAction.AcceptFriend(friend = it))
+                                }
+                            )
                         }
                     }
                     currentTab = pos
@@ -516,7 +516,7 @@ fun FriendScreen(
                             resId = R.drawable.ic_time_primary,
                             title = "타임캡슐 공유",
                             onClick = {
-                                onAddTimeCapsule(selectedFriend.id)
+                                onNavigateToAddTimeCapsule(selectedFriend.id)
                                 showInfoBottomSheet = false
                             })
                         MenuItem(
@@ -541,9 +541,7 @@ fun FriendScreen(
                 ) {
                     BottomSheetScreen(
                         uiState = uiState,
-                        onSearch = onSearchUser,
-                        onQuery = onQuery,
-                        onAddFriend = onAddFriend
+                        onAction = onAction
                     )
                 }
             }
@@ -629,9 +627,7 @@ fun AddFriend(modifier: Modifier = Modifier) {
 @Composable
 fun BottomSheetScreen(
     uiState: FriendUiState,
-    onQuery: (String) -> Unit,
-    onSearch: () -> Unit,
-    onAddFriend: () -> Unit
+    onAction: (FriendAction) -> Unit
 ) {
     val userId = uiState.searchResult.userId
     val friendsIds = uiState.myInfo.friends.map { it.id }
@@ -693,7 +689,7 @@ fun BottomSheetScreen(
                         Text(text = "친구 코드 입력")
                     },
                     onValueChange = {
-                        onQuery(it)
+                        onAction(FriendAction.Query(it))
                     },
                     modifier = Modifier
                         .fillMaxSize(),
@@ -712,7 +708,7 @@ fun BottomSheetScreen(
                     .fillMaxHeight()
                     .aspectRatio(1f),
                 onClick = {
-                    onSearch()
+                    onAction(FriendAction.SearchUser)
                 }
             ) {
                 Image(
@@ -766,7 +762,7 @@ fun BottomSheetScreen(
                                 .height(48.dp)
                                 .align(Alignment.CenterVertically),
                             onClick = {
-                                onAddFriend()
+                                onAction(FriendAction.AddFriend)
                             }
                         ) {
                             Image(
@@ -786,7 +782,7 @@ fun BottomSheetScreen(
 @Preview(showBackground = true)
 @Composable
 private fun SearchScreenPreview() {
-    BottomSheetScreen(FriendUiState(), {}, {}, {})
+    BottomSheetScreen(FriendUiState(), onAction = {})
 }
 
 @Preview(showBackground = true)
