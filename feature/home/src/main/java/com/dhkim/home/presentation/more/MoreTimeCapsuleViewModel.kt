@@ -7,9 +7,11 @@ import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,9 +22,16 @@ class MoreTimeCapsuleViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MoreTimeCapsuleUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState = _uiState
+        .onStart {
+            initData()
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = MoreTimeCapsuleUiState()
+        )
 
-    init {
+    private fun initData() {
         viewModelScope.launch(Dispatchers.IO) {
             val myId = userRepository.getMyId()
             val myProfileImage = "${userRepository.getProfileImage()}"

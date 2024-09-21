@@ -78,7 +78,7 @@ fun TimeCapsuleOpenScreen(
     timeCapsuleId: String,
     isReceived: Boolean,
     uiState: TimeCapsuleDetailUiState,
-    init: (String, Boolean) -> Unit,
+    onAction: (TimeCapsuleDetailAction) -> Unit,
     onNavigateToDetail: (String, Boolean) -> Unit
 ) {
 
@@ -102,7 +102,7 @@ fun TimeCapsuleOpenScreen(
     }
 
     LaunchedEffect(uiState) {
-        init(timeCapsuleId, isReceived)
+        onAction(TimeCapsuleDetailAction.Init(timeCapsuleId, isReceived))
     }
 
     LaunchedEffect(countDownNumber) {
@@ -148,10 +148,8 @@ private fun TimeCapsuleOpenScreenPreview() {
         timeCapsuleId = "",
         isReceived = false,
         uiState = TimeCapsuleDetailUiState(),
-        onNavigateToDetail = { _, _ ->
-
-        },
-        init = { _, _ -> }
+        onAction = {},
+        onNavigateToDetail = { _, _ ->  }
     )
 }
 

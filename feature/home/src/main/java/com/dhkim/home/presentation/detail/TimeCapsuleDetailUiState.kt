@@ -5,7 +5,7 @@ import com.dhkim.home.domain.TimeCapsule
 
 @Stable
 data class TimeCapsuleDetailUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val isReceived: Boolean = false,
     val timeCapsule: TimeCapsule = TimeCapsule()
 )

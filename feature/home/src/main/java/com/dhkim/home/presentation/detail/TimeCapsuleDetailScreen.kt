@@ -50,6 +50,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.home.R
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.ui.DefaultBackground
+import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.WarningDialog
 import com.dhkim.ui.onStartCollect
 import com.naver.maps.geometry.LatLng
@@ -76,10 +77,9 @@ fun TimeCapsuleDetailScreen(
     timeCapsuleId: String,
     isReceived: Boolean,
     uiState: TimeCapsuleDetailUiState,
-    sideEffect: Flow<TimeCapsuleDetailSideEffect>,
+    sideEffect: () -> Flow<TimeCapsuleDetailSideEffect>,
+    onAction: (TimeCapsuleDetailAction) -> Unit,
     onNavigateToImageDetail: (String, String) -> Unit,
-    onDelete: (String) -> Unit,
-    init: (String, Boolean) -> Unit,
     onBack: () -> Unit
 ) {
     val lifecycle = LocalLifecycleOwner.current
@@ -116,10 +116,9 @@ fun TimeCapsuleDetailScreen(
                 )
             )
         )
-        init(timeCapsuleId, isReceived)
     }
 
-    lifecycle.onStartCollect(sideEffect) {
+    lifecycle.onStartCollect(sideEffect()) {
         when (it) {
             is TimeCapsuleDetailSideEffect.Completed -> {
                 onBack()
@@ -170,7 +169,7 @@ fun TimeCapsuleDetailScreen(
 
             WarningDialog(
                 onConfirmation = {
-                    onDelete(timeCapsuleId)
+                    onAction(TimeCapsuleDetailAction.DeleteTimeCapsule(timeCapsuleId))
                 },
                 onDismissRequest = {
                     showDeleteDialog = false
@@ -178,6 +177,20 @@ fun TimeCapsuleDetailScreen(
                 dialogTitle = "삭제",
                 dialogText = desc
             )
+        }
+
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = it.calculateTopPadding())
+            ) {
+                LoadingProgressBar(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
+            }
+            return@Scaffold
         }
 
         Column(
@@ -336,19 +349,10 @@ private fun TimeCapsuleDetailScreenPreview() {
         timeCapsuleId = "",
         isReceived = false,
         uiState = TimeCapsuleDetailUiState(timeCapsule = timeCapsule),
-        sideEffect = flowOf(),
-        init = { _, _ ->
-
-        },
-        onNavigateToImageDetail = { _, _ ->
-
-        },
-        onDelete = {
-
-        },
-        onBack = {
-
-        }
+        sideEffect = { flowOf() },
+        onAction = {},
+        onNavigateToImageDetail = { _, _ -> },
+        onBack = {}
     )
 }
 

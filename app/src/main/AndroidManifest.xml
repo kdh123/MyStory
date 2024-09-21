@@ -83,7 +83,6 @@
 
         <activity
             android:name="com.dhkim.main.MainActivity"
-            android:screenOrientation="portrait"
             android:exported="true"
             android:theme="@style/Theme.TimeCapsule">
         </activity>

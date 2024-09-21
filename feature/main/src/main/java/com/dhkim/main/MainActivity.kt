@@ -9,14 +9,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -32,19 +30,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.showGuide.collect {
-                    setContent {
-                        MainScreen(
-                            appState = rememberMyStoryAppState(),
-                            showGuide = it,
-                            onCloseGuide = viewModel::closeGuideDialog,
-                            onNeverShowGuideAgain = viewModel::neverShowGuideAgain
-                        )
-                    }
-                }
-            }
+        setContent {
+            val showGuide by viewModel.showGuide.collectAsStateWithLifecycle(initialValue = false)
+
+            MainScreen(
+                appState = rememberMyStoryAppState(),
+                showGuide = showGuide,
+                onCloseGuide = viewModel::closeGuideDialog,
+                onNeverShowGuideAgain = viewModel::neverShowGuideAgain
+            )
         }
 
         requestPermission()

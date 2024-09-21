@@ -170,10 +170,6 @@ class TimeCapsuleViewModel @Inject constructor(
         return items
     }
 
-    fun delete2(timeCapsuleId: String, isReceived: Boolean) {
-
-    }
-
     fun deleteTimeCapsule(timeCapsuleId: String, isReceived: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             with(timeCapsuleRepository) {

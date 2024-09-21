@@ -33,28 +33,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.dhkim.location.domain.Place
 import com.dhkim.home.R
+import com.dhkim.home.presentation.add.AddTimeCapsuleAction
 import com.dhkim.home.presentation.add.AddTimeCapsuleUiState
+import com.dhkim.location.domain.Place
 import kotlinx.coroutines.android.awaitFrame
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import retrofit2.HttpException
 
 @Composable
 fun LocationSearchScreen(
     uiState: AddTimeCapsuleUiState,
-    onQuery: (String) -> Unit,
-    onClick: (Place) -> Unit
+    onAction: (AddTimeCapsuleAction) -> Unit
 ) {
     val searchResult = uiState.placeResult.collectAsLazyPagingItems()
     Column(modifier = Modifier.fillMaxSize()) {
-        SearchBar(query = uiState.placeQuery, onQuery = onQuery)
+        SearchBar(query = uiState.placeQuery, onAction = onAction)
         Box(modifier = Modifier.fillMaxWidth()) {
             if (uiState.isLoading) {
                 CircularProgressIndicator(
@@ -67,7 +64,7 @@ fun LocationSearchScreen(
                 )
             }
             if (searchResult.itemCount > 0) {
-                PlaceList(places = searchResult, onPlaceClick = onClick)
+                PlaceList(places = searchResult, onAction = onAction)
             } else {
                 if (!uiState.isLoading && uiState.placeQuery.isNotEmpty()) {
                     //Text(text = "검색 결과가 존재하지 않습니다.", modifier = Modifier.align(Alignment.Center))
@@ -80,25 +77,22 @@ fun LocationSearchScreen(
 @Preview(showBackground = true)
 @Composable
 private fun LocationSearchScreenPreview() {
-    val result: StateFlow<PagingData<Place>> = MutableStateFlow(PagingData.empty())
-
     LocationSearchScreen(
         uiState = AddTimeCapsuleUiState(),
-        onQuery = {},
-        onClick = {}
+        onAction = {}
     )
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(query: String, onQuery: (String) -> Unit) {
+fun SearchBar(query: String, onAction: (AddTimeCapsuleAction) -> Unit) {
     val focusRequester = remember { FocusRequester() }
 
     OutlinedTextField(
         value = query,
         onValueChange = {
-            onQuery(it)
+            onAction(AddTimeCapsuleAction.Query(it))
         },
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = colorResource(id = R.color.primary),
@@ -123,7 +117,7 @@ fun SearchBar(query: String, onQuery: (String) -> Unit) {
 }
 
 @Composable
-fun PlaceList(places: LazyPagingItems<Place>, onPlaceClick: (Place) -> Unit) {
+fun PlaceList(places: LazyPagingItems<Place>, onAction: (AddTimeCapsuleAction) -> Unit) {
     val state = places.loadState.refresh
     if (state is LoadState.Error) {
         if ((state.error) is HttpException) {
@@ -141,7 +135,7 @@ fun PlaceList(places: LazyPagingItems<Place>, onPlaceClick: (Place) -> Unit) {
         ) { index ->
             val item = places[index]
             if (item != null) {
-                Place(place = item, onBack = onPlaceClick)
+                Place(place = item, onAction = onAction)
             }
         }
     }
@@ -166,18 +160,16 @@ private fun PlaceListPreview() {
         )
         list.add(place)
     }
-
-    //PlaceList(places = list)
 }
 
 @Composable
-fun Place(place: Place, onBack: (Place) -> Unit) {
+fun Place(place: Place, onAction: (AddTimeCapsuleAction) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
             .clickable {
-                onBack(place)
+                onAction(AddTimeCapsuleAction.PlaceClick(place))
             },
         verticalArrangement = Arrangement.Center
     ) {
