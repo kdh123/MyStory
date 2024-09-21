@@ -45,12 +45,12 @@ class TimeCapsuleViewModel @Inject constructor(
         with(timeCapsules) {
             val items = getTimeCapsules(0, toOpenableTimeCapsules()) +
                     getTimeCapsules(1, toOpenedTimeCapsules()) +
-                    getTimeCapsules(2, toUnOpenedMyTimeCapsules() + toUnOpenedReceivedTimeCapsules()) +
-                    getTimeCapsules(3)
+                    getTimeCapsules(
+                        2,
+                        toUnOpenedMyTimeCapsules() + toUnOpenedReceivedTimeCapsules()
+                    )
 
-            items.ifEmpty {
-                getTimeCapsules(-1) + getTimeCapsules(3)
-            }
+            items.ifEmpty { getTimeCapsules(-1) } + getTimeCapsules(3)
         }
     }.flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), listOf())
@@ -103,7 +103,6 @@ class TimeCapsuleViewModel @Inject constructor(
                     )
                     add(TimeCapsuleItem(id = spaceId++, type = TimeCapsuleType.Line))
                 }
-
             }
 
             1 -> {

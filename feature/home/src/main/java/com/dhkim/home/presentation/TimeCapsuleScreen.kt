@@ -196,7 +196,7 @@ fun TimeCapsuleScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "삭제",
-                        modifier = modifier
+                        modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
                                 showMenuDialog = false
