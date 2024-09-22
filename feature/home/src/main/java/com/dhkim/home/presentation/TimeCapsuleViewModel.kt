@@ -10,12 +10,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -27,46 +27,56 @@ class TimeCapsuleViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val timeCapsuleItems = combine(
-        timeCapsuleRepository.getMyAllTimeCapsule(),
-        timeCapsuleRepository.getReceivedAllTimeCapsule()
-    ) { myTimeCapsules, receivedTimeCapsules ->
-        val myId = userRepository.getMyId()
-        val myProfileImage = "${userRepository.getProfileImage()}"
-        val timeCapsules = myTimeCapsules.map {
-            val sharedFriends = it.sharedFriends.map { userId ->
-                userRepository.getFriend(userId)?.nickname ?: userId
-            }
-            it.toTimeCapsule(myId, myProfileImage, sharedFriends)
-        } + receivedTimeCapsules.map {
-            val nickname = userRepository.getFriend(it.sender)?.nickname ?: it.sender
-            it.toTimeCapsule(nickname)
-        }
-        with(timeCapsules) {
-            val items = getTimeCapsules(0, toOpenableTimeCapsules()) +
-                    getTimeCapsules(1, toOpenedTimeCapsules()) +
-                    getTimeCapsules(
-                        2,
-                        toUnOpenedMyTimeCapsules() + toUnOpenedReceivedTimeCapsules()
-                    )
-
-            items.ifEmpty { getTimeCapsules(-1) } + getTimeCapsules(3)
-        }
-    }.flowOn(Dispatchers.IO)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), listOf())
-
-    val uiState = timeCapsuleItems.map {
-        TimeCapsuleUiState(
-            isLoading = false,
-            isNothing = it.isEmpty(),
-            timeCapsules = it.toImmutableList()
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TimeCapsuleUiState())
+    private val _uiState = MutableStateFlow(TimeCapsuleUiState())
+    val uiState = _uiState.onStart {
+        init()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = TimeCapsuleUiState()
+    )
 
     private val _sideEffect = Channel<TimeCapsuleSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
     private var spaceId = 100
+
+    private fun init() {
+        viewModelScope.launch {
+            combine(
+                timeCapsuleRepository.getMyAllTimeCapsule(),
+                timeCapsuleRepository.getReceivedAllTimeCapsule()
+            ) { myTimeCapsules, receivedTimeCapsules ->
+                val myId = userRepository.getMyId()
+                val myProfileImage = "${userRepository.getProfileImage()}"
+                val timeCapsules = myTimeCapsules.map {
+                    val sharedFriends = it.sharedFriends.map { userId ->
+                        userRepository.getFriend(userId)?.nickname ?: userId
+                    }
+                    it.toTimeCapsule(myId, myProfileImage, sharedFriends)
+                } + receivedTimeCapsules.map {
+                    val nickname = userRepository.getFriend(it.sender)?.nickname ?: it.sender
+                    it.toTimeCapsule(nickname)
+                }
+                with(timeCapsules) {
+                    val items = getTimeCapsules(0, toOpenableTimeCapsules()) +
+                            getTimeCapsules(1, toOpenedTimeCapsules()) +
+                            getTimeCapsules(
+                                2,
+                                toUnOpenedMyTimeCapsules() + toUnOpenedReceivedTimeCapsules()
+                            )
+
+                    items.ifEmpty { getTimeCapsules(-1) } + getTimeCapsules(3)
+                }
+            }.collect {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    isNothing = it.isEmpty(),
+                    timeCapsules = it.toImmutableList()
+                )
+            }
+        }
+    }
 
     private fun getTimeCapsules(
         type: Int,
@@ -146,7 +156,7 @@ class TimeCapsuleViewModel @Inject constructor(
             }
 
             3 -> {
-                timeCapsuleItems.value.run {
+                _uiState.value.run {
                     items.run {
                         add(
                             TimeCapsuleItem(
