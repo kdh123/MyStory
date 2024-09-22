@@ -106,17 +106,13 @@ import retrofit2.HttpException
 fun MapScreen(
     uiState: MapUiState,
     sideEffect: () -> Flow<MapSideEffect>,
+    onAction: (MapAction) -> Unit,
     place: () -> Place?,
-    onSelectPlace: (Place) -> Unit,
-    onSearchPlaceByQuery: (query: String, lat: String, lng: String) -> Unit,
-    onSearchPlaceByCategory: (Category, lat: String, lng: String) -> Unit,
-    onCloseSearch: (Boolean) -> Unit,
     onNavigateToSearch: (Double, Double) -> Unit,
     onNavigateToAddScreen: (Place) -> Unit,
     onHideBottomNav: (Place?) -> Unit,
     onInitSavedState: () -> Unit
 ) {
-
     val bottomSheetState = rememberStandardBottomSheetState(skipHiddenState = false)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
     val lifecycle = LocalLifecycleOwner.current
@@ -169,7 +165,7 @@ fun MapScreen(
     BackHandler {
         if (uiState.query.isNotEmpty()) {
             onInitSavedState()
-            onCloseSearch(false)
+            onAction(MapAction.CloseSearch(isPlaceSelected = false))
         } else {
             (context as? Activity)?.finish()
         }
@@ -204,9 +200,9 @@ fun MapScreen(
         )
     }
 
-    LaunchedEffect(place) {
+    LaunchedEffect(place()?.id) {
         place()?.let {
-            onSelectPlace(it)
+            onAction(MapAction.SelectPlace(it))
         }
     }
 
@@ -252,9 +248,8 @@ fun MapScreen(
             } else {
                 PlaceList(
                     uiState = uiState,
-                    onPlaceClick = onSelectPlace,
-                    onHide = {
-                    }
+                    onAction = onAction,
+                    onHide = {}
                 )
             }
         },
@@ -283,11 +278,11 @@ fun MapScreen(
                             ),
                             onClick = {
                                 place()?.let {
-                                    onSelectPlace(it)
+                                    onAction(MapAction.SelectPlace(it))
                                 }
                                 true
                             },
-                            captionText = uiState.selectedPlace.name ?: ""
+                            captionText = uiState.selectedPlace.name
                         )
                     } else {
                         uiState.places.collectAsLazyPagingItems().itemSnapshotList.items.forEach { place ->
@@ -299,7 +294,7 @@ fun MapScreen(
                                     )
                                 ),
                                 onClick = {
-                                    onSelectPlace(place)
+                                    onAction(MapAction.SelectPlace(place))
                                     true
                                 },
                                 captionText = place.name
@@ -315,7 +310,7 @@ fun MapScreen(
                     lat = currentLocation.latitude,
                     lng = currentLocation.longitude,
                     showClose = uiState.category != Category.None || uiState.selectedPlace != null,
-                    onClose = onCloseSearch,
+                    onAction = onAction,
                     onNavigateToSearch = onNavigateToSearch,
                     onInitSavedState = onInitSavedState
                 )
@@ -335,16 +330,18 @@ fun MapScreen(
                             category = it, isSelected = it == uiState.category
                         ) { category ->
                             if (isCategory(category)) {
-                                onSearchPlaceByCategory(
-                                    it,
-                                    "${currentLocation.latitude}",
-                                    "${currentLocation.longitude}"
+                                onAction(MapAction.SearchPlacesByCategory(
+                                    category = it,
+                                    lat = "${currentLocation.latitude}",
+                                    lng = "${currentLocation.longitude}"
+                                )
                                 )
                             } else {
-                                onSearchPlaceByQuery(
-                                    category.type,
-                                    "${currentLocation.latitude}",
-                                    "${currentLocation.longitude}"
+                                onAction(MapAction.SearchPlacesByKeyword(
+                                    query = category.type,
+                                    lat = "${currentLocation.latitude}",
+                                    lng = "${currentLocation.longitude}"
+                                )
                                 )
                             }
                         }
@@ -489,7 +486,7 @@ private fun SearchBarColorsPreview() {
         lat = 34.4,
         lng = 35.5,
         showClose = false,
-        onClose = { _ -> },
+        onAction = { _ -> },
         onNavigateToSearch = { _, _ -> },
         onInitSavedState = {}
     )
@@ -501,7 +498,7 @@ fun SearchBar(
     lat: Double,
     lng: Double,
     showClose: Boolean,
-    onClose: (Boolean) -> Unit,
+    onAction: (MapAction) -> Unit,
     onNavigateToSearch: (Double, Double) -> Unit,
     onInitSavedState: () -> Unit
 ) {
@@ -560,7 +557,7 @@ fun SearchBar(
                             .align(Alignment.CenterVertically)
                             .clickable {
                                 onInitSavedState()
-                                onClose(false)
+                                onAction(MapAction.CloseSearch(isPlaceSelected = false))
                             }
                     )
                 }
@@ -629,7 +626,7 @@ private fun CategoryChipPreview() {
 }
 
 @Composable
-fun PlaceList(uiState: MapUiState, onPlaceClick: (Place) -> Unit, onHide: () -> Unit) {
+fun PlaceList(uiState: MapUiState, onAction: (MapAction) -> Unit, onHide: () -> Unit) {
     val places = uiState.places.collectAsLazyPagingItems()
     val state = places.loadState.refresh
     if (state is LoadState.Error) {
@@ -650,7 +647,7 @@ fun PlaceList(uiState: MapUiState, onPlaceClick: (Place) -> Unit, onHide: () -> 
         ) { index ->
             val item = places[index]
             if (item != null) {
-                PlaceItem(place = item, onPlaceClick = onPlaceClick) {
+                PlaceItem(place = item, onAction = onAction) {
                     onHide()
                 }
             }
@@ -659,13 +656,13 @@ fun PlaceList(uiState: MapUiState, onPlaceClick: (Place) -> Unit, onHide: () -> 
 }
 
 @Composable
-fun PlaceItem(place: Place, onPlaceClick: ((Place) -> Unit)? = null, onHide: () -> Unit) {
+fun PlaceItem(place: Place, onAction: ((MapAction) -> Unit)? = null, onHide: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
             .clickable {
-                onPlaceClick?.invoke(place)
+                onAction?.invoke(MapAction.SelectPlace(place))
                 onHide()
             },
         verticalArrangement = Arrangement.Center

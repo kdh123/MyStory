@@ -30,10 +30,9 @@ fun NavGraphBuilder.mapScreen(
             uiState = uiState,
             sideEffect = { sideEffect },
             place = { place },
-            onSelectPlace = viewModel::selectPlace,
-            onSearchPlaceByQuery = viewModel::searchPlacesByKeyword,
-            onSearchPlaceByCategory = viewModel::searchPlacesByCategory,
-            onCloseSearch = viewModel::closeSearch,
+            onAction = remember(viewModel) {
+                viewModel::onAction
+            },
             onNavigateToSearch = onNavigateToSearch,
             onHideBottomNav = onHideBottomNav,
             onInitSavedState = onInitSavedState,

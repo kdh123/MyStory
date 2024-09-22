@@ -65,8 +65,9 @@ fun SearchScreen(
             if (uiState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier
-                        .width(64.dp)
-                        .align(Alignment.Center),
+                        .padding(10.dp)
+                        .width(48.dp)
+                        .align(Alignment.TopCenter),
                     color = Color.White,
                     trackColor = colorResource(id = R.color.primary),
                 )

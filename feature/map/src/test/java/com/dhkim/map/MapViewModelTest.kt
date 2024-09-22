@@ -12,6 +12,7 @@ import com.dhkim.location.data.model.PlaceDocument
 import com.dhkim.location.data.repository.LocationRepositoryImpl
 import com.dhkim.location.domain.Category
 import com.dhkim.location.domain.LocationRepository
+import com.dhkim.map.presentation.MapAction
 import com.dhkim.map.presentation.MapViewModel
 import dagger.Binds
 import dagger.Module
@@ -77,7 +78,7 @@ class MapViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `키워드 검색 결과 테스트`() = runTest {
-        viewModel.searchPlacesByKeyword("맛집", "0.0", "0.0")
+        viewModel.onAction(MapAction.SearchPlacesByKeyword("맛집", "0.0", "0.0"))
 
         advanceTimeBy(1500L)
 
@@ -116,7 +117,7 @@ class MapViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `카테고리 검색 결과 테스트`() = runTest {
-        viewModel.searchPlacesByCategory(Category.Cafe, "0.0", "0.0")
+        viewModel.onAction(MapAction.SearchPlacesByCategory(Category.Cafe, "0.0", "0.0"))
 
         advanceTimeBy(1500L)
 

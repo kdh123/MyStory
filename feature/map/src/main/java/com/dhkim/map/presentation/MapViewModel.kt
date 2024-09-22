@@ -28,7 +28,27 @@ class MapViewModel @Inject constructor(
     private val _sideEffect = Channel<MapSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
-    fun searchPlacesByCategory(category: Category, lat: String, lng: String) {
+    fun onAction(action: MapAction) {
+        when (action) {
+            is MapAction.CloseSearch -> {
+                closeSearch(action.isPlaceSelected)
+            }
+
+            is MapAction.SearchPlacesByCategory -> {
+                searchPlacesByCategory(action.category, action.lat, action.lng)
+            }
+
+            is MapAction.SearchPlacesByKeyword -> {
+                searchPlacesByKeyword(action.query, action.lat, action.lng)
+            }
+
+            is MapAction.SelectPlace -> {
+                selectPlace(action.place)
+            }
+        }
+    }
+
+    private fun searchPlacesByCategory(category: Category, lat: String, lng: String) {
         viewModelScope.launch {
             locationRepository.getPlaceByCategory(
                 category = category,
@@ -48,7 +68,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun searchPlacesByKeyword(query: String, lat: String, lng: String) {
+    private fun searchPlacesByKeyword(query: String, lat: String, lng: String) {
         viewModelScope.launch {
             locationRepository.getNearPlaceByKeyword(
                 query = query,
@@ -59,7 +79,7 @@ class MapViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         query = query,
-                        category = Category.entries.first { category ->  category.type == query },
+                        category = Category.entries.first { category -> category.type == query },
                         places = flowOf(it).stateIn(viewModelScope),
                         selectedPlace = null
                     )
@@ -68,7 +88,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun selectPlace(place: Place) {
+    private fun selectPlace(place: Place) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 query = place.name,
@@ -81,8 +101,8 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun closeSearch(selectPlace: Boolean) {
-        _uiState.value = if (selectPlace) {
+    private fun closeSearch(isPlaceSlected: Boolean) {
+        _uiState.value = if (isPlaceSlected) {
             _uiState.value.copy(
                 places = MutableStateFlow(PagingData.empty()),
                 category = Category.None
