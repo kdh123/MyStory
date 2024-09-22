@@ -1,5 +1,6 @@
 package com.dhkim.trip.presentation.schedule
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.trip.domain.TripRepository
@@ -10,29 +11,33 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TripScheduleViewModel @Inject constructor(
-    private val tripRepository: TripRepository
+    private val tripRepository: TripRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    private val tripId = savedStateHandle.get<String>("tripId") ?: ""
     private val _uiState = MutableStateFlow(TripScheduleUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState = _uiState.onStart {
+        if (tripId.isNotEmpty()) {
+            init(tripId = tripId)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TripScheduleUiState())
 
     private val _sideEffect = Channel<TripScheduleSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
     fun onAction(action: TripScheduleAction) {
         when (action) {
-            is TripScheduleAction.Init -> {
-                init(tripId = action.tripId)
-            }
-
             is TripScheduleAction.UpdateProgress -> {
                 _uiState.value = _uiState.value.copy(progress = action.progress)
             }
@@ -57,8 +62,8 @@ class TripScheduleViewModel @Inject constructor(
                 saveTrip()
             }
 
-            is TripScheduleAction.UpdateTrip -> {
-                updateTrip(tripId = action.tripId)
+            TripScheduleAction.UpdateTrip -> {
+                updateTrip(tripId = tripId)
             }
         }
     }

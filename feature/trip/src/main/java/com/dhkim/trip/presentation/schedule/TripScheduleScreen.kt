@@ -96,12 +96,6 @@ fun TripScheduleScreen(
         }
     }
 
-    LaunchedEffect(tripId) {
-        if (tripId.isNotEmpty()) {
-            onAction(TripScheduleAction.Init(tripId))
-        }
-    }
-
     lifecycle.onStartCollect(sideEffect) {
         when (it) {
             TripScheduleSideEffect.Complete -> {
@@ -842,7 +836,7 @@ private fun TripDateScreen(
                     .noRippleClick {
                         if (isCompleted) {
                             if (tripId.isNotEmpty()) {
-                                onAction(TripScheduleAction.UpdateTrip(tripId = tripId))
+                                onAction(TripScheduleAction.UpdateTrip)
                             } else {
                                 onAction(TripScheduleAction.SaveTrip)
                             }

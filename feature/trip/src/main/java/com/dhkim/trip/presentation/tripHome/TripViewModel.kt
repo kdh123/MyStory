@@ -7,8 +7,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,9 +20,15 @@ class TripViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TripUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState = _uiState.onStart {
+        init()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = TripUiState()
+    )
 
-    init {
+    private fun init() {
         viewModelScope.launch {
             tripRepository.getAllTrip()
                 .catch { }

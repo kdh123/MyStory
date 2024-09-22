@@ -7,7 +7,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType.Companion.StringType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.dhkim.trip.presentation.detail.TripDetailScreen
 import com.dhkim.trip.presentation.detail.TripDetailViewModel
@@ -48,7 +50,15 @@ fun NavGraphBuilder.tripScreen(
             )
         }
 
-        composable("$TRIP_SCHEDULE_ROUTE/{tripId}") {
+        composable(
+            route = "$TRIP_SCHEDULE_ROUTE/{tripId}",
+            arguments = listOf(
+                navArgument("tripId") {
+                    type = StringType
+                    defaultValue = ""
+                }
+            )
+        ) {
             var tripId = it.arguments?.getString("tripId") ?: ""
             if (tripId.isBlank()) {
                 tripId = ""
@@ -68,7 +78,15 @@ fun NavGraphBuilder.tripScreen(
             )
         }
 
-        composable("$TRIP_DETAIL_ROUTE/{tripId}") {
+        composable(
+            route = "$TRIP_DETAIL_ROUTE/{tripId}",
+            arguments = listOf(
+                navArgument("tripId") {
+                    type = StringType
+                    defaultValue = ""
+                }
+            )
+        ) {
             val tripId = it.arguments?.getString("tripId") ?: ""
             val viewModel = hiltViewModel<TripDetailViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()

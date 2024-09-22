@@ -114,7 +114,7 @@ class AppState(
         }
     }
 
-    fun navigateToTripSchedule(tripId: String) = navController::navigateToTripSchedule
+    fun navigateToTripSchedule(tripId: String) = navController.navigateToTripSchedule(tripId)
     fun navigateToTripDetail(tripId: String) = navController.navigateToTripDetail(tripId)
     fun navigateToTripImageDetail(imageUrl: String) =
         navController.navigateToTripImageDetail(imageUrl)
