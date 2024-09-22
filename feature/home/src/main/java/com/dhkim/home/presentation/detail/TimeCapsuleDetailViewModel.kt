@@ -1,5 +1,6 @@
 package com.dhkim.home.presentation.detail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.home.domain.TimeCapsuleRepository
@@ -18,16 +19,16 @@ import javax.inject.Inject
 @HiltViewModel
 class TimeCapsuleDetailViewModel @Inject constructor(
     private val timeCapsuleRepository: TimeCapsuleRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
-    private var timeCapsuleIdParam = ""
-    private var isReceivedParam = false
 
     private val _uiState = MutableStateFlow(TimeCapsuleDetailUiState())
     val uiState = _uiState
         .onStart {
-            init(timeCapsuleId = timeCapsuleIdParam, isReceived = isReceivedParam)
+            val timeCapsuleId = savedStateHandle.get<String>("id") ?: ""
+            val isReceived = savedStateHandle.get<Boolean>("isReceived") ?: false
+            init(timeCapsuleId = timeCapsuleId, isReceived = isReceived)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TimeCapsuleDetailUiState())
 
@@ -36,11 +37,6 @@ class TimeCapsuleDetailViewModel @Inject constructor(
 
     fun onAction(action: TimeCapsuleDetailAction) {
         when (action) {
-            is TimeCapsuleDetailAction.InitParams -> {
-                timeCapsuleIdParam = action.timeCapsuleId
-                isReceivedParam = action.isReceived
-            }
-
             is TimeCapsuleDetailAction.Init -> {
                 init(timeCapsuleId = action.timeCapsuleId, isReceived = action.isReceived)
             }

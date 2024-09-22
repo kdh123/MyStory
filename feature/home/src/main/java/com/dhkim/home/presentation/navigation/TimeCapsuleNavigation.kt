@@ -7,14 +7,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType.Companion.BoolType
+import androidx.navigation.NavType.Companion.StringType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.dhkim.home.presentation.TimeCapsuleScreen
 import com.dhkim.home.presentation.TimeCapsuleViewModel
 import com.dhkim.home.presentation.add.AddTimeCapsuleScreen
 import com.dhkim.home.presentation.add.AddTimeCapsuleViewModel
 import com.dhkim.home.presentation.detail.ImageDetailScreen
-import com.dhkim.home.presentation.detail.TimeCapsuleDetailAction
 import com.dhkim.home.presentation.detail.TimeCapsuleDetailScreen
 import com.dhkim.home.presentation.detail.TimeCapsuleDetailViewModel
 import com.dhkim.home.presentation.detail.TimeCapsuleOpenScreen
@@ -115,12 +117,23 @@ fun NavGraphBuilder.timeCapsuleScreen(
             )
         }
 
-        composable("timeCapsuleDetail/{id}/{isReceived}") { backStackEntry ->
+        composable(
+            route = "timeCapsuleDetail/{id}/{isReceived}",
+            arguments = listOf(
+                navArgument("id") {
+                    type = StringType
+                    defaultValue = ""
+                },
+                navArgument("isReceived") {
+                    type = BoolType
+                    defaultValue = false
+                }
+            )
+        ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: ""
             val isReceived =
                 (backStackEntry.arguments?.getString("isReceived") ?: "false").toBoolean()
             val viewModel = hiltViewModel<TimeCapsuleDetailViewModel>()
-            viewModel.onAction(action = TimeCapsuleDetailAction.InitParams(id, isReceived))
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val sideEffect = remember {
                 viewModel.sideEffect
@@ -139,20 +152,24 @@ fun NavGraphBuilder.timeCapsuleScreen(
             )
         }
 
-        composable("$TIME_CAPSULE_OPEN_ROUTE/{id}/{isReceived}") { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("id") ?: ""
-            val isReceived =
-                (backStackEntry.arguments?.getString("isReceived") ?: "false").toBoolean()
+        composable(
+            route = "$TIME_CAPSULE_OPEN_ROUTE/{id}/{isReceived}",
+            arguments = listOf(
+                navArgument("id") {
+                    type = StringType
+                    defaultValue = ""
+                },
+                navArgument("isReceived") {
+                    type = BoolType
+                    defaultValue = false
+                }
+            )
+        ) {
             val viewModel = hiltViewModel<TimeCapsuleDetailViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             TimeCapsuleOpenScreen(
-                timeCapsuleId = id,
-                isReceived = isReceived,
                 uiState = uiState,
-                onAction = remember(viewModel) {
-                    viewModel::onAction
-                },
                 onNavigateToDetail = onNavigateToDetailFromOpen,
             )
         }
