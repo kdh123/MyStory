@@ -289,13 +289,6 @@ fun FriendScreen(
                         .fillMaxWidth()
                         .padding(10.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_back_black),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .alpha(0f)
-                    )
                     Box(
                         modifier = Modifier
                             .width(0.dp)

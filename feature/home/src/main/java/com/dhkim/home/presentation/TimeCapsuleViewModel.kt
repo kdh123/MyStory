@@ -3,6 +3,7 @@ package com.dhkim.home.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.DateUtil
+import com.dhkim.common.onetimeRestartableStateFlow
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.home.domain.TimeCapsuleRepository
 import com.dhkim.user.domain.UserRepository
@@ -11,13 +12,11 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,10 +29,10 @@ class TimeCapsuleViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TimeCapsuleUiState())
     val uiState = _uiState.onStart {
         init()
-    }.stateIn(
+    }.onetimeRestartableStateFlow(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = TimeCapsuleUiState()
+        initialValue = TimeCapsuleUiState(),
+        isOnetime = false
     )
 
     private val _sideEffect = Channel<TimeCapsuleSideEffect>()

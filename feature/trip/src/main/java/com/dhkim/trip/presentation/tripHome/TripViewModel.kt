@@ -2,15 +2,14 @@ package com.dhkim.trip.presentation.tripHome
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.common.onetimeRestartableStateFlow
 import com.dhkim.trip.domain.TripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,10 +21,10 @@ class TripViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TripUiState())
     val uiState = _uiState.onStart {
         init()
-    }.stateIn(
+    }.onetimeRestartableStateFlow(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = TripUiState()
+        initialValue = TripUiState(),
+        isOnetime = false
     )
 
     private fun init() {

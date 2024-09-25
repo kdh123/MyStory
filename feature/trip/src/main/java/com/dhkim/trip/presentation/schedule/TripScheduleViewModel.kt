@@ -3,6 +3,7 @@ package com.dhkim.trip.presentation.schedule
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.common.onetimeRestartableStateFlow
 import com.dhkim.trip.domain.TripRepository
 import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.domain.model.TripPlace
@@ -11,11 +12,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,7 +30,10 @@ class TripScheduleViewModel @Inject constructor(
         if (tripId.isNotEmpty()) {
             init(tripId = tripId)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TripScheduleUiState())
+    }.onetimeRestartableStateFlow(
+        scope = viewModelScope,
+        initialValue = TripScheduleUiState()
+    )
 
     private val _sideEffect = Channel<TripScheduleSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
