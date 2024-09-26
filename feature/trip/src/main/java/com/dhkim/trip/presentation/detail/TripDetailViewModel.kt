@@ -36,9 +36,7 @@ class TripDetailViewModel @Inject constructor(
     fun onAction(action: TripDetailAction) {
         when (action) {
             is TripDetailAction.InitTrip -> {
-                if (uiState.value.tripDates.isEmpty()) {
-                    initTrip(tripId = action.tripId)
-                }
+                initTrip(tripId = action.tripId)
             }
 
             is TripDetailAction.LoadImages -> {
@@ -70,7 +68,7 @@ class TripDetailViewModel @Inject constructor(
                 tripRepository.getTrip(id = tripId).first()?.copy(images = tripAllImages.value)
                     ?: return@launch
             tripRepository.updateTrip(updateTrip)
-            val updateImages = _uiState.value.images.filter { it.id != imageId }.toImmutableList()
+            val updateImages = _uiState.value.images?.filter { it.id != imageId }?.toImmutableList()
             _uiState.value = _uiState.value.copy(images = updateImages)
         }
     }
@@ -117,12 +115,14 @@ class TripDetailViewModel @Inject constructor(
                         }
                     }
                     title.append(" 여행")
-
+                    val currentIndex = _uiState.value.selectedIndex
                     if (currentTrip.images.isEmpty()) {
                         with(currentTrip) {
                             _uiState.value = _uiState.value.copy(
                                 isLoading = true,
+                                isInit = true,
                                 title = "$title",
+                                selectedIndex = if (currentIndex < 0) 0 else currentIndex,
                                 startDate = startDate,
                                 endDate = endDate,
                                 type = type.toTripType().desc
@@ -149,6 +149,8 @@ class TripDetailViewModel @Inject constructor(
 
                             _uiState.value = _uiState.value.copy(
                                 isLoading = false,
+                                isInit = true,
+                                selectedIndex = if (currentIndex < 0) 0 else currentIndex,
                                 title = "$title",
                                 type = currentTrip.type.toTripType().desc,
                                 startDate = startDate,

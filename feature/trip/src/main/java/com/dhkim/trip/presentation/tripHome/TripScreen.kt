@@ -19,13 +19,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,6 +45,7 @@ import com.dhkim.ui.WarningDialog
 import com.dhkim.ui.noRippleClick
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
@@ -94,7 +95,16 @@ fun TripScreen(
             }
         }
     ) { paddingValues ->
-        if (uiState.prevTrips.isEmpty() && uiState.nextTrips.isEmpty()) {
+        if (uiState.isLoading) {
+            Box(modifier = modifier.fillMaxSize()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+            return@Scaffold
+        }
+
+        if (uiState.prevTrips.isNullOrEmpty() && uiState.nextTrips.isNullOrEmpty()) {
             EmptyTripScheduleLayout(
                 onNavigateToSchedule = {
                     onNavigateToSchedule(" ")
@@ -118,7 +128,7 @@ fun TripScreen(
             )
             TripSchedules(
                 title = "다음 여행",
-                trips = uiState.nextTrips,
+                trips = uiState.nextTrips ?: persistentListOf(),
                 showDeleteDialog = {
                     selectedTripId = it
                     showDeleteDialog = true
@@ -127,7 +137,7 @@ fun TripScreen(
             )
             TripSchedules(
                 title = "지난 여행",
-                trips = uiState.prevTrips,
+                trips = uiState.prevTrips ?: persistentListOf(),
                 showDeleteDialog = {
                     selectedTripId = it
                     showDeleteDialog = true

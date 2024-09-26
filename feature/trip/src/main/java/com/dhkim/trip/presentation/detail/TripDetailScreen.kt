@@ -120,7 +120,9 @@ fun TripDetailScreen(
                 showPermissionDialog = true
             } else {
                 if (it == Manifest.permission.READ_MEDIA_IMAGES) {
-                    onAction(TripDetailAction.InitTrip(tripId = tripId))
+                    if (!uiState.isInit) {
+                        onAction(TripDetailAction.InitTrip(tripId = tripId))
+                    }
                 }
             }
         }
@@ -397,7 +399,7 @@ private fun TripInfo(uiState: TripDetailUiState) {
 
         ) {
             Text(
-                text = uiState.title,
+                text = uiState.title ?: "",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 overflow = TextOverflow.Ellipsis,
@@ -496,7 +498,7 @@ private fun TripDetails(
     onShowImageMenuPopup: (String) -> Unit,
     onNavigateToImageDetail: (String) -> Unit
 ) {
-    if (uiState.endDate.isNotEmpty() && DateUtil.isBefore(uiState.endDate)) {
+    if (!uiState.endDate.isNullOrEmpty() && DateUtil.isBefore(uiState.endDate)) {
         Text(
             text = "여행이 끝난 후 여행 기간 중에 찍었던 사진이 노출됩니다.",
             color = colorResource(id = R.color.gray),
@@ -505,6 +507,10 @@ private fun TripDetails(
                 .padding(horizontal = 20.dp, vertical = 10.dp)
         )
 
+        return
+    }
+
+    if (uiState.images == null) {
         return
     }
 

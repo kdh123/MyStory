@@ -30,10 +30,13 @@ class TripViewModel @Inject constructor(
     private fun init() {
         viewModelScope.launch {
             tripRepository.getAllTrip()
-                .catch { }
+                .catch {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                }
                 .collect { trips ->
                     val partition = trips.partition { it.isNextTrip }
                     _uiState.value = _uiState.value.copy(
+                        isLoading = false,
                         nextTrips = partition.first.toImmutableList(),
                         prevTrips = partition.second.toImmutableList(),
                     )
