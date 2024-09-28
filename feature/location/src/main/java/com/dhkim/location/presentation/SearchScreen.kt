@@ -41,7 +41,6 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.location.R
 import com.dhkim.location.domain.Place
-import com.naver.maps.geometry.LatLng
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.HttpException
@@ -50,15 +49,9 @@ import retrofit2.HttpException
 fun SearchScreen(
     uiState: SearchUiState,
     searchResult: LazyPagingItems<Place>,
-    latLng: LatLng,
-    onSetCurrentLocation: (LatLng) -> Unit,
     onQuery: (String) -> Unit,
     onBack: (Place) -> Unit
 ) {
-    LaunchedEffect(latLng) {
-        onSetCurrentLocation(latLng)
-    }
-
     Column(modifier = Modifier.fillMaxSize()) {
         SearchBar(query = uiState.query, onQuery = onQuery)
         Box(modifier = Modifier.fillMaxSize()) {
@@ -74,10 +67,6 @@ fun SearchScreen(
             }
             if (searchResult.itemCount > 0) {
                 PlaceList(places = searchResult, onBack = onBack)
-            } else {
-                if (!uiState.isLoading && uiState.query.isNotEmpty()) {
-                    //Text(text = "검색 결과가 존재하지 않습니다.", modifier = Modifier.align(Alignment.Center))
-                }
             }
         }
     }
@@ -91,13 +80,10 @@ private fun SearchScreenPreview() {
     SearchScreen(
         uiState = SearchUiState(),
         searchResult = result.collectAsLazyPagingItems(),
-        latLng = LatLng(0.0, 0.0),
-        onSetCurrentLocation = {},
         onQuery = {},
         onBack = {}
     )
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -178,8 +164,6 @@ private fun PlaceListPreview() {
         )
         list.add(place)
     }
-
-    //PlaceList(places = list)
 }
 
 @Composable
