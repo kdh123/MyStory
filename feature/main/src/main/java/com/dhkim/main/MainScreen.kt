@@ -167,6 +167,7 @@ fun MainScreen(
                 onNavigateToAddTimeCapsule = appState::navigateToAddTimeCapsuleWithFriend,
                 onNavigateToChangeInfo = appState::navigateToChangeFriendInfo,
                 onBack = appState.navController::navigateUp,
+                showPopup = showPopup,
                 modifier = Modifier
                     .padding(bottom = innerPadding.calculateBottomPadding())
             )
@@ -194,6 +195,7 @@ fun MainScreen(
                         showPopup(null)
                     },
                     onDismissRequest = {
+                        onDismissRequest?.invoke()
                         showPopup(null)
                     }
                 )

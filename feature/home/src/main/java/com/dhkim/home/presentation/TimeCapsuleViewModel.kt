@@ -41,7 +41,7 @@ class TimeCapsuleViewModel @Inject constructor(
     private var spaceId = 100
 
     private fun init() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             combine(
                 timeCapsuleRepository.getMyAllTimeCapsule(),
                 timeCapsuleRepository.getReceivedAllTimeCapsule()

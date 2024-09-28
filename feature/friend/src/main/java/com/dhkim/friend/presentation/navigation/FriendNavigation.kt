@@ -14,6 +14,7 @@ import com.dhkim.friend.presentation.FriendScreen
 import com.dhkim.friend.presentation.FriendViewModel
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoScreen
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoViewModel
+import com.dhkim.ui.Popup
 import com.dhkim.user.domain.Friend
 
 const val FRIEND_MAIN_ROUTE = "mainFriend"
@@ -24,6 +25,7 @@ fun NavGraphBuilder.friendScreen(
     onNavigateToChangeInfo: (Friend) -> Unit,
     onNavigateToAddTimeCapsule: (friendId: String) -> Unit,
     onBack: () -> Unit,
+    showPopup: (Popup?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     navigation(startDestination = FRIEND_ROUTE, route = FRIEND_MAIN_ROUTE) {
@@ -43,6 +45,7 @@ fun NavGraphBuilder.friendScreen(
                 onNavigateToAddTimeCapsule = onNavigateToAddTimeCapsule,
                 onNavigateToChangeInfo = onNavigateToChangeInfo,
                 onBack = onBack,
+                showPopup = showPopup,
                 modifier = modifier
             )
         }

@@ -52,7 +52,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -75,7 +74,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dhkim.friend.R
 import com.dhkim.ui.LoadingProgressBar
-import com.dhkim.ui.WarningDialog
+import com.dhkim.ui.Popup
 import com.dhkim.ui.onStartCollect
 import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.User
@@ -91,36 +90,31 @@ fun FriendScreen(
     onNavigateToAddTimeCapsule: (friendId: String) -> Unit,
     onNavigateToChangeInfo: (Friend) -> Unit,
     onBack: () -> Unit,
+    showPopup: (Popup?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
-    var currentTab by remember { mutableIntStateOf(0) }
+    var currentTab by rememberSaveable { mutableIntStateOf(0) }
     val titles = listOf("친구", "요청")
     val pagerState = rememberPagerState(pageCount = {
         2
     })
     val scope = rememberCoroutineScope()
-    var selectedFriend by remember {
-        mutableStateOf(Friend())
+    var selectedFriend: Friend? by remember {
+        mutableStateOf(null)
     }
     val focusManager = LocalFocusManager.current
-    var showFriendMenuDialog by remember {
+    var showFriendMenuDialog by rememberSaveable {
         mutableStateOf(false)
     }
     var showPendingFriendMenuDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showDeleteDialog by rememberSaveable {
         mutableStateOf(false)
     }
     var showInfoBottomSheet by rememberSaveable {
         mutableStateOf(false)
     }
     var showFriendsBottomSheet by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showCodeGuideDialog by rememberSaveable {
         mutableStateOf(false)
     }
     val infoBottomSheetState = rememberModalBottomSheetState()
@@ -135,10 +129,10 @@ fun FriendScreen(
 
             is FriendSideEffect.ShowDialog -> {
                 if (!it.show) {
-                    showDeleteDialog = false
+                    showPopup(null)
                     showFriendMenuDialog = false
                     showPendingFriendMenuDialog = false
-                    selectedFriend = Friend()
+                    selectedFriend = null
                 }
             }
 
@@ -160,7 +154,7 @@ fun FriendScreen(
         }
     }
 
-    if (showFriendMenuDialog) {
+    if (showFriendMenuDialog && selectedFriend != null) {
         Dialog(
             onDismissRequest = {
                 selectedFriend = Friend()
@@ -180,7 +174,7 @@ fun FriendScreen(
                     Text(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        text = selectedFriend.nickname,
+                        text = selectedFriend!!.nickname,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -191,7 +185,21 @@ fun FriendScreen(
                             .fillMaxWidth()
                             .clickable {
                                 showFriendMenuDialog = false
-                                showDeleteDialog = true
+                                showPopup(
+                                    Popup.Warning(
+                                        title = "삭제",
+                                        desc = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedFriend!!.nickname}님을 정말 삭제하시겠습니까?",
+                                        onPositiveClick = {
+                                            onAction(FriendAction.DeleteFriend(selectedFriend!!.id))
+                                        },
+                                        onNegativeClick = {
+                                            selectedFriend = null
+                                        },
+                                        onDismissRequest = {
+                                            selectedFriend = null
+                                        }
+                                    )
+                                )
                             }
                     )
 
@@ -202,7 +210,7 @@ fun FriendScreen(
                             .fillMaxWidth()
                             .clickable {
                                 showFriendMenuDialog = false
-                                onNavigateToChangeInfo(selectedFriend)
+                                onNavigateToChangeInfo(selectedFriend!!)
                             }
                     )
                 }
@@ -210,7 +218,7 @@ fun FriendScreen(
         }
     }
 
-    if (showPendingFriendMenuDialog) {
+    if (showPendingFriendMenuDialog && selectedFriend != null) {
         Dialog(
             onDismissRequest = {
                 selectedFriend = Friend()
@@ -241,43 +249,26 @@ fun FriendScreen(
                             .fillMaxWidth()
                             .clickable {
                                 showPendingFriendMenuDialog = false
-                                showDeleteDialog = true
+                                showPopup(
+                                    Popup.Warning(
+                                        title = "삭제",
+                                        desc = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedFriend!!.nickname}님을 정말 삭제하시겠습니까?",
+                                        onPositiveClick = {
+                                            onAction(FriendAction.DeleteFriend(selectedFriend!!.id))
+                                        },
+                                        onNegativeClick = {
+                                            selectedFriend = null
+                                        },
+                                        onDismissRequest = {
+                                            selectedFriend = null
+                                        }
+                                    )
+                                )
                             }
                     )
                 }
             }
         }
-    }
-
-    if (showCodeGuideDialog) {
-        WarningDialog(
-            onDismissRequest = {
-                showCodeGuideDialog = false
-            },
-            onConfirmation = {
-                showCodeGuideDialog = false
-                onAction(FriendAction.CreateCode)
-            },
-            negativeText = "취소",
-            positiveText = "확인",
-            dialogTitle = "알림",
-            dialogText = "개인 코드는 타임캡슐 공유 목적 외 다른 목적으로 사용되지 않습니다. 또한 코드 생성시 사용자의 이름, 전화번호, 주소 등 어떠한 개인정보도 사용되지 않습니다.",
-        )
-    }
-
-    if (showDeleteDialog) {
-        WarningDialog(
-            onDismissRequest = {
-                showDeleteDialog = false
-                selectedFriend = Friend()
-            },
-            onConfirmation = {
-                showDeleteDialog = false
-                onAction(FriendAction.DeleteFriend(selectedFriend.id))
-            },
-            dialogTitle = "삭제",
-            dialogText = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedFriend.nickname}님을 정말 삭제하시겠습니까?",
-        )
     }
 
     Scaffold(
@@ -361,7 +352,15 @@ fun FriendScreen(
                                 indication = null
                             ) {
                                 if (!uiState.isCreatingCode) {
-                                    showCodeGuideDialog = true
+                                    showPopup(
+                                        Popup.Warning(
+                                            title = "알림",
+                                            desc = "개인 코드는 타임캡슐 공유 목적 외 다른 목적으로 사용되지 않습니다. 또한 코드 생성시 사용자의 이름, 전화번호, 주소 등 어떠한 개인정보도 사용되지 않습니다.",
+                                            onPositiveClick = {
+                                                onAction(FriendAction.CreateCode)
+                                            }
+                                        )
+                                    )
                                 }
                             }
                     ) {
@@ -485,7 +484,7 @@ fun FriendScreen(
                 }
             }
 
-            if (showInfoBottomSheet) {
+            if (showInfoBottomSheet && selectedFriend != null) {
                 ModalBottomSheet(
                     sheetState = infoBottomSheetState,
                     onDismissRequest = {
@@ -499,7 +498,7 @@ fun FriendScreen(
                             .padding(bottom = 48.dp)
                     ) {
                         Text(
-                            text = selectedFriend.nickname,
+                            text = selectedFriend!!.nickname,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp,
                             modifier = Modifier
@@ -509,14 +508,14 @@ fun FriendScreen(
                             resId = R.drawable.ic_time_primary,
                             title = "타임캡슐 공유",
                             onClick = {
-                                onNavigateToAddTimeCapsule(selectedFriend.id)
+                                onNavigateToAddTimeCapsule(selectedFriend!!.id)
                                 showInfoBottomSheet = false
                             })
                         MenuItem(
                             resId = R.drawable.ic_smile_blue,
                             title = "정보 변경",
                             onClick = {
-                                onNavigateToChangeInfo(selectedFriend)
+                                onNavigateToChangeInfo(selectedFriend!!)
                                 showInfoBottomSheet = false
                             }
                         )
