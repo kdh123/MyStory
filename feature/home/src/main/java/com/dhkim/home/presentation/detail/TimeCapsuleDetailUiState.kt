@@ -8,4 +8,10 @@ data class TimeCapsuleDetailUiState(
     val isLoading: Boolean = true,
     val isReceived: Boolean = false,
     val timeCapsule: TimeCapsule = TimeCapsule()
-)
+) {
+    val writer = if (!isReceived) {
+        "${timeCapsule.sender} (나)"
+    } else {
+        "${timeCapsule.host.nickname} (친구)"
+    }
+}

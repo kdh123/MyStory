@@ -65,7 +65,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
                     val profileImage = data?.get("profileImage") as? String ?: ""
 
                     val user = User(
-                        id = myId,
+                        id = if (data != null) myId else "",
                         uuid = uuid,
                         profileImage = profileImage,
                         friends = currentFriends,

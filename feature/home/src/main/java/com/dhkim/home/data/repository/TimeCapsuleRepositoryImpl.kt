@@ -11,7 +11,6 @@ import com.dhkim.home.domain.MyTimeCapsule
 import com.dhkim.home.domain.ReceivedTimeCapsule
 import com.dhkim.home.domain.SendTimeCapsule
 import com.dhkim.home.domain.TimeCapsuleRepository
-import com.dhkim.user.domain.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -20,11 +19,12 @@ typealias isSuccessful = Boolean
 
 class TimeCapsuleRepositoryImpl @Inject constructor(
     private val localDataSource: TimeCapsuleLocalDataSource,
-    private val remoteDataSource: TimeCapsuleRemoteDataSource,
-    private val userRepository: UserRepository
+    private val remoteDataSource: TimeCapsuleRemoteDataSource
 ) : TimeCapsuleRepository {
 
     override suspend fun shareTimeCapsule(
+        myId: String,
+        myProfileImage: String,
         timeCapsuleId: String,
         sharedFriends: List<Uuid>,
         openDate: String,
@@ -35,9 +35,6 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         address: String,
         checkLocation: Boolean
     ): isSuccessful {
-        val myId = userRepository.getMyId()
-        val myProfileImage = "${userRepository.getProfileImage()}"
-
         return remoteDataSource.shareTimeCapsule(
             timeCapsuleId = timeCapsuleId,
             myId = myId,
@@ -53,8 +50,11 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         ) is CommonResult.Success
     }
 
-    override suspend fun deleteTimeCapsule(sharedFriends: List<Uuid>, timeCapsuleId: String): isSuccessful {
-        val myId = userRepository.getMyId()
+    override suspend fun deleteTimeCapsule(
+        myId: String,
+        sharedFriends: List<Uuid>,
+        timeCapsuleId: String
+    ): isSuccessful {
         return remoteDataSource.deleteTimeCapsule(myId, sharedFriends, timeCapsuleId) is CommonResult.Success
     }
 

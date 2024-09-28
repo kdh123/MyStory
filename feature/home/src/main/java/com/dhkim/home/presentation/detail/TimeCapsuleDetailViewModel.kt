@@ -22,14 +22,14 @@ class TimeCapsuleDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    val timeCapsuleId = savedStateHandle.get<String>("id") ?: ""
+    val isReceived = savedStateHandle.get<String>("isReceived") ?: "false"
+
     private val _uiState = MutableStateFlow(TimeCapsuleDetailUiState())
     val uiState = _uiState
         .onStart {
-            val timeCapsuleId = savedStateHandle.get<String>("id") ?: ""
-            val isReceived = savedStateHandle.get<Boolean>("isReceived") ?: false
-            init(timeCapsuleId = timeCapsuleId, isReceived = isReceived)
-        }
-        .onetimeRestartableStateFlow(
+            init(timeCapsuleId = timeCapsuleId, isReceived = isReceived.toBoolean())
+        }.onetimeRestartableStateFlow(
             scope = viewModelScope,
             initialValue = TimeCapsuleDetailUiState()
         )
@@ -44,7 +44,7 @@ class TimeCapsuleDetailViewModel @Inject constructor(
             }
 
             is TimeCapsuleDetailAction.DeleteTimeCapsule -> {
-                deleteTImeCapsule(action.timeCapsuleId)
+                deleteTImeCapsule()
             }
         }
     }
@@ -79,7 +79,7 @@ class TimeCapsuleDetailViewModel @Inject constructor(
         }
     }
 
-    private fun deleteTImeCapsule(timeCapsuleId: String) {
+    private fun deleteTImeCapsule() {
         viewModelScope.launch(Dispatchers.IO) {
             if (_uiState.value.isReceived) {
                 timeCapsuleRepository.deleteReceivedTimeCapsule(timeCapsuleId)

@@ -245,7 +245,11 @@ class AddTimeCapsuleViewModel @Inject constructor(
                             timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = timeCapsule)
                             _sideEffect.send(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
                         } else {
+                            val myId = userRepository.getMyId()
+                            val myProfileImage = "${userRepository.getProfileImage()}"
                             val isSuccessful = timeCapsuleRepository.shareTimeCapsule(
+                                myId = myId,
+                                myProfileImage = myProfileImage,
                                 timeCapsuleId = timeCapsuleId,
                                 sharedFriends = sharedFriends.filter { it.isChecked }
                                     .map { it.uuid },

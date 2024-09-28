@@ -1,5 +1,6 @@
 package com.dhkim.trip.schedule
 
+import androidx.lifecycle.SavedStateHandle
 import com.dhkim.trip.FakeTripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
@@ -18,6 +19,7 @@ import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -56,11 +58,12 @@ class TripScheduleViewModelTest {
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = TripScheduleViewModel(tripRepository = tripRepository)
+        viewModel = TripScheduleViewModel(tripRepository = tripRepository, savedStateHandle = SavedStateHandle())
     }
 
     @Test
     fun `여행 시작 날짜 업데이트 테스트`() = runBlocking {
+        viewModel.uiState.first()
         viewModel.onAction(TripScheduleAction.UpdateStartDate("2024-04-03"))
         delay(300)
         assertEquals(viewModel.uiState.value.startDate, "2024-04-03")
@@ -68,6 +71,7 @@ class TripScheduleViewModelTest {
 
     @Test
     fun `여행 장소 선택 테스트`() = runBlocking {
+        viewModel.uiState.first()
         viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.Seoul))
         viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.Gyeongi))
         viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.AbroadPlace.USA))

@@ -185,6 +185,7 @@ class TimeCapsuleViewModel @Inject constructor(
                     deleteReceivedTimeCapsule(timeCapsuleId)
                 } else {
                     val sharedFriends = getMyTimeCapsule(timeCapsuleId)?.sharedFriends ?: listOf()
+                    val myId = userRepository.getMyId()
                     val sharedFriendsUuids = userRepository.getMyInfo().catch { }
                         .firstOrNull()?.friends
                         ?.filter {
@@ -194,7 +195,7 @@ class TimeCapsuleViewModel @Inject constructor(
                         } ?: listOf()
 
                     if (sharedFriendsUuids.isNotEmpty()) {
-                        val isSuccessful = deleteTimeCapsule(sharedFriendsUuids, timeCapsuleId)
+                        val isSuccessful = deleteTimeCapsule(myId, sharedFriendsUuids, timeCapsuleId)
                         if (isSuccessful) {
                             deleteMyTimeCapsule(timeCapsuleId)
                         } else {

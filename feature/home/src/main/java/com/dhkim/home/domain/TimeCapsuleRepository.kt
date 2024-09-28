@@ -8,6 +8,8 @@ typealias isSuccessful = Boolean
 interface TimeCapsuleRepository {
 
     suspend fun shareTimeCapsule(
+        myId: String,
+        myProfileImage: String,
         timeCapsuleId: String,
         sharedFriends: List<Uuid>,
         openDate: String,
@@ -19,7 +21,11 @@ interface TimeCapsuleRepository {
         checkLocation: Boolean
     ): isSuccessful
 
-    suspend fun deleteTimeCapsule(sharedFriends: List<Uuid>, timeCapsuleId: String): isSuccessful
+    suspend fun deleteTimeCapsule(
+        myId: String,
+        sharedFriends: List<Uuid>,
+        timeCapsuleId: String
+    ): isSuccessful
 
     fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>>
     suspend fun getMyTimeCapsule(id: String): MyTimeCapsule?

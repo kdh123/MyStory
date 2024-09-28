@@ -51,7 +51,7 @@ import com.dhkim.home.R
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.ui.DefaultBackground
 import com.dhkim.ui.LoadingProgressBar
-import com.dhkim.ui.WarningDialog
+import com.dhkim.ui.Popup
 import com.dhkim.ui.onStartCollect
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
@@ -74,12 +74,11 @@ import java.nio.charset.StandardCharsets
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TimeCapsuleDetailScreen(
-    timeCapsuleId: String,
-    isReceived: Boolean,
     uiState: TimeCapsuleDetailUiState,
     sideEffect: () -> Flow<TimeCapsuleDetailSideEffect>,
     onAction: (TimeCapsuleDetailAction) -> Unit,
     onNavigateToImageDetail: (String, String) -> Unit,
+    showPopup: (Popup) -> Unit,
     onBack: () -> Unit
 ) {
     val lifecycle = LocalLifecycleOwner.current
@@ -101,9 +100,6 @@ fun TimeCapsuleDetailScreen(
         mutableStateOf(true)
     }
     var showOption by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showDeleteDialog by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -143,7 +139,21 @@ fun TimeCapsuleDetailScreen(
                         .fillMaxWidth()
                         .clickable {
                             showOption = false
-                            showDeleteDialog = true
+                            val desc = if (uiState.timeCapsule.sharedFriends.isNotEmpty() && !uiState.timeCapsule.isReceived) {
+                                "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
+                            } else {
+                                "정말 삭제하겠습니까?"
+                            }
+
+                            showPopup(
+                                Popup.Warning(
+                                    title = "삭제",
+                                    desc = desc,
+                                    onPositiveClick = {
+                                        onAction(TimeCapsuleDetailAction.DeleteTimeCapsule)
+                                    }
+                                )
+                            )
                         }
                 ) {
                     Image(
@@ -158,25 +168,6 @@ fun TimeCapsuleDetailScreen(
                     )
                 }
             }
-        }
-
-        if (showDeleteDialog) {
-            val desc = if (uiState.timeCapsule.sharedFriends.isNotEmpty() && !uiState.timeCapsule.isReceived) {
-                "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
-            } else {
-                "정말 삭제하겠습니까?"
-            }
-
-            WarningDialog(
-                onConfirmation = {
-                    onAction(TimeCapsuleDetailAction.DeleteTimeCapsule(timeCapsuleId))
-                },
-                onDismissRequest = {
-                    showDeleteDialog = false
-                },
-                dialogTitle = "삭제",
-                dialogText = desc
-            )
         }
 
         if (uiState.isLoading) {
@@ -200,11 +191,6 @@ fun TimeCapsuleDetailScreen(
                     enabled = enableScroll
                 )
         ) {
-            val writer = if (!isReceived) {
-                "${uiState.timeCapsule.sender} (나)"
-            } else {
-                "${uiState.timeCapsule.host.nickname} (친구)"
-            }
             TimeCapsulePager(
                 uiState = uiState,
                 onNavigateToImageDetail = onNavigateToImageDetail,
@@ -213,7 +199,7 @@ fun TimeCapsuleDetailScreen(
                 },
                 onBack = onBack
             )
-            MenuItem(resId = uiState.timeCapsule.host.profileImage.toInt(), title = "작성자 : $writer")
+            MenuItem(resId = uiState.timeCapsule.host.profileImage.toInt(), title = "작성자 : ${uiState.writer}")
             Divider(
                 color = colorResource(id = R.color.light_gray),
                 modifier = Modifier
@@ -269,7 +255,8 @@ fun TimeCapsuleDetailScreen(
             LaunchedEffect(cameraPositionState.isMoving) {
                 enableScroll = !cameraPositionState.isMoving
             }
-            if (uiState.timeCapsule.checkLocation || !isReceived) {
+
+            if (uiState.timeCapsule.checkLocation || !uiState.timeCapsule.isReceived) {
                 MenuItem(resId = R.drawable.ic_location_black, title = uiState.timeCapsule.address)
                 NaverMap(
                     cameraPositionState = cameraPositionState,
@@ -346,12 +333,11 @@ private fun TimeCapsuleDetailScreenPreview() {
         content = "안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 "
     )
     TimeCapsuleDetailScreen(
-        timeCapsuleId = "",
-        isReceived = false,
         uiState = TimeCapsuleDetailUiState(timeCapsule = timeCapsule),
         sideEffect = { flowOf() },
         onAction = {},
         onNavigateToImageDetail = { _, _ -> },
+        showPopup = {},
         onBack = {}
     )
 }

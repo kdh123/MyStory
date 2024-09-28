@@ -60,8 +60,8 @@ class TripViewModelTest {
     @Test
     fun `uiState 테스트`() = runBlocking {
         delay(300)
-        assertEquals(viewModel.uiState.value.nextTrips.size, 2)
-        assertEquals(viewModel.uiState.value.prevTrips.size, 4)
+        assertEquals(viewModel.uiState.value.nextTrips?.size, 2)
+        assertEquals(viewModel.uiState.value.prevTrips?.size, 4)
     }
 
     @Test

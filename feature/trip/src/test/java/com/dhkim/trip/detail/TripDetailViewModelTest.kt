@@ -17,7 +17,6 @@ import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -64,9 +63,8 @@ class TripDetailViewModelTest {
     @Test
     fun `여행 이미지가 존재할 때`() = runBlocking {
         viewModel.onAction(TripDetailAction.InitTrip(tripId = "id0"))
-
         delay(300L)
-        assertEquals(viewModel.uiState.value.images.size, 7)
+        assertEquals(viewModel.uiState.value.images?.size, 7)
     }
 
     @Test
@@ -76,7 +74,7 @@ class TripDetailViewModelTest {
         viewModel.onAction(TripDetailAction.SelectDate(selectedIndex = 1))
         delay(300L)
 
-        assertEquals(viewModel.uiState.value.images.size, 2)
+        assertEquals(viewModel.uiState.value.images?.size, 2)
     }
 
     @Test
@@ -86,7 +84,7 @@ class TripDetailViewModelTest {
         viewModel.onAction(TripDetailAction.DeleteImage(tripId = "id0", imageId = "trip0"))
         delay(300L)
 
-        assertEquals(viewModel.uiState.value.images.size, 6)
+        assertEquals(viewModel.uiState.value.images?.size, 6)
         assertEquals(viewModel.tripAllImages.value.size, 19)
     }
 }

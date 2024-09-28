@@ -75,7 +75,8 @@ class TripScreenTest {
                 uiState = uiState,
                 onAction = viewModel::onAction,
                 onNavigateToSchedule = {},
-                onNavigateToDetail = {}
+                onNavigateToDetail = {},
+                showPopup = {}
             )
         }
 

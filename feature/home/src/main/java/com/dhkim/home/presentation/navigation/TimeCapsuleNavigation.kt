@@ -7,8 +7,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType.Companion.BoolType
-import androidx.navigation.NavType.Companion.StringType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
@@ -121,21 +119,16 @@ fun NavGraphBuilder.timeCapsuleScreen(
         }
 
         composable(
-            route = "timeCapsuleDetail/{id}/{isReceived}",
+            route = "$TIME_CAPSULE_DETAIL/{id}/{isReceived}",
             arguments = listOf(
                 navArgument("id") {
-                    type = StringType
                     defaultValue = ""
                 },
                 navArgument("isReceived") {
-                    type = BoolType
-                    defaultValue = false
+                    defaultValue = "false"
                 }
             )
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("id") ?: ""
-            val isReceived =
-                (backStackEntry.arguments?.getString("isReceived") ?: "false").toBoolean()
+        ) {
             val viewModel = hiltViewModel<TimeCapsuleDetailViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val sideEffect = remember {
@@ -143,14 +136,13 @@ fun NavGraphBuilder.timeCapsuleScreen(
             }
 
             TimeCapsuleDetailScreen(
-                timeCapsuleId = id,
-                isReceived = isReceived,
                 uiState = uiState,
                 sideEffect = { sideEffect },
                 onAction = remember(viewModel) {
                     viewModel::onAction
                 },
                 onNavigateToImageDetail = onNavigateToImageDetail,
+                showPopup = showPopup,
                 onBack = onBack
             )
         }
@@ -159,12 +151,10 @@ fun NavGraphBuilder.timeCapsuleScreen(
             route = "$TIME_CAPSULE_OPEN_ROUTE/{id}/{isReceived}",
             arguments = listOf(
                 navArgument("id") {
-                    type = StringType
                     defaultValue = ""
                 },
                 navArgument("isReceived") {
-                    type = BoolType
-                    defaultValue = false
+                    defaultValue = "false"
                 }
             )
         ) {
