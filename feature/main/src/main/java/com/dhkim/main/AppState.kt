@@ -12,7 +12,6 @@ import com.dhkim.friend.presentation.navigation.FRIEND_ROUTE
 import com.dhkim.friend.presentation.navigation.navigateToChangeFriendInfo
 import com.dhkim.friend.presentation.navigation.navigateToFriend
 import com.dhkim.home.presentation.navigation.ADD_TIME_CAPSULE_ROUTE
-import com.dhkim.home.presentation.navigation.TIME_CAPSULE_OPEN_ROUTE
 import com.dhkim.home.presentation.navigation.TIME_CAPSULE_ROUTE
 import com.dhkim.home.presentation.navigation.navigateToAddTimeCapsule
 import com.dhkim.home.presentation.navigation.navigateToDetail
@@ -29,7 +28,9 @@ import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
 import com.dhkim.trip.presentation.navigation.navigateToTripDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripImageDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripSchedule
+import com.dhkim.ui.Popup
 import com.dhkim.user.domain.Friend
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Stable
 class AppState(
@@ -42,15 +43,12 @@ class AppState(
         Screen.Trip,
         Screen.Friend
     )
-    val routes = listOf(
+    private val routes = listOf(
         TIME_CAPSULE_ROUTE,
         MAP_ROUTE,
         TRIP_ROUTE,
         FRIEND_ROUTE
     )
-    private val showBottomNavItems = bottomItems
-        .filter { it.route != ADD_TIME_CAPSULE_ROUTE }
-        .map { it.route }
     val isBottomNavShow: Boolean
         @Composable get() {
             val entry = navController.currentBackStackEntryAsState().value
@@ -65,6 +63,7 @@ class AppState(
 
             return route
         }
+    var currentPopup = MutableStateFlow<Popup?>(null)
 
     fun navigateToTopLevelDestination(route: String) {
         navController.navigate(route) {
@@ -132,6 +131,14 @@ class AppState(
                 ?.savedStateHandle
                 ?.set("place", place)
         }
+    }
+
+    fun showPopup(popup: Popup) {
+        currentPopup.value = popup
+    }
+
+    fun hidePopup() {
+        currentPopup.value = null
     }
 }
 

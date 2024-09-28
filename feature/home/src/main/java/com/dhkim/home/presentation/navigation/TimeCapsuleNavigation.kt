@@ -23,6 +23,7 @@ import com.dhkim.home.presentation.detail.TimeCapsuleOpenScreen
 import com.dhkim.home.presentation.more.MoreTimeCapsuleScreen
 import com.dhkim.home.presentation.more.MoreTimeCapsuleViewModel
 import com.dhkim.location.domain.Place
+import com.dhkim.ui.Popup
 
 const val TIME_CAPSULE_MAIN_ROUTE = "mainTimeCapsule"
 const val TIME_CAPSULE_OPEN_ROUTE = "timeCapsuleOpen"
@@ -69,6 +70,7 @@ fun NavGraphBuilder.timeCapsuleScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToMore: () -> Unit,
     onNavigateToImageDetail: (String, String) -> Unit,
+    showPopup: (Popup) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -95,7 +97,8 @@ fun NavGraphBuilder.timeCapsuleScreen(
                 onNavigateToNotification = onNavigateToNotification,
                 onNavigateToSetting = onNavigateToSetting,
                 onNavigateToProfile = onNavigateToProfile,
-                onNavigateToMore = onNavigateToMore
+                onNavigateToMore = onNavigateToMore,
+                showPopup = showPopup
             )
         }
 

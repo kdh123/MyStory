@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import com.dhkim.friend.presentation.navigation.FRIEND_MAIN_ROUTE
 import com.dhkim.friend.presentation.navigation.friendScreen
@@ -38,6 +39,7 @@ import com.dhkim.notification.navigation.notificationScreen
 import com.dhkim.setting.presentation.navigation.settingScreen
 import com.dhkim.trip.presentation.navigation.TRIP_MAIN_ROUTE
 import com.dhkim.trip.presentation.navigation.tripScreen
+import com.dhkim.ui.Popup
 import com.dhkim.ui.WarningDialog
 
 @Composable
@@ -135,6 +137,7 @@ fun MainScreen(
                 onNavigateToProfile = appState::navigateToFriend,
                 onNavigateToMore = appState::navigateToMoreTimeCapsule,
                 onNavigateToImageDetail = appState::navigateToImageDetail,
+                showPopup = appState::showPopup,
                 onBack = appState.navController::navigateUp,
                 modifier = Modifier
                     .padding(bottom = innerPadding.calculateBottomPadding())
@@ -172,6 +175,29 @@ fun MainScreen(
             settingScreen(onBack = appState.navController::navigateUp)
             searchScreen(onBack = appState::navigateToAddTimeCapsuleFromSearch)
         }
+    }
+
+    val currentPopup by appState.currentPopup.collectAsStateWithLifecycle()
+    when (currentPopup) {
+        is Popup.OneButton -> {
+
+        }
+
+        is Popup.Warning -> {
+            appState.currentPopup.value?.run {
+                WarningDialog(
+                    dialogTitle = title,
+                    dialogText = desc,
+                    onConfirmation = {
+                        onPositiveClick()
+                        appState.hidePopup()
+                    },
+                    onDismissRequest = appState::hidePopup
+                )
+            }
+        }
+
+        null -> {}
     }
 }
 
