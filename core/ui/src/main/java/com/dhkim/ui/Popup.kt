@@ -10,10 +10,10 @@ sealed interface Popup {
     data class Warning(
         override val title: String,
         override val desc: String,
-        override val positiveText: String,
+        override val positiveText: String = "확인",
         override val onPositiveClick: () -> Unit,
-        val negativeText: String,
-        val onNegativeClick: () -> Unit
+        val negativeText: String = "취소",
+        val onNegativeClick: (() -> Unit)? = null
     ) : Popup
 
     data class OneButton(

@@ -24,10 +24,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.trip.R
 import com.dhkim.trip.domain.model.Trip
-import com.dhkim.ui.WarningDialog
+import com.dhkim.ui.Popup
 import com.dhkim.ui.noRippleClick
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.ImmutableList
@@ -54,15 +50,9 @@ fun TripScreen(
     onAction: (TripAction) -> Unit,
     modifier: Modifier = Modifier,
     onNavigateToSchedule: (String) -> Unit,
-    onNavigateToDetail: (String) -> Unit
+    onNavigateToDetail: (String) -> Unit,
+    showPopup: (Popup) -> Unit
 ) {
-    var showDeleteDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var selectedTripId by rememberSaveable {
-        mutableStateOf("")
-    }
-
     Scaffold(
         topBar = {
             Column(
@@ -130,8 +120,15 @@ fun TripScreen(
                 title = "다음 여행",
                 trips = uiState.nextTrips ?: persistentListOf(),
                 showDeleteDialog = {
-                    selectedTripId = it
-                    showDeleteDialog = true
+                    showPopup(
+                        Popup.Warning(
+                            title = "일정 삭제",
+                            desc = "정말 삭제하겠습니까?",
+                            onPositiveClick = {
+                                onAction(TripAction.DeleteTrip(it))
+                            }
+                        )
+                    )
                 },
                 onNavigateToDetail = onNavigateToDetail
             )
@@ -139,25 +136,18 @@ fun TripScreen(
                 title = "지난 여행",
                 trips = uiState.prevTrips ?: persistentListOf(),
                 showDeleteDialog = {
-                    selectedTripId = it
-                    showDeleteDialog = true
+                    showPopup(
+                        Popup.Warning(
+                            title = "일정 삭제",
+                            desc = "정말 삭제하겠습니까?",
+                            onPositiveClick = {
+                                onAction(TripAction.DeleteTrip(it))
+                            }
+                        )
+                    )
                 },
                 onNavigateToDetail = onNavigateToDetail
             )
-        }
-
-        if (showDeleteDialog) {
-            WarningDialog(
-                dialogTitle = "일정 삭제",
-                dialogText = "정말 삭제하겠습니까?",
-                onConfirmation = {
-                    onAction(TripAction.DeleteTrip(selectedTripId))
-                    showDeleteDialog = false
-                },
-                onDismissRequest = {
-                    showDeleteDialog = false
-                    selectedTripId = ""
-                })
         }
     }
 }
@@ -407,6 +397,7 @@ private fun TripScreenPreview() {
         uiState = uiState,
         onNavigateToSchedule = {},
         onNavigateToDetail = {},
-        onAction = {}
+        onAction = {},
+        showPopup = {}
     )
 }

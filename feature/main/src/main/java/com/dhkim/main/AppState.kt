@@ -28,9 +28,7 @@ import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
 import com.dhkim.trip.presentation.navigation.navigateToTripDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripImageDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripSchedule
-import com.dhkim.ui.Popup
 import com.dhkim.user.domain.Friend
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Stable
 class AppState(
@@ -63,7 +61,6 @@ class AppState(
 
             return route
         }
-    var currentPopup = MutableStateFlow<Popup?>(null)
 
     fun navigateToTopLevelDestination(route: String) {
         navController.navigate(route) {
@@ -131,14 +128,6 @@ class AppState(
                 ?.savedStateHandle
                 ?.set("place", place)
         }
-    }
-
-    fun showPopup(popup: Popup) {
-        currentPopup.value = popup
-    }
-
-    fun hidePopup() {
-        currentPopup.value = null
     }
 }
 

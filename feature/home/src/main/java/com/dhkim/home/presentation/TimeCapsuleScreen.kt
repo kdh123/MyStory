@@ -183,15 +183,12 @@ fun TimeCapsuleScreen(
                                     Popup.Warning(
                                         title = "삭제",
                                         desc = desc,
-                                        positiveText = "확인",
                                         onPositiveClick = {
                                             onDeleteTimeCapsule(
                                                 selectedTimeCapsule.id,
                                                 selectedTimeCapsule.isReceived
                                             )
-                                        },
-                                        negativeText = "취소",
-                                        onNegativeClick = {}
+                                        }
                                     )
                                 )
                             }
@@ -356,7 +353,6 @@ fun TimeCapsuleScreen(
                                                 Popup.Warning(
                                                     title = "위치 권한 요청",
                                                     desc = "타임캡슐을 개봉하기 위해서 위치 권한을 허용해주세요.",
-                                                    positiveText = "확인",
                                                     onPositiveClick = {
                                                         val uri = Uri.fromParts("package", context.packageName, null)
                                                         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -364,9 +360,7 @@ fun TimeCapsuleScreen(
                                                             data = uri
                                                         }
                                                         context.startActivity(intent)
-                                                    },
-                                                    negativeText = "취소",
-                                                    onNegativeClick = {}
+                                                    }
                                                 )
                                             )
                                         } else {
@@ -379,12 +373,9 @@ fun TimeCapsuleScreen(
                                             Popup.Warning(
                                                 title = "개봉",
                                                 desc = "정말 개봉하겠습니까?",
-                                                positiveText = "확인",
                                                 onPositiveClick = {
                                                     onNavigateToOpen(it.id, it.isReceived)
-                                                },
-                                                negativeText = "취소",
-                                                onNegativeClick = {},
+                                                }
                                             )
                                         )
                                     },

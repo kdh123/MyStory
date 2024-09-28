@@ -18,6 +18,7 @@ import com.dhkim.trip.presentation.schedule.TripScheduleScreen
 import com.dhkim.trip.presentation.schedule.TripScheduleViewModel
 import com.dhkim.trip.presentation.tripHome.TripScreen
 import com.dhkim.trip.presentation.tripHome.TripViewModel
+import com.dhkim.ui.Popup
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
@@ -32,6 +33,7 @@ fun NavGraphBuilder.tripScreen(
     onNavigateToSchedule: (String) -> Unit,
     onNavigateToDetail: (String) -> Unit,
     onNavigateToImageDetail: (String) -> Unit,
+    showPopup: (Popup) -> Unit,
     onBack: () -> Unit
 ) {
     navigation(startDestination = TRIP_ROUTE, route = TRIP_MAIN_ROUTE) {
@@ -46,7 +48,8 @@ fun NavGraphBuilder.tripScreen(
                 },
                 modifier = modifier,
                 onNavigateToSchedule = onNavigateToSchedule,
-                onNavigateToDetail = onNavigateToDetail
+                onNavigateToDetail = onNavigateToDetail,
+                showPopup = showPopup
             )
         }
 

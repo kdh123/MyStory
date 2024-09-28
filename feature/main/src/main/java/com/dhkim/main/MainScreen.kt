@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import com.dhkim.friend.presentation.navigation.FRIEND_MAIN_ROUTE
 import com.dhkim.friend.presentation.navigation.friendScreen
@@ -48,6 +47,8 @@ fun MainScreen(
     showGuide: Boolean,
     onCloseGuide: () -> Unit,
     onNeverShowGuideAgain: () -> Unit,
+    currentPopup: Popup?,
+    showPopup: (Popup?) -> Unit
 ) {
     var isPlaceSelected by remember {
         mutableStateOf(false)
@@ -137,7 +138,7 @@ fun MainScreen(
                 onNavigateToProfile = appState::navigateToFriend,
                 onNavigateToMore = appState::navigateToMoreTimeCapsule,
                 onNavigateToImageDetail = appState::navigateToImageDetail,
-                showPopup = appState::showPopup,
+                showPopup = showPopup,
                 onBack = appState.navController::navigateUp,
                 modifier = Modifier
                     .padding(bottom = innerPadding.calculateBottomPadding())
@@ -159,6 +160,7 @@ fun MainScreen(
                 onNavigateToSchedule = appState::navigateToTripSchedule,
                 onNavigateToDetail = appState::navigateToTripDetail,
                 onNavigateToImageDetail = appState::navigateToTripImageDetail,
+                showPopup = showPopup,
                 onBack = appState.navController::navigateUp
             )
             friendScreen(
@@ -177,22 +179,23 @@ fun MainScreen(
         }
     }
 
-    val currentPopup by appState.currentPopup.collectAsStateWithLifecycle()
     when (currentPopup) {
         is Popup.OneButton -> {
 
         }
 
         is Popup.Warning -> {
-            appState.currentPopup.value?.run {
+            with(currentPopup) {
                 WarningDialog(
                     dialogTitle = title,
                     dialogText = desc,
                     onConfirmation = {
                         onPositiveClick()
-                        appState.hidePopup()
+                        showPopup(null)
                     },
-                    onDismissRequest = appState::hidePopup
+                    onDismissRequest = {
+                        showPopup(null)
+                    }
                 )
             }
         }

@@ -32,12 +32,15 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val showGuide by viewModel.showGuide.collectAsStateWithLifecycle(initialValue = false)
+            val currentPopup by viewModel.currentPopup.collectAsStateWithLifecycle()
 
             MainScreen(
                 appState = rememberMyStoryAppState(),
                 showGuide = showGuide,
                 onCloseGuide = viewModel::closeGuideDialog,
-                onNeverShowGuideAgain = viewModel::neverShowGuideAgain
+                onNeverShowGuideAgain = viewModel::neverShowGuideAgain,
+                currentPopup = currentPopup,
+                showPopup = viewModel::showPopup
             )
         }
 
