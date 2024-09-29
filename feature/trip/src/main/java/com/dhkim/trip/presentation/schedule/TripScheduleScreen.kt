@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -58,8 +59,6 @@ import com.dhkim.trip.domain.model.TripType
 import com.dhkim.trip.domain.model.toTripType
 import com.dhkim.ui.noRippleClick
 import com.dhkim.ui.onStartCollect
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -148,11 +147,122 @@ fun TripScheduleScreen(
                     }
 
                     1 -> {
-                        TripPlaceScreen(
-                            tripPlaces = uiState.tripPlaces,
-                            onAction = onAction,
-                            onMoveToPage = onMoveToNextPage
-                        )
+                        var selectedPlaceTypeIndex by rememberSaveable {
+                            mutableIntStateOf(0)
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .fillMaxSize()
+                        ) {
+                            Text(
+                                text = "여행하려는 장소가 어디인가요?",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            TripPlaceType(
+                                isDomesticSelected = selectedPlaceTypeIndex == 0,
+                                onDomesticClick = {
+                                    selectedPlaceTypeIndex = 0
+                                },
+                                onAbroadClick = {
+                                    selectedPlaceTypeIndex = 1
+                                }
+                            )
+
+                            var selectedCount by rememberSaveable {
+                                mutableIntStateOf(0)
+                            }
+                            var selectedDomesticPlaces by rememberSaveable {
+                                mutableStateOf("")
+                            }
+                            var selectedAbroadPlaces by rememberSaveable {
+                                mutableStateOf("")
+                            }
+
+                            if (selectedPlaceTypeIndex == 0) {
+                                LazyColumn(
+                                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                                    modifier = Modifier
+                                        .padding(vertical = 10.dp)
+                                        .fillMaxWidth()
+                                        .height(0.dp)
+                                        .weight(1f)
+                                ) {
+                                    items(
+                                        items = TripPlace.DomesticPlace.entries.toTypedArray(),
+                                        key = { item ->
+                                            item.placeName
+                                        }
+                                    ) { item ->
+                                        PlaceItem(
+                                            initIsSelected = selectedDomesticPlaces.split(",")
+                                                .filter { it.isNotBlank() }
+                                                .contains(item.placeName),
+                                            placeName = item.placeName,
+                                            onClick = { isSelected, placeName ->
+                                                if (isSelected) {
+                                                    selectedDomesticPlaces += "$placeName,"
+                                                    selectedCount++
+                                                } else {
+                                                    selectedDomesticPlaces = selectedDomesticPlaces.replace("$placeName,", "")
+                                                    selectedCount--
+                                                }
+                                                onAction(TripScheduleAction.SelectTripPlace(isSelected, placeName))
+                                            }
+                                        )
+                                    }
+                                }
+                            } else {
+                                LazyColumn(
+                                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                                    modifier = Modifier
+                                        .padding(vertical = 10.dp)
+                                        .fillMaxWidth()
+                                        .height(0.dp)
+                                        .weight(1f)
+                                ) {
+                                    items(
+                                        items = TripPlace.AbroadPlace.entries.toTypedArray(),
+                                        key = { item ->
+                                            item.placeName
+                                        }
+                                    ) { item ->
+                                        PlaceItem(
+                                            initIsSelected = selectedAbroadPlaces.split(",")
+                                                .filter { it.isNotBlank() }
+                                                .contains(item.placeName),
+                                            placeName = item.placeName,
+                                            onClick = { isSelected, placeName ->
+                                                if (isSelected) {
+                                                    selectedCount++
+                                                    selectedAbroadPlaces += "$placeName,"
+                                                } else {
+                                                    selectedCount--
+                                                    selectedAbroadPlaces = selectedAbroadPlaces.replace("$placeName,", "")
+                                                }
+
+                                                onAction(TripScheduleAction.SelectTripPlace(isSelected, placeName))
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            TripPlaceBottom(
+                                enableNextButton = selectedCount > 0,
+                                onPrevClick = {
+                                    onMoveToNextPage.invoke(0)
+                                    onAction(TripScheduleAction.UpdateProgress(0.33f))
+                                },
+                                onNextClick = {
+                                    onMoveToNextPage.invoke(2)
+                                    onAction(TripScheduleAction.UpdateProgress(1f))
+                                }
+                            )
+                        }
                     }
 
                     2 -> {
@@ -202,6 +312,151 @@ fun TripScheduleScreen(
                 }
             )
         }
+    }
+}
+
+@Composable
+fun TripPlaceType(
+    isDomesticSelected: Boolean,
+    onDomesticClick: () -> Unit,
+    onAbroadClick: () -> Unit
+) {
+    Row {
+        Text(
+            text = "국내",
+            color = if (isDomesticSelected) {
+                colorResource(id = R.color.primary)
+            } else {
+                colorResource(id = R.color.black)
+            },
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(top = 10.dp, end = 10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(
+                    color = colorResource(
+                        id = if (isDomesticSelected) {
+                            R.color.white
+                        } else {
+                            R.color.light_gray
+                        }
+                    )
+                )
+                .run {
+                    if (isDomesticSelected) {
+                        border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.primary),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                    } else {
+                        this
+                    }
+                }
+                .padding(horizontal = 10.dp, vertical = 8.dp)
+                .noRippleClick {
+                    onDomesticClick()
+                }
+                .testTag("domestic")
+        )
+
+        Text(
+            text = "해외",
+            color = if (!isDomesticSelected) {
+                colorResource(id = R.color.primary)
+            } else {
+                colorResource(id = R.color.black)
+            },
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            modifier = Modifier
+                .padding(top = 10.dp, end = 10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(
+                    color = colorResource(
+                        id = if (!isDomesticSelected) {
+                            R.color.white
+                        } else {
+                            R.color.light_gray
+                        }
+                    )
+                )
+                .run {
+                    if (!isDomesticSelected) {
+                        border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.primary),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                    } else {
+                        this
+                    }
+                }
+                .padding(horizontal = 10.dp, vertical = 8.dp)
+                .noRippleClick {
+                    onAbroadClick()
+                }
+                .testTag("abroad")
+        )
+    }
+}
+
+@Composable
+fun TripPlaceBottom(
+    enableNextButton: Boolean,
+    onPrevClick: () -> Unit,
+    onNextClick: () -> Unit
+) {
+    val textColor = if (enableNextButton) {
+        colorResource(id = R.color.white)
+    } else {
+        colorResource(id = R.color.gray)
+    }
+
+    val backgroundColor = if (enableNextButton) {
+        colorResource(id = R.color.primary)
+    } else {
+        colorResource(id = R.color.light_gray)
+    }
+
+    Column {
+        Text(
+            text = "이전",
+            fontSize = 16.sp,
+            color = colorResource(id = R.color.white),
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(bottom = 10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .fillMaxWidth()
+                .background(color = colorResource(id = R.color.primary))
+                .padding(10.dp)
+                .noRippleClick {
+                    onPrevClick()
+                }
+                .testTag("tripPlacePrevBtn")
+        )
+
+        Text(
+            text = "다음",
+            fontSize = 16.sp,
+            color = textColor,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .fillMaxWidth()
+                .background(color = backgroundColor)
+                .padding(10.dp)
+                .noRippleClick {
+                    if (enableNextButton) {
+                        onNextClick()
+                    }
+                }
+                .testTag("tripPlaceNextBtn")
+        )
     }
 }
 
@@ -409,333 +664,64 @@ private fun TripTypeScreenPreview() {
 }
 
 @Composable
-private fun TripPlaceScreen(
-    tripPlaces: ImmutableList<TripPlace>,
-    onAction: (TripScheduleAction) -> Unit,
-    onMoveToPage: (Int) -> Unit
+fun PlaceItem(
+    initIsSelected: Boolean,
+    placeName: String,
+    onClick: (Boolean, String) -> Unit,
 ) {
-    var selectedPlaceTypeIndex by remember {
-        mutableIntStateOf(0)
+    var isSelected by rememberSaveable {
+        mutableStateOf(initIsSelected)
     }
 
-    Column(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxSize()
-    ) {
+    Row {
         Text(
-            text = "여행하려는 장소가 어디인가요?",
+            text = placeName,
             fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .width(0.dp)
+                .weight(1f)
+                .align(Alignment.CenterVertically)
         )
 
-        Row {
-            Text(
-                text = "국내",
-                color = if (selectedPlaceTypeIndex == 0) {
-                    colorResource(id = R.color.primary)
-                } else {
-                    colorResource(id = R.color.black)
-                },
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(top = 10.dp, end = 10.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        color = colorResource(
-                            id = if (selectedPlaceTypeIndex == 0) {
-                                R.color.white
-                            } else {
-                                R.color.light_gray
-                            }
-                        )
-                    )
-                    .run {
-                        if (selectedPlaceTypeIndex == 0) {
-                            border(
-                                width = 1.dp,
-                                color = colorResource(id = R.color.primary),
-                                shape = RoundedCornerShape(10.dp)
-                            )
+        Text(
+            text = "선택",
+            color = if (isSelected) {
+                colorResource(id = R.color.primary)
+            } else {
+                colorResource(id = R.color.black)
+            },
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(
+                    color = colorResource(
+                        id = if (isSelected) {
+                            R.color.white
                         } else {
-                            this
+                            R.color.light_gray
                         }
-                    }
-                    .padding(horizontal = 10.dp, vertical = 8.dp)
-                    .noRippleClick {
-                        selectedPlaceTypeIndex = 0
-                    }
-                    .testTag("domestic")
-            )
-
-            Text(
-                text = "해외",
-                color = if (selectedPlaceTypeIndex == 1) {
-                    colorResource(id = R.color.primary)
-                } else {
-                    colorResource(id = R.color.black)
-                },
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .padding(top = 10.dp, end = 10.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        color = colorResource(
-                            id = if (selectedPlaceTypeIndex == 1) {
-                                R.color.white
-                            } else {
-                                R.color.light_gray
-                            }
-                        )
                     )
-                    .run {
-                        if (selectedPlaceTypeIndex == 1) {
-                            border(
-                                width = 1.dp,
-                                color = colorResource(id = R.color.primary),
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                        } else {
-                            this
-                        }
-                    }
-                    .padding(horizontal = 10.dp, vertical = 8.dp)
-                    .noRippleClick {
-                        selectedPlaceTypeIndex = 1
-                    }
-                    .testTag("abroad")
-            )
-        }
-
-        if (selectedPlaceTypeIndex == 0) {
-            DomesticPlaces(
-                tripPlaces = tripPlaces,
-                onAction = onAction,
-                modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .fillMaxWidth()
-                    .height(0.dp)
-                    .weight(1f)
-            )
-        } else {
-            AbroadPlaces(
-                tripPlaces = tripPlaces,
-                onAction = onAction,
-                modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .fillMaxWidth()
-                    .height(0.dp)
-                    .weight(1f)
-            )
-        }
-
-        val isCompleted = tripPlaces.isNotEmpty()
-
-        val textColor = if (isCompleted) {
-            colorResource(id = R.color.white)
-        } else {
-            colorResource(id = R.color.gray)
-        }
-
-        val backgroundColor = if (isCompleted) {
-            colorResource(id = R.color.primary)
-        } else {
-            colorResource(id = R.color.light_gray)
-        }
-
-        Column {
-            Text(
-                text = "이전",
-                fontSize = 16.sp,
-                color = colorResource(id = R.color.white),
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(bottom = 10.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
-                    .background(color = colorResource(id = R.color.primary))
-                    .padding(10.dp)
-                    .noRippleClick {
-                        onMoveToPage(0)
-                        onAction(TripScheduleAction.UpdateProgress(0.33f))
-                    }
-                    .testTag("tripPlacePrevBtn")
-            )
-
-            Text(
-                text = "다음",
-                fontSize = 16.sp,
-                color = textColor,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
-                    .background(color = backgroundColor)
-                    .padding(10.dp)
-                    .noRippleClick {
-                        if (isCompleted) {
-                            onMoveToPage(2)
-                            onAction(TripScheduleAction.UpdateProgress(1f))
-                        }
-                    }
-                    .testTag("tripPlaceNextBtn")
-            )
-        }
-    }
-}
-
-@Composable
-private fun DomesticPlaces(
-    tripPlaces: ImmutableList<TripPlace>,
-    onAction: (TripScheduleAction) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val onClick: (Int) -> Unit = remember {
-        {
-            onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.entries[it]))
-        }
-    }
-
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = modifier
-    ) {
-        itemsIndexed(
-            items = TripPlace.DomesticPlace.entries.toTypedArray(),
-            key = { index, _ ->
-                index
-            }) { index, item ->
-            val isDomesticSelected = tripPlaces
-                .filterIsInstance<TripPlace.DomesticPlace>()
-                .map { it.placeName }
-                .contains(item.placeName)
-
-            Row {
-                Text(
-                    text = item.placeName,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                        .width(0.dp)
-                        .weight(1f)
-                        .align(Alignment.CenterVertically)
                 )
-
-                Text(
-                    text = "선택",
-                    color = if (isDomesticSelected) {
-                        colorResource(id = R.color.primary)
-                    } else {
-                        colorResource(id = R.color.black)
-                    },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(
-                            color = colorResource(
-                                id = if (isDomesticSelected) {
-                                    R.color.white
-                                } else {
-                                    R.color.light_gray
-                                }
-                            )
+                .run {
+                    if (isSelected) {
+                        border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.primary),
+                            shape = RoundedCornerShape(20.dp)
                         )
-                        .run {
-                            if (isDomesticSelected) {
-                                border(
-                                    width = 1.dp,
-                                    color = colorResource(id = R.color.primary),
-                                    shape = RoundedCornerShape(20.dp)
-                                )
-                            } else {
-                                this
-                            }
-                        }
-                        .align(Alignment.CenterVertically)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .noRippleClick {
-                            onClick(index)
-                        }
-                        .testTag(item.placeName)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun AbroadPlaces(
-    tripPlaces: ImmutableList<TripPlace>,
-    onAction: (TripScheduleAction) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = modifier
-    ) {
-        itemsIndexed(
-            items = TripPlace.AbroadPlace.entries.toTypedArray(),
-            key = { index, _ ->
-                index
-            }) { index, item ->
-            val isAbroadSelected = tripPlaces
-                .filterIsInstance<TripPlace.AbroadPlace>()
-                .map { it.placeName }
-                .contains(item.placeName)
-
-            Row {
-                Text(
-                    text = item.placeName,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                        .width(0.dp)
-                        .weight(1f)
-                        .align(Alignment.CenterVertically)
-                )
-
-                Text(
-                    text = "선택",
-                    color = if (isAbroadSelected) {
-                        colorResource(id = R.color.primary)
                     } else {
-                        colorResource(id = R.color.black)
-                    },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(
-                            color = colorResource(
-                                id = if (isAbroadSelected) {
-                                    R.color.white
-                                } else {
-                                    R.color.light_gray
-                                }
-                            )
-                        )
-                        .run {
-                            if (isAbroadSelected) {
-                                border(
-                                    width = 1.dp,
-                                    color = colorResource(id = R.color.primary),
-                                    shape = RoundedCornerShape(20.dp)
-                                )
-                            } else {
-                                this
-                            }
-                        }
-                        .align(Alignment.CenterVertically)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .noRippleClick {
-                            onAction(TripScheduleAction.UpdatePlaces(TripPlace.AbroadPlace.entries[index]))
-                        }
-                )
-            }
-        }
+                        this
+                    }
+                }
+                .align(Alignment.CenterVertically)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .noRippleClick {
+                    isSelected = !isSelected
+                    onClick(isSelected, placeName)
+                }
+                .testTag(placeName)
+        )
     }
 }
 
@@ -885,15 +871,5 @@ private fun TripDateScreenPreview() {
         onMoveToPage = {},
         onShowStartDateDialog = {},
         onShowEndDateDialog = {}
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TripPlaceScreenPreview() {
-    TripPlaceScreen(
-        tripPlaces = persistentListOf(),
-        onAction = {},
-        onMoveToPage = {}
     )
 }
