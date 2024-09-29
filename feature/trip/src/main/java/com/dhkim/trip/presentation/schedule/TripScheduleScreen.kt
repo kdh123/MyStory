@@ -151,11 +151,7 @@ fun TripScheduleScreen(
                         TripPlaceScreen(
                             tripPlaces = uiState.tripPlaces,
                             onAction = onAction,
-                            onMoveToPage = {
-                                scope.launch {
-                                    pagerState.scrollToPage(it)
-                                }
-                            }
+                            onMoveToPage = onMoveToNextPage
                         )
                     }
 
@@ -332,8 +328,6 @@ private fun TripTypeScreen(
                     isSelected = selectedIndex == index,
                     index = index,
                     desc = item.desc,
-                    colorResId = if (index == selectedIndex) R.color.primary else R.color.black,
-                    backgroundColorResId = if (index == selectedIndex) R.color.white  else R.color.light_gray,
                     onClick = onClick
                 )
             }
@@ -365,13 +359,15 @@ fun TripTypeItem(
     isSelected: Boolean,
     index: Int,
     desc: String,
-    colorResId: Int,
-    backgroundColorResId: Int,
     onClick: (Int) -> Unit,
 ) {
     Text(
         text = desc,
-        color = colorResource(id = colorResId),
+        color = if (isSelected) {
+            colorResource(id = R.color.primary)
+        } else {
+            colorResource(id = R.color.black)
+        },
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
         modifier = Modifier
@@ -389,7 +385,13 @@ fun TripTypeItem(
                     this
                 }
             }
-            .background(color = colorResource(id = backgroundColorResId))
+            .background(
+                color = if (isSelected) {
+                    colorResource(id = R.color.white)
+                } else {
+                    colorResource(id = R.color.light_gray)
+                }
+            )
             .padding(vertical = 14.dp)
             .noRippleClick(index = index, onClick = onClick)
             .testTag("tripType$index")
