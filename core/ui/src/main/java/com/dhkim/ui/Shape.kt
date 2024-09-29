@@ -97,6 +97,20 @@ fun Modifier.noRippleClick(
     }
 }
 
+fun Modifier.noRippleClick(
+    index: Int,
+    onClick: (Int) -> Unit
+) = composed {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Modifier.clickable(
+        interactionSource = interactionSource,
+        indication = null
+    ) {
+        onClick(index)
+    }
+}
+
 fun Modifier.drawAnimatedBorder(
     strokeWidth: Dp,
     shape: Shape,

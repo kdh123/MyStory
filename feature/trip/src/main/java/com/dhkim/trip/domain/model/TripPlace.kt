@@ -1,6 +1,11 @@
 package com.dhkim.trip.domain.model
 
+import androidx.compose.runtime.Stable
+
+@Stable
 sealed interface TripPlace {
+
+    @Stable
     enum class DomesticPlace(val placeName: String) : TripPlace {
         Seoul("서울"),
         Incheon("인천"),
@@ -19,6 +24,7 @@ sealed interface TripPlace {
         Domestic("국내"),
     }
 
+    @Stable
     enum class AbroadPlace(val placeName: String) : TripPlace {
         USA("미국"),
         Japan("일본"),

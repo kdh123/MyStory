@@ -58,6 +58,8 @@ import com.dhkim.trip.domain.model.TripType
 import com.dhkim.trip.domain.model.toTripType
 import com.dhkim.ui.noRippleClick
 import com.dhkim.ui.onStartCollect
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -124,6 +126,14 @@ fun TripScheduleScreen(
                     .align(Alignment.End)
             )
 
+            val onMoveToNextPage: (Int) -> Unit = remember {
+                {
+                    scope.launch {
+                        pagerState.scrollToPage(it)
+                    }
+                }
+            }
+
             HorizontalPager(
                 state = pagerState,
                 userScrollEnabled = false
@@ -131,19 +141,15 @@ fun TripScheduleScreen(
                 when (page) {
                     0 -> {
                         TripTypeScreen(
-                            uiState = uiState,
+                            type = uiState.type.type,
                             onAction = onAction,
-                            onMoveToNextPage = {
-                                scope.launch {
-                                    pagerState.scrollToPage(it)
-                                }
-                            }
+                            onMoveToNextPage = onMoveToNextPage
                         )
                     }
 
                     1 -> {
                         TripPlaceScreen(
-                            uiState = uiState,
+                            tripPlaces = uiState.tripPlaces,
                             onAction = onAction,
                             onMoveToPage = {
                                 scope.launch {
@@ -287,12 +293,18 @@ private fun TripScheduleScreenPreview() {
 
 @Composable
 private fun TripTypeScreen(
-    uiState: TripScheduleUiState,
+    type: Int,
     onAction: (TripScheduleAction) -> Unit,
     onMoveToNextPage: (Int) -> Unit
 ) {
-    var selectedIndex by remember(uiState.type.type) {
-        mutableIntStateOf(uiState.type.type)
+    var selectedIndex by remember(type) {
+        mutableIntStateOf(type)
+    }
+
+    val onClick: (Int) -> Unit = remember {
+        {
+            selectedIndex = it
+        }
     }
 
     Column(
@@ -316,42 +328,13 @@ private fun TripTypeScreen(
             itemsIndexed(items = TripType.entries.toTypedArray(), key = { _, item ->
                 item.type
             }) { index, item ->
-                Text(
-                    text = item.desc,
-                    color = if (index == selectedIndex) {
-                        colorResource(id = R.color.primary)
-                    } else {
-                        colorResource(id = R.color.black)
-                    },
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .fillMaxWidth()
-                        .run {
-                            if (index == selectedIndex) {
-                                border(
-                                    width = 1.dp,
-                                    color = colorResource(id = R.color.primary),
-                                    shape = RoundedCornerShape(10.dp)
-                                )
-                            } else {
-                                this
-                            }
-                        }
-                        .background(
-                            color = if (index == selectedIndex) {
-                                colorResource(id = R.color.white)
-                            } else {
-                                colorResource(id = R.color.light_gray)
-                            }
-                        )
-                        .padding(vertical = 14.dp)
-                        .noRippleClick {
-                            selectedIndex = index
-                        }
-                        .testTag("tripType$index")
+                TripTypeItem(
+                    isSelected = selectedIndex == index,
+                    index = index,
+                    desc = item.desc,
+                    colorResId = if (index == selectedIndex) R.color.primary else R.color.black,
+                    backgroundColorResId = if (index == selectedIndex) R.color.white  else R.color.light_gray,
+                    onClick = onClick
                 )
             }
         }
@@ -377,11 +360,47 @@ private fun TripTypeScreen(
     }
 }
 
+@Composable
+fun TripTypeItem(
+    isSelected: Boolean,
+    index: Int,
+    desc: String,
+    colorResId: Int,
+    backgroundColorResId: Int,
+    onClick: (Int) -> Unit,
+) {
+    Text(
+        text = desc,
+        color = colorResource(id = colorResId),
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .fillMaxWidth()
+            .run {
+                if (isSelected) {
+                    border(
+                        width = 1.dp,
+                        color = colorResource(id = R.color.primary),
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                } else {
+                    this
+                }
+            }
+            .background(color = colorResource(id = backgroundColorResId))
+            .padding(vertical = 14.dp)
+            .noRippleClick(index = index, onClick = onClick)
+            .testTag("tripType$index")
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun TripTypeScreenPreview() {
     TripTypeScreen(
-        uiState = TripScheduleUiState(),
+        type = TripType.Alone.type,
         onAction = {},
         onMoveToNextPage = {}
     )
@@ -389,7 +408,7 @@ private fun TripTypeScreenPreview() {
 
 @Composable
 private fun TripPlaceScreen(
-    uiState: TripScheduleUiState,
+    tripPlaces: ImmutableList<TripPlace>,
     onAction: (TripScheduleAction) -> Unit,
     onMoveToPage: (Int) -> Unit
 ) {
@@ -490,7 +509,7 @@ private fun TripPlaceScreen(
 
         if (selectedPlaceTypeIndex == 0) {
             DomesticPlaces(
-                uiState = uiState,
+                tripPlaces = tripPlaces,
                 onAction = onAction,
                 modifier = Modifier
                     .padding(vertical = 10.dp)
@@ -500,7 +519,7 @@ private fun TripPlaceScreen(
             )
         } else {
             AbroadPlaces(
-                uiState = uiState,
+                tripPlaces = tripPlaces,
                 onAction = onAction,
                 modifier = Modifier
                     .padding(vertical = 10.dp)
@@ -510,7 +529,7 @@ private fun TripPlaceScreen(
             )
         }
 
-        val isCompleted = uiState.tripPlaces.isNotEmpty()
+        val isCompleted = tripPlaces.isNotEmpty()
 
         val textColor = if (isCompleted) {
             colorResource(id = R.color.white)
@@ -569,10 +588,16 @@ private fun TripPlaceScreen(
 
 @Composable
 private fun DomesticPlaces(
-    uiState: TripScheduleUiState,
+    tripPlaces: ImmutableList<TripPlace>,
     onAction: (TripScheduleAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val onClick: (Int) -> Unit = remember {
+        {
+            onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.entries[it]))
+        }
+    }
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = modifier
@@ -582,7 +607,7 @@ private fun DomesticPlaces(
             key = { index, _ ->
                 index
             }) { index, item ->
-            val isDomesticSelected = uiState.tripPlaces
+            val isDomesticSelected = tripPlaces
                 .filterIsInstance<TripPlace.DomesticPlace>()
                 .map { it.placeName }
                 .contains(item.placeName)
@@ -631,7 +656,7 @@ private fun DomesticPlaces(
                         .align(Alignment.CenterVertically)
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .noRippleClick {
-                            onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.entries[index]))
+                            onClick(index)
                         }
                         .testTag(item.placeName)
                 )
@@ -642,7 +667,7 @@ private fun DomesticPlaces(
 
 @Composable
 private fun AbroadPlaces(
-    uiState: TripScheduleUiState,
+    tripPlaces: ImmutableList<TripPlace>,
     onAction: (TripScheduleAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -655,7 +680,7 @@ private fun AbroadPlaces(
             key = { index, _ ->
                 index
             }) { index, item ->
-            val isAbroadSelected = uiState.tripPlaces
+            val isAbroadSelected = tripPlaces
                 .filterIsInstance<TripPlace.AbroadPlace>()
                 .map { it.placeName }
                 .contains(item.placeName)
@@ -865,7 +890,7 @@ private fun TripDateScreenPreview() {
 @Composable
 private fun TripPlaceScreenPreview() {
     TripPlaceScreen(
-        uiState = TripScheduleUiState(),
+        tripPlaces = persistentListOf(),
         onAction = {},
         onMoveToPage = {}
     )
