@@ -291,10 +291,6 @@ private fun TripTypeScreen(
     onAction: (TripScheduleAction) -> Unit,
     onMoveToNextPage: (Int) -> Unit
 ) {
-    var selectedIndex by remember(uiState.type.type) {
-        mutableIntStateOf(uiState.type.type)
-    }
-
     Column(
         modifier = Modifier
             .padding(10.dp)
@@ -316,65 +312,88 @@ private fun TripTypeScreen(
             itemsIndexed(items = TripType.entries.toTypedArray(), key = { _, item ->
                 item.type
             }) { index, item ->
-                Text(
-                    text = item.desc,
-                    color = if (index == selectedIndex) {
-                        colorResource(id = R.color.primary)
-                    } else {
-                        colorResource(id = R.color.black)
-                    },
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .fillMaxWidth()
-                        .run {
-                            if (index == selectedIndex) {
-                                border(
-                                    width = 1.dp,
-                                    color = colorResource(id = R.color.primary),
-                                    shape = RoundedCornerShape(10.dp)
-                                )
-                            } else {
-                                this
-                            }
-                        }
-                        .background(
-                            color = if (index == selectedIndex) {
-                                colorResource(id = R.color.white)
-                            } else {
-                                colorResource(id = R.color.light_gray)
-                            }
-                        )
-                        .padding(vertical = 14.dp)
-                        .noRippleClick {
-                            selectedIndex = index
-                        }
-                        .testTag("tripType$index")
+                TripTypeItem(
+                    index = index,
+                    desc = item.desc,
+                    isSelected = item.type == uiState.type.type,
+                    onAction = onAction
                 )
             }
         }
 
-        Text(
-            text = "다음",
-            fontSize = 16.sp,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .fillMaxWidth()
-                .background(color = colorResource(id = R.color.primary))
-                .padding(10.dp)
-                .noRippleClick {
-                    onAction(TripScheduleAction.UpdateType(selectedIndex.toTripType()))
-                    onMoveToNextPage(1)
-                    onAction(TripScheduleAction.UpdateProgress(0.66f))
-                }
-                .testTag("tripTypeNextBtn")
-        )
+        val onNextClick = remember {
+            {
+                onMoveToNextPage(1)
+                onAction(TripScheduleAction.UpdateProgress(0.66f))
+            }
+        }
+
+        TripTypeNextButton(onNextClick = onNextClick)
     }
+}
+
+@Composable
+fun TripTypeNextButton(onNextClick: () -> Unit) {
+    Text(
+        text = "다음",
+        fontSize = 16.sp,
+        color = Color.White,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .fillMaxWidth()
+            .background(color = colorResource(id = R.color.primary))
+            .padding(10.dp)
+            .noRippleClick(onClick = onNextClick)
+            .testTag("tripTypeNextBtn")
+    )
+}
+
+@Composable
+fun TripTypeItem(
+    index: Int,
+    desc: String,
+    isSelected: Boolean,
+    onAction: (TripScheduleAction) -> Unit
+) {
+    Text(
+        text = desc,
+        color = if (isSelected) {
+            colorResource(id = R.color.primary)
+        } else {
+            colorResource(id = R.color.black)
+        },
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .fillMaxWidth()
+            .run {
+                if (isSelected) {
+                    border(
+                        width = 1.dp,
+                        color = colorResource(id = R.color.primary),
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                } else {
+                    this
+                }
+            }
+            .background(
+                color = if (isSelected) {
+                    colorResource(id = R.color.white)
+                } else {
+                    colorResource(id = R.color.light_gray)
+                }
+            )
+            .padding(vertical = 14.dp)
+            .noRippleClick {
+                onAction(TripScheduleAction.UpdateType(index.toTripType()))
+            }
+            .testTag("tripType$index")
+    )
 }
 
 @Preview(showBackground = true)

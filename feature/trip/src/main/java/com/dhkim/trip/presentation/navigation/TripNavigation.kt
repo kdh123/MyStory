@@ -76,7 +76,9 @@ fun NavGraphBuilder.tripScreen(
                 tripId = tripId,
                 uiState = uiState,
                 sideEffect = sideEffect,
-                onAction = viewModel::onAction,
+                onAction = remember(viewModel) {
+                    viewModel::onAction
+                },
                 onBack = onBack
             )
         }
