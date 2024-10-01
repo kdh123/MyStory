@@ -22,7 +22,6 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -83,10 +82,11 @@ class FriendScreenTest {
             FriendScreen(
                 uiState = uiState,
                 sideEffect = { sideEffect },
-                onAction = viewModel::onAction,
-                onNavigateToChangeInfo = {},
+                onAction = { viewModel.onAction(it) },
                 onNavigateToAddTimeCapsule = {},
-                onBack = {}
+                onNavigateToChangeInfo = {},
+                showPopup = {},
+                onBack = {},
             )
         }
 

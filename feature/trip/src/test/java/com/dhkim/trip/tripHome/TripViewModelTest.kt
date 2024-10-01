@@ -5,6 +5,7 @@ import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
 import com.dhkim.trip.data.di.TripModule
 import com.dhkim.trip.domain.TripRepository
+import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.presentation.tripHome.TripViewModel
 import dagger.Binds
 import dagger.Module
@@ -60,8 +61,14 @@ class TripViewModelTest {
     @Test
     fun `uiState 테스트`() = runBlocking {
         delay(300)
-        assertEquals(viewModel.uiState.value.nextTrips?.size, 2)
-        assertEquals(viewModel.uiState.value.prevTrips?.size, 4)
+        assertEquals(viewModel.uiState.value.trips
+            ?.filter { it.data is Trip }
+            ?.filter { (it.data as Trip).isNextTrip }
+            ?.size, 2)
+        assertEquals(viewModel.uiState.value.trips
+            ?.filter { it.data is Trip }
+            ?.filter { !(it.data as Trip).isNextTrip }
+            ?.size, 4)
     }
 
     @Test

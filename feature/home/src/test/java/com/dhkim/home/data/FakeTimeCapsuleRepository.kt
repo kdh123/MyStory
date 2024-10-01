@@ -18,6 +18,8 @@ class FakeTimeCapsuleRepository @Inject constructor(
 ) : TimeCapsuleRepository {
 
     override suspend fun shareTimeCapsule(
+        myId: String,
+        myProfileImage: String,
         timeCapsuleId: String,
         sharedFriends: List<Uuid>,
         openDate: String,
@@ -31,11 +33,11 @@ class FakeTimeCapsuleRepository @Inject constructor(
         return true
     }
 
-    override suspend fun deleteTimeCapsule(sharedFriends: List<Uuid>, timeCapsuleId: String): isSuccessful {
+    override suspend fun deleteTimeCapsule(myId: String, sharedFriends: List<Uuid>, timeCapsuleId: String): isSuccessful {
         return true
     }
 
-    override suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>> {
+    override fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>> {
         return localDataSource.getMyAllTimeCapsule().map { timeCapsules ->
             timeCapsules?.map {
                 it.toMyTimeCapsule()
@@ -73,14 +75,6 @@ class FakeTimeCapsuleRepository @Inject constructor(
 
     override suspend fun deleteMyTimeCapsule(id: String) {
         localDataSource.deleteMyTimeCapsule(id)
-    }
-
-    override suspend fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>> {
-        return localDataSource.getReceivedAllTimeCapsule().map { timeCapsules ->
-            timeCapsules?.map {
-                it.toReceivedTimeCapsule()
-            } ?: listOf()
-        }
     }
 
     override suspend fun getReceivedTimeCapsule(id: String): ReceivedTimeCapsule? {
@@ -138,5 +132,13 @@ class FakeTimeCapsuleRepository @Inject constructor(
 
     override suspend fun deleteSendTimeCapsule(id: String) {
         TODO("Not yet implemented")
+    }
+
+    override fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>> {
+        return localDataSource.getReceivedAllTimeCapsule().map { timeCapsules ->
+            timeCapsules?.map {
+                it.toReceivedTimeCapsule()
+            } ?: listOf()
+        }
     }
 }

@@ -119,6 +119,7 @@ class TimeCapsuleScreenTest {
                 onNavigateToSetting = {},
                 onNavigateToProfile = {},
                 onNavigateToMore = {},
+                showPopup = {}
             )
         }
 
