@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -157,7 +158,8 @@ fun TripScheduleScreen(
                     2 -> {
                         TripDateScreen(
                             tripId = tripId,
-                            uiState = uiState,
+                            startDate = uiState.startDate,
+                            endDate = uiState.endDate,
                             onAction = onAction,
                             onMoveToPage = {
                                 scope.launch {
@@ -743,7 +745,8 @@ private fun AbroadPlaces(
 @Composable
 private fun TripDateScreen(
     tripId: String,
-    uiState: TripScheduleUiState,
+    startDate: String,
+    endDate: String,
     onAction: (TripScheduleAction) -> Unit,
     onMoveToPage: (Int) -> Unit,
     onShowStartDateDialog: () -> Unit,
@@ -762,118 +765,164 @@ private fun TripDateScreen(
                 .padding(bottom = 10.dp)
         )
 
-        Row(
+        Box(
             modifier = Modifier
                 .height(0.dp)
                 .weight(1f)
         ) {
-            Text(
-                text = uiState.startDate.ifEmpty { "시작일" },
-                color = if (uiState.startDate.isEmpty()) {
-                    colorResource(id = R.color.gray)
-                } else {
-                    colorResource(id = R.color.black)
-                },
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .width(0.dp)
-                    .weight(1f)
-                    .border(
-                        width = 1.dp,
-                        color = colorResource(id = R.color.gray),
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(10.dp)
-                    .noRippleClick {
-                        onShowStartDateDialog()
-                    }
-            )
-            Text(
-                text = " - ",
-                color = colorResource(id = R.color.gray),
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-            )
-            Text(
-                text = uiState.endDate.ifEmpty { "종료일" },
-                color = if (uiState.endDate.isEmpty()) {
-                    colorResource(id = R.color.gray)
-                } else {
-                    colorResource(id = R.color.black)
-                },
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .width(0.dp)
-                    .weight(1f)
-                    .border(
-                        width = 1.dp,
-                        color = colorResource(id = R.color.gray),
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(10.dp)
-                    .noRippleClick {
-                        onShowEndDateDialog()
-                    }
-            )
+            Row {
+                StartDate(
+                    startDate = startDate,
+                    onClick = onShowStartDateDialog,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .width(0.dp)
+                        .weight(1f)
+                        .border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.gray),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(10.dp)
+                )
+
+                Text(
+                    text = " - ",
+                    color = colorResource(id = R.color.gray),
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                )
+
+                EndDate(
+                    endDate = endDate,
+                    onClick = onShowEndDateDialog,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .width(0.dp)
+                        .weight(1f)
+                        .border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.gray),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(10.dp)
+                )
+            }
         }
 
-        val isCompleted = uiState.startDate.isNotEmpty() && uiState.endDate.isNotEmpty()
-        val textColor = if (isCompleted) {
-            colorResource(id = R.color.white)
-        } else {
-            colorResource(id = R.color.gray)
+        val isCompleted = startDate.isNotEmpty() && endDate.isNotEmpty()
+        val onPrevClick = remember {
+            {
+                onMoveToPage(1)
+                onAction(TripScheduleAction.UpdateProgress(0.66f))
+            }
         }
-        val backgroundColor = if (isCompleted) {
-            colorResource(id = R.color.primary)
-        } else {
-            colorResource(id = R.color.light_gray)
-        }
-
-        Column {
-            Text(
-                text = "이전",
-                fontSize = 16.sp,
-                color = colorResource(id = R.color.white),
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(bottom = 10.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
-                    .background(color = colorResource(id = R.color.primary))
-                    .padding(10.dp)
-                    .noRippleClick {
-                        onMoveToPage(1)
-                        onAction(TripScheduleAction.UpdateProgress(0.66f))
+        val onNextClick = remember(isCompleted) {
+            {
+                if (isCompleted) {
+                    if (tripId.isNotEmpty()) {
+                        onAction(TripScheduleAction.UpdateTrip)
+                    } else {
+                        onAction(TripScheduleAction.SaveTrip)
                     }
-                    .testTag("tripPlacePrevBtn")
-            )
 
-            Text(
-                text = "완료",
-                fontSize = 16.sp,
-                color = textColor,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
-                    .background(backgroundColor)
-                    .padding(10.dp)
-                    .noRippleClick {
-                        if (isCompleted) {
-                            if (tripId.isNotEmpty()) {
-                                onAction(TripScheduleAction.UpdateTrip)
-                            } else {
-                                onAction(TripScheduleAction.SaveTrip)
-                            }
-
-                        }
-                    }
-            )
+                }
+            }
         }
+
+        SelectTripDate(
+            isCompleted = isCompleted,
+            onPrevClick = onPrevClick,
+            onNextClick = onNextClick
+        )
     }
+}
+
+@Composable
+fun SelectTripDate(
+    isCompleted: Boolean,
+    onPrevClick: () -> Unit,
+    onNextClick: () -> Unit
+) {
+    val textColor = if (isCompleted) {
+        colorResource(id = R.color.white)
+    } else {
+        colorResource(id = R.color.gray)
+    }
+    val backgroundColor = if (isCompleted) {
+        colorResource(id = R.color.primary)
+    } else {
+        colorResource(id = R.color.light_gray)
+    }
+
+    Column {
+        Text(
+            text = "이전",
+            fontSize = 16.sp,
+            color = colorResource(id = R.color.white),
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(bottom = 10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .fillMaxWidth()
+                .background(color = colorResource(id = R.color.primary))
+                .padding(10.dp)
+                .noRippleClick(onClick = onPrevClick)
+                .testTag("tripPlacePrevBtn")
+        )
+
+        Text(
+            text = "완료",
+            fontSize = 16.sp,
+            color = textColor,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .fillMaxWidth()
+                .background(backgroundColor)
+                .padding(10.dp)
+                .noRippleClick(onClick = onNextClick)
+        )
+    }
+}
+
+@Composable
+fun StartDate(
+    startDate: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = startDate.ifEmpty { "시작일" },
+        color = if (startDate.isEmpty()) {
+            colorResource(id = R.color.gray)
+        } else {
+            colorResource(id = R.color.black)
+        },
+        modifier = modifier
+            .noRippleClick(onClick = onClick)
+    )
+}
+
+@Composable
+fun EndDate(
+    endDate: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = endDate.ifEmpty { "종료일" },
+        color = if (endDate.isEmpty()) {
+            colorResource(id = R.color.gray)
+        } else {
+            colorResource(id = R.color.black)
+        },
+        modifier = modifier
+            .noRippleClick(onClick = onClick)
+    )
 }
 
 @Preview(showBackground = true)
@@ -881,7 +930,8 @@ private fun TripDateScreen(
 private fun TripDateScreenPreview() {
     TripDateScreen(
         tripId = "",
-        uiState = TripScheduleUiState(),
+        startDate = "",
+        endDate = "",
         onAction = {},
         onMoveToPage = {},
         onShowStartDateDialog = {},
@@ -893,7 +943,10 @@ private fun TripDateScreenPreview() {
 @Composable
 private fun TripPlaceScreenPreview() {
     TripPlaceScreen(
-        uiState = TripScheduleUiState(),
+        uiState = TripScheduleUiState(
+            startDate = "2024-07-03",
+            endDate = "2024-08-04"
+        ),
         onAction = {},
         onMoveToPage = {}
     )
