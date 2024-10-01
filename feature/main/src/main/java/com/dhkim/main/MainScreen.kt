@@ -156,6 +156,7 @@ fun MainScreen(
             )
             tripScreen(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(bottom = innerPadding.calculateBottomPadding()),
                 onNavigateToSchedule = appState::navigateToTripSchedule,
                 onNavigateToDetail = appState::navigateToTripDetail,

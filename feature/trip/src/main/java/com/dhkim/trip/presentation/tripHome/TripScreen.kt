@@ -104,7 +104,7 @@ fun TripScreen(
         }
 
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .padding(
                     top = paddingValues.calculateTopPadding() + 10.dp,
                     start = 10.dp,
@@ -130,7 +130,7 @@ fun TripScreen(
                         )
                     )
                 },
-                onNavigateToDetail = onNavigateToDetail
+                onNavigateToDetail = onNavigateToDetail,
             )
             TripSchedules(
                 title = "지난 여행",
@@ -146,7 +146,7 @@ fun TripScreen(
                         )
                     )
                 },
-                onNavigateToDetail = onNavigateToDetail
+                onNavigateToDetail = onNavigateToDetail,
             )
         }
     }
@@ -270,14 +270,15 @@ private fun TripSchedules(
     title: String,
     trips: ImmutableList<Trip>,
     showDeleteDialog: (String) -> Unit,
-    onNavigateToDetail: (String) -> Unit
+    onNavigateToDetail: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (trips.isEmpty()) {
         return
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier
     ) {
         Text(
             text = title,
@@ -286,9 +287,9 @@ private fun TripSchedules(
             modifier = Modifier
                 .padding(top = 10.dp)
         )
-        Row(
+        /*Row(
             modifier = Modifier.fillMaxWidth()
-        ) {
+        ) {*/
             LazyColumn(
                 contentPadding = PaddingValues(vertical = 10.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -361,7 +362,7 @@ private fun TripSchedules(
                     }
                 }
             }
-        }
+        //}
     }
 }
 

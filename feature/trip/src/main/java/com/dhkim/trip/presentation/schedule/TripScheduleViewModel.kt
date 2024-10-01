@@ -9,6 +9,7 @@ import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.domain.model.TripPlace
 import com.dhkim.trip.domain.model.toTripType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -82,7 +83,7 @@ class TripScheduleViewModel @Inject constructor(
                     } else {
                         TripPlace.AbroadPlace.entries.first { it.placeName == place }
                     }
-                }
+                }.toImmutableList()
 
                 _uiState.value = _uiState.value.copy(
                     type = type.toTripType(),
@@ -103,7 +104,7 @@ class TripScheduleViewModel @Inject constructor(
                 } else {
                     add(place)
                 }
-            }
+            }.toImmutableList()
 
         _uiState.value = _uiState.value.copy(tripPlaces = updatePlaces)
     }
