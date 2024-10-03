@@ -48,7 +48,7 @@ roboletric = "4.12"
 coroutineTest = "1.8.1"
 collectionImmutable = "0.3.7"
 uiTooling = "1.6.8"
-dhcamera = "1.0.0-alpha04"
+dhcamera = "1.0.0-alpha05"
 ksp = "1.8.10-1.0.9"
 
 [libraries]
