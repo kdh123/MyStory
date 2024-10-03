@@ -29,7 +29,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "TimeCapsule"
 include(":app")
-include(":camera")
 include(":core")
 include(":core:database")
 include(":core:network")
