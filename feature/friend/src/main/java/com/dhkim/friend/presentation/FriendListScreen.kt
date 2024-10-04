@@ -451,7 +451,7 @@ fun FriendScreen(
                 HorizontalPager(state = pagerState) { pos ->
                     when (pos) {
                         0 -> {
-                            FriendScreen(
+                            FriendListScreen(
                                 uiState = uiState,
                                 showInfoBottomSheet = {
                                     selectedFriend = it
@@ -780,7 +780,7 @@ private fun SearchScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun FriendScreenPreview() {
-    FriendScreen(
+    FriendListScreen(
         uiState = FriendUiState(
             myInfo = User(
                 id = "홍길동",
@@ -817,7 +817,7 @@ fun RequestScreen(uiState: FriendUiState, onClick: (Friend) -> Unit) {
 }
 
 @Composable
-fun FriendScreen(
+fun FriendListScreen(
     uiState: FriendUiState,
     showInfoBottomSheet: (Friend) -> Unit,
     showAddFriendBottomSheet: () -> Unit,

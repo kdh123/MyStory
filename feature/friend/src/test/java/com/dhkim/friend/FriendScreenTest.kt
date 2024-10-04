@@ -22,7 +22,6 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -86,23 +85,24 @@ class FriendScreenTest {
                 onAction = viewModel::onAction,
                 onNavigateToChangeInfo = {},
                 onNavigateToAddTimeCapsule = {},
+                showPopup = {},
                 onBack = {}
             )
         }
 
         composeTestRule.waitUntilAtLeastOneExists(
             hasText("id0"),
-            300
+            100
         )
 
         composeTestRule.waitUntilAtLeastOneExists(
             hasText("nickname1"),
-            300
+            100
         )
 
         composeTestRule.waitUntilAtLeastOneExists(
             hasText("nickname2"),
-            300
+            100
         )
     }
 }

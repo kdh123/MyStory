@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.CommonResult
+import com.dhkim.common.onetimeRestartableStateFlow
 import com.dhkim.friend.R
 import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.UserRepository
@@ -13,8 +14,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,7 +26,13 @@ class FriendViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FriendUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState = _uiState.onStart {
+        getMyInfo()
+    }.onetimeRestartableStateFlow(
+        scope = viewModelScope,
+        initialValue = FriendUiState(),
+        isOnetime = false
+    )
 
     private val _sideEffect = Channel<FriendSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
@@ -43,10 +50,6 @@ class FriendViewModel @Inject constructor(
         R.drawable.ic_smile_green,
         R.drawable.ic_smile_orange
     )
-
-    init {
-        getMyInfo()
-    }
 
     fun onAction(action: FriendAction) {
         when (action) {
@@ -131,7 +134,6 @@ class FriendViewModel @Inject constructor(
 
                     if (isSuccessful) {
                         getMyInfo()
-                        //_sideEffect.send(FriendSideEffect.Message(message = "코드 생성 성공!!"))
                     } else {
                         _uiState.value = _uiState.value.copy(isCreatingCode = false)
                         _sideEffect.send(FriendSideEffect.Message(message = "코드 생성에 실패하였습니다. 다시 시도해주세요."))
