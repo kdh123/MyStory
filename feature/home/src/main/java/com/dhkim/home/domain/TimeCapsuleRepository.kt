@@ -27,7 +27,7 @@ interface TimeCapsuleRepository {
         timeCapsuleId: String
     ): isSuccessful
 
-    fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>>
+    suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>>
     suspend fun getMyTimeCapsule(id: String): MyTimeCapsule?
     suspend fun getMyTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<MyTimeCapsule>>
     suspend fun saveMyTimeCapsule(timeCapsule: MyTimeCapsule)
@@ -41,7 +41,7 @@ interface TimeCapsuleRepository {
     suspend fun editSendTimeCapsule(timeCapsule: SendTimeCapsule)
     suspend fun deleteSendTimeCapsule(id: String) 
 
-    fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>>
+    suspend fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>>
     suspend fun getReceivedTimeCapsule(id: String): ReceivedTimeCapsule?
     suspend fun getReceivedTimeCapsulesInDate(startDate: String, endDate: String): Flow<List<ReceivedTimeCapsule>>
     suspend fun saveReceivedTimeCapsule(timeCapsule: ReceivedTimeCapsule)

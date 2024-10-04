@@ -15,7 +15,7 @@ class FakeTimeCapsuleLocalDataSource @Inject constructor() : TimeCapsuleLocalDat
             val openDate = if (it % 2 == 0) {
                 "2024-06-07"
             } else {
-                "2024-09-12"
+                "2026-09-12"
             }
 
             val isOpened = it % 4 == 0
@@ -41,10 +41,16 @@ class FakeTimeCapsuleLocalDataSource @Inject constructor() : TimeCapsuleLocalDat
 
     private val receivedTimeCapsules = MutableStateFlow(mutableListOf<ReceivedTimeCapsuleEntity>().apply {
         repeat(10) {
+            val openDate = if (it % 2 == 0) {
+                "2024-06-07"
+            } else {
+                "2026-09-12"
+            }
+
             val receivedTimeCapsuleEntity = ReceivedTimeCapsuleEntity(
                 id = "receivedId$it",
-                date = "2024-07-07",
-                openDate = "2024-09-18",
+                date = "2024-06-07",
+                openDate = openDate,
                 lat = "0.0",
                 lng = "0.0",
                 placeName = "광화문$it",
@@ -122,7 +128,7 @@ class FakeTimeCapsuleLocalDataSource @Inject constructor() : TimeCapsuleLocalDat
     }
 
     override fun deleteReceivedTimeCapsule(id: String) {
-        val data = receivedTimeCapsules.value.apply {
+        val data = receivedTimeCapsules.value.toMutableList().apply {
             removeIf { it.id == id }
         }
         receivedTimeCapsules.value = data
