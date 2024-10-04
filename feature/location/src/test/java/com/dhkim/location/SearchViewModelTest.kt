@@ -21,6 +21,7 @@ import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -80,8 +81,10 @@ class SearchViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `UI 상태 테스트`() = runTest {
+        viewModel.uiState.first()
+        advanceTimeBy(100)
         viewModel.onQuery("롯데타워")
-        advanceTimeBy(1500L)
+        advanceTimeBy(1_500)
 
         val uiState = viewModel.uiState.value
         val places = uiState.places.asSnapshot()
