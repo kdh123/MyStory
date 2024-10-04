@@ -65,7 +65,7 @@ class TripScheduleViewModelTest {
     fun `여행 시작 날짜 업데이트 테스트`() = runBlocking {
         viewModel.uiState.first()
         viewModel.onAction(TripScheduleAction.UpdateStartDate("2024-04-03"))
-        delay(300)
+        delay(100)
         assertEquals(viewModel.uiState.value.startDate, "2024-04-03")
     }
 
@@ -76,7 +76,7 @@ class TripScheduleViewModelTest {
         viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.Gyeongi))
         viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.AbroadPlace.USA))
 
-        delay(300)
+        delay(100)
         assertEquals(viewModel.uiState.value.tripPlaces.size, 3)
     }
 }

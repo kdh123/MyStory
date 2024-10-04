@@ -45,8 +45,8 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
                         TripEntity(
                             id = "id$it",
                             type = TripType.Alone.type,
-                            startDate = "2024-03-01",
-                            endDate = "2024-03-03",
+                            startDate = "2026-03-01",
+                            endDate = "2026-03-03",
                             places = listOf("서울", "부산"),
                             images = images,
                             videos = listOf()
@@ -96,5 +96,7 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
 
     override suspend fun deleteTrip(id: String) {
         trips.value = trips.value.filter { it.id != id }
+        val a = trips.value
+        a
     }
 }

@@ -17,6 +17,7 @@ import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -61,28 +62,35 @@ class TripDetailViewModelTest {
     }
 
     @Test
-    fun `여행 이미지가 존재할 때`() = runBlocking {
+    fun `여행 이미지가 존재할 때 - 다음 여행`() = runBlocking {
         viewModel.onAction(TripDetailAction.InitTrip(tripId = "id0"))
-        delay(300L)
+        delay(100)
+        assertEquals(viewModel.uiState.value.images?.size, 0)
+    }
+
+    @Test
+    fun `여행 이미지가 존재할 때 - 지난 여행`() = runBlocking {
+        viewModel.onAction(TripDetailAction.InitTrip(tripId = "id1"))
+        delay(100)
         assertEquals(viewModel.uiState.value.images?.size, 7)
     }
 
     @Test
     fun `특정 날짜 선택`() = runBlocking {
-        viewModel.onAction(TripDetailAction.InitTrip(tripId = "id0"))
-        delay(300L)
+        viewModel.onAction(TripDetailAction.InitTrip(tripId = "id1"))
+        delay(100)
         viewModel.onAction(TripDetailAction.SelectDate(selectedIndex = 1))
-        delay(300L)
+        delay(100)
 
         assertEquals(viewModel.uiState.value.images?.size, 2)
     }
 
     @Test
     fun `이미지 삭제`() = runBlocking {
-        viewModel.onAction(TripDetailAction.InitTrip(tripId = "id0"))
-        delay(300L)
-        viewModel.onAction(TripDetailAction.DeleteImage(tripId = "id0", imageId = "trip0"))
-        delay(300L)
+        viewModel.onAction(TripDetailAction.InitTrip(tripId = "id1"))
+        delay(100)
+        viewModel.onAction(TripDetailAction.DeleteImage(tripId = "id1", imageId = "trip0"))
+        delay(100)
 
         assertEquals(viewModel.uiState.value.images?.size, 6)
         assertEquals(viewModel.tripAllImages.value.size, 19)

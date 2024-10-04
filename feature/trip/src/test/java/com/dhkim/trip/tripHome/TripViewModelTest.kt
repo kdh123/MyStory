@@ -5,6 +5,7 @@ import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
 import com.dhkim.trip.data.di.TripModule
 import com.dhkim.trip.domain.TripRepository
+import com.dhkim.trip.presentation.tripHome.TripAction
 import com.dhkim.trip.presentation.tripHome.TripViewModel
 import dagger.Binds
 import dagger.Module
@@ -16,6 +17,7 @@ import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -59,14 +61,21 @@ class TripViewModelTest {
 
     @Test
     fun `uiState 테스트`() = runBlocking {
-        delay(300)
+        viewModel.uiState.first()
+        delay(100)
         assertEquals(viewModel.uiState.value.nextTrips?.size, 2)
         assertEquals(viewModel.uiState.value.prevTrips?.size, 4)
     }
 
     @Test
     fun `여행 아이템 삭제 테스트`() = runBlocking {
-
+        viewModel.uiState.first()
+        delay(100)
+        viewModel.onAction(TripAction.DeleteTrip(tripId = "id0"))
+        delay(100)
+        viewModel.uiState.restart()
+        assertEquals(viewModel.uiState.value.nextTrips?.size, 1)
+        assertEquals(viewModel.uiState.value.prevTrips?.size, 4)
     }
 
 }

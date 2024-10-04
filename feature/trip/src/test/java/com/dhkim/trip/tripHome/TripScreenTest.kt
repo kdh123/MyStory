@@ -86,7 +86,7 @@ class TripScreenTest {
         )
 
         composeTestRule.waitUntilAtLeastOneExists(
-            hasText("2024-09-04 - 2024-09-10"),
+            hasText("2026-03-01 - 2026-03-03"),
             300
         )
     }
