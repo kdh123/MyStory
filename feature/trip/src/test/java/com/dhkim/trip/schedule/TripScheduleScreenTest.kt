@@ -80,7 +80,7 @@ class TripScheduleScreenTest {
             }
 
             TripScheduleScreen(
-                tripId = "",
+                isEdit = false,
                 uiState = uiState,
                 sideEffect = sideEffect,
                 onAction = viewModel::onAction,
@@ -95,8 +95,6 @@ class TripScheduleScreenTest {
 
         composeTestRule.onNodeWithTag("tripType1")
             .performClick()
-
-        composeTestRule.awaitIdle()
 
         composeTestRule.onNodeWithTag("tripTypeNextBtn")
             .performClick()
@@ -128,7 +126,7 @@ class TripScheduleScreenTest {
             }
 
             TripScheduleScreen(
-                tripId = "",
+                isEdit = false,
                 uiState = uiState,
                 sideEffect = sideEffect,
                 onAction = viewModel::onAction,
@@ -144,8 +142,6 @@ class TripScheduleScreenTest {
         composeTestRule.onNodeWithTag("tripType1")
             .performClick()
 
-        composeTestRule.awaitIdle()
-
         composeTestRule.onNodeWithTag("tripTypeNextBtn")
             .performClick()
 
@@ -157,8 +153,6 @@ class TripScheduleScreenTest {
         composeTestRule.onNodeWithTag("abroad")
             .performClick()
 
-        composeTestRule.awaitIdle()
-
         composeTestRule.waitUntilAtLeastOneExists(
             hasText("일본"),
             300
@@ -166,8 +160,6 @@ class TripScheduleScreenTest {
 
         composeTestRule.onNodeWithTag("domestic")
             .performClick()
-
-        composeTestRule.awaitIdle()
 
         composeTestRule.waitUntilAtLeastOneExists(
             hasText("인천"),

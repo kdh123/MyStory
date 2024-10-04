@@ -73,7 +73,7 @@ fun NavGraphBuilder.tripScreen(
             }
 
             TripScheduleScreen(
-                tripId = tripId,
+                isEdit = tripId.isNotEmpty(),
                 uiState = uiState,
                 sideEffect = sideEffect,
                 onAction = remember(viewModel) {

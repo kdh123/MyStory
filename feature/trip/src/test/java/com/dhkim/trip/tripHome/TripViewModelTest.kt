@@ -5,6 +5,7 @@ import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
 import com.dhkim.trip.data.di.TripModule
 import com.dhkim.trip.domain.TripRepository
+import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.presentation.tripHome.TripAction
 import com.dhkim.trip.presentation.tripHome.TripViewModel
 import dagger.Binds
@@ -63,8 +64,13 @@ class TripViewModelTest {
     fun `uiState 테스트`() = runBlocking {
         viewModel.uiState.first()
         delay(100)
-        assertEquals(viewModel.uiState.value.nextTrips?.size, 2)
-        assertEquals(viewModel.uiState.value.prevTrips?.size, 4)
+
+        val items = viewModel.uiState.value.trips?.filter {
+            it.data !is String
+        }
+
+        assertEquals(items?.count { (it.data as Trip).isNextTrip }, 2)
+        assertEquals(items?.count { !(it.data as Trip).isNextTrip }, 4)
     }
 
     @Test
@@ -74,8 +80,12 @@ class TripViewModelTest {
         viewModel.onAction(TripAction.DeleteTrip(tripId = "id0"))
         delay(100)
         viewModel.uiState.restart()
-        assertEquals(viewModel.uiState.value.nextTrips?.size, 1)
-        assertEquals(viewModel.uiState.value.prevTrips?.size, 4)
+
+        val items = viewModel.uiState.value.trips?.filter {
+            it.data !is String
+        }
+        assertEquals(items?.count { (it.data as Trip).isNextTrip }, 1)
+        assertEquals(items?.count { !(it.data as Trip).isNextTrip }, 4)
     }
 
 }

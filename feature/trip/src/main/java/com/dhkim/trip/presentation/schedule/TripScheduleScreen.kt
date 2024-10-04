@@ -67,7 +67,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TripScheduleScreen(
-    tripId: String,
+    isEdit: Boolean,
     uiState: TripScheduleUiState,
     sideEffect: Flow<TripScheduleSideEffect>,
     onAction: (TripScheduleAction) -> Unit,
@@ -157,7 +157,7 @@ fun TripScheduleScreen(
 
                     2 -> {
                         TripDateScreen(
-                            tripId = tripId,
+                            isEdit = isEdit,
                             startDate = uiState.startDate,
                             endDate = uiState.endDate,
                             onAction = onAction,
@@ -280,7 +280,7 @@ fun Calender(
 @Composable
 private fun TripScheduleScreenPreview() {
     TripScheduleScreen(
-        tripId = "",
+        isEdit = false,
         uiState = TripScheduleUiState(),
         sideEffect = MutableSharedFlow(),
         onAction = {},
@@ -744,7 +744,7 @@ private fun AbroadPlaces(
 
 @Composable
 private fun TripDateScreen(
-    tripId: String,
+    isEdit: Boolean,
     startDate: String,
     endDate: String,
     onAction: (TripScheduleAction) -> Unit,
@@ -821,7 +821,7 @@ private fun TripDateScreen(
         val onNextClick = remember(isCompleted) {
             {
                 if (isCompleted) {
-                    if (tripId.isNotEmpty()) {
+                    if (isEdit) {
                         onAction(TripScheduleAction.UpdateTrip)
                     } else {
                         onAction(TripScheduleAction.SaveTrip)
@@ -929,7 +929,7 @@ fun EndDate(
 @Composable
 private fun TripDateScreenPreview() {
     TripDateScreen(
-        tripId = "",
+        isEdit = false,
         startDate = "",
         endDate = "",
         onAction = {},

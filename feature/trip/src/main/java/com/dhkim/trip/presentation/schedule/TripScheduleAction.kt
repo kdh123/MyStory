@@ -10,7 +10,6 @@ sealed interface TripScheduleAction {
     data class UpdateStartDate(val startDate: String) : TripScheduleAction
     data class UpdateEndDate(val endDate: String) : TripScheduleAction
     data class UpdatePlaces(val place: TripPlace) : TripScheduleAction
-    data class SelectTripPlace(val isSelected: Boolean, val placeName: String) : TripScheduleAction
     data object SaveTrip : TripScheduleAction
     data object UpdateTrip : TripScheduleAction
 }

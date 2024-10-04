@@ -39,8 +39,6 @@ class TripScheduleViewModel @Inject constructor(
     private val _sideEffect = Channel<TripScheduleSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
-    private val selectedTripPlaces = mutableListOf<String>()
-
     fun onAction(action: TripScheduleAction) {
         when (action) {
             is TripScheduleAction.UpdateProgress -> {
@@ -61,14 +59,6 @@ class TripScheduleViewModel @Inject constructor(
 
             is TripScheduleAction.UpdatePlaces -> {
                 updatePlaces(place = action.place)
-            }
-
-            is TripScheduleAction.SelectTripPlace -> {
-                if (action.isSelected) {
-                    selectedTripPlaces.add(action.placeName)
-                } else {
-                    selectedTripPlaces.remove(action.placeName)
-                }
             }
 
             TripScheduleAction.SaveTrip -> {
@@ -127,7 +117,17 @@ class TripScheduleViewModel @Inject constructor(
                     type = type.type,
                     startDate = startDate,
                     endDate = endDate,
-                    places = selectedTripPlaces
+                    places = tripPlaces.map {
+                        when (it) {
+                            is TripPlace.DomesticPlace -> {
+                                it.placeName
+                            }
+
+                            is TripPlace.AbroadPlace -> {
+                                it.placeName
+                            }
+                        }
+                    },
                 )
             }
 
