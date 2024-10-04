@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.CommonResult
-import com.dhkim.common.onetimeRestartableStateFlow
+import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.friend.R
 import com.dhkim.user.domain.Friend
 import com.dhkim.user.domain.UserRepository
@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -25,10 +26,12 @@ class FriendViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
+    private var initJob: Job? = null
+
     private val _uiState = MutableStateFlow(FriendUiState())
     val uiState = _uiState.onStart {
         getMyInfo()
-    }.onetimeRestartableStateFlow(
+    }.onetimeRestartableStateIn(
         scope = viewModelScope,
         initialValue = FriendUiState(),
         isOnetime = false
@@ -80,7 +83,8 @@ class FriendViewModel @Inject constructor(
     }
 
     private fun getMyInfo() {
-        viewModelScope.launch(Dispatchers.IO) {
+        initJob?.cancel()
+        initJob = viewModelScope.launch(Dispatchers.IO) {
             val myId = userRepository.getMyId()
 
             if (myId.isEmpty()) {

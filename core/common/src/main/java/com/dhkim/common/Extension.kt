@@ -43,7 +43,7 @@ interface RestartableStateFlow<out T> : StateFlow<T> {
     fun restart()
 }
 
-fun <T> Flow<T>.onetimeRestartableStateFlow(
+fun <T> Flow<T>.onetimeRestartableStateIn(
     scope: CoroutineScope,
     initialValue: T,
     stopTimeOut: Long = 5_000,

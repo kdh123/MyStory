@@ -3,7 +3,7 @@ package com.dhkim.trip.presentation.schedule
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.common.onetimeRestartableStateFlow
+import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.trip.domain.TripRepository
 import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.domain.model.TripPlace
@@ -31,7 +31,7 @@ class TripScheduleViewModel @Inject constructor(
         if (tripId.isNotEmpty()) {
             init(tripId = tripId)
         }
-    }.onetimeRestartableStateFlow(
+    }.onetimeRestartableStateIn(
         scope = viewModelScope,
         initialValue = TripScheduleUiState()
     )

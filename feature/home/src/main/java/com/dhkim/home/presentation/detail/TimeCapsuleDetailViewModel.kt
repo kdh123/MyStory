@@ -3,7 +3,7 @@ package com.dhkim.home.presentation.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.common.onetimeRestartableStateFlow
+import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.home.domain.TimeCapsuleRepository
 import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +29,7 @@ class TimeCapsuleDetailViewModel @Inject constructor(
     val uiState = _uiState
         .onStart {
             init(timeCapsuleId = timeCapsuleId, isReceived = isReceived.toBoolean())
-        }.onetimeRestartableStateFlow(
+        }.onetimeRestartableStateIn(
             scope = viewModelScope,
             initialValue = TimeCapsuleDetailUiState()
         )

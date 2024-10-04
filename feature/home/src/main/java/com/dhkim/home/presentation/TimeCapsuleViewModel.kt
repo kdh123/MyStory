@@ -3,13 +3,14 @@ package com.dhkim.home.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.DateUtil
-import com.dhkim.common.onetimeRestartableStateFlow
+import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.home.domain.TimeCapsuleRepository
 import com.dhkim.user.domain.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -26,10 +27,12 @@ class TimeCapsuleViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
+    private var initJob: Job? = null
+
     private val _uiState = MutableStateFlow(TimeCapsuleUiState())
     val uiState = _uiState.onStart {
         init()
-    }.onetimeRestartableStateFlow(
+    }.onetimeRestartableStateIn(
         scope = viewModelScope,
         initialValue = TimeCapsuleUiState(),
         isOnetime = false
@@ -41,7 +44,8 @@ class TimeCapsuleViewModel @Inject constructor(
     private var spaceId = 100
 
     private fun init() {
-        viewModelScope.launch(Dispatchers.IO) {
+        initJob?.cancel()
+        initJob = viewModelScope.launch(Dispatchers.IO) {
             combine(
                 timeCapsuleRepository.getMyAllTimeCapsule(),
                 timeCapsuleRepository.getReceivedAllTimeCapsule()
