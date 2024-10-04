@@ -91,10 +91,9 @@ fun Modifier.noRippleClick(
 
     Modifier.clickable(
         interactionSource = interactionSource,
-        indication = null
-    ) {
-        onClick()
-    }
+        indication = null,
+        onClick = onClick
+    )
 }
 
 fun Modifier.noRippleClick(

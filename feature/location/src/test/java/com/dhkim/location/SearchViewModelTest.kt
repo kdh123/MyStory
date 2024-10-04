@@ -1,5 +1,6 @@
 package com.dhkim.location
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.paging.testing.asSnapshot
 import com.dhkim.location.data.dataSource.remote.LocationApi
 import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
@@ -50,8 +51,13 @@ class SearchViewModelTest {
 
     @Before
     fun setup() {
+        val savedStateHandle = SavedStateHandle().apply {
+            set("lat", "37.572389")
+            set("lng", "126.9769117")
+        }
+
         hiltRule.inject()
-        viewModel = SearchViewModel(locationRepository)
+        viewModel = SearchViewModel(locationRepository,savedStateHandle)
     }
 
     @Module

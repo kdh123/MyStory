@@ -43,6 +43,7 @@ import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import java.util.UUID
 
 @Composable
 fun TripScreen(
@@ -55,9 +56,7 @@ fun TripScreen(
 ) {
     Scaffold(
         topBar = {
-            Column(
-                modifier = Modifier
-            ) {
+            Column {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -94,7 +93,7 @@ fun TripScreen(
             return@Scaffold
         }
 
-        if (uiState.prevTrips.isNullOrEmpty() && uiState.nextTrips.isNullOrEmpty()) {
+        if (uiState.trips.isNullOrEmpty()) {
             EmptyTripScheduleLayout(
                 onNavigateToSchedule = {
                     onNavigateToSchedule(" ")
@@ -104,7 +103,7 @@ fun TripScreen(
         }
 
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .padding(
                     top = paddingValues.calculateTopPadding() + 10.dp,
                     start = 10.dp,
@@ -117,8 +116,7 @@ fun TripScreen(
                 }
             )
             TripSchedules(
-                title = "다음 여행",
-                trips = uiState.nextTrips ?: persistentListOf(),
+                items = uiState.trips ?: persistentListOf(),
                 showDeleteDialog = {
                     showPopup(
                         Popup.Warning(
@@ -130,23 +128,7 @@ fun TripScreen(
                         )
                     )
                 },
-                onNavigateToDetail = onNavigateToDetail
-            )
-            TripSchedules(
-                title = "지난 여행",
-                trips = uiState.prevTrips ?: persistentListOf(),
-                showDeleteDialog = {
-                    showPopup(
-                        Popup.Warning(
-                            title = "일정 삭제",
-                            desc = "정말 삭제하겠습니까?",
-                            onPositiveClick = {
-                                onAction(TripAction.DeleteTrip(it))
-                            }
-                        )
-                    )
-                },
-                onNavigateToDetail = onNavigateToDetail
+                onNavigateToDetail = onNavigateToDetail,
             )
         }
     }
@@ -264,101 +246,116 @@ private fun AddTripScheduleLayoutPreview() {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TripSchedules(
-    title: String,
-    trips: ImmutableList<Trip>,
+fun TripSchedules(
+    items: ImmutableList<TripItem>,
+    modifier: Modifier = Modifier,
     showDeleteDialog: (String) -> Unit,
-    onNavigateToDetail: (String) -> Unit
+    onNavigateToDetail: (String) -> Unit,
 ) {
-    if (trips.isEmpty()) {
+    if (items.isEmpty()) {
         return
     }
 
-    Column(
-        modifier = Modifier.fillMaxWidth()
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = title,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
-            modifier = Modifier
-                .padding(top = 10.dp)
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            LazyColumn(
-                contentPadding = PaddingValues(vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+        items(items = items, key = {
+            it.id
+        }) {
+            TripScheduleItem(
+                item = it,
+                showDeleteDialog = showDeleteDialog,
+                onNavigateToDetail = onNavigateToDetail
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun TripScheduleItem(
+    item: TripItem,
+    showDeleteDialog: (String) -> Unit,
+    onNavigateToDetail: (String) -> Unit,
+) {
+    when (item.data) {
+        is String -> {
+            Text(
+                text = item.data,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .padding(top = 10.dp)
+            )
+        }
+
+        is Trip -> {
+            val tripSchedule = item.data
+
+            val res = if (tripSchedule.isDomestic) {
+                R.drawable.ic_domestic_white
+            } else {
+                R.drawable.ic_abroad_white
+            }
+
+            val backgroundColor = if (tripSchedule.isDomestic) {
+                R.color.teal_200
+            } else {
+                R.color.sky_blue
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .combinedClickable(
+                        onLongClick = {
+                            showDeleteDialog(tripSchedule.id)
+                        },
+                        onClick = {
+                            onNavigateToDetail(tripSchedule.id)
+                        }
+                    )
             ) {
-                items(items = trips, key = {
-                    it.id
-                }) {
-                    val res = if (it.isDomestic) {
-                        R.drawable.ic_domestic_white
-                    } else {
-                        R.drawable.ic_abroad_white
-                    }
-
-                    val backgroundColor = if (it.isDomestic) {
-                        R.color.teal_200
-                    } else {
-                        R.color.sky_blue
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .combinedClickable(
-                                onLongClick = {
-                                    showDeleteDialog(it.id)
-                                },
-                                onClick = {
-                                    onNavigateToDetail(it.id)
-                                }
-                            )
-                    ) {
-                        GlideImage(
-                            imageModel = { res },
-                            previewPlaceholder = painterResource(id = res),
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .width(76.dp)
-                                .aspectRatio(1f)
-                                .background(color = colorResource(id = backgroundColor))
-                                .align(Alignment.CenterVertically)
-                                .padding(12.dp)
-                        )
-                        Column(
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            val title = StringBuilder()
-                            it.places.forEachIndexed { index, place ->
-                                title.append(place)
-                                if (index < it.places.size - 1) {
-                                    title.append(" - ")
-                                }
-                            }
-                            title.append(" 여행")
-                            Text(
-                                text = "$title",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 2,
-                                modifier = Modifier
-                                    .padding(start = 10.dp)
-                            )
-                            Text(
-                                text = "${it.startDate} - ${it.endDate}",
-                                modifier = Modifier
-                                    .padding(start = 10.dp, top = 6.dp)
-                            )
+                GlideImage(
+                    imageModel = { res },
+                    previewPlaceholder = painterResource(id = res),
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .width(76.dp)
+                        .aspectRatio(1f)
+                        .background(color = colorResource(id = backgroundColor))
+                        .align(Alignment.CenterVertically)
+                        .padding(12.dp)
+                )
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                ) {
+                    val title = StringBuilder()
+                    tripSchedule.places.forEachIndexed { index, place ->
+                        title.append(place)
+                        if (index < tripSchedule.places.size - 1) {
+                            title.append(" - ")
                         }
                     }
+                    title.append(" 여행")
+                    Text(
+                        text = "$title",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 2,
+                        modifier = Modifier
+                            .padding(start = 10.dp)
+                    )
+                    Text(
+                        text = "${tripSchedule.startDate} - ${tripSchedule.endDate}",
+                        modifier = Modifier
+                            .padding(start = 10.dp, top = 6.dp)
+                    )
                 }
             }
         }
@@ -388,10 +385,11 @@ private fun TripScreenPreview() {
         }
     }.toImmutableList()
 
-    val uiState = TripUiState(
-        prevTrips = trips,
-        nextTrips = trips
-    )
+    val items = mutableListOf<TripItem>()
+    items.add(TripItem(id = "${UUID.randomUUID()}", data = "다음 여행"))
+    items.addAll(trips.map { TripItem(id = it.id, data = it) })
+
+    val uiState = TripUiState(trips = items.toImmutableList())
 
     TripScreen(
         uiState = uiState,
