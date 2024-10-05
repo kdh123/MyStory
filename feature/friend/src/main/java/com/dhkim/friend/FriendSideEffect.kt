@@ -1,4 +1,4 @@
-package com.dhkim.friend.presentation
+package com.dhkim.friend
 
 sealed interface FriendSideEffect {
 

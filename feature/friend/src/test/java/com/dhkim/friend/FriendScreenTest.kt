@@ -5,8 +5,6 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.dhkim.friend.presentation.FriendScreen
-import com.dhkim.friend.presentation.FriendViewModel
 import com.dhkim.user.FakeFriendUserLocalDataSource
 import com.dhkim.user.FakeFriendUserRemoteDataSource
 import com.dhkim.user.repository.UserRepositoryImpl

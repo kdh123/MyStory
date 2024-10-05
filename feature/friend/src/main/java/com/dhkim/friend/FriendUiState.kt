@@ -1,4 +1,4 @@
-package com.dhkim.friend.presentation
+package com.dhkim.friend
 
 import androidx.compose.runtime.Stable
 import com.dhkim.user.model.User

@@ -1,11 +1,10 @@
-package com.dhkim.friend.presentation
+package com.dhkim.friend
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.CommonResult
 import com.dhkim.common.onetimeRestartableStateIn
-import com.dhkim.friend.R
 import com.dhkim.user.model.Friend
 import com.dhkim.user.repository.UserRepository
 import com.google.android.gms.tasks.OnCompleteListener

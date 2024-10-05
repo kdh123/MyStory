@@ -25,8 +25,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.compose.NavHost
-import com.dhkim.friend.presentation.navigation.FRIEND_MAIN_ROUTE
-import com.dhkim.friend.presentation.navigation.friendScreen
+import com.dhkim.friend.navigation.FRIEND_MAIN_ROUTE
+import com.dhkim.friend.navigation.friendScreen
 import com.dhkim.home.presentation.navigation.ADD_TIME_CAPSULE_ROUTE
 import com.dhkim.home.presentation.navigation.TIME_CAPSULE_MAIN_ROUTE
 import com.dhkim.home.presentation.navigation.addTimeCapsuleScreen

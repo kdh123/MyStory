@@ -1,4 +1,4 @@
-package com.dhkim.friend.presentation.navigation
+package com.dhkim.friend.navigation
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -10,10 +10,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.dhkim.friend.presentation.FriendScreen
-import com.dhkim.friend.presentation.FriendViewModel
-import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoScreen
-import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoViewModel
+import com.dhkim.friend.FriendScreen
+import com.dhkim.friend.FriendViewModel
+import com.dhkim.friend.changeInfo.ChangeFriendInfoScreen
+import com.dhkim.friend.changeInfo.ChangeFriendInfoViewModel
 import com.dhkim.ui.Popup
 import com.dhkim.user.model.Friend
 

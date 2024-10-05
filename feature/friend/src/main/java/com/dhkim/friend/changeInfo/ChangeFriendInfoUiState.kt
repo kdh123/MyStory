@@ -1,4 +1,4 @@
-package com.dhkim.friend.presentation.changeInfo
+package com.dhkim.friend.changeInfo
 
 import com.dhkim.user.model.Friend
 

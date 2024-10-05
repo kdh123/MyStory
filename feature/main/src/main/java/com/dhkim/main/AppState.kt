@@ -8,9 +8,9 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.dhkim.friend.presentation.navigation.FRIEND_ROUTE
-import com.dhkim.friend.presentation.navigation.navigateToChangeFriendInfo
-import com.dhkim.friend.presentation.navigation.navigateToFriend
+import com.dhkim.friend.navigation.FRIEND_ROUTE
+import com.dhkim.friend.navigation.navigateToChangeFriendInfo
+import com.dhkim.friend.navigation.navigateToFriend
 import com.dhkim.home.presentation.navigation.ADD_TIME_CAPSULE_ROUTE
 import com.dhkim.home.presentation.navigation.TIME_CAPSULE_ROUTE
 import com.dhkim.home.presentation.navigation.navigateToAddTimeCapsule

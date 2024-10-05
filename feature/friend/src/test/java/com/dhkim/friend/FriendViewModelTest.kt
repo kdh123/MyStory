@@ -1,7 +1,6 @@
 package com.dhkim.friend
 
 import com.dhkim.MainDispatcherRule
-import com.dhkim.friend.presentation.FriendViewModel
 import com.dhkim.user.FakeFriendUserLocalDataSource
 import com.dhkim.user.FakeFriendUserRemoteDataSource
 import com.dhkim.user.repository.UserRepositoryImpl

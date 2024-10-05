@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class)
 
-package com.dhkim.friend.presentation
+package com.dhkim.friend
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -72,7 +72,6 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.dhkim.friend.R
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.Popup
 import com.dhkim.ui.onStartCollect
