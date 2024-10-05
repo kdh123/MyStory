@@ -12,8 +12,8 @@ import com.dhkim.home.domain.SharedFriend
 import com.dhkim.home.domain.TimeCapsuleRepository
 import com.dhkim.location.domain.LocationRepository
 import com.dhkim.location.domain.Place
-import com.dhkim.user.domain.UserId
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.model.UserId
+import com.dhkim.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

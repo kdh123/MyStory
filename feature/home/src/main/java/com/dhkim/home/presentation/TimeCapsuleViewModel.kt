@@ -6,7 +6,7 @@ import com.dhkim.common.DateUtil
 import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.home.domain.TimeCapsuleRepository
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers

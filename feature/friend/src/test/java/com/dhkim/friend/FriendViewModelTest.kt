@@ -4,11 +4,11 @@ import com.dhkim.MainDispatcherRule
 import com.dhkim.friend.presentation.FriendViewModel
 import com.dhkim.user.FakeFriendUserLocalDataSource
 import com.dhkim.user.FakeFriendUserRemoteDataSource
-import com.dhkim.user.data.UserRepositoryImpl
-import com.dhkim.user.data.dataSource.UserLocalDataSource
-import com.dhkim.user.data.dataSource.UserRemoteDataSource
-import com.dhkim.user.data.di.UserModule
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.repository.UserRepositoryImpl
+import com.dhkim.user.datasource.UserLocalDataSource
+import com.dhkim.user.datasource.UserRemoteDataSource
+import com.dhkim.user.di.UserModule
+import com.dhkim.user.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

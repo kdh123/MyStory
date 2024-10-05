@@ -5,7 +5,6 @@ import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.home.data.dataSource.toMyTimeCapsule
 import com.dhkim.home.data.di.TimeCapsuleModule
 import com.dhkim.home.domain.TimeCapsuleRepository
-import com.dhkim.user.data.di.UserModule
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

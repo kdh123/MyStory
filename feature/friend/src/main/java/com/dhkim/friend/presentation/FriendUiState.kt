@@ -1,7 +1,7 @@
 package com.dhkim.friend.presentation
 
 import androidx.compose.runtime.Stable
-import com.dhkim.user.domain.User
+import com.dhkim.user.model.User
 
 @Stable
 data class FriendUiState(

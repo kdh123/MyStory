@@ -1,7 +1,6 @@
-package com.dhkim.user.data.dataSource
+package com.dhkim.user.model
 
 import com.dhkim.database.entity.FriendEntity
-import com.dhkim.user.domain.LocalFriend
 
 fun FriendEntity.toLocalFriend(): LocalFriend {
     return LocalFriend(

@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.dhkim.common.CommonResult
 import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.friend.R
-import com.dhkim.user.domain.Friend
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.model.Friend
+import com.dhkim.user.repository.UserRepository
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -181,8 +181,8 @@ class FriendViewModel @Inject constructor(
                 .catch {
                     _sideEffect.send(FriendSideEffect.ShowDialog(show = false))
                     _sideEffect.send(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
-                }.collect { isSuccessful ->
-                    if (isSuccessful) {
+                }.collect { isSuccessful2 ->
+                    if (isSuccessful2) {
                         userRepository.deleteLocalFriend(userId)
                         _sideEffect.send(FriendSideEffect.ShowKeyboard(show = false))
                         _sideEffect.send(FriendSideEffect.ShowDialog(show = false))

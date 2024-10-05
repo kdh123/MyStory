@@ -1,8 +1,8 @@
 package com.dhkim.home.data
 
 import com.dhkim.database.entity.FriendEntity
-import com.dhkim.user.data.dataSource.UserLocalDataSource
-import com.dhkim.user.domain.User
+import com.dhkim.user.datasource.UserLocalDataSource
+import com.dhkim.user.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject

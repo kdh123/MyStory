@@ -2,7 +2,9 @@ package com.dhkim.home
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -15,13 +17,12 @@ import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.home.data.di.TimeCapsuleModule
 import com.dhkim.home.domain.TimeCapsuleRepository
 import com.dhkim.home.presentation.TimeCapsuleScreen
-import com.dhkim.home.presentation.TimeCapsuleSideEffect
 import com.dhkim.home.presentation.TimeCapsuleViewModel
-import com.dhkim.user.data.UserRepositoryImpl
-import com.dhkim.user.data.dataSource.UserLocalDataSource
-import com.dhkim.user.data.dataSource.UserRemoteDataSource
-import com.dhkim.user.data.di.UserModule
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.repository.UserRepositoryImpl
+import com.dhkim.user.datasource.UserLocalDataSource
+import com.dhkim.user.datasource.UserRemoteDataSource
+import com.dhkim.user.di.UserModule
+import com.dhkim.user.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -31,6 +32,7 @@ import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -104,6 +106,7 @@ class TimeCapsuleScreenTest {
     @Test
     fun `UI 테스트`() = runBlocking {
         // Start the app
+        viewModel.uiState.first()
         delay(300L)
         val uiState = viewModel.uiState.value
 
@@ -139,12 +142,6 @@ class TimeCapsuleScreenTest {
             hasTestTag("lockTimeCapsuleid1"),
             300L
         )
-
-        //composeRule.onNodeWithTag("unopenedTimeCapsules").assertIsDisplayed()
-
-        //composeTestRule.onNodeWithText("Continue").performClick()
-        //composeTestRule.onNodeWithTag("title").assert(hasText("나의 이야기"))
-        //composeTestRule.onNodeWithText("나의 이야기").assertIsDisplayed()
     }
 
     @OptIn(ExperimentalTestApi::class)

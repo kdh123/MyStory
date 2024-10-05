@@ -1,4 +1,4 @@
-package com.dhkim.user.domain
+package com.dhkim.user.model
 
 import androidx.compose.runtime.Stable
 
@@ -8,7 +8,7 @@ typealias Nickname = String
 data class User(
     val id: String = "",
     val uuid: String = "",
-    val profileImage: String = "",
+    val profileImage: String = "0",
     val friends: List<Friend> = listOf(),
     val requests: List<Friend> = listOf()
 )

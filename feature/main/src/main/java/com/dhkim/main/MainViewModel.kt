@@ -8,7 +8,7 @@ import androidx.work.WorkManager
 import com.dhkim.setting.domain.SettingRepository
 import com.dhkim.main.work.CheckOpenableTimeCapsuleWorker
 import com.dhkim.ui.Popup
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -28,7 +28,7 @@ import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
 import com.dhkim.trip.presentation.navigation.navigateToTripDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripImageDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripSchedule
-import com.dhkim.user.domain.Friend
+import com.dhkim.user.model.Friend
 
 @Stable
 class AppState(

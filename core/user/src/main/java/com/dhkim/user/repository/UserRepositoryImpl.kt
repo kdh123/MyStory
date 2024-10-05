@@ -1,15 +1,14 @@
-package com.dhkim.user.data
+package com.dhkim.user.repository
 
 import com.dhkim.common.CommonResult
-import com.dhkim.user.data.dataSource.UserLocalDataSource
-import com.dhkim.user.data.dataSource.UserRemoteDataSource
-import com.dhkim.user.data.dataSource.isSuccessful
-import com.dhkim.user.data.dataSource.toEntity
-import com.dhkim.user.data.dataSource.toLocalFriend
-import com.dhkim.user.domain.Friend
-import com.dhkim.user.domain.LocalFriend
-import com.dhkim.user.domain.User
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.datasource.UserLocalDataSource
+import com.dhkim.user.model.toEntity
+import com.dhkim.user.model.toLocalFriend
+import com.dhkim.user.model.Friend
+import com.dhkim.user.model.LocalFriend
+import com.dhkim.user.model.User
+import com.dhkim.user.datasource.UserRemoteDataSource
+import com.dhkim.user.datasource.isSuccessful
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first

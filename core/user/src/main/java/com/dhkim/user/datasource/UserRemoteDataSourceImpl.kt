@@ -1,11 +1,11 @@
-package com.dhkim.user.data.dataSource
+package com.dhkim.user.datasource
 
 import android.util.Log
 import com.dhkim.common.CommonResult
 import com.dhkim.network.di.FirebaseModule
 import com.dhkim.user.R
-import com.dhkim.user.domain.Friend
-import com.dhkim.user.domain.User
+import com.dhkim.user.model.Friend
+import com.dhkim.user.model.User
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference

@@ -1,12 +1,12 @@
 package com.dhkim.user
 
-import com.dhkim.user.data.UserRepositoryImpl
-import com.dhkim.user.data.dataSource.UserLocalDataSource
-import com.dhkim.user.data.dataSource.UserRemoteDataSource
-import com.dhkim.user.data.di.UserModule
-import com.dhkim.user.domain.Friend
-import com.dhkim.user.domain.User
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.repository.UserRepositoryImpl
+import com.dhkim.user.datasource.UserLocalDataSource
+import com.dhkim.user.datasource.UserRemoteDataSource
+import com.dhkim.user.di.UserModule
+import com.dhkim.user.model.Friend
+import com.dhkim.user.model.User
+import com.dhkim.user.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -16,11 +16,19 @@ import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -74,10 +82,17 @@ class UserRepositoryTest {
                     profileImage = "158",
                     uuid = "15608465",
                     isPending = false
-                )
+                ),
+                Friend(
+                    id = "id7",
+                    profileImage = "84561",
+                    uuid = "84561",
+                    isPending = true
+                ),
             ),
             requests = listOf()
         )
+        println("user : $user")
         assertEquals(data, user)
     }
 
@@ -87,7 +102,7 @@ class UserRepositoryTest {
         val prevFriendSize = myInfo.friends.size
 
         userRepository.addFriend(
-            userId = "id7",
+            userId = "id10",
             userProfileImage = "84561"
         )
 

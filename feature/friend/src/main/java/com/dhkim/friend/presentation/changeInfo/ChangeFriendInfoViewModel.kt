@@ -2,8 +2,8 @@ package com.dhkim.friend.presentation.changeInfo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.user.domain.Friend
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.model.Friend
+import com.dhkim.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel

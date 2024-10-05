@@ -1,6 +1,6 @@
 package com.dhkim.friend.presentation
 
-import com.dhkim.user.domain.Friend
+import com.dhkim.user.model.Friend
 
 sealed interface FriendAction {
 

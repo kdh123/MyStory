@@ -15,7 +15,7 @@ import com.dhkim.friend.presentation.FriendViewModel
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoScreen
 import com.dhkim.friend.presentation.changeInfo.ChangeFriendInfoViewModel
 import com.dhkim.ui.Popup
-import com.dhkim.user.domain.Friend
+import com.dhkim.user.model.Friend
 
 const val FRIEND_MAIN_ROUTE = "mainFriend"
 const val FRIEND_ROUTE = "friend"
