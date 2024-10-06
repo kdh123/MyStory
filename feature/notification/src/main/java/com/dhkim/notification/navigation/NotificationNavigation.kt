@@ -13,7 +13,7 @@ fun NavController.navigateToNotification() {
     navigate("notification")
 }
 
-fun NavGraphBuilder.notificationNavigation(
+fun NavGraphBuilder.notificationScreen(
     onNavigateToTimeCapsule: () -> Unit,
     onBack: () -> Unit
 ) {

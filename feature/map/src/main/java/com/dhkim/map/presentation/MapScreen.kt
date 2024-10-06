@@ -1,4 +1,8 @@
-@file:OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class, ExperimentalNaverMapApi::class)
+@file:OptIn(
+    ExperimentalPermissionsApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalNaverMapApi::class
+)
 
 package com.dhkim.map.presentation
 
@@ -37,13 +41,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -63,6 +68,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -72,6 +78,7 @@ import com.dhkim.location.domain.Category
 import com.dhkim.location.domain.Place
 import com.dhkim.map.R
 import com.dhkim.ui.LoadingProgressBar
+import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -89,6 +96,7 @@ import com.naver.maps.map.compose.MarkerState
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberCameraPositionState
 import com.naver.maps.map.compose.rememberFusedLocationSource
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -97,18 +105,17 @@ import retrofit2.HttpException
 @Composable
 fun MapScreen(
     uiState: MapUiState,
-    sideEffect: MapSideEffect,
-    scaffoldState: BottomSheetScaffoldState,
-    place: Place?,
-    onSelectPlace: (Place) -> Unit,
-    onSearchPlaceByQuery: (query: String, lat: String, lng: String) -> Unit,
-    onSearchPlaceByCategory: (Category, lat: String, lng: String) -> Unit,
-    onCloseSearch: (Boolean) -> Unit,
+    sideEffect: () -> Flow<MapSideEffect>,
+    onAction: (MapAction) -> Unit,
+    place: () -> Place?,
     onNavigateToSearch: (Double, Double) -> Unit,
     onNavigateToAddScreen: (Place) -> Unit,
     onHideBottomNav: (Place?) -> Unit,
     onInitSavedState: () -> Unit
 ) {
+    val bottomSheetState = rememberStandardBottomSheetState(skipHiddenState = false)
+    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
+    val lifecycle = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val places = uiState.places.collectAsLazyPagingItems()
@@ -124,7 +131,11 @@ fun MapScreen(
     val cameraPositionState = rememberCameraPositionState()
     val mapProperties by remember {
         mutableStateOf(
-            MapProperties(maxZoom = 20.0, minZoom = 5.0, locationTrackingMode = LocationTrackingMode.NoFollow)
+            MapProperties(
+                maxZoom = 20.0,
+                minZoom = 5.0,
+                locationTrackingMode = LocationTrackingMode.NoFollow
+            )
         )
     }
     val mapUiSettings by remember {
@@ -137,13 +148,11 @@ fun MapScreen(
         )
     }
 
-    LaunchedEffect(sideEffect) {
-        when (sideEffect) {
-            is MapSideEffect.None -> {}
-
+    lifecycle.onStartCollect(sideEffect()) {
+        when (it) {
             is MapSideEffect.BottomSheet -> {
                 scope.launch {
-                    if (sideEffect.isHide) {
+                    if (it.isHide) {
                         scaffoldState.bottomSheetState.hide()
                     } else {
                         scaffoldState.bottomSheetState.expand()
@@ -156,7 +165,7 @@ fun MapScreen(
     BackHandler {
         if (uiState.query.isNotEmpty()) {
             onInitSavedState()
-            onCloseSearch(false)
+            onAction(MapAction.CloseSearch(isPlaceSelected = false))
         } else {
             (context as? Activity)?.finish()
         }
@@ -173,7 +182,7 @@ fun MapScreen(
             }
 
             uiState.selectedPlace != null -> {
-                LatLng(uiState.selectedPlace!!.lat.toDouble(), uiState.selectedPlace!!.lng.toDouble())
+                LatLng(uiState.selectedPlace.lat.toDouble(), uiState.selectedPlace!!.lng.toDouble())
             }
 
             else -> {
@@ -191,9 +200,9 @@ fun MapScreen(
         )
     }
 
-    LaunchedEffect(place) {
-        place?.let {
-            onSelectPlace(it)
+    LaunchedEffect(place()?.id) {
+        place()?.let {
+            onAction(MapAction.SelectPlace(it))
         }
     }
 
@@ -239,9 +248,8 @@ fun MapScreen(
             } else {
                 PlaceList(
                     uiState = uiState,
-                    onPlaceClick = onSelectPlace,
-                    onHide = {
-                    }
+                    onAction = onAction,
+                    onHide = {}
                 )
             }
         },
@@ -264,17 +272,17 @@ fun MapScreen(
                         Marker(
                             state = MarkerState(
                                 position = LatLng(
-                                    uiState.selectedPlace!!.lat.toDouble(),
-                                    uiState.selectedPlace!!.lng.toDouble()
+                                    uiState.selectedPlace.lat.toDouble(),
+                                    uiState.selectedPlace.lng.toDouble()
                                 )
                             ),
                             onClick = {
-                                place?.let {
-                                    onSelectPlace(it)
+                                place()?.let {
+                                    onAction(MapAction.SelectPlace(it))
                                 }
                                 true
                             },
-                            captionText = uiState.selectedPlace?.name ?: ""
+                            captionText = uiState.selectedPlace.name
                         )
                     } else {
                         uiState.places.collectAsLazyPagingItems().itemSnapshotList.items.forEach { place ->
@@ -286,7 +294,7 @@ fun MapScreen(
                                     )
                                 ),
                                 onClick = {
-                                    onSelectPlace(place)
+                                    onAction(MapAction.SelectPlace(place))
                                     true
                                 },
                                 captionText = place.name
@@ -302,7 +310,7 @@ fun MapScreen(
                     lat = currentLocation.latitude,
                     lng = currentLocation.longitude,
                     showClose = uiState.category != Category.None || uiState.selectedPlace != null,
-                    onClose = onCloseSearch,
+                    onAction = onAction,
                     onNavigateToSearch = onNavigateToSearch,
                     onInitSavedState = onInitSavedState
                 )
@@ -322,9 +330,19 @@ fun MapScreen(
                             category = it, isSelected = it == uiState.category
                         ) { category ->
                             if (isCategory(category)) {
-                                onSearchPlaceByCategory(it, "${currentLocation.latitude}", "${currentLocation.longitude}")
+                                onAction(MapAction.SearchPlacesByCategory(
+                                    category = it,
+                                    lat = "${currentLocation.latitude}",
+                                    lng = "${currentLocation.longitude}"
+                                )
+                                )
                             } else {
-                                onSearchPlaceByQuery(category.type, "${currentLocation.latitude}", "${currentLocation.longitude}")
+                                onAction(MapAction.SearchPlacesByKeyword(
+                                    query = category.type,
+                                    lat = "${currentLocation.latitude}",
+                                    lng = "${currentLocation.longitude}"
+                                )
+                                )
                             }
                         }
                     }
@@ -468,7 +486,7 @@ private fun SearchBarColorsPreview() {
         lat = 34.4,
         lng = 35.5,
         showClose = false,
-        onClose = { _ -> },
+        onAction = { _ -> },
         onNavigateToSearch = { _, _ -> },
         onInitSavedState = {}
     )
@@ -480,7 +498,7 @@ fun SearchBar(
     lat: Double,
     lng: Double,
     showClose: Boolean,
-    onClose: (Boolean) -> Unit,
+    onAction: (MapAction) -> Unit,
     onNavigateToSearch: (Double, Double) -> Unit,
     onInitSavedState: () -> Unit
 ) {
@@ -539,7 +557,7 @@ fun SearchBar(
                             .align(Alignment.CenterVertically)
                             .clickable {
                                 onInitSavedState()
-                                onClose(false)
+                                onAction(MapAction.CloseSearch(isPlaceSelected = false))
                             }
                     )
                 }
@@ -608,7 +626,7 @@ private fun CategoryChipPreview() {
 }
 
 @Composable
-fun PlaceList(uiState: MapUiState, onPlaceClick: (Place) -> Unit, onHide: () -> Unit) {
+fun PlaceList(uiState: MapUiState, onAction: (MapAction) -> Unit, onHide: () -> Unit) {
     val places = uiState.places.collectAsLazyPagingItems()
     val state = places.loadState.refresh
     if (state is LoadState.Error) {
@@ -629,7 +647,7 @@ fun PlaceList(uiState: MapUiState, onPlaceClick: (Place) -> Unit, onHide: () -> 
         ) { index ->
             val item = places[index]
             if (item != null) {
-                PlaceItem(place = item, onPlaceClick = onPlaceClick) {
+                PlaceItem(place = item, onAction = onAction) {
                     onHide()
                 }
             }
@@ -638,13 +656,13 @@ fun PlaceList(uiState: MapUiState, onPlaceClick: (Place) -> Unit, onHide: () -> 
 }
 
 @Composable
-fun PlaceItem(place: Place, onPlaceClick: ((Place) -> Unit)? = null, onHide: () -> Unit) {
+fun PlaceItem(place: Place, onAction: ((MapAction) -> Unit)? = null, onHide: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
             .clickable {
-                onPlaceClick?.invoke(place)
+                onAction?.invoke(MapAction.SelectPlace(place))
                 onHide()
             },
         verticalArrangement = Arrangement.Center

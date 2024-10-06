@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 fun LoadingProgressBar(modifier: Modifier = Modifier) {
     CircularProgressIndicator(
         modifier = modifier
-            .width(64.dp),
+            .width(48.dp),
         color = Color.White,
         trackColor = colorResource(id = R.color.primary),
     )

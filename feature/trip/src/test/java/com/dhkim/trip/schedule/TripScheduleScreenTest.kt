@@ -7,6 +7,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dhkim.trip.FakeTripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
@@ -66,7 +67,7 @@ class TripScheduleScreenTest {
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = TripScheduleViewModel(tripRepository = tripRepository)
+        viewModel = TripScheduleViewModel(tripRepository = tripRepository, savedStateHandle = SavedStateHandle())
     }
 
     @OptIn(ExperimentalTestApi::class)
@@ -79,7 +80,7 @@ class TripScheduleScreenTest {
             }
 
             TripScheduleScreen(
-                tripId = "",
+                isEdit = false,
                 uiState = uiState,
                 sideEffect = sideEffect,
                 onAction = viewModel::onAction,
@@ -94,8 +95,6 @@ class TripScheduleScreenTest {
 
         composeTestRule.onNodeWithTag("tripType1")
             .performClick()
-
-        composeTestRule.awaitIdle()
 
         composeTestRule.onNodeWithTag("tripTypeNextBtn")
             .performClick()
@@ -127,7 +126,7 @@ class TripScheduleScreenTest {
             }
 
             TripScheduleScreen(
-                tripId = "",
+                isEdit = false,
                 uiState = uiState,
                 sideEffect = sideEffect,
                 onAction = viewModel::onAction,
@@ -143,8 +142,6 @@ class TripScheduleScreenTest {
         composeTestRule.onNodeWithTag("tripType1")
             .performClick()
 
-        composeTestRule.awaitIdle()
-
         composeTestRule.onNodeWithTag("tripTypeNextBtn")
             .performClick()
 
@@ -156,8 +153,6 @@ class TripScheduleScreenTest {
         composeTestRule.onNodeWithTag("abroad")
             .performClick()
 
-        composeTestRule.awaitIdle()
-
         composeTestRule.waitUntilAtLeastOneExists(
             hasText("일본"),
             300
@@ -165,8 +160,6 @@ class TripScheduleScreenTest {
 
         composeTestRule.onNodeWithTag("domestic")
             .performClick()
-
-        composeTestRule.awaitIdle()
 
         composeTestRule.waitUntilAtLeastOneExists(
             hasText("인천"),

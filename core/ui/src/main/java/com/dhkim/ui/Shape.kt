@@ -91,9 +91,22 @@ fun Modifier.noRippleClick(
 
     Modifier.clickable(
         interactionSource = interactionSource,
+        indication = null,
+        onClick = onClick
+    )
+}
+
+fun Modifier.noRippleClick(
+    index: Int,
+    onClick: (Int) -> Unit
+) = composed {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Modifier.clickable(
+        interactionSource = interactionSource,
         indication = null
     ) {
-        onClick()
+        onClick(index)
     }
 }
 

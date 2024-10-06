@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -49,27 +51,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
 import com.dhkim.trip.R
 import com.dhkim.trip.domain.model.TripPlace
 import com.dhkim.trip.domain.model.TripType
 import com.dhkim.trip.domain.model.toTripType
-import com.dhkim.trip.presentation.tripHome.TripScheduleSideEffect
 import com.dhkim.ui.noRippleClick
+import com.dhkim.ui.onStartCollect
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TripScheduleScreen(
-    tripId: String,
+    isEdit: Boolean,
     uiState: TripScheduleUiState,
-    sideEffect: SharedFlow<TripScheduleSideEffect>,
+    sideEffect: Flow<TripScheduleSideEffect>,
     onAction: (TripScheduleAction) -> Unit,
     onBack: () -> Unit
 ) {
+    val lifecycle = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = {
         3
@@ -81,10 +85,10 @@ fun TripScheduleScreen(
         targetValue = uiState.progress,
         animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing), label = ""
     )
-    var showStartDateDialog by remember {
+    var showStartDateDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showEndDateDialog by remember {
+    var showEndDateDialog by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -94,18 +98,10 @@ fun TripScheduleScreen(
         }
     }
 
-    LaunchedEffect(tripId) {
-        if (tripId.isNotEmpty()) {
-            onAction(TripScheduleAction.Init(tripId))
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        sideEffect.collectLatest {
-            when (it) {
-                TripScheduleSideEffect.Complete -> {
-                    onBack()
-                }
+    lifecycle.onStartCollect(sideEffect) {
+        when (it) {
+            TripScheduleSideEffect.Complete -> {
+                onBack()
             }
         }
     }
@@ -161,8 +157,9 @@ fun TripScheduleScreen(
 
                     2 -> {
                         TripDateScreen(
-                            tripId = tripId,
-                            uiState = uiState,
+                            isEdit = isEdit,
+                            startDate = uiState.startDate,
+                            endDate = uiState.endDate,
                             onAction = onAction,
                             onMoveToPage = {
                                 scope.launch {
@@ -283,7 +280,7 @@ fun Calender(
 @Composable
 private fun TripScheduleScreenPreview() {
     TripScheduleScreen(
-        tripId = "",
+        isEdit = false,
         uiState = TripScheduleUiState(),
         sideEffect = MutableSharedFlow(),
         onAction = {},
@@ -297,10 +294,6 @@ private fun TripTypeScreen(
     onAction: (TripScheduleAction) -> Unit,
     onMoveToNextPage: (Int) -> Unit
 ) {
-    var selectedIndex by remember(uiState.type.type) {
-        mutableIntStateOf(uiState.type.type)
-    }
-
     Column(
         modifier = Modifier
             .padding(10.dp)
@@ -322,65 +315,88 @@ private fun TripTypeScreen(
             itemsIndexed(items = TripType.entries.toTypedArray(), key = { _, item ->
                 item.type
             }) { index, item ->
-                Text(
-                    text = item.desc,
-                    color = if (index == selectedIndex) {
-                        colorResource(id = R.color.primary)
-                    } else {
-                        colorResource(id = R.color.black)
-                    },
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .fillMaxWidth()
-                        .run {
-                            if (index == selectedIndex) {
-                                border(
-                                    width = 1.dp,
-                                    color = colorResource(id = R.color.primary),
-                                    shape = RoundedCornerShape(10.dp)
-                                )
-                            } else {
-                                this
-                            }
-                        }
-                        .background(
-                            color = if (index == selectedIndex) {
-                                colorResource(id = R.color.white)
-                            } else {
-                                colorResource(id = R.color.light_gray)
-                            }
-                        )
-                        .padding(vertical = 14.dp)
-                        .noRippleClick {
-                            selectedIndex = index
-                        }
-                        .testTag("tripType$index")
+                TripTypeItem(
+                    index = index,
+                    desc = item.desc,
+                    isSelected = item.type == uiState.type.type,
+                    onAction = onAction
                 )
             }
         }
 
-        Text(
-            text = "다음",
-            fontSize = 16.sp,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .fillMaxWidth()
-                .background(color = colorResource(id = R.color.primary))
-                .padding(10.dp)
-                .noRippleClick {
-                    onAction(TripScheduleAction.UpdateType(selectedIndex.toTripType()))
-                    onMoveToNextPage(1)
-                    onAction(TripScheduleAction.UpdateProgress(0.66f))
-                }
-                .testTag("tripTypeNextBtn")
-        )
+        val onNextClick = remember {
+            {
+                onMoveToNextPage(1)
+                onAction(TripScheduleAction.UpdateProgress(0.66f))
+            }
+        }
+
+        TripTypeNextButton(onNextClick = onNextClick)
     }
+}
+
+@Composable
+fun TripTypeNextButton(onNextClick: () -> Unit) {
+    Text(
+        text = "다음",
+        fontSize = 16.sp,
+        color = Color.White,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .fillMaxWidth()
+            .background(color = colorResource(id = R.color.primary))
+            .padding(10.dp)
+            .noRippleClick(onClick = onNextClick)
+            .testTag("tripTypeNextBtn")
+    )
+}
+
+@Composable
+fun TripTypeItem(
+    index: Int,
+    desc: String,
+    isSelected: Boolean,
+    onAction: (TripScheduleAction) -> Unit
+) {
+    Text(
+        text = desc,
+        color = if (isSelected) {
+            colorResource(id = R.color.primary)
+        } else {
+            colorResource(id = R.color.black)
+        },
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .fillMaxWidth()
+            .run {
+                if (isSelected) {
+                    border(
+                        width = 1.dp,
+                        color = colorResource(id = R.color.primary),
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                } else {
+                    this
+                }
+            }
+            .background(
+                color = if (isSelected) {
+                    colorResource(id = R.color.white)
+                } else {
+                    colorResource(id = R.color.light_gray)
+                }
+            )
+            .padding(vertical = 14.dp)
+            .noRippleClick {
+                onAction(TripScheduleAction.UpdateType(index.toTripType()))
+            }
+            .testTag("tripType$index")
+    )
 }
 
 @Preview(showBackground = true)
@@ -402,6 +418,11 @@ private fun TripPlaceScreen(
     var selectedPlaceTypeIndex by remember {
         mutableIntStateOf(0)
     }
+    val onTripPlaceTypeClick: (Int) -> Unit = remember {
+        {
+            selectedPlaceTypeIndex = it
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -414,89 +435,14 @@ private fun TripPlaceScreen(
             fontWeight = FontWeight.Bold
         )
 
-        Row {
-            Text(
-                text = "국내",
-                color = if (selectedPlaceTypeIndex == 0) {
-                    colorResource(id = R.color.primary)
-                } else {
-                    colorResource(id = R.color.black)
-                },
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(top = 10.dp, end = 10.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        color = colorResource(
-                            id = if (selectedPlaceTypeIndex == 0) {
-                                R.color.white
-                            } else {
-                                R.color.light_gray
-                            }
-                        )
-                    )
-                    .run {
-                        if (selectedPlaceTypeIndex == 0) {
-                            border(
-                                width = 1.dp,
-                                color = colorResource(id = R.color.primary),
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                        } else {
-                            this
-                        }
-                    }
-                    .padding(horizontal = 10.dp, vertical = 8.dp)
-                    .noRippleClick {
-                        selectedPlaceTypeIndex = 0
-                    }
-                    .testTag("domestic")
-            )
-
-            Text(
-                text = "해외",
-                color = if (selectedPlaceTypeIndex == 1) {
-                    colorResource(id = R.color.primary)
-                } else {
-                    colorResource(id = R.color.black)
-                },
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .padding(top = 10.dp, end = 10.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        color = colorResource(
-                            id = if (selectedPlaceTypeIndex == 1) {
-                                R.color.white
-                            } else {
-                                R.color.light_gray
-                            }
-                        )
-                    )
-                    .run {
-                        if (selectedPlaceTypeIndex == 1) {
-                            border(
-                                width = 1.dp,
-                                color = colorResource(id = R.color.primary),
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                        } else {
-                            this
-                        }
-                    }
-                    .padding(horizontal = 10.dp, vertical = 8.dp)
-                    .noRippleClick {
-                        selectedPlaceTypeIndex = 1
-                    }
-                    .testTag("abroad")
-            )
-        }
+        TripPlaceTypes(
+            isDomestic = selectedPlaceTypeIndex == 0,
+            onClick = onTripPlaceTypeClick
+        )
 
         if (selectedPlaceTypeIndex == 0) {
             DomesticPlaces(
-                uiState = uiState,
+                tripPlaces = uiState.tripPlaces,
                 onAction = onAction,
                 modifier = Modifier
                     .padding(vertical = 10.dp)
@@ -506,7 +452,7 @@ private fun TripPlaceScreen(
             )
         } else {
             AbroadPlaces(
-                uiState = uiState,
+                tripPlaces = uiState.tripPlaces,
                 onAction = onAction,
                 modifier = Modifier
                     .padding(vertical = 10.dp)
@@ -517,65 +463,167 @@ private fun TripPlaceScreen(
         }
 
         val isCompleted = uiState.tripPlaces.isNotEmpty()
-
-        val textColor = if (isCompleted) {
-            colorResource(id = R.color.white)
-        } else {
-            colorResource(id = R.color.gray)
+        val onPrevClick = remember {
+            {
+                onMoveToPage(0)
+                onAction(TripScheduleAction.UpdateProgress(0.33f))
+            }
         }
-
-        val backgroundColor = if (isCompleted) {
-            colorResource(id = R.color.primary)
-        } else {
-            colorResource(id = R.color.light_gray)
+        val onNextClick = remember {
+            {
+                onMoveToPage(2)
+                onAction(TripScheduleAction.UpdateProgress(1f))
+            }
         }
+        TripPlaceBottom(
+            isCompleted = isCompleted,
+            onPrevClick = onPrevClick,
+            onNextClick = onNextClick
+        )
+    }
+}
 
-        Column {
-            Text(
-                text = "이전",
-                fontSize = 16.sp,
-                color = colorResource(id = R.color.white),
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(bottom = 10.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
-                    .background(color = colorResource(id = R.color.primary))
-                    .padding(10.dp)
-                    .noRippleClick {
-                        onMoveToPage(0)
-                        onAction(TripScheduleAction.UpdateProgress(0.33f))
-                    }
-                    .testTag("tripPlacePrevBtn")
-            )
-
-            Text(
-                text = "다음",
-                fontSize = 16.sp,
-                color = textColor,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
-                    .background(color = backgroundColor)
-                    .padding(10.dp)
-                    .noRippleClick {
-                        if (isCompleted) {
-                            onMoveToPage(2)
-                            onAction(TripScheduleAction.UpdateProgress(1f))
+@Composable
+fun TripPlaceTypes(
+    isDomestic: Boolean,
+    onClick: (Int) -> Unit
+) {
+    Row {
+        Text(
+            text = "국내",
+            color = if (isDomestic) {
+                colorResource(id = R.color.primary)
+            } else {
+                colorResource(id = R.color.black)
+            },
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(top = 10.dp, end = 10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(
+                    color = colorResource(
+                        id = if (isDomestic) {
+                            R.color.white
+                        } else {
+                            R.color.light_gray
                         }
+                    )
+                )
+                .run {
+                    if (isDomestic) {
+                        border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.primary),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                    } else {
+                        this
                     }
-                    .testTag("tripPlaceNextBtn")
-            )
-        }
+                }
+                .padding(horizontal = 10.dp, vertical = 8.dp)
+                .noRippleClick {
+                    onClick(0)
+                }
+                .testTag("domestic")
+        )
+
+        Text(
+            text = "해외",
+            color = if (!isDomestic) {
+                colorResource(id = R.color.primary)
+            } else {
+                colorResource(id = R.color.black)
+            },
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            modifier = Modifier
+                .padding(top = 10.dp, end = 10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(
+                    color = colorResource(
+                        id = if (!isDomestic) {
+                            R.color.white
+                        } else {
+                            R.color.light_gray
+                        }
+                    )
+                )
+                .run {
+                    if (!isDomestic) {
+                        border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.primary),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                    } else {
+                        this
+                    }
+                }
+                .padding(horizontal = 10.dp, vertical = 8.dp)
+                .noRippleClick {
+                    onClick(1)
+                }
+                .testTag("abroad")
+        )
+    }
+}
+
+@Composable
+fun TripPlaceBottom(
+    isCompleted: Boolean,
+    onPrevClick: () -> Unit,
+    onNextClick: () -> Unit
+) {
+    val textColor = if (isCompleted) {
+        colorResource(id = R.color.white)
+    } else {
+        colorResource(id = R.color.gray)
+    }
+
+    val backgroundColor = if (isCompleted) {
+        colorResource(id = R.color.primary)
+    } else {
+        colorResource(id = R.color.light_gray)
+    }
+
+    Column {
+        Text(
+            text = "이전",
+            fontSize = 16.sp,
+            color = colorResource(id = R.color.white),
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(bottom = 10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .fillMaxWidth()
+                .background(color = colorResource(id = R.color.primary))
+                .padding(10.dp)
+                .noRippleClick(onClick = onPrevClick)
+                .testTag("tripPlacePrevBtn")
+        )
+
+        Text(
+            text = "다음",
+            fontSize = 16.sp,
+            color = textColor,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .fillMaxWidth()
+                .background(color = backgroundColor)
+                .padding(10.dp)
+                .noRippleClick(onClick = onNextClick)
+                .testTag("tripPlaceNextBtn")
+        )
     }
 }
 
 @Composable
 private fun DomesticPlaces(
-    uiState: TripScheduleUiState,
+    tripPlaces: ImmutableList<TripPlace>,
     onAction: (TripScheduleAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -588,67 +636,84 @@ private fun DomesticPlaces(
             key = { index, _ ->
                 index
             }) { index, item ->
-            val isDomesticSelected = uiState.tripPlaces
+            val isDomesticSelected = tripPlaces
                 .filterIsInstance<TripPlace.DomesticPlace>()
                 .map { it.placeName }
                 .contains(item.placeName)
-
-            Row {
-                Text(
-                    text = item.placeName,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                        .width(0.dp)
-                        .weight(1f)
-                        .align(Alignment.CenterVertically)
-                )
-
-                Text(
-                    text = "선택",
-                    color = if (isDomesticSelected) {
-                        colorResource(id = R.color.primary)
-                    } else {
-                        colorResource(id = R.color.black)
-                    },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(
-                            color = colorResource(
-                                id = if (isDomesticSelected) {
-                                    R.color.white
-                                } else {
-                                    R.color.light_gray
-                                }
-                            )
-                        )
-                        .run {
-                            if (isDomesticSelected) {
-                                border(
-                                    width = 1.dp,
-                                    color = colorResource(id = R.color.primary),
-                                    shape = RoundedCornerShape(20.dp)
-                                )
-                            } else {
-                                this
-                            }
-                        }
-                        .align(Alignment.CenterVertically)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .noRippleClick {
-                            onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.entries[index]))
-                        }
-                        .testTag(item.placeName)
-                )
-            }
+            PlaceItem(
+                isDomestic = true,
+                index = index,
+                placeName = item.placeName,
+                isSelected = isDomesticSelected,
+                onAction = onAction
+            )
         }
     }
 }
 
 @Composable
+fun PlaceItem(
+    isDomestic: Boolean,
+    index: Int,
+    placeName: String,
+    isSelected: Boolean,
+    onAction: (TripScheduleAction) -> Unit
+) {
+    Row {
+        Text(
+            text = placeName,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .width(0.dp)
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+        )
+
+        Text(
+            text = "선택",
+            color = if (isSelected) {
+                colorResource(id = R.color.primary)
+            } else {
+                colorResource(id = R.color.black)
+            },
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(
+                    color = colorResource(
+                        id = if (isSelected) {
+                            R.color.white
+                        } else {
+                            R.color.light_gray
+                        }
+                    )
+                )
+                .run {
+                    if (isSelected) {
+                        border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.primary),
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                    } else {
+                        this
+                    }
+                }
+                .align(Alignment.CenterVertically)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .noRippleClick {
+                    val entries = if (isDomestic) TripPlace.DomesticPlace.entries else TripPlace.AbroadPlace.entries
+                    onAction(TripScheduleAction.UpdatePlaces(entries[index]))
+                }
+                .testTag(placeName)
+        )
+    }
+}
+
+@Composable
 private fun AbroadPlaces(
-    uiState: TripScheduleUiState,
+    tripPlaces: ImmutableList<TripPlace>,
     onAction: (TripScheduleAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -661,67 +726,27 @@ private fun AbroadPlaces(
             key = { index, _ ->
                 index
             }) { index, item ->
-            val isAbroadSelected = uiState.tripPlaces
+            val isAbroadSelected = tripPlaces
                 .filterIsInstance<TripPlace.AbroadPlace>()
                 .map { it.placeName }
                 .contains(item.placeName)
 
-            Row {
-                Text(
-                    text = item.placeName,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                        .width(0.dp)
-                        .weight(1f)
-                        .align(Alignment.CenterVertically)
-                )
-
-                Text(
-                    text = "선택",
-                    color = if (isAbroadSelected) {
-                        colorResource(id = R.color.primary)
-                    } else {
-                        colorResource(id = R.color.black)
-                    },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(
-                            color = colorResource(
-                                id = if (isAbroadSelected) {
-                                    R.color.white
-                                } else {
-                                    R.color.light_gray
-                                }
-                            )
-                        )
-                        .run {
-                            if (isAbroadSelected) {
-                                border(
-                                    width = 1.dp,
-                                    color = colorResource(id = R.color.primary),
-                                    shape = RoundedCornerShape(20.dp)
-                                )
-                            } else {
-                                this
-                            }
-                        }
-                        .align(Alignment.CenterVertically)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .noRippleClick {
-                            onAction(TripScheduleAction.UpdatePlaces(TripPlace.AbroadPlace.entries[index]))
-                        }
-                )
-            }
+            PlaceItem(
+                isDomestic = false,
+                index = index,
+                placeName = item.placeName,
+                isSelected = isAbroadSelected,
+                onAction = onAction
+            )
         }
     }
 }
 
 @Composable
 private fun TripDateScreen(
-    tripId: String,
-    uiState: TripScheduleUiState,
+    isEdit: Boolean,
+    startDate: String,
+    endDate: String,
     onAction: (TripScheduleAction) -> Unit,
     onMoveToPage: (Int) -> Unit,
     onShowStartDateDialog: () -> Unit,
@@ -740,126 +765,173 @@ private fun TripDateScreen(
                 .padding(bottom = 10.dp)
         )
 
-        Row(
+        Box(
             modifier = Modifier
                 .height(0.dp)
                 .weight(1f)
         ) {
-            Text(
-                text = uiState.startDate.ifEmpty { "시작일" },
-                color = if (uiState.startDate.isEmpty()) {
-                    colorResource(id = R.color.gray)
-                } else {
-                    colorResource(id = R.color.black)
-                },
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .width(0.dp)
-                    .weight(1f)
-                    .border(
-                        width = 1.dp,
-                        color = colorResource(id = R.color.gray),
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(10.dp)
-                    .noRippleClick {
-                        onShowStartDateDialog()
-                    }
-            )
-            Text(
-                text = " - ",
-                color = colorResource(id = R.color.gray),
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-            )
-            Text(
-                text = uiState.endDate.ifEmpty { "종료일" },
-                color = if (uiState.endDate.isEmpty()) {
-                    colorResource(id = R.color.gray)
-                } else {
-                    colorResource(id = R.color.black)
-                },
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .width(0.dp)
-                    .weight(1f)
-                    .border(
-                        width = 1.dp,
-                        color = colorResource(id = R.color.gray),
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(10.dp)
-                    .noRippleClick {
-                        onShowEndDateDialog()
-                    }
-            )
+            Row {
+                StartDate(
+                    startDate = startDate,
+                    onClick = onShowStartDateDialog,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .width(0.dp)
+                        .weight(1f)
+                        .border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.gray),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(10.dp)
+                )
+
+                Text(
+                    text = " - ",
+                    color = colorResource(id = R.color.gray),
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                )
+
+                EndDate(
+                    endDate = endDate,
+                    onClick = onShowEndDateDialog,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .width(0.dp)
+                        .weight(1f)
+                        .border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.gray),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(10.dp)
+                )
+            }
         }
 
-        val isCompleted = uiState.startDate.isNotEmpty() && uiState.endDate.isNotEmpty()
-        val textColor = if (isCompleted) {
-            colorResource(id = R.color.white)
-        } else {
-            colorResource(id = R.color.gray)
+        val isCompleted = startDate.isNotEmpty() && endDate.isNotEmpty()
+        val onPrevClick = remember {
+            {
+                onMoveToPage(1)
+                onAction(TripScheduleAction.UpdateProgress(0.66f))
+            }
         }
-        val backgroundColor = if (isCompleted) {
-            colorResource(id = R.color.primary)
-        } else {
-            colorResource(id = R.color.light_gray)
-        }
-
-        Column {
-            Text(
-                text = "이전",
-                fontSize = 16.sp,
-                color = colorResource(id = R.color.white),
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(bottom = 10.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
-                    .background(color = colorResource(id = R.color.primary))
-                    .padding(10.dp)
-                    .noRippleClick {
-                        onMoveToPage(1)
-                        onAction(TripScheduleAction.UpdateProgress(0.66f))
+        val onNextClick = remember(isCompleted) {
+            {
+                if (isCompleted) {
+                    if (isEdit) {
+                        onAction(TripScheduleAction.UpdateTrip)
+                    } else {
+                        onAction(TripScheduleAction.SaveTrip)
                     }
-                    .testTag("tripPlacePrevBtn")
-            )
 
-            Text(
-                text = "완료",
-                fontSize = 16.sp,
-                color = textColor,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .fillMaxWidth()
-                    .background(backgroundColor)
-                    .padding(10.dp)
-                    .noRippleClick {
-                        if (isCompleted) {
-                            if (tripId.isNotEmpty()) {
-                                onAction(TripScheduleAction.UpdateTrip(tripId = tripId))
-                            } else {
-                                onAction(TripScheduleAction.SaveTrip)
-                            }
-
-                        }
-                    }
-            )
+                }
+            }
         }
+
+        SelectTripDate(
+            isCompleted = isCompleted,
+            onPrevClick = onPrevClick,
+            onNextClick = onNextClick
+        )
     }
+}
+
+@Composable
+fun SelectTripDate(
+    isCompleted: Boolean,
+    onPrevClick: () -> Unit,
+    onNextClick: () -> Unit
+) {
+    val textColor = if (isCompleted) {
+        colorResource(id = R.color.white)
+    } else {
+        colorResource(id = R.color.gray)
+    }
+    val backgroundColor = if (isCompleted) {
+        colorResource(id = R.color.primary)
+    } else {
+        colorResource(id = R.color.light_gray)
+    }
+
+    Column {
+        Text(
+            text = "이전",
+            fontSize = 16.sp,
+            color = colorResource(id = R.color.white),
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(bottom = 10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .fillMaxWidth()
+                .background(color = colorResource(id = R.color.primary))
+                .padding(10.dp)
+                .noRippleClick(onClick = onPrevClick)
+                .testTag("tripPlacePrevBtn")
+        )
+
+        Text(
+            text = "완료",
+            fontSize = 16.sp,
+            color = textColor,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .fillMaxWidth()
+                .background(backgroundColor)
+                .padding(10.dp)
+                .noRippleClick(onClick = onNextClick)
+        )
+    }
+}
+
+@Composable
+fun StartDate(
+    startDate: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = startDate.ifEmpty { "시작일" },
+        color = if (startDate.isEmpty()) {
+            colorResource(id = R.color.gray)
+        } else {
+            colorResource(id = R.color.black)
+        },
+        modifier = modifier
+            .noRippleClick(onClick = onClick)
+    )
+}
+
+@Composable
+fun EndDate(
+    endDate: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = endDate.ifEmpty { "종료일" },
+        color = if (endDate.isEmpty()) {
+            colorResource(id = R.color.gray)
+        } else {
+            colorResource(id = R.color.black)
+        },
+        modifier = modifier
+            .noRippleClick(onClick = onClick)
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun TripDateScreenPreview() {
     TripDateScreen(
-        tripId = "",
-        uiState = TripScheduleUiState(),
+        isEdit = false,
+        startDate = "",
+        endDate = "",
         onAction = {},
         onMoveToPage = {},
         onShowStartDateDialog = {},
@@ -871,7 +943,10 @@ private fun TripDateScreenPreview() {
 @Composable
 private fun TripPlaceScreenPreview() {
     TripPlaceScreen(
-        uiState = TripScheduleUiState(),
+        uiState = TripScheduleUiState(
+            startDate = "2024-07-03",
+            endDate = "2024-08-04"
+        ),
         onAction = {},
         onMoveToPage = {}
     )

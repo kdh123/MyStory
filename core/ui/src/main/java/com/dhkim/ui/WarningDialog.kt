@@ -37,9 +37,7 @@ fun WarningDialog(
         confirmButton = {
             if (choice) {
                 TextButton(
-                    onClick = {
-                        onConfirmation()
-                    }
+                    onClick = onConfirmation
                 ) {
                     Text(positiveText)
                 }
@@ -47,9 +45,7 @@ fun WarningDialog(
         },
         dismissButton = {
             TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
+                onClick = onDismissRequest
             ) {
                 if (choice) {
                     Text(negativeText)

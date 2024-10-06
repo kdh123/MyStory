@@ -11,11 +11,7 @@ import com.dhkim.setting.presentation.SettingViewModel
 
 const val SETTING_ROUTE = "setting"
 
-fun NavController.navigateToSetting() {
-    navigate(SETTING_ROUTE)
-}
-
-fun NavGraphBuilder.settingNavigation(onBack: () -> Unit) {
+fun NavGraphBuilder.settingScreen(onBack: () -> Unit) {
     composable(SETTING_ROUTE) {
         val viewModel = hiltViewModel<SettingViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -26,4 +22,8 @@ fun NavGraphBuilder.settingNavigation(onBack: () -> Unit) {
             onBack = onBack
         )
     }
+}
+
+fun NavController.navigateToSetting() {
+    navigate(SETTING_ROUTE)
 }

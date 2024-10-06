@@ -5,7 +5,6 @@ import com.dhkim.common.DateUtil
 import com.dhkim.trip.domain.model.TripImage
 import com.dhkim.trip.domain.model.TripVideo
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 
 typealias Year = String
 typealias Month = String
@@ -13,20 +12,22 @@ typealias Day = String
 
 @Stable
 data class TripDetailUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
+    val isInit: Boolean = false,
     val title: String = "",
     val type: String = "",
-    val startDate: String = "",
-    val endDate: String = "",
-    val selectedIndex: Int = 0,
-    val images: ImmutableList<TripImage> = persistentListOf(),
-    val videos: ImmutableList<TripVideo> = persistentListOf()
+    val startDate: String? = null,
+    val endDate: String? = null,
+    val selectedIndex: Int = -1,
+    val images: ImmutableList<TripImage>? = null,
+    val videos: ImmutableList<TripVideo>? = null
 ) {
-    val tripDates = if (startDate.isNotEmpty()) {
+    val tripDates = if (!startDate.isNullOrEmpty()) {
         mutableListOf<Triple<String, String, String>>().apply {
             var date = startDate
 
-            while (DateUtil.isBefore(date, endDate)) {
+            if (date.isNotEmpty() && !endDate.isNullOrEmpty())
+            while (DateUtil.isBefore(date!!, endDate)) {
                 val currentDate = DateUtil.dateAfterDays(date, 0)
                 val month = if (currentDate.second.toInt() < 10) {
                     "0${currentDate.second}"

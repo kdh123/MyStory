@@ -1,14 +1,13 @@
 package com.dhkim.friend
 
 import com.dhkim.MainDispatcherRule
-import com.dhkim.friend.presentation.FriendViewModel
 import com.dhkim.user.FakeFriendUserLocalDataSource
 import com.dhkim.user.FakeFriendUserRemoteDataSource
-import com.dhkim.user.data.UserRepositoryImpl
-import com.dhkim.user.data.dataSource.UserLocalDataSource
-import com.dhkim.user.data.dataSource.UserRemoteDataSource
-import com.dhkim.user.data.di.UserModule
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.repository.UserRepositoryImpl
+import com.dhkim.user.datasource.UserLocalDataSource
+import com.dhkim.user.datasource.UserRemoteDataSource
+import com.dhkim.user.di.UserModule
+import com.dhkim.user.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -18,9 +17,9 @@ import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,6 +55,9 @@ class FriendViewModelTest {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
     @Inject
     lateinit var userRepository: UserRepository
 
@@ -67,13 +69,11 @@ class FriendViewModelTest {
         viewModel = FriendViewModel(userRepository = userRepository)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `UiState 테스트`() = runTest {
-        advanceTimeBy(300)
-        val uiState = viewModel.uiState.value
-
-        assertEquals(uiState.myInfo.friends.size, 2)
-        assertEquals(uiState.myInfo.requests.size, 0)
+    fun `UiState 테스트`() = runBlocking {
+        viewModel.uiState.first()
+        delay(100)
+        assertEquals(viewModel.uiState.value.myInfo.friends.size, 2)
+        assertEquals(viewModel.uiState.value.myInfo.requests.size, 0)
     }
 }

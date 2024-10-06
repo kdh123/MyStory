@@ -1,31 +1,55 @@
 package com.dhkim.home.presentation.detail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.home.domain.TimeCapsuleRepository
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TimeCapsuleDetailViewModel @Inject constructor(
     private val timeCapsuleRepository: TimeCapsuleRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    val timeCapsuleId = savedStateHandle.get<String>("id") ?: ""
+    val isReceived = savedStateHandle.get<String>("isReceived") ?: "false"
+
     private val _uiState = MutableStateFlow(TimeCapsuleDetailUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState = _uiState
+        .onStart {
+            init(timeCapsuleId = timeCapsuleId, isReceived = isReceived.toBoolean())
+        }.onetimeRestartableStateIn(
+            scope = viewModelScope,
+            initialValue = TimeCapsuleDetailUiState()
+        )
 
-    private val _sideEffect = MutableSharedFlow<TimeCapsuleDetailSideEffect>()
-    val sideEffect = _sideEffect.asSharedFlow()
+    private val _sideEffect = Channel<TimeCapsuleDetailSideEffect>()
+    val sideEffect = _sideEffect.receiveAsFlow()
 
-    fun init(timeCapsuleId: String, isReceived: Boolean) {
+    fun onAction(action: TimeCapsuleDetailAction) {
+        when (action) {
+            is TimeCapsuleDetailAction.Init -> {
+                init(timeCapsuleId = action.timeCapsuleId, isReceived = action.isReceived)
+            }
+
+            is TimeCapsuleDetailAction.DeleteTimeCapsule -> {
+                deleteTImeCapsule()
+            }
+        }
+    }
+
+    private fun init(timeCapsuleId: String, isReceived: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             val myId = userRepository.getMyId()
             val myProfileImage = "${userRepository.getProfileImage()}"
@@ -33,7 +57,11 @@ class TimeCapsuleDetailViewModel @Inject constructor(
                 timeCapsuleRepository.getReceivedTimeCapsule(id = timeCapsuleId)?.let {
                     timeCapsuleRepository.updateReceivedTimeCapsule(it.copy(isOpened = true))
                     val nickname = userRepository.getFriend(it.sender)?.nickname ?: it.sender
-                    _uiState.value = _uiState.value.copy(isReceived = true, timeCapsule = it.toTimeCapsule(nickname))
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        isReceived = true,
+                        timeCapsule = it.toTimeCapsule(nickname)
+                    )
                 }
             } else {
                 timeCapsuleRepository.getMyTimeCapsule(id = timeCapsuleId)?.let {
@@ -42,6 +70,7 @@ class TimeCapsuleDetailViewModel @Inject constructor(
                         userRepository.getFriend(userId)?.nickname ?: userId
                     }
                     _uiState.value = _uiState.value.copy(
+                        isLoading = false,
                         isReceived = false,
                         timeCapsule = it.toTimeCapsule(myId, myProfileImage, sharedFriends)
                     )
@@ -50,14 +79,14 @@ class TimeCapsuleDetailViewModel @Inject constructor(
         }
     }
 
-    fun deleteTImeCapsule(timeCapsuleId: String) {
+    private fun deleteTImeCapsule() {
         viewModelScope.launch(Dispatchers.IO) {
             if (_uiState.value.isReceived) {
                 timeCapsuleRepository.deleteReceivedTimeCapsule(timeCapsuleId)
             } else {
                 timeCapsuleRepository.deleteMyTimeCapsule(timeCapsuleId)
             }
-            _sideEffect.emit(TimeCapsuleDetailSideEffect.Completed(isCompleted = true))
+            _sideEffect.send(TimeCapsuleDetailSideEffect.Completed(isCompleted = true))
         }
     }
 }

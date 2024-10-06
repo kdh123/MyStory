@@ -46,6 +46,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,14 +65,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
 import com.dhkim.common.DistanceManager
 import com.dhkim.home.R
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.ui.DefaultBackground
+import com.dhkim.ui.Popup
 import com.dhkim.ui.ShimmerBrush
-import com.dhkim.ui.WarningDialog
+import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -91,13 +94,15 @@ import com.naver.maps.map.compose.rememberCameraPositionState
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TimeCapsuleScreen(
     uiState: TimeCapsuleUiState,
-    sideEffect: TimeCapsuleSideEffect,
+    sideEffect: () -> Flow<TimeCapsuleSideEffect>,
     modifier: Modifier = Modifier,
     onDeleteTimeCapsule: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToAdd: () -> Unit,
@@ -106,28 +111,21 @@ fun TimeCapsuleScreen(
     onNavigateToNotification: () -> Unit,
     onNavigateToSetting: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToMore: () -> Unit
+    onNavigateToMore: () -> Unit,
+    showPopup: (Popup) -> Unit
 ) {
+    val lifecycle = LocalLifecycleOwner.current
+    val context = LocalContext.current
     var currentLocation by remember {
         mutableStateOf(Constants.defaultLocation)
     }
     var selectedTimeCapsule by remember {
         mutableStateOf(TimeCapsule())
     }
-    val context = LocalContext.current
-    var showLocationDialog by remember {
+    var showLocationDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showOpenDialog by remember {
-        mutableStateOf(false)
-    }
-    var showMenuDialog by remember {
-        mutableStateOf(false)
-    }
-    var showDeleteDialog by remember {
-        mutableStateOf(false)
-    }
-    var showPermissionDialog by remember {
+    var showMenuDialog by rememberSaveable {
         mutableStateOf(false)
     }
     val fusedLocationClient = remember {
@@ -145,25 +143,6 @@ fun TimeCapsuleScreen(
         }
     }
 
-    if (showPermissionDialog) {
-        WarningDialog(
-            dialogTitle = "위치 권한 요청",
-            dialogText = "타임캡슐을 개봉하기 위해서 위치 권한을 허용해주세요.",
-            onConfirmation = {
-                showPermissionDialog = false
-                val uri = Uri.fromParts("package", context.packageName, null)
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    data = uri
-                }
-                context.startActivity(intent)
-            },
-            onDismissRequest = {
-                showPermissionDialog = false
-            }
-        )
-    }
-
     if (showMenuDialog) {
         Dialog(
             onDismissRequest = {
@@ -172,7 +151,7 @@ fun TimeCapsuleScreen(
             }
         ) {
             Card(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .padding(10.dp),
                 shape = RoundedCornerShape(16.dp),
@@ -193,7 +172,25 @@ fun TimeCapsuleScreen(
                             .fillMaxWidth()
                             .clickable {
                                 showMenuDialog = false
-                                showDeleteDialog = true
+                                val desc =
+                                    if (selectedTimeCapsule.sharedFriends.isNotEmpty() && !selectedTimeCapsule.isReceived) {
+                                        "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
+                                    } else {
+                                        "정말 삭제하겠습니까?"
+                                    }
+
+                                showPopup(
+                                    Popup.Warning(
+                                        title = "삭제",
+                                        desc = desc,
+                                        onPositiveClick = {
+                                            onDeleteTimeCapsule(
+                                                selectedTimeCapsule.id,
+                                                selectedTimeCapsule.isReceived
+                                            )
+                                        }
+                                    )
+                                )
                             }
                     )
                 }
@@ -201,43 +198,13 @@ fun TimeCapsuleScreen(
         }
     }
 
-    if (showDeleteDialog) {
-        val desc = if (selectedTimeCapsule.sharedFriends.isNotEmpty() && !selectedTimeCapsule.isReceived) {
-            "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
-        } else {
-            "정말 삭제하겠습니까?"
-        }
-
-        WarningDialog(
-            dialogTitle = "삭제",
-            dialogText = desc,
-            onConfirmation = {
-                onDeleteTimeCapsule(selectedTimeCapsule.id, selectedTimeCapsule.isReceived)
-                showDeleteDialog = false
-            },
-            onDismissRequest = {
-                showDeleteDialog = false
-            }
-        )
-    }
-
-    if (showOpenDialog) {
-        WarningDialog(
-            dialogTitle = "개봉",
-            dialogText = "정말 개봉하겠습니까?",
-            onConfirmation = {
-                onNavigateToOpen(selectedTimeCapsule.id, selectedTimeCapsule.isReceived)
-            },
-            onDismissRequest = {
-                showOpenDialog = false
-            }
-        )
-    }
-
     if (showLocationDialog) {
-        LocationDialog(timeCapsule = selectedTimeCapsule) {
-            showLocationDialog = false
-        }
+        LocationDialog(
+            timeCapsule = selectedTimeCapsule,
+            onDismissRequest = {
+                showLocationDialog = false
+            }
+        )
     }
 
     LaunchedEffect(locationPermissionState) {
@@ -248,29 +215,27 @@ fun TimeCapsuleScreen(
         }
     }
 
-    LaunchedEffect(sideEffect) {
-        when (sideEffect) {
+    lifecycle.onStartCollect(sideEffect()) {
+        when (it) {
             is TimeCapsuleSideEffect.None -> {}
 
             is TimeCapsuleSideEffect.Message -> {
-                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
             }
 
             is TimeCapsuleSideEffect.NavigateToOpen -> {
-                onNavigateToOpen(sideEffect.id, sideEffect.isReceived)
+                onNavigateToOpen(it.id, it.isReceived)
             }
 
             is TimeCapsuleSideEffect.NavigateToDetail -> {
-                onNavigateToDetail(sideEffect.id, sideEffect.isReceived)
+                onNavigateToDetail(it.id, it.isReceived)
             }
         }
     }
 
     Scaffold(
         topBar = {
-            Row(
-                modifier = Modifier
-            ) {
+            Row {
                 Text(
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
@@ -312,7 +277,7 @@ fun TimeCapsuleScreen(
         }
     ) {
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .padding(top = it.calculateTopPadding())
                 .fillMaxSize()
         ) {
@@ -320,7 +285,7 @@ fun TimeCapsuleScreen(
                 LoadingScreen()
             } else {
                 LazyColumn(
-                    modifier = Modifier
+                    modifier = modifier
                         .testTag("timeCapsuleItems")
                 ) {
                     items(uiState.timeCapsules, key = {
@@ -344,7 +309,8 @@ fun TimeCapsuleScreen(
                                     )
 
                                     if (title == "나의 이야기") {
-                                        val interactionSource = remember { MutableInteractionSource() }
+                                        val interactionSource =
+                                            remember { MutableInteractionSource() }
                                         Text(
                                             text = "더보기",
                                             modifier = Modifier
@@ -377,20 +343,41 @@ fun TimeCapsuleScreen(
 
                             TimeCapsuleType.OpenableTimeCapsule -> {
                                 OpenableTimeCapsules(
-                                    timeCapsules = (it.data as? List<TimeCapsule> ?: listOf()).toImmutableList(),
+                                    timeCapsules = (it.data as? List<TimeCapsule>
+                                        ?: listOf()).toImmutableList(),
                                     currentLat = currentLocation.latitude,
                                     currentLng = currentLocation.longitude,
                                     onShowLocationDialog = {
                                         if (!locationPermissionState.status.isGranted) {
-                                            showPermissionDialog = true
+                                            showPopup(
+                                                Popup.Warning(
+                                                    title = "위치 권한 요청",
+                                                    desc = "타임캡슐을 개봉하기 위해서 위치 권한을 허용해주세요.",
+                                                    onPositiveClick = {
+                                                        val uri = Uri.fromParts("package", context.packageName, null)
+                                                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                                            data = uri
+                                                        }
+                                                        context.startActivity(intent)
+                                                    }
+                                                )
+                                            )
                                         } else {
                                             selectedTimeCapsule = it
                                             showLocationDialog = true
                                         }
                                     },
                                     onShowOpenDialog = {
-                                        selectedTimeCapsule = it
-                                        showOpenDialog = true
+                                        showPopup(
+                                            Popup.Warning(
+                                                title = "개봉",
+                                                desc = "정말 개봉하겠습니까?",
+                                                onPositiveClick = {
+                                                    onNavigateToOpen(it.id, it.isReceived)
+                                                }
+                                            )
+                                        )
                                     },
                                     onLongClick = {
                                         selectedTimeCapsule = it
@@ -432,9 +419,7 @@ fun TimeCapsuleScreen(
                                         .width(150.dp)
                                         .height(150.dp)
                                         .background(color = colorResource(id = R.color.light_gray))
-                                        .clickable {
-                                            onNavigateToAdd()
-                                        }
+                                        .clickable(onClick = onNavigateToAdd)
                                 ) {
                                     Image(
                                         painter = painterResource(id = R.drawable.ic_add_black),
@@ -448,9 +433,7 @@ fun TimeCapsuleScreen(
                             }
 
                             TimeCapsuleType.InviteFriend -> {
-                                InviteFriendItem(
-                                    onNavigateToProfile = onNavigateToProfile
-                                )
+                                InviteFriendItem(onNavigateToProfile = onNavigateToProfile)
                             }
 
                             TimeCapsuleType.Line -> {
@@ -535,9 +518,7 @@ private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
             DefaultBackground(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable {
-                        onNavigateToProfile()
-                    }
+                    .clickable(onClick = onNavigateToProfile)
             ) {
                 Text(
                     color = Color.White,
@@ -577,13 +558,12 @@ private fun OpenedTimeCapsules(
                 onClick = {
                     onNavigateToDetail(it.id, it.isReceived)
                 },
-                onLongClick = {
-                    onLongClick(it)
-                }
+                onLongClick = onLongClick
             )
         }
     }
 }
+
 
 @OptIn(ExperimentalNaverMapApi::class)
 @Composable
@@ -594,14 +574,16 @@ fun LocationDialog(
     val cameraPositionState = rememberCameraPositionState()
     val mapProperties by remember {
         mutableStateOf(
-            MapProperties(maxZoom = 20.0, minZoom = 5.0, locationTrackingMode = LocationTrackingMode.NoFollow)
+            MapProperties(
+                maxZoom = 20.0,
+                minZoom = 5.0,
+                locationTrackingMode = LocationTrackingMode.NoFollow
+            )
         )
     }
     val mapUiSettings by remember {
         mutableStateOf(
-            MapUiSettings(
-                isLocationButtonEnabled = false
-            )
+            MapUiSettings(isLocationButtonEnabled = false)
         )
     }
 
@@ -723,9 +705,7 @@ private fun OpenableTimeCapsules(
                 currentLng = currentLng,
                 onShowLocationDialog = onShowLocationDialog,
                 onShowOpenDialog = onShowOpenDialog,
-                onLongClick = {
-                    onLongClick(it)
-                }
+                onLongClick = onLongClick
             )
         }
     }
@@ -769,18 +749,39 @@ private fun TimeCapsuleScreenPreview() {
 
     repeat(5) {
         if (it % 2 == 0) {
-            openedList.add(TimeCapsule(id = "$it", date = "2024-06-28", openDate = "2024-06-28", images = listOf("")))
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf("")
+                )
+            )
             unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", images = listOf("")))
         } else {
-            openedList.add(TimeCapsule(id = "$it", date = "2024-06-28", openDate = "2024-06-28", checkLocation = true, images = listOf("")))
-            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", checkLocation = true, images = listOf("")))
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
+            unOpenedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    openDate = "2024-06-28",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
         }
     }
 
     TimeCapsuleScreen(
         uiState = TimeCapsuleUiState(),
-        sideEffect = TimeCapsuleSideEffect.None,
-        modifier = Modifier,
+        sideEffect = { flowOf() },
         onDeleteTimeCapsule = { _, _ -> },
         onNavigateToAdd = { },
         onNavigateToOpen = { _, _ -> },
@@ -788,13 +789,18 @@ private fun TimeCapsuleScreenPreview() {
         onNavigateToNotification = { },
         onNavigateToSetting = { },
         onNavigateToProfile = { },
-        onNavigateToMore = { }
+        onNavigateToMore = { },
+        showPopup = {}
     )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongClick: (TimeCapsule) -> Unit) {
+fun OpenedBox(
+    timeCapsule: TimeCapsule,
+    onClick: (TimeCapsule) -> Unit,
+    onLongClick: (TimeCapsule) -> Unit
+) {
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(10.dp),
@@ -816,7 +822,7 @@ fun OpenedBox(timeCapsule: TimeCapsule, onClick: (TimeCapsule) -> Unit, onLongCl
             Box {
                 if (timeCapsule.images.isNotEmpty()) {
                     GlideImage(
-                        imageModel =  { timeCapsule.images[0] },
+                        imageModel = { timeCapsule.images[0] },
                         previewPlaceholder = painterResource(id = R.drawable.ic_launcher_background),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -900,7 +906,12 @@ private fun LockTimeCapsule(
     onLongClick: (TimeCapsule) -> Unit
 ) {
     val checkLocation = timeCapsule.checkLocation
-    val isNear = DistanceManager.getDistance(currentLat, currentLng, timeCapsule.lat.toDouble(), timeCapsule.lng.toDouble()) <= 100
+    val isNear = DistanceManager.getDistance(
+        currentLat,
+        currentLng,
+        timeCapsule.lat.toDouble(),
+        timeCapsule.lng.toDouble()
+    ) <= 100
     val canOpen = DateUtil.getDateGap(timeCapsule.openDate) <= 0
 
     Card(
@@ -947,7 +958,7 @@ private fun LockTimeCapsule(
             ) {
                 if (timeCapsule.images.isNotEmpty()) {
                     GlideImage(
-                        imageModel =  { timeCapsule.images[0] },
+                        imageModel = { timeCapsule.images[0] },
                         previewPlaceholder = painterResource(id = R.drawable.ic_launcher_background),
                         modifier = modifier
                             .aspectRatio(1f)

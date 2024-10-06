@@ -9,7 +9,7 @@ import com.dhkim.home.data.dataSource.remote.DeleteTimeCapsule
 import com.dhkim.home.domain.ReceivedTimeCapsule
 import com.dhkim.home.domain.SharedTimeCapsule
 import com.dhkim.home.domain.TimeCapsuleRepository
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.repository.UserRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson

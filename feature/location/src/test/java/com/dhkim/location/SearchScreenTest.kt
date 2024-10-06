@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTextInput
+import androidx.lifecycle.SavedStateHandle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.dhkim.location.data.dataSource.remote.LocationApi
 import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
@@ -20,7 +21,6 @@ import com.dhkim.location.domain.LocationRepository
 import com.dhkim.location.domain.Place
 import com.dhkim.location.presentation.SearchScreen
 import com.dhkim.location.presentation.SearchViewModel
-import com.naver.maps.geometry.LatLng
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -82,7 +82,11 @@ class SearchScreenTest {
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = SearchViewModel(locationRepository = locationRepository)
+        val savedStateHandle = SavedStateHandle().apply {
+            set("lat", "37.572389")
+            set("lng", "126.9769117")
+        }
+        viewModel = SearchViewModel(locationRepository = locationRepository, savedStateHandle = savedStateHandle)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -99,8 +103,6 @@ class SearchScreenTest {
             SearchScreen(
                 uiState = uiState,
                 searchResult = searchResult,
-                latLng = LatLng(0.0, 0.0),
-                onSetCurrentLocation = viewModel::setCurrentLocation,
                 onQuery = viewModel::onQuery,
                 onBack = {}
             )

@@ -47,7 +47,6 @@ dependencies {
 
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
-    implementation(project(":camera"))
     implementation(project(":core:user"))
     implementation(project(":feature:friend"))
     implementation(project(":feature:location"))

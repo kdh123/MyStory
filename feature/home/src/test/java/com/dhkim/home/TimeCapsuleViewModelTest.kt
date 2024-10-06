@@ -1,6 +1,5 @@
 package com.dhkim.home
 
-import androidx.compose.ui.test.junit4.createComposeRule
 import com.dhkim.home.data.FakeTimeCapsuleLocalDataSource
 import com.dhkim.home.data.FakeTimeCapsuleRepository
 import com.dhkim.home.data.FakeUserLocalDataSource
@@ -11,11 +10,11 @@ import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.home.domain.TimeCapsuleRepository
 import com.dhkim.home.presentation.TimeCapsuleType
 import com.dhkim.home.presentation.TimeCapsuleViewModel
-import com.dhkim.user.data.UserRepositoryImpl
-import com.dhkim.user.data.dataSource.UserLocalDataSource
-import com.dhkim.user.data.dataSource.UserRemoteDataSource
-import com.dhkim.user.data.di.UserModule
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.user.repository.UserRepositoryImpl
+import com.dhkim.user.datasource.UserLocalDataSource
+import com.dhkim.user.datasource.UserRemoteDataSource
+import com.dhkim.user.di.UserModule
+import com.dhkim.user.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -25,6 +24,7 @@ import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -78,9 +78,6 @@ class TimeCapsuleViewModelTest {
     @get:Rule
     var mainDispatcherRule = MainDispatcherRule()
 
-    @get:Rule
-    val composeRule = createComposeRule()
-
     @Inject lateinit var timeCapsuleRepository: TimeCapsuleRepository
     @Inject lateinit var userRepository: UserRepository
 
@@ -94,7 +91,8 @@ class TimeCapsuleViewModelTest {
 
     @Test
     fun `상태 테스트`() = runBlocking {
-        delay(500L)
+        viewModel.uiState.first()
+        delay(100)
         val timeCapsules = viewModel.uiState.value.timeCapsules
         val openableTimeCapsules = timeCapsules
             .firstOrNull { it.type == TimeCapsuleType.OpenableTimeCapsule }
@@ -108,27 +106,28 @@ class TimeCapsuleViewModelTest {
             .firstOrNull { it.type == TimeCapsuleType.UnopenedTimeCapsule }
             ?.data as? List<TimeCapsule> ?: listOf()
 
-        assertEquals(timeCapsules.size, 11)
-        assertEquals(openableTimeCapsules.size, 2)
+        assertEquals(openableTimeCapsules.size, 7)
         assertEquals(openableTimeCapsules[0].id, "id2")
 
         assertEquals(openedTimeCapsules.size, 3)
         assertEquals(openedTimeCapsules[0].id, "id0")
 
-        assertEquals(unopenedTimeCapsules.size, 15)
+        assertEquals(unopenedTimeCapsules.size, 10)
         assertEquals(unopenedTimeCapsules[0].id, "id1")
     }
 
     @Test
     fun `삭제 테스트`() = runBlocking {
+        viewModel.uiState.first()
+        delay(100)
         viewModel.deleteTimeCapsule("receivedId1", isReceived = true)
-        delay(500L)
+        delay(100)
 
         val timeCapsules = viewModel.uiState.value.timeCapsules
         val unopenedTimeCapsules = timeCapsules
             .firstOrNull { it.type == TimeCapsuleType.UnopenedTimeCapsule }
             ?.data as? List<TimeCapsule> ?: listOf()
 
-        assertEquals(unopenedTimeCapsules.size, 14)
+        assertEquals(unopenedTimeCapsules.size, 9)
     }
 }

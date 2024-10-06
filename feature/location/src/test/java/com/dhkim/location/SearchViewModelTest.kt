@@ -1,5 +1,6 @@
 package com.dhkim.location
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.paging.testing.asSnapshot
 import com.dhkim.location.data.dataSource.remote.LocationApi
 import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
@@ -20,6 +21,7 @@ import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -50,8 +52,13 @@ class SearchViewModelTest {
 
     @Before
     fun setup() {
+        val savedStateHandle = SavedStateHandle().apply {
+            set("lat", "37.572389")
+            set("lng", "126.9769117")
+        }
+
         hiltRule.inject()
-        viewModel = SearchViewModel(locationRepository)
+        viewModel = SearchViewModel(locationRepository,savedStateHandle)
     }
 
     @Module
@@ -74,8 +81,10 @@ class SearchViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `UI 상태 테스트`() = runTest {
+        viewModel.uiState.first()
+        advanceTimeBy(100)
         viewModel.onQuery("롯데타워")
-        advanceTimeBy(1500L)
+        advanceTimeBy(1_500)
 
         val uiState = viewModel.uiState.value
         val places = uiState.places.asSnapshot()

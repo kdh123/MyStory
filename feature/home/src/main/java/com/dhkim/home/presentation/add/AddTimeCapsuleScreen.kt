@@ -1,4 +1,9 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@file:OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalPermissionsApi::class
+)
 
 package com.dhkim.home.presentation.add
 
@@ -62,6 +67,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,18 +85,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
 import com.dhkim.dhcamera.camera.DhCamera
 import com.dhkim.dhcamera.model.BackgroundText
 import com.dhkim.dhcamera.model.FontElement
 import com.dhkim.home.R
-import com.dhkim.home.domain.BaseTimeCapsule
-import com.dhkim.home.domain.MyTimeCapsule
-import com.dhkim.home.domain.SendTimeCapsule
 import com.dhkim.home.domain.SharedFriend
 import com.dhkim.home.presentation.LocationSearchScreen
 import com.dhkim.location.domain.Place
+import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -100,6 +105,8 @@ import com.naver.maps.geometry.LatLng
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -107,26 +114,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddTimeCapsuleScreen(
     uiState: AddTimeCapsuleUiState,
-    sideEffect: AddTimeCapsuleSideEffect,
+    sideEffect: () -> Flow<AddTimeCapsuleSideEffect>,
+    onAction: (AddTimeCapsuleAction) -> Unit,
     imageUrl: String,
     place: Place,
     friendId: String,
-    onSaveTimeCapsule: () -> Unit,
-    onSetCheckShare: (Boolean) -> Unit,
-    onSetCheckLocation: (Boolean) -> Unit,
-    onSetSelectImageIndex: (Int) -> Unit,
-    onSetOpenDate: (String) -> Unit,
-    onTyping: (String) -> Unit,
-    onCheckSharedFriend: (String) -> Unit,
-    onQuery: (String) -> Unit,
-    onPlaceClick: (Place) -> Unit,
-    onSearchAddress: (lat: String, lng: String) -> Unit,
-    onInitPlace: (Place) -> Unit,
-    onAddImage: (imageUrl: String) -> Unit,
-    onAddFriend: (friendId: String) -> Unit,
-    onNavigateToCamera: () -> Unit,
     onBack: () -> Unit,
 ) {
+    val lifecycle = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
     var showSharedFriendsBottomSheet by remember { mutableStateOf(false) }
     var showImagePickBottomSheet by remember { mutableStateOf(false) }
@@ -142,13 +137,13 @@ fun AddTimeCapsuleScreen(
                 val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 context.contentResolver.takePersistableUriPermission(it, flag)
             }
-            onAddImage("$it")
+            onAction(AddTimeCapsuleAction.AddImage(imageUrl = "$it"))
         }
     }
-    var showLocationBottomSheet by remember {
+    var showLocationBottomSheet by rememberSaveable {
         mutableStateOf(false)
     }
-    var showDateDialog by remember {
+    var showDateDialog by rememberSaveable {
         mutableStateOf(false)
     }
     var currentLocation by remember {
@@ -170,16 +165,17 @@ fun AddTimeCapsuleScreen(
                     if (place.lat == "" || place.lng == "") {
                         currentLocation =
                             LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-                        onSearchAddress(
-                            "${currentLocation.latitude}",
-                            "${currentLocation.longitude}"
+                        onAction(
+                            AddTimeCapsuleAction.SearchAddress(
+                                "${currentLocation.latitude}",
+                                "${currentLocation.longitude}"
+                            )
                         )
                     } else {
-                        onInitPlace(place)
+                        onAction(AddTimeCapsuleAction.InitPlace(place = place))
                     }
                 }
         } else {
-            // Handle permission denial
         }
     }
     var contentHeight by remember {
@@ -191,22 +187,20 @@ fun AddTimeCapsuleScreen(
     val density = LocalDensity.current
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(sideEffect) {
-        when (sideEffect) {
-            is AddTimeCapsuleSideEffect.None -> {}
-
+    lifecycle.onStartCollect(sideEffect()) {
+        when (it) {
             is AddTimeCapsuleSideEffect.Message -> {
-                Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
             }
 
             is AddTimeCapsuleSideEffect.Completed -> {
-                if (sideEffect.isCompleted) {
+                if (it.isCompleted) {
                     onBack()
                 }
             }
 
             is AddTimeCapsuleSideEffect.ShowPlaceBottomSheet -> {
-                if (!sideEffect.show) {
+                if (!it.show) {
                     showLocationBottomSheet = false
                 }
             }
@@ -232,13 +226,13 @@ fun AddTimeCapsuleScreen(
 
     LaunchedEffect(friendId) {
         if (friendId.isNotEmpty()) {
-            onAddFriend(friendId)
+            onAction(AddTimeCapsuleAction.AddFriend(friendId))
         }
     }
 
     LaunchedEffect(imageUrl) {
         if (imageUrl.isNotEmpty()) {
-            onAddImage(imageUrl)
+            onAction(AddTimeCapsuleAction.AddImage(imageUrl = imageUrl))
         }
     }
 
@@ -301,8 +295,7 @@ fun AddTimeCapsuleScreen(
             ) {
                 LocationSearchScreen(
                     uiState = uiState,
-                    onQuery = onQuery,
-                    onClick = onPlaceClick
+                    onAction = onAction
                 )
             }
         }
@@ -317,7 +310,7 @@ fun AddTimeCapsuleScreen(
                 SharedFriendList(
                     modifier = Modifier.padding(bottom = 48.dp),
                     sharedFriends = uiState.sharedFriends.toImmutableList(),
-                    onClickCheckBox = onCheckSharedFriend
+                    onAction = onAction
                 )
             }
         }
@@ -344,7 +337,7 @@ fun AddTimeCapsuleScreen(
                             startCamera(
                                 context = context,
                                 uiState = uiState,
-                                onAddImage = onAddImage
+                                onAction = onAction
                             )
                         }
                     )
@@ -382,7 +375,7 @@ fun AddTimeCapsuleScreen(
             ) {
                 if (showDateDialog) {
                     Calender(
-                        onSave = onSetOpenDate,
+                        onAction = onAction,
                         onDismiss = {
                             showDateDialog = false
                         }
@@ -390,14 +383,14 @@ fun AddTimeCapsuleScreen(
                 }
                 ContentsView(
                     content = uiState.content,
-                    onType = onTyping
+                    onAction = onAction
                 )
                 ImageListView(
                     imageUrls = uiState.imageUrls,
                     modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
                     onSelectPicture = {
                         scope.launch {
-                            onSetSelectImageIndex(it)
+                            onAction(AddTimeCapsuleAction.SetSelectImageIndex(it))
                             showImagePickBottomSheet = true
                         }
                     }
@@ -413,7 +406,7 @@ fun AddTimeCapsuleScreen(
                         subTitle = "개봉할 수 있는 위치를 지정합니다.",
                         isChecked = uiState.checkLocation
                     ) {
-                        onSetCheckLocation(it)
+                        onAction(AddTimeCapsuleAction.SetCheckLocation(it))
                     }
                     if (uiState.checkLocation) {
                         MenuItem(
@@ -461,7 +454,7 @@ fun AddTimeCapsuleScreen(
                         subTitle = "사진은 친구에게 공유되지 않습니다.",
                         isChecked = uiState.isShare
                     ) {
-                        onSetCheckShare(it)
+                        onAction(AddTimeCapsuleAction.SetCheckShare(it))
                         if (uiState.checkLocation) {
                             scope.launch {
                                 scrollState.animateScrollTo(200)
@@ -503,7 +496,7 @@ fun AddTimeCapsuleScreen(
                         }
                     }
             ) {
-                onSaveTimeCapsule()
+                onAction(AddTimeCapsuleAction.SaveTimeCapsule)
             }
         }
     }
@@ -513,7 +506,7 @@ fun AddTimeCapsuleScreen(
 private fun SharedFriendList(
     modifier: Modifier = Modifier,
     sharedFriends: ImmutableList<SharedFriend>,
-    onClickCheckBox: (String) -> Unit
+    onAction: (AddTimeCapsuleAction) -> Unit
 ) {
     if (sharedFriends.isNotEmpty()) {
         LazyColumn(
@@ -527,7 +520,7 @@ private fun SharedFriendList(
             ) {
                 SharedFriendItem(
                     sharedFriend = it,
-                    onClickCheckBox = onClickCheckBox
+                    onAction = onAction
                 )
             }
         }
@@ -545,7 +538,7 @@ private fun SharedFriendList(
 private fun startCamera(
     context: Context,
     uiState: AddTimeCapsuleUiState,
-    onAddImage: (imageUrl: String) -> Unit
+    onAction: (AddTimeCapsuleAction) -> Unit,
 ) {
     val backgroundItems = listOf(
         BackgroundText.Builder(context)
@@ -625,23 +618,22 @@ private fun startCamera(
         .fontElements(fonts)
         .enableAddGalleryImage(true)
         .onCompleted(isFinishCamera = true) { savedUrl ->
-            onAddImage(savedUrl)
+            onAction(AddTimeCapsuleAction.AddImage(savedUrl))
         }
         .start()
 }
 
-
 @Composable
 private fun SharedFriendItem(
     sharedFriend: SharedFriend,
-    onClickCheckBox: (String) -> Unit
+    onAction: (AddTimeCapsuleAction) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
             .clickable {
-                onClickCheckBox(sharedFriend.userId)
+                onAction(AddTimeCapsuleAction.CheckSharedFriend(sharedFriend.userId))
             }
     ) {
         Image(
@@ -755,7 +747,7 @@ private fun BottomMenuItemPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Calender(
-    onSave: (String) -> Unit,
+    onAction: (AddTimeCapsuleAction) -> Unit,
     onDismiss: () -> Unit
 ) {
     val startDate = DateUtil.dateAfterMonths(3)
@@ -777,7 +769,7 @@ fun Calender(
                 onClick = {
                     datePickerState.selectedDateMillis?.let {
                         val date = DateUtil.millsToDate(it)
-                        onSave(date)
+                        onAction(AddTimeCapsuleAction.SetOpenDate(date))
                         onDismiss()
                     }
                 }
@@ -1025,7 +1017,7 @@ private fun ImageViewPreview() {
 @Composable
 private fun ContentsView(
     content: String,
-    onType: (String) -> Unit
+    onAction: (AddTimeCapsuleAction) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -1049,7 +1041,9 @@ private fun ContentsView(
                 unfocusedIndicatorColor = Color.Transparent
             ),
             value = content,
-            onValueChange = onType,
+            onValueChange = {
+                onAction(AddTimeCapsuleAction.Typing(it))
+            },
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxSize()
@@ -1070,29 +1064,11 @@ private fun ContentViewPreview() {
 private fun AddTimeCapsuleScreenPreview() {
     AddTimeCapsuleScreen(
         uiState = AddTimeCapsuleUiState(),
-        sideEffect = AddTimeCapsuleSideEffect.None,
+        sideEffect = { flowOf() },
+        onAction = {},
         imageUrl = "imageUrl2",
         place = Place(),
         friendId = "",
-        onSaveTimeCapsule = { },
-        onSetCheckShare = { },
-        onSetCheckLocation = { },
-        onSetSelectImageIndex = { },
-        onSetOpenDate = { },
-        onTyping = { },
-        onCheckSharedFriend = { },
-        onQuery = { },
-        onPlaceClick = { },
-        onSearchAddress = { _, _ -> },
-        onAddFriend = { },
-        onInitPlace = { },
-        onAddImage = { },
-        onNavigateToCamera = { },
         onBack = { }
     )
-}
-
-sealed class TimeCapsuleType(val timeCapsule: BaseTimeCapsule) {
-    data class My(val myTimeCapsule: MyTimeCapsule) : TimeCapsuleType(myTimeCapsule)
-    data class Send(val sendTimeCapsule: SendTimeCapsule) : TimeCapsuleType(sendTimeCapsule)
 }

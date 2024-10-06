@@ -7,10 +7,13 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.dhkim.setting.domain.SettingRepository
 import com.dhkim.main.work.CheckOpenableTimeCapsuleWorker
-import com.dhkim.user.domain.UserRepository
+import com.dhkim.ui.Popup
+import com.dhkim.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -27,6 +30,13 @@ class MainViewModel @Inject constructor(
 
     private val _showGuide = MutableSharedFlow<Boolean>()
     val showGuide = _showGuide.asSharedFlow()
+
+    private val _currentPopup = MutableStateFlow<Popup?>(null)
+    val currentPopup = _currentPopup.asStateFlow()
+
+    fun showPopup(popup: Popup?) {
+        _currentPopup.value = popup
+    }
 
     init {
         viewModelScope.launch {
