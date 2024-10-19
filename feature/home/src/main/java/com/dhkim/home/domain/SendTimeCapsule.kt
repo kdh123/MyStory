@@ -12,4 +12,4 @@ data class SendTimeCapsule(
     val content: String,
     val checkLocation: Boolean,
     val isChecked: Boolean
-): BaseTimeCapsule
+)

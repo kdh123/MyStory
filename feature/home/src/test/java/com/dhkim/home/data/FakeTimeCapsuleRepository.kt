@@ -37,7 +37,7 @@ class FakeTimeCapsuleRepository @Inject constructor(
         return true
     }
 
-    override suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>> {
+    override fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>> {
         return localDataSource.getMyAllTimeCapsule().map { timeCapsules ->
             timeCapsules?.map {
                 it.toMyTimeCapsule()
@@ -45,7 +45,7 @@ class FakeTimeCapsuleRepository @Inject constructor(
         }
     }
 
-    override suspend fun getMyTimeCapsule(id: String): MyTimeCapsule? {
+    override fun getMyTimeCapsule(id: String): MyTimeCapsule? {
         return localDataSource.getMyTimeCapsule(id)?.toMyTimeCapsule()
     }
 
@@ -134,7 +134,7 @@ class FakeTimeCapsuleRepository @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>> {
+    override fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>> {
         return localDataSource.getReceivedAllTimeCapsule().map { timeCapsules ->
             timeCapsules?.map {
                 it.toReceivedTimeCapsule()

@@ -13,8 +13,7 @@ data class ReceivedTimeCapsule(
     val content: String = "",
     val checkLocation: Boolean = false,
     val isOpened: Boolean = false
-) : BaseTimeCapsule {
-
+) {
     fun toTimeCapsule(nickname: String): TimeCapsule {
         return TimeCapsule(
             id = id,

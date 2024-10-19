@@ -58,7 +58,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         return remoteDataSource.deleteTimeCapsule(myId, sharedFriends, timeCapsuleId) is CommonResult.Success
     }
 
-    override suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>> {
+    override fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>> {
         return localDataSource.getMyAllTimeCapsule().map { timeCapsules ->
             timeCapsules?.map {
                 it.toMyTimeCapsule()
@@ -66,7 +66,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getMyTimeCapsule(id: String): MyTimeCapsule? {
+    override fun getMyTimeCapsule(id: String): MyTimeCapsule? {
         return localDataSource.getMyTimeCapsule(id = id)?.toMyTimeCapsule()
     }
 
@@ -146,7 +146,7 @@ class TimeCapsuleRepositoryImpl @Inject constructor(
         localDataSource.deleteSendTimeCapsule(id = id)
     }
 
-    override suspend fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>> {
+    override fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>> {
         return localDataSource.getReceivedAllTimeCapsule().map { timeCapsules ->
             timeCapsules?.map {
                 it.toReceivedTimeCapsule()

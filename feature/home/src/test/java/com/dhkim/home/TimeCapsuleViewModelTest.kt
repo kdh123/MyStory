@@ -6,15 +6,17 @@ import com.dhkim.home.data.FakeUserLocalDataSource
 import com.dhkim.home.data.FakeUserRemoteDataSource
 import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.home.data.di.TimeCapsuleModule
+import com.dhkim.home.domain.DeleteTimeCapsuleUseCase
+import com.dhkim.home.domain.GetAllTimeCapsuleUseCase
 import com.dhkim.home.domain.TimeCapsule
 import com.dhkim.home.domain.TimeCapsuleRepository
-import com.dhkim.home.presentation.TimeCapsuleType
+import com.dhkim.home.domain.TimeCapsuleType
 import com.dhkim.home.presentation.TimeCapsuleViewModel
-import com.dhkim.user.repository.UserRepositoryImpl
 import com.dhkim.user.datasource.UserLocalDataSource
 import com.dhkim.user.datasource.UserRemoteDataSource
 import com.dhkim.user.di.UserModule
 import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.repository.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -80,13 +82,19 @@ class TimeCapsuleViewModelTest {
 
     @Inject lateinit var timeCapsuleRepository: TimeCapsuleRepository
     @Inject lateinit var userRepository: UserRepository
+    @Inject lateinit var getAllTimeCapsuleUseCase: GetAllTimeCapsuleUseCase
+    @Inject lateinit var deleteTimeCapsuleUseCase: DeleteTimeCapsuleUseCase
+
 
     private lateinit var viewModel: TimeCapsuleViewModel
 
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = TimeCapsuleViewModel(timeCapsuleRepository, userRepository)
+        viewModel = TimeCapsuleViewModel(
+            getAllTimeCapsuleUseCase = getAllTimeCapsuleUseCase,
+            deleteTimeCapsuleUseCase = deleteTimeCapsuleUseCase
+        )
     }
 
     @Test
