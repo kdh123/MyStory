@@ -1,7 +1,7 @@
 package com.dhkim.home.presentation
 
 import androidx.compose.runtime.Stable
-import com.dhkim.home.domain.TimeCapsuleItem
+import com.dhkim.home.domain.model.TimeCapsuleItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

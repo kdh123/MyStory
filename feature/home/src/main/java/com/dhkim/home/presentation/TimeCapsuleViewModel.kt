@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.RestartableStateFlow
 import com.dhkim.common.onetimeRestartableStateIn
-import com.dhkim.home.domain.DeleteTimeCapsuleUseCase
-import com.dhkim.home.domain.GetAllTimeCapsuleUseCase
-import com.dhkim.home.domain.TimeCapsuleItem
+import com.dhkim.home.domain.usecase.DeleteTimeCapsuleUseCase
+import com.dhkim.home.domain.usecase.GetAllTimeCapsuleUseCase
+import com.dhkim.home.domain.model.TimeCapsuleItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers

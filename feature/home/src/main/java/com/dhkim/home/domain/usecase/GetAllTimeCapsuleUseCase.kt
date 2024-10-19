@@ -1,6 +1,10 @@
-package com.dhkim.home.domain
+package com.dhkim.home.domain.usecase
 
 import com.dhkim.common.DateUtil
+import com.dhkim.home.domain.model.TimeCapsule
+import com.dhkim.home.domain.model.TimeCapsuleItem
+import com.dhkim.home.domain.repository.TimeCapsuleRepository
+import com.dhkim.home.domain.model.TimeCapsuleType
 import com.dhkim.user.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

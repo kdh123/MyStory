@@ -1,4 +1,4 @@
-package com.dhkim.home.domain
+package com.dhkim.home.domain.model
 
 import com.dhkim.user.model.UserId
 import com.dhkim.user.model.Nickname

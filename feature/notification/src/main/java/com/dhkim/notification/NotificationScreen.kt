@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dhkim.home.domain.ReceivedTimeCapsule
+import com.dhkim.home.domain.model.ReceivedTimeCapsule
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable

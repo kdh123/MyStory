@@ -3,7 +3,7 @@ package com.dhkim.home.data.di
 import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSourceImpl
 import com.dhkim.home.data.repository.TimeCapsuleRepositoryImpl
-import com.dhkim.home.domain.TimeCapsuleRepository
+import com.dhkim.home.domain.repository.TimeCapsuleRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

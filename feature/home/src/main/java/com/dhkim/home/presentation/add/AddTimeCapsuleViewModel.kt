@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.dhkim.common.CommonResult
 import com.dhkim.common.DateUtil
-import com.dhkim.home.domain.MyTimeCapsule
-import com.dhkim.home.domain.SharedFriend
-import com.dhkim.home.domain.TimeCapsuleRepository
+import com.dhkim.home.domain.model.MyTimeCapsule
+import com.dhkim.home.domain.model.SharedFriend
+import com.dhkim.home.domain.repository.TimeCapsuleRepository
 import com.dhkim.location.domain.LocationRepository
 import com.dhkim.location.domain.Place
 import com.dhkim.user.model.UserId

@@ -7,10 +7,10 @@ import com.dhkim.home.data.dataSource.remote.Uuid
 import com.dhkim.home.data.dataSource.toMyTimeCapsule
 import com.dhkim.home.data.dataSource.toReceivedTimeCapsule
 import com.dhkim.home.data.dataSource.toSenderTimeCapsule
-import com.dhkim.home.domain.MyTimeCapsule
-import com.dhkim.home.domain.ReceivedTimeCapsule
-import com.dhkim.home.domain.SendTimeCapsule
-import com.dhkim.home.domain.TimeCapsuleRepository
+import com.dhkim.home.domain.model.MyTimeCapsule
+import com.dhkim.home.domain.model.ReceivedTimeCapsule
+import com.dhkim.home.domain.model.SendTimeCapsule
+import com.dhkim.home.domain.repository.TimeCapsuleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

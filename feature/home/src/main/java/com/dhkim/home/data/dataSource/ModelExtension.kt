@@ -3,9 +3,9 @@ package com.dhkim.home.data.dataSource
 import com.dhkim.database.entity.MyTimeCapsuleEntity
 import com.dhkim.database.entity.ReceivedTimeCapsuleEntity
 import com.dhkim.database.entity.SendTimeCapsuleEntity
-import com.dhkim.home.domain.MyTimeCapsule
-import com.dhkim.home.domain.ReceivedTimeCapsule
-import com.dhkim.home.domain.SendTimeCapsule
+import com.dhkim.home.domain.model.MyTimeCapsule
+import com.dhkim.home.domain.model.ReceivedTimeCapsule
+import com.dhkim.home.domain.model.SendTimeCapsule
 
 fun MyTimeCapsuleEntity.toMyTimeCapsule(): MyTimeCapsule {
     return MyTimeCapsule(

@@ -70,8 +70,8 @@ import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
 import com.dhkim.common.DistanceManager
 import com.dhkim.home.R
-import com.dhkim.home.domain.TimeCapsule
-import com.dhkim.home.domain.TimeCapsuleType
+import com.dhkim.home.domain.model.TimeCapsule
+import com.dhkim.home.domain.model.TimeCapsuleType
 import com.dhkim.ui.DefaultBackground
 import com.dhkim.ui.Popup
 import com.dhkim.ui.ShimmerBrush

@@ -6,11 +6,11 @@ import com.dhkim.home.data.FakeUserLocalDataSource
 import com.dhkim.home.data.FakeUserRemoteDataSource
 import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.home.data.di.TimeCapsuleModule
-import com.dhkim.home.domain.DeleteTimeCapsuleUseCase
-import com.dhkim.home.domain.GetAllTimeCapsuleUseCase
-import com.dhkim.home.domain.TimeCapsule
-import com.dhkim.home.domain.TimeCapsuleRepository
-import com.dhkim.home.domain.TimeCapsuleType
+import com.dhkim.home.domain.usecase.DeleteTimeCapsuleUseCase
+import com.dhkim.home.domain.usecase.GetAllTimeCapsuleUseCase
+import com.dhkim.home.domain.model.TimeCapsule
+import com.dhkim.home.domain.repository.TimeCapsuleRepository
+import com.dhkim.home.domain.model.TimeCapsuleType
 import com.dhkim.home.presentation.TimeCapsuleViewModel
 import com.dhkim.user.datasource.UserLocalDataSource
 import com.dhkim.user.datasource.UserRemoteDataSource

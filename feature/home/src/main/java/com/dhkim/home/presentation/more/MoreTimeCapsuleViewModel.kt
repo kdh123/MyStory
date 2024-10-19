@@ -3,7 +3,7 @@ package com.dhkim.home.presentation.more
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.onetimeRestartableStateIn
-import com.dhkim.home.domain.TimeCapsuleRepository
+import com.dhkim.home.domain.repository.TimeCapsuleRepository
 import com.dhkim.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

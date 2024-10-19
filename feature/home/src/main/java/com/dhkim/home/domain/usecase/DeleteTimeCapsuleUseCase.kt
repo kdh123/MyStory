@@ -1,5 +1,7 @@
-package com.dhkim.home.domain
+package com.dhkim.home.domain.usecase
 
+import com.dhkim.home.domain.repository.TimeCapsuleRepository
+import com.dhkim.home.domain.repository.isSuccessful
 import com.dhkim.user.repository.UserRepository
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull

@@ -1,4 +1,4 @@
-package com.dhkim.home.domain
+package com.dhkim.home.domain.model
 
 data class ReceivedTimeCapsule(
     val id: String = "${System.currentTimeMillis()}",
