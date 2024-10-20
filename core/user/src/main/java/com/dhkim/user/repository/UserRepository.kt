@@ -15,7 +15,7 @@ interface UserRepository {
     suspend fun updateFriend(friend: Friend)
     fun deleteLocalFriend(id: String)
 
-    suspend fun getMyInfo(): Flow<User>
+    fun getMyInfo(): Flow<User>
     suspend fun getMyId(): String
     suspend fun signUp(userId: String, profileImage: String, fcmToken: String): isSuccessful
     fun updateUser(user: User)

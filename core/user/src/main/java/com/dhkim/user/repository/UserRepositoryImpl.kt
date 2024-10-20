@@ -9,15 +9,19 @@ import com.dhkim.user.model.LocalFriend
 import com.dhkim.user.model.User
 import com.dhkim.user.datasource.UserRemoteDataSource
 import com.dhkim.user.datasource.isSuccessful
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class UserRepositoryImpl @Inject constructor(
     private val localDataSource: UserLocalDataSource,
     private val remoteDataSource: UserRemoteDataSource
@@ -48,13 +52,13 @@ class UserRepositoryImpl @Inject constructor(
         localDataSource.deleteFriend(id)
     }
 
-    override suspend fun getMyInfo(): Flow<User> {
-        val myId = localDataSource.getUserId()
-
-        return if (myId.isNotEmpty()) {
-            remoteDataSource.getMyInfo(myId = localDataSource.getUserId())
-        } else {
-            flowOf(User())
+    override fun getMyInfo(): Flow<User> {
+        return flow { emit(localDataSource.getUserId()) }.flatMapLatest {
+            if (it.isNotEmpty()) {
+                remoteDataSource.getMyInfo(myId = it)
+            } else {
+                flowOf(User())
+            }
         }
     }
 

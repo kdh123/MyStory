@@ -605,15 +605,6 @@ private fun MenuItem(
     }
 }
 
-@Composable
-fun AddFriend(modifier: Modifier = Modifier) {
-    Image(
-        painter = painterResource(id = R.drawable.ic_friend_add_black),
-        contentDescription = null,
-        modifier = modifier
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetScreen(
