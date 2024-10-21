@@ -69,7 +69,7 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
         this.trips.value = trips.map { it.toTrip() }
     }
 
-    override suspend fun getAllTrip(): Flow<List<Trip>> {
+    override fun getAllTrip(): Flow<List<Trip>> {
         return trips
     }
 
@@ -96,7 +96,5 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
 
     override suspend fun deleteTrip(id: String) {
         trips.value = trips.value.filter { it.id != id }
-        val a = trips.value
-        a
     }
 }

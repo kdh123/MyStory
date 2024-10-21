@@ -17,9 +17,12 @@ import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -51,12 +54,15 @@ class TripViewModelTest {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
+    val dispatcher = TestCoroutineDispatcher()
+
     private lateinit var viewModel: TripViewModel
     @Inject lateinit var tripRepository: TripRepository
 
     @Before
     fun setup() {
         hiltRule.inject()
+        Dispatchers.setMain(dispatcher)
         viewModel = TripViewModel(tripRepository = tripRepository)
     }
 
@@ -76,9 +82,7 @@ class TripViewModelTest {
     @Test
     fun `여행 아이템 삭제 테스트`() = runBlocking {
         viewModel.uiState.first()
-        delay(100)
         viewModel.onAction(TripAction.DeleteTrip(tripId = "id0"))
-        delay(100)
         viewModel.uiState.restart()
 
         val items = viewModel.uiState.value.trips?.filter {
@@ -87,5 +91,4 @@ class TripViewModelTest {
         assertEquals(items?.count { (it.data as Trip).isNextTrip }, 1)
         assertEquals(items?.count { !(it.data as Trip).isNextTrip }, 4)
     }
-
 }
