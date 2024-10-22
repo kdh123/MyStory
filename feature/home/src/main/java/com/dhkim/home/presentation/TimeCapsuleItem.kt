@@ -1,5 +1,8 @@
-package com.dhkim.home.domain.model
+package com.dhkim.home.presentation
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class TimeCapsuleItem(
     val id: Int = 0,
     val type: TimeCapsuleType = TimeCapsuleType.NoneTimeCapsule,
