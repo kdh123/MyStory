@@ -47,13 +47,12 @@ android {
 
     buildTypes {
         debug {
-            isDebuggable = false
             isMinifyEnabled = false
             manifestPlaceholders["NAVER_MAP_API_KEY"] = apiProperties["NAVER_MAP_API_KEY"] as String
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
-        create("benchmark") {
 
+        create("benchmark") {
             initWith(buildTypes.getByName("release"))
             matchingFallbacks += listOf("release")
             isDebuggable = false
@@ -96,6 +95,7 @@ dependencies {
     implementation(project(":feature:main"))
     implementation(project(":feature:onboarding"))
     implementation(project(":core:common"))
+    "baselineProfile"(project(":baselineprofile"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.workManager)
@@ -105,7 +105,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    "baselineProfile"(project(":baselineprofile"))
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 

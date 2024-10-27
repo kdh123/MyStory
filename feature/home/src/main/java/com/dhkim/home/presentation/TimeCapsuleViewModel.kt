@@ -53,11 +53,11 @@ fun List<TimeCapsule>.toUiState(spaceId: Int): TimeCapsuleUiState {
                 timeCapsules = toUnOpenedMyTimeCapsules() + toUnOpenedReceivedTimeCapsules()
             )
 
-    items.ifEmpty { getTimeCapsules(spaceId + 3, -1) } + getTimeCapsules(spaceId + 4, 3)
+    val result = items.ifEmpty { getTimeCapsules(spaceId + 3, -1) } + getTimeCapsules(spaceId + 4, 3)
 
     return TimeCapsuleUiState(
         isLoading = false,
-        timeCapsules = items.toImmutableList()
+        timeCapsules = result.toImmutableList()
     )
 }
 
