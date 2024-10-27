@@ -41,7 +41,7 @@ class StartupBenchmarks {
 
     @Test
     fun startupCompilationNone() =
-        benchmark(CompilationMode.DEFAULT)
+        benchmark(CompilationMode.None())
 
     @Test
     fun startupCompilationBaselineProfiles() =
