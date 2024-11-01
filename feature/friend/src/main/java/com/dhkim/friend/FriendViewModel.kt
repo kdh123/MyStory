@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.CommonResult
+import com.dhkim.common.Dispatcher
 import com.dhkim.common.RestartableStateFlow
+import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.user.model.Friend
 import com.dhkim.user.model.User
@@ -12,7 +14,7 @@ import com.dhkim.user.repository.UserRepository
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -25,7 +27,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FriendViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val creatingCodeFlow = MutableStateFlow(false)
@@ -153,7 +156,7 @@ class FriendViewModel @Inject constructor(
     }
 
     private fun deleteFriend(userId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             userRepository.deleteFriend(userId = userId)
                 .onCompletion {
                     _sideEffect.send(FriendSideEffect.ShowDialog(show = false))

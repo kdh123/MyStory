@@ -2,20 +2,24 @@ package com.dhkim.friend.changeInfo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.common.Dispatcher
+import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.user.model.Friend
 import com.dhkim.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ChangeFriendInfoViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChangeFriendInfoUiState())
@@ -25,11 +29,11 @@ class ChangeFriendInfoViewModel @Inject constructor(
     val sideEffect = _sideEffect.receiveAsFlow()
 
     fun initInfo(friend: Friend) {
-        _uiState.value = _uiState.value.copy(friend = friend)
+        _uiState.update { it.copy(friend = friend) }
     }
 
     fun editFriendInfo() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val nickname = _uiState.value.friend.nickname
 
             when {
@@ -51,7 +55,7 @@ class ChangeFriendInfoViewModel @Inject constructor(
 
     fun onEdit(str: String) {
         val friend = _uiState.value.friend
-        _uiState.value = _uiState.value.copy(friend = friend.copy(nickname = str))
+        _uiState.update { it.copy(friend = friend.copy(nickname = str)) }
     }
 
     private fun containSpace(input: String): Boolean {

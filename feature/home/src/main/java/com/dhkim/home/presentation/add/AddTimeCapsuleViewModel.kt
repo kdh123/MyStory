@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.dhkim.common.CommonResult
 import com.dhkim.common.DateUtil
+import com.dhkim.common.Dispatcher
+import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.home.domain.model.MyTimeCapsule
 import com.dhkim.home.domain.model.SharedFriend
 import com.dhkim.home.domain.repository.TimeCapsuleRepository
@@ -15,7 +17,7 @@ import com.dhkim.location.domain.Place
 import com.dhkim.user.model.UserId
 import com.dhkim.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -38,7 +40,8 @@ import javax.inject.Inject
 class AddTimeCapsuleViewModel @Inject constructor(
     private val timeCapsuleRepository: TimeCapsuleRepository,
     private val locationRepository: LocationRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddTimeCapsuleUiState())
@@ -77,9 +80,10 @@ class AddTimeCapsuleViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            query.debounce(1_000).flatMapLatest {
-                locationRepository.getPlaceByKeyword(query = it)
-            }.cachedIn(viewModelScope)
+            query.debounce(1_000)
+                .flatMapLatest {
+                    locationRepository.getPlaceByKeyword(query = it)
+                }.cachedIn(viewModelScope)
                 .catch { }
                 .collectLatest { result ->
                     _uiState.update { it.copy(isLoading = false, placeResult = flowOf(result).stateIn(viewModelScope)) }
@@ -201,7 +205,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
     }
 
     private fun saveTimeCapsule() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             with(_uiState.value) {
                 when {
                     openDate.isEmpty() -> {
