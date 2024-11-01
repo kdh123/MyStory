@@ -20,15 +20,17 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,7 +42,13 @@ class AddTimeCapsuleViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddTimeCapsuleUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState = _uiState.onStart {
+        init()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = AddTimeCapsuleUiState()
+    )
 
     private val _sideEffect = Channel<AddTimeCapsuleSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
@@ -50,12 +58,9 @@ class AddTimeCapsuleViewModel @Inject constructor(
     private val query = MutableStateFlow("")
     private val checkedFriend = MutableStateFlow("")
 
-    init {
+    private fun init() {
         viewModelScope.launch {
-            combine(
-                userRepository.getMyInfo(),
-                checkedFriend
-            ) { myInfo, checkedFriendId ->
+            combine(userRepository.getMyInfo(), checkedFriend) { myInfo, checkedFriendId ->
                 myInfo.friends.map {
                     SharedFriend(
                         isChecked = it.id == checkedFriendId,
@@ -65,25 +70,19 @@ class AddTimeCapsuleViewModel @Inject constructor(
                     )
                 }
             }.catch {
-                _uiState.value = _uiState.value.copy(isLoading = false)
-            }.collect {
-                _uiState.value =
-                    _uiState.value.copy(isShare = it.any { it.isChecked }, sharedFriends = it)
+                _uiState.update { it.copy(isLoading = false) }
+            }.collect { sharedFriends ->
+                _uiState.update { it.copy(isShare = sharedFriends.any { it.isChecked }, sharedFriends = sharedFriends) }
             }
         }
 
         viewModelScope.launch {
-            query.debounce(1000L).flatMapLatest {
-                locationRepository.getPlaceByKeyword(
-                    query = it
-                )
+            query.debounce(1_000).flatMapLatest {
+                locationRepository.getPlaceByKeyword(query = it)
             }.cachedIn(viewModelScope)
                 .catch { }
                 .collectLatest { result ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        placeResult = flowOf(result).stateIn(viewModelScope)
-                    )
+                    _uiState.update { it.copy(isLoading = false, placeResult = flowOf(result).stateIn(viewModelScope)) }
                 }
         }
     }
@@ -145,35 +144,31 @@ class AddTimeCapsuleViewModel @Inject constructor(
     }
 
     private fun initPlace(place: Place) {
-        _uiState.value = _uiState.value.copy(
-            lat = place.lat,
-            lng = place.lng,
-            placeName = place.name,
-            address = place.address,
-            checkLocation = true
-        )
+        _uiState.update {
+            it.copy(
+                lat = place.lat,
+                lng = place.lng,
+                placeName = place.name,
+                address = place.address,
+                checkLocation = true
+            )
+        }
     }
 
     private fun addFriend(friendId: String) {
-        checkedFriend.value = friendId
+        checkedFriend.update { friendId }
     }
 
     private fun onQuery(s: String) {
-        query.value = s
-        _uiState.value = _uiState.value.copy(
-            isLoading = true,
-            placeQuery = s
-        )
+        query.update { s }
+        _uiState.update { it.copy(isLoading = true, placeQuery = s) }
     }
 
     private fun onPlaceClick(place: Place) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                lat = place.lat,
-                lng = place.lng,
-                placeName = place.name,
-                address = place.address
-            )
+            _uiState.update {
+                it.copy(lat = place.lat, lng = place.lng, placeName = place.name, address = place.address)
+            }
             _sideEffect.send(AddTimeCapsuleSideEffect.ShowPlaceBottomSheet(show = false))
         }
     }
@@ -184,25 +179,22 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
     private fun searchAddress(lat: String, lng: String) {
         viewModelScope.launch {
-            val result = locationRepository.getAddress(lat, lng)
-
-            when (result) {
+            when (val result = locationRepository.getAddress(lat, lng)) {
                 is CommonResult.Success -> {
-                    _uiState.value = _uiState.value.copy(
-                        lat = lat,
-                        lng = lng,
-                        placeName = result.data?.placeName ?: "알 수 없음",
-                        address = result.data?.placeName ?: "알 수 없음"
-                    )
+                    _uiState.update {
+                        it.copy(
+                            lat = lat,
+                            lng = lng,
+                            placeName = result.data?.placeName ?: "알 수 없음",
+                            address = result.data?.placeName ?: "알 수 없음"
+                        )
+                    }
                 }
 
                 is CommonResult.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        lat = lat,
-                        lng = lng,
-                        placeName = "알 수 없음",
-                        address = "알 수 없음"
-                    )
+                    _uiState.update {
+                        it.copy(lat = lat, lng = lng, placeName = "알 수 없음", address = "알 수 없음")
+                    }
                 }
             }
         }
@@ -251,8 +243,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
                                 myId = myId,
                                 myProfileImage = myProfileImage,
                                 timeCapsuleId = timeCapsuleId,
-                                sharedFriends = sharedFriends.filter { it.isChecked }
-                                    .map { it.uuid },
+                                sharedFriends = sharedFriends.filter { it.isChecked }.map { it.uuid },
                                 openDate = openDate,
                                 content = content,
                                 lat = lat,
@@ -277,18 +268,13 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
     private fun checkSharedFriend(userId: UserId) {
         val sharedFriends = _uiState.value.sharedFriends.map {
-            if (it.userId == userId) {
-                it.copy(isChecked = !it.isChecked)
-            } else {
-                it
-            }
+            if (it.userId == userId) it.copy(isChecked = !it.isChecked) else it
         }
-
-        _uiState.value = _uiState.value.copy(isShare = true, sharedFriends = sharedFriends)
+        _uiState.update { it.copy(isShare = true, sharedFriends = sharedFriends) }
     }
 
     private fun typing(str: String) {
-        _uiState.value = _uiState.value.copy(content = str)
+        _uiState.update { it.copy(content = str) }
     }
 
     private fun addImage(imageUrl: String) {
@@ -299,18 +285,18 @@ class AddTimeCapsuleViewModel @Inject constructor(
                 set(selectImageIndex, imageUrl)
             }
         }
-        _uiState.value = _uiState.value.copy(imageUrls = currentImageUrls)
+        _uiState.update { it.copy(imageUrls = currentImageUrls) }
     }
 
     private fun setCheckLocation(isChecked: Boolean) {
-        _uiState.value = _uiState.value.copy(checkLocation = isChecked)
+        _uiState.update { it.copy(checkLocation = isChecked) }
     }
 
     private fun setCheckShare(isChecked: Boolean) {
-        _uiState.value = _uiState.value.copy(isShare = isChecked)
+        _uiState.update { it.copy(isShare = isChecked) }
     }
 
     private fun setOpenDate(date: String) {
-        _uiState.value = _uiState.value.copy(openDate = date)
+        _uiState.update { it.copy(openDate = date) }
     }
 }
