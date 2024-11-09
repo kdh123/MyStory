@@ -20,6 +20,8 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -30,6 +32,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
@@ -62,7 +65,7 @@ class TripScreenTest {
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = TripViewModel(tripRepository = tripRepository)
+        viewModel = TripViewModel(tripRepository = tripRepository, ioDispatcher = UnconfinedTestDispatcher())
     }
 
     @OptIn(ExperimentalTestApi::class)

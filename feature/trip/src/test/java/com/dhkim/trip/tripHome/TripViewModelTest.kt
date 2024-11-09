@@ -17,12 +17,10 @@ import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,16 +52,13 @@ class TripViewModelTest {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
-    val dispatcher = TestCoroutineDispatcher()
-
     private lateinit var viewModel: TripViewModel
     @Inject lateinit var tripRepository: TripRepository
 
     @Before
     fun setup() {
         hiltRule.inject()
-        Dispatchers.setMain(dispatcher)
-        viewModel = TripViewModel(tripRepository = tripRepository)
+        viewModel = TripViewModel(tripRepository = tripRepository, ioDispatcher = UnconfinedTestDispatcher())
     }
 
     @Test

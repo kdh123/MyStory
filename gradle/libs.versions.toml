@@ -54,6 +54,7 @@ uiautomator = "2.2.0"
 benchmarkMacroJunit4 = "1.2.3"
 baselineprofile = "1.2.3"
 profileinstaller = "1.4.1"
+turbine = "1.2.0"
 
 [libraries]
 dhcamera = { module = "com.github.kdh123:DhCamera", version.ref = "dhcamera" }
@@ -133,7 +134,7 @@ androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomato
 androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacroJunit4" }
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }
 
-
+app-cash-turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 
 [bundles]
@@ -193,7 +194,8 @@ test = [
     "androidx-junit",
     "androidx-espresso-core",
     "androidx-ui-test-junit4",
-    "hilt-test"
+    "hilt-test",
+    "app-cash-turbine"
 ]
 
 debug-ui-test = [

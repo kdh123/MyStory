@@ -25,9 +25,13 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -38,6 +42,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
@@ -93,7 +98,8 @@ class TimeCapsuleViewModelTest {
         hiltRule.inject()
         viewModel = TimeCapsuleViewModel(
             getAllTimeCapsuleUseCase = getAllTimeCapsuleUseCase,
-            deleteTimeCapsuleUseCase = deleteTimeCapsuleUseCase
+            deleteTimeCapsuleUseCase = deleteTimeCapsuleUseCase,
+            ioDispatcher = UnconfinedTestDispatcher()
         )
     }
 
@@ -113,6 +119,7 @@ class TimeCapsuleViewModelTest {
         val unopenedTimeCapsules = timeCapsules
             .firstOrNull { it.type == TimeCapsuleType.UnopenedTimeCapsule }
             ?.data as? List<TimeCapsule> ?: listOf()
+
 
         assertEquals(openableTimeCapsules.size, 7)
         assertEquals(openableTimeCapsules[0].id, "id2")
