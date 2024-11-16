@@ -9,7 +9,7 @@ class TripRepositoryImpl @Inject constructor(
     private val localDataSource: TripLocalDataSource
 ) : TripRepository {
 
-    override suspend fun getAllTrip(): Flow<List<Trip>> {
+    override fun getAllTrip(): Flow<List<Trip>> {
         return localDataSource.getAllTrip()
     }
 

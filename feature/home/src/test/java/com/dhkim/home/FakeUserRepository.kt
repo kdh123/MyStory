@@ -30,7 +30,7 @@ class FakeUserRepository : UserRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getMyInfo(): Flow<User> {
+    override fun getMyInfo(): Flow<User> {
         TODO("Not yet implemented")
     }
 

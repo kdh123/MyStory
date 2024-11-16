@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kapt)
     alias(libs.plugins.google.service)
+    alias(libs.plugins.baselineprofile)
 }
 
 val localProperties = Properties().apply {
@@ -51,6 +52,16 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
 
+        create("benchmark") {
+            initWith(buildTypes.getByName("release"))
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+            proguardFile("benchmark-rules.pro")
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
+            manifestPlaceholders["NAVER_MAP_API_KEY"] = apiProperties["NAVER_MAP_API_KEY"] as String
+        }
+
         release {
             manifestPlaceholders += mapOf()
             isMinifyEnabled = false
@@ -84,9 +95,11 @@ dependencies {
     implementation(project(":feature:main"))
     implementation(project(":feature:onboarding"))
     implementation(project(":core:common"))
+    "baselineProfile"(project(":baselineprofile"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.workManager)
+    implementation(libs.androidx.profileinstaller)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

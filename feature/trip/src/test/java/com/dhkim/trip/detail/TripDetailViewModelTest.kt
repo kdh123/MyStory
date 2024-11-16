@@ -19,6 +19,7 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -58,7 +59,7 @@ class TripDetailViewModelTest {
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = TripDetailViewModel(tripRepository = tripRepository)
+        viewModel = TripDetailViewModel(tripRepository = tripRepository, ioDispatcher = UnconfinedTestDispatcher())
     }
 
     @Test

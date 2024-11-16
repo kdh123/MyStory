@@ -1,4 +1,4 @@
-package com.dhkim.home.domain
+package com.dhkim.home.domain.model
 
 data class ReceivedTimeCapsule(
     val id: String = "${System.currentTimeMillis()}",
@@ -13,8 +13,7 @@ data class ReceivedTimeCapsule(
     val content: String = "",
     val checkLocation: Boolean = false,
     val isOpened: Boolean = false
-) : BaseTimeCapsule {
-
+) {
     fun toTimeCapsule(nickname: String): TimeCapsule {
         return TimeCapsule(
             id = id,

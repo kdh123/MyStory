@@ -9,6 +9,20 @@ import org.junit.Test
 class UnitTest {
 
     @Test
+    fun `랜덤`() {
+        val userId = StringBuilder().apply {
+            repeat(6) {
+                when ((0..2).random()) {
+                    0 -> append(('0'.code..'9'.code).random().toChar())
+                    1 -> append(('A'.code..'Z'.code).random().toChar())
+                    2 -> append(('a'.code..'z'.code).random().toChar())
+                }
+            }
+        }
+        println(userId)
+    }
+
+    @Test
     fun `특정 날짜 이후인지 체크`() {
         val strDate1 = "2024-05-06"
         val strDate2 = "2024-04-06"

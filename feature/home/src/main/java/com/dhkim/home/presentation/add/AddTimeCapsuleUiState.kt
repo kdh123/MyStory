@@ -3,7 +3,7 @@ package com.dhkim.home.presentation.add
 import androidx.compose.runtime.Stable
 import androidx.paging.PagingData
 import com.dhkim.location.domain.Place
-import com.dhkim.home.domain.SharedFriend
+import com.dhkim.home.domain.model.SharedFriend
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

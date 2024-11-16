@@ -18,9 +18,11 @@ import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,6 +32,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
@@ -58,7 +61,11 @@ class TripScheduleViewModelTest {
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = TripScheduleViewModel(tripRepository = tripRepository, savedStateHandle = SavedStateHandle())
+        viewModel = TripScheduleViewModel(
+            tripRepository = tripRepository,
+            savedStateHandle = SavedStateHandle(),
+            ioDispatcher = UnconfinedTestDispatcher()
+        )
     }
 
     @Test

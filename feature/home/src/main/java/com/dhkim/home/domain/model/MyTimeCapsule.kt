@@ -1,4 +1,4 @@
-package com.dhkim.home.domain
+package com.dhkim.home.domain.model
 
 import com.dhkim.user.model.UserId
 import com.dhkim.user.model.Nickname
@@ -17,8 +17,7 @@ data class MyTimeCapsule(
     val checkLocation: Boolean = false,
     val isOpened: Boolean = false,
     val sharedFriends: List<UserId> = listOf()
-) : BaseTimeCapsule {
-
+) {
     fun toTimeCapsule(myId: String, profileImage: String, sharedFriends: List<Nickname>): TimeCapsule {
         return TimeCapsule(
             id = id,

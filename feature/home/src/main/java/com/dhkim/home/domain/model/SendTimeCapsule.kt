@@ -1,4 +1,4 @@
-package com.dhkim.home.domain
+package com.dhkim.home.domain.model
 
 
 data class SendTimeCapsule(
@@ -12,4 +12,4 @@ data class SendTimeCapsule(
     val content: String,
     val checkLocation: Boolean,
     val isChecked: Boolean
-): BaseTimeCapsule
+)

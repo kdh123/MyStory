@@ -8,7 +8,7 @@ import androidx.work.WorkerParameters
 import com.dhkim.common.DateUtil
 import com.dhkim.common.NotificationManager
 import com.dhkim.main.MainActivity
-import com.dhkim.home.domain.TimeCapsuleRepository
+import com.dhkim.home.domain.repository.TimeCapsuleRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers

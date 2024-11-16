@@ -20,6 +20,7 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -57,7 +58,7 @@ class TripViewModelTest {
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = TripViewModel(tripRepository = tripRepository)
+        viewModel = TripViewModel(tripRepository = tripRepository, ioDispatcher = UnconfinedTestDispatcher())
     }
 
     @Test
@@ -76,9 +77,7 @@ class TripViewModelTest {
     @Test
     fun `여행 아이템 삭제 테스트`() = runBlocking {
         viewModel.uiState.first()
-        delay(100)
         viewModel.onAction(TripAction.DeleteTrip(tripId = "id0"))
-        delay(100)
         viewModel.uiState.restart()
 
         val items = viewModel.uiState.value.trips?.filter {
@@ -87,5 +86,4 @@ class TripViewModelTest {
         assertEquals(items?.count { (it.data as Trip).isNextTrip }, 1)
         assertEquals(items?.count { !(it.data as Trip).isNextTrip }, 4)
     }
-
 }

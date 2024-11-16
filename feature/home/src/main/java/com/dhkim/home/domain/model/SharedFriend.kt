@@ -1,5 +1,4 @@
-package com.dhkim.home.domain
-
+package com.dhkim.home.domain.model
 
 data class SharedFriend(
     val isChecked: Boolean = false,

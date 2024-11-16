@@ -2,9 +2,7 @@ package com.dhkim.home
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -15,7 +13,9 @@ import com.dhkim.home.data.FakeUserLocalDataSource
 import com.dhkim.home.data.FakeUserRemoteDataSource
 import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.home.data.di.TimeCapsuleModule
-import com.dhkim.home.domain.TimeCapsuleRepository
+import com.dhkim.home.domain.usecase.DeleteTimeCapsuleUseCase
+import com.dhkim.home.domain.usecase.GetAllTimeCapsuleUseCase
+import com.dhkim.home.domain.repository.TimeCapsuleRepository
 import com.dhkim.home.presentation.TimeCapsuleScreen
 import com.dhkim.home.presentation.TimeCapsuleViewModel
 import com.dhkim.user.repository.UserRepositoryImpl
@@ -31,10 +31,12 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,6 +46,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
@@ -95,12 +98,22 @@ class TimeCapsuleScreenTest {
     @Inject
     lateinit var userRepository: UserRepository
 
+    @Inject
+    lateinit var getAllTimeCapsuleUseCase: GetAllTimeCapsuleUseCase
+
+    @Inject
+    lateinit var deleteTimeCapsuleUseCase: DeleteTimeCapsuleUseCase
+
     private lateinit var viewModel: TimeCapsuleViewModel
 
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = TimeCapsuleViewModel(timeCapsuleRepository, userRepository)
+        viewModel = TimeCapsuleViewModel(
+            getAllTimeCapsuleUseCase = getAllTimeCapsuleUseCase,
+            deleteTimeCapsuleUseCase = deleteTimeCapsuleUseCase,
+            ioDispatcher = UnconfinedTestDispatcher()
+        )
     }
 
     @Test

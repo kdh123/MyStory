@@ -3,6 +3,8 @@ package com.dhkim.trip.presentation.schedule
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.common.Dispatcher
+import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.trip.domain.TripRepository
 import com.dhkim.trip.domain.model.Trip
@@ -10,7 +12,7 @@ import com.dhkim.trip.domain.model.TripPlace
 import com.dhkim.trip.domain.model.toTripType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -22,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TripScheduleViewModel @Inject constructor(
     private val tripRepository: TripRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val tripId = savedStateHandle.get<String>("tripId") ?: ""
@@ -72,7 +75,7 @@ class TripScheduleViewModel @Inject constructor(
     }
 
     private fun init(tripId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val trip = tripRepository.getTrip(tripId).firstOrNull() ?: return@launch
 
             trip.run {
@@ -110,7 +113,7 @@ class TripScheduleViewModel @Inject constructor(
     }
 
     private fun saveTrip() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val trip = with(_uiState.value) {
                 Trip(
                     id = "${System.currentTimeMillis()}",
@@ -137,7 +140,7 @@ class TripScheduleViewModel @Inject constructor(
     }
 
     private fun updateTrip(tripId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val trip = with(_uiState.value) {
                 Trip(
                     id = tripId,

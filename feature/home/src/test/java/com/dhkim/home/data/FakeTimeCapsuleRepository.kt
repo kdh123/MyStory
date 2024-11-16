@@ -4,11 +4,11 @@ import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.home.data.dataSource.remote.Uuid
 import com.dhkim.home.data.dataSource.toMyTimeCapsule
 import com.dhkim.home.data.dataSource.toReceivedTimeCapsule
-import com.dhkim.home.domain.MyTimeCapsule
-import com.dhkim.home.domain.ReceivedTimeCapsule
-import com.dhkim.home.domain.SendTimeCapsule
-import com.dhkim.home.domain.TimeCapsuleRepository
-import com.dhkim.home.domain.isSuccessful
+import com.dhkim.home.domain.model.MyTimeCapsule
+import com.dhkim.home.domain.model.ReceivedTimeCapsule
+import com.dhkim.home.domain.model.SendTimeCapsule
+import com.dhkim.home.domain.repository.TimeCapsuleRepository
+import com.dhkim.home.domain.repository.isSuccessful
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -37,7 +37,7 @@ class FakeTimeCapsuleRepository @Inject constructor(
         return true
     }
 
-    override suspend fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>> {
+    override fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsule>> {
         return localDataSource.getMyAllTimeCapsule().map { timeCapsules ->
             timeCapsules?.map {
                 it.toMyTimeCapsule()
@@ -45,7 +45,7 @@ class FakeTimeCapsuleRepository @Inject constructor(
         }
     }
 
-    override suspend fun getMyTimeCapsule(id: String): MyTimeCapsule? {
+    override fun getMyTimeCapsule(id: String): MyTimeCapsule? {
         return localDataSource.getMyTimeCapsule(id)?.toMyTimeCapsule()
     }
 
@@ -134,7 +134,7 @@ class FakeTimeCapsuleRepository @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>> {
+    override fun getReceivedAllTimeCapsule(): Flow<List<ReceivedTimeCapsule>> {
         return localDataSource.getReceivedAllTimeCapsule().map { timeCapsules ->
             timeCapsules?.map {
                 it.toReceivedTimeCapsule()
