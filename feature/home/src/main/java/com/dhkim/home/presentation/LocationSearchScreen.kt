@@ -40,7 +40,7 @@ import androidx.paging.compose.itemKey
 import com.dhkim.home.R
 import com.dhkim.home.presentation.add.AddTimeCapsuleAction
 import com.dhkim.home.presentation.add.AddTimeCapsuleUiState
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.model.Place
 import kotlinx.coroutines.android.awaitFrame
 import retrofit2.HttpException
 

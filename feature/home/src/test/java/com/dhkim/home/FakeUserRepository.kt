@@ -10,15 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 class FakeUserRepository : UserRepository {
 
-    override fun getAllFriend(): Flow<List<LocalFriend>> {
-        TODO("Not yet implemented")
-    }
-
     override fun getFriend(id: String): LocalFriend? {
-        TODO("Not yet implemented")
-    }
-
-    override fun saveFriend(localFriend: LocalFriend) {
         TODO("Not yet implemented")
     }
 

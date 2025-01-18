@@ -1,4 +1,4 @@
-package com.dhkim.location.domain
+package com.dhkim.location.domain.model
 
 import com.dhkim.location.R
 

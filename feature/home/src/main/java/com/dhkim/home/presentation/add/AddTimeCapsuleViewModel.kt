@@ -6,16 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.dhkim.common.CommonResult
-import com.dhkim.common.DateUtil
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
-import com.dhkim.home.domain.model.MyTimeCapsule
 import com.dhkim.home.domain.model.SharedFriend
-import com.dhkim.home.domain.repository.TimeCapsuleRepository
-import com.dhkim.location.domain.LocationRepository
-import com.dhkim.location.domain.Place
+import com.dhkim.home.domain.usecase.SaveMyTimeCapsuleUseCase
+import com.dhkim.location.domain.model.Place
+import com.dhkim.location.domain.usecase.GetAddressUseCase
+import com.dhkim.location.domain.usecase.GetPlacesByKeywordUseCase
 import com.dhkim.user.model.UserId
-import com.dhkim.user.repository.UserRepository
 import com.dhkim.user.usecase.GetMyInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -28,6 +26,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
@@ -39,10 +38,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddTimeCapsuleViewModel @Inject constructor(
-    private val timeCapsuleRepository: TimeCapsuleRepository,
-    private val locationRepository: LocationRepository,
-    private val userRepository: UserRepository,
+    private val saveMyTimeCapsuleUseCase: SaveMyTimeCapsuleUseCase,
     private val getMyInfoUseCase: GetMyInfoUseCase,
+    private val getPlacesByKeywordUseCase: GetPlacesByKeywordUseCase,
+    private val getAddressUseCase: GetAddressUseCase,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -83,9 +82,8 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
         viewModelScope.launch {
             query.debounce(1_000)
-                .flatMapLatest {
-                    locationRepository.getPlaceByKeyword(query = it)
-                }.cachedIn(viewModelScope)
+                .flatMapLatest { getPlacesByKeywordUseCase(query = it) }
+                .cachedIn(viewModelScope)
                 .catch { }
                 .collectLatest { result ->
                     _uiState.update { it.copy(isLoading = false, placeResult = flowOf(result).stateIn(viewModelScope)) }
@@ -172,9 +170,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
     private fun onPlaceClick(place: Place) {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(lat = place.lat, lng = place.lng, placeName = place.name, address = place.address)
-            }
+            _uiState.update { it.copy(lat = place.lat, lng = place.lng, placeName = place.name, address = place.address) }
             _sideEffect.send(AddTimeCapsuleSideEffect.ShowPlaceBottomSheet(show = false))
         }
     }
@@ -185,7 +181,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
     private fun searchAddress(lat: String, lng: String) {
         viewModelScope.launch {
-            when (val result = locationRepository.getAddress(lat, lng)) {
+            when (val result = getAddressUseCase(lat, lng).first()) {
                 is CommonResult.Success -> {
                     _uiState.update {
                         it.copy(
@@ -198,9 +194,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
                 }
 
                 is CommonResult.Error -> {
-                    _uiState.update {
-                        it.copy(lat = lat, lng = lng, placeName = "알 수 없음", address = "알 수 없음")
-                    }
+                    _uiState.update { it.copy(lat = lat, lng = lng, placeName = "알 수 없음", address = "알 수 없음") }
                 }
             }
         }
@@ -223,48 +217,23 @@ class AddTimeCapsuleViewModel @Inject constructor(
                     }
 
                     else -> {
-                        val timeCapsuleId = "${System.currentTimeMillis()}"
-                        val timeCapsule = MyTimeCapsule(
-                            id = timeCapsuleId,
-                            date = DateUtil.todayDate(),
+                        val isShare = !sharedFriends.none { it.isChecked }
+                        val isSuccessful = saveMyTimeCapsuleUseCase(
+                            imageUrls = imageUrls,
+                            sharedFriends = sharedFriends.filter { it.isChecked },
                             openDate = openDate,
+                            content = content,
                             lat = lat,
                             lng = lng,
                             placeName = placeName,
                             address = address,
-                            images = imageUrls,
-                            content = content,
                             checkLocation = checkLocation,
-                            isOpened = false,
-                            sharedFriends = sharedFriends.filter { it.isChecked }.map { it.userId }
-                        )
-
-                        if (sharedFriends.none { it.isChecked }) {
-                            timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = timeCapsule)
+                            isShare = isShare
+                        ).first()
+                        if (isSuccessful) {
                             _sideEffect.send(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
                         } else {
-                            val myId = userRepository.getMyId()
-                            val myProfileImage = "${userRepository.getProfileImage()}"
-                            val isSuccessful = timeCapsuleRepository.shareTimeCapsule(
-                                myId = myId,
-                                myProfileImage = myProfileImage,
-                                timeCapsuleId = timeCapsuleId,
-                                sharedFriends = sharedFriends.filter { it.isChecked }.map { it.uuid },
-                                openDate = openDate,
-                                content = content,
-                                lat = lat,
-                                lng = lng,
-                                placeName = placeName,
-                                address = address,
-                                checkLocation = checkLocation
-                            )
-
-                            if (isSuccessful) {
-                                timeCapsuleRepository.saveMyTimeCapsule(timeCapsule = timeCapsule)
-                                _sideEffect.send(AddTimeCapsuleSideEffect.Completed(isCompleted = true))
-                            } else {
-                                _sideEffect.send(AddTimeCapsuleSideEffect.Message(message = "저장에 실패하였습니다."))
-                            }
+                            _sideEffect.send(AddTimeCapsuleSideEffect.Message(message = "저장에 실패하였습니다."))
                         }
                     }
                 }

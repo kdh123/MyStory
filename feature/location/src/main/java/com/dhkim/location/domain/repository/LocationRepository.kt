@@ -1,4 +1,4 @@
-package com.dhkim.location.data.dataSource.remote
+package com.dhkim.location.domain.repository
 
 import androidx.paging.PagingData
 import com.dhkim.common.CommonResult
@@ -7,7 +7,7 @@ import com.dhkim.location.domain.model.Category
 import com.dhkim.location.domain.model.Place
 import kotlinx.coroutines.flow.Flow
 
-interface LocationRemoteDataSource {
+interface LocationRepository {
 
     fun getNearPlaceByKeyword(query: String, lat: String, lng: String): Flow<PagingData<Place>>
     fun getPlaceByKeyword(query: String): Flow<PagingData<Place>>

@@ -1,7 +1,7 @@
 package com.dhkim.home.domain.model
 
-import com.dhkim.user.model.UserId
 import com.dhkim.user.model.Nickname
+import com.dhkim.user.model.UserId
 
 data class MyTimeCapsule(
     val id: String = "",

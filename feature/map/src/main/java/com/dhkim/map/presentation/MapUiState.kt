@@ -2,8 +2,8 @@ package com.dhkim.map.presentation
 
 import androidx.compose.runtime.Stable
 import androidx.paging.PagingData
-import com.dhkim.location.domain.Category
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.model.Category
+import com.dhkim.location.domain.model.Place
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

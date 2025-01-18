@@ -8,7 +8,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.model.Place
 import com.dhkim.location.presentation.SearchScreen
 import com.dhkim.location.presentation.SearchViewModel
 

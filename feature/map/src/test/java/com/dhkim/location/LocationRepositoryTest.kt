@@ -12,7 +12,7 @@ import com.dhkim.location.data.di.LocationApiModule
 import com.dhkim.location.data.di.LocationModule
 import com.dhkim.location.data.model.PlaceDocument
 import com.dhkim.location.data.repository.LocationRepositoryImpl
-import com.dhkim.location.domain.LocationRepository
+import com.dhkim.location.domain.repository.LocationRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
