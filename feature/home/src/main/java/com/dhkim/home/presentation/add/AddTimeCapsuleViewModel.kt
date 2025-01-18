@@ -16,6 +16,7 @@ import com.dhkim.location.domain.LocationRepository
 import com.dhkim.location.domain.Place
 import com.dhkim.user.model.UserId
 import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.usecase.GetMyInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +42,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
     private val timeCapsuleRepository: TimeCapsuleRepository,
     private val locationRepository: LocationRepository,
     private val userRepository: UserRepository,
+    private val getMyInfoUseCase: GetMyInfoUseCase,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -63,7 +65,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
 
     private fun init() {
         viewModelScope.launch {
-            combine(userRepository.getMyInfo(), checkedFriend) { myInfo, checkedFriendId ->
+            combine(getMyInfoUseCase(), checkedFriend) { myInfo, checkedFriendId ->
                 myInfo.friends.map {
                     SharedFriend(
                         isChecked = it.id == checkedFriendId,

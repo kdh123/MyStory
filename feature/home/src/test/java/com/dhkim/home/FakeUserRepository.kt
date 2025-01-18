@@ -22,7 +22,7 @@ class FakeUserRepository : UserRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun updateFriend(friend: Friend) {
+    override fun updateFriend(friend: Friend): Flow<isSuccessful> {
         TODO("Not yet implemented")
     }
 
@@ -30,7 +30,7 @@ class FakeUserRepository : UserRepository {
         TODO("Not yet implemented")
     }
 
-    override fun getMyInfo(): Flow<User> {
+    override fun getMyInfo(myId: String): Flow<User> {
         TODO("Not yet implemented")
     }
 
@@ -38,15 +38,11 @@ class FakeUserRepository : UserRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun signUp(userId: String, profileImage: String, fcmToken: String): isSuccessful {
+    override fun updateUser(user: User): Flow<isSuccessful> {
         TODO("Not yet implemented")
     }
 
-    override fun updateUser(user: User) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun searchUser(userId: String): Flow<CommonResult<User?>> {
+    override fun searchUser(userId: String): Flow<CommonResult<User?>> {
         TODO("Not yet implemented")
     }
 
@@ -54,7 +50,7 @@ class FakeUserRepository : UserRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteFriend(userId: String): Flow<isSuccessful> {
+    override fun deleteFriend(userId: String): Flow<isSuccessful> {
         TODO("Not yet implemented")
     }
 
@@ -62,11 +58,19 @@ class FakeUserRepository : UserRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun acceptFriend(userId: String, userProfileImage: String, userUuid: String): Flow<isSuccessful> {
+    override fun acceptFriend(userId: String, userProfileImage: String, userUuid: String): Flow<isSuccessful> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateUserId(userId: String) {
         TODO("Not yet implemented")
     }
 
     override suspend fun getFcmToken(): String {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateFcmToken(fcmToken: String) {
         TODO("Not yet implemented")
     }
 

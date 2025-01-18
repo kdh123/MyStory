@@ -21,84 +21,39 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class UserRepositoryImpl @Inject constructor(
     private val localDataSource: UserLocalDataSource,
     private val remoteDataSource: UserRemoteDataSource
 ) : UserRepository {
 
-    override fun getAllFriend(): Flow<List<LocalFriend>> {
-        return localDataSource.getAllFriend().map { friends ->
-            friends?.map {
-                it.toLocalFriend()
-            } ?: listOf()
-        }
-    }
-
     override fun getFriend(id: String): LocalFriend? {
         return localDataSource.getFriend(id)?.toLocalFriend()
     }
 
-    override fun saveFriend(localFriend: LocalFriend) {
-        localDataSource.saveFriend(localFriend.toEntity())
-    }
-
-    override suspend fun updateFriend(friend: Friend) {
-        val myId = localDataSource.getUserId()
-        remoteDataSource.updateFriend(myId, friend).first()
+    override fun updateFriend(friend: Friend): Flow<isSuccessful> {
+        return flow {
+            val myId = localDataSource.getUserId()
+            emit(remoteDataSource.updateFriend(myId, friend).first())
+        }
     }
 
     override fun deleteLocalFriend(id: String) {
         localDataSource.deleteFriend(id)
     }
 
-    override fun getMyInfo(): Flow<User> {
-        return flow { emit(localDataSource.getUserId()) }.flatMapLatest {
-            if (it.isNotEmpty()) {
-                remoteDataSource.getMyInfo(myId = it)
-            } else {
-                flowOf(User())
-            }
-        }
+    override fun getMyInfo(myId: String): Flow<User> {
+        return remoteDataSource.getMyInfo(myId = myId)
     }
 
     override suspend fun getMyId(): String {
         return localDataSource.getUserId()
     }
 
-    override suspend fun signUp(userId: String, profileImage: String, fcmToken: String): isSuccessful {
-        val uuid = (0..10_000_000_000).random().toString()
-        val registerResult = remoteDataSource.registerPush(uuid, fcmToken)
-
-        return when (registerResult) {
-            is CommonResult.Success -> {
-                val user = User(id = userId, profileImage = profileImage, uuid = uuid)
-                val isSuccessful = remoteDataSource.updateUser(user).catch { }.firstOrNull() ?: false
-
-                if (isSuccessful) {
-                    localDataSource.run {
-                        updateUserId(userId = userId)
-                        updateProfileImage(profileImage = profileImage)
-                        updateUuid(uuid = uuid)
-                        updateFcmToken(fcmToken = fcmToken)
-                    }
-                    true
-                } else {
-                    false
-                }
-            }
-
-            is CommonResult.Error -> {
-                false
-            }
-        }
+    override fun updateUser(user: User): Flow<isSuccessful> {
+        return remoteDataSource.updateUser(user = user)
     }
 
-    override fun updateUser(user: User) {
-        remoteDataSource.updateUser(user = user)
-    }
-
-    override suspend fun searchUser(userId: String): Flow<CommonResult<User?>> {
+    override fun searchUser(userId: String): Flow<CommonResult<User?>> {
         return remoteDataSource.searchUser(userId)
     }
 
@@ -112,8 +67,10 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun deleteFriend(userId: String): Flow<isSuccessful> {
-        return remoteDataSource.deleteFriend(myId = getMyId(), userId = userId)
+    override fun deleteFriend(userId: String): Flow<isSuccessful> {
+        return flow {
+            emit(remoteDataSource.deleteFriend(myId = getMyId(), userId = userId).first())
+        }
     }
 
     override suspend fun addRequests(userId: String): Flow<isSuccessful> {
@@ -124,23 +81,35 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun acceptFriend(userId: String, userProfileImage: String, userUuid: String): Flow<isSuccessful> {
-        val myId = getMyId()
-        val myProfileImage = getProfileImage()
-        val myUuid = getMyUuid()
+    override fun acceptFriend(userId: String, userProfileImage: String, userUuid: String): Flow<isSuccessful> {
+        return flow {
+            val myId = getMyId()
+            val myProfileImage = getProfileImage()
+            val myUuid = getMyUuid()
 
-        return remoteDataSource.acceptFriend(
-            myId = myId,
-            myProfileImage = "$myProfileImage",
-            myUuid = myUuid,
-            userId = userId,
-            userProfileImage = userProfileImage,
-            userUuid = userUuid
-        )
+            val isSuccessful = remoteDataSource.acceptFriend(
+                myId = myId,
+                myProfileImage = "$myProfileImage",
+                myUuid = myUuid,
+                userId = userId,
+                userProfileImage = userProfileImage,
+                userUuid = userUuid
+            ).first()
+
+            emit(isSuccessful)
+        }
+    }
+
+    override suspend fun updateUserId(userId: String) {
+        localDataSource.updateUserId(userId)
     }
 
     override suspend fun getFcmToken(): String {
         return localDataSource.getFcmToken()
+    }
+
+    override suspend fun updateFcmToken(fcmToken: String) {
+        localDataSource.updateFcmToken(fcmToken)
     }
 
     override suspend fun updateLocalFcmToken(fcmToken: String) {

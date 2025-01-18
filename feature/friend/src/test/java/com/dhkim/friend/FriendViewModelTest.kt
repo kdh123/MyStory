@@ -8,6 +8,12 @@ import com.dhkim.user.datasource.UserLocalDataSource
 import com.dhkim.user.datasource.UserRemoteDataSource
 import com.dhkim.user.di.UserModule
 import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.usecase.AcceptFriendUseCase
+import com.dhkim.user.usecase.AddFriendUseCase
+import com.dhkim.user.usecase.CreateFriendCodeUseCase
+import com.dhkim.user.usecase.DeleteFriendUseCase
+import com.dhkim.user.usecase.GetMyInfoUseCase
+import com.dhkim.user.usecase.SearchFriendUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -62,12 +68,38 @@ class FriendViewModelTest {
     @Inject
     lateinit var userRepository: UserRepository
 
+    @Inject
+    lateinit var deleteFriendUseCase: DeleteFriendUseCase
+
+    @Inject
+    lateinit var createFriendCodeUseCase: CreateFriendCodeUseCase
+
+    @Inject
+    lateinit var addFriendUseCase: AddFriendUseCase
+
+    @Inject
+    lateinit var acceptFriendUseCase: AcceptFriendUseCase
+
+    @Inject
+    lateinit var searchFriendUseCase: SearchFriendUseCase
+
+    @Inject
+    lateinit var getMyInfoUseCase: GetMyInfoUseCase
+
     private lateinit var viewModel: FriendViewModel
 
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = FriendViewModel(userRepository = userRepository, ioDispatcher = UnconfinedTestDispatcher())
+        viewModel = FriendViewModel(
+            deleteFriendUseCase = deleteFriendUseCase,
+            createFriendCodeUseCase = createFriendCodeUseCase,
+            addFriendUseCase = addFriendUseCase,
+            acceptFriendUseCase = acceptFriendUseCase,
+            searchFriendUseCase = searchFriendUseCase,
+            getMyInfoUseCase = getMyInfoUseCase,
+            ioDispatcher = UnconfinedTestDispatcher()
+        )
     }
 
     @Test

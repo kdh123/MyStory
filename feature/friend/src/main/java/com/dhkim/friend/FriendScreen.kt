@@ -356,7 +356,7 @@ fun FriendScreen(
                                             title = "알림",
                                             desc = "개인 코드는 타임캡슐 공유 목적 외 다른 목적으로 사용되지 않습니다. 또한 코드 생성시 사용자의 이름, 전화번호, 주소 등 어떠한 개인정보도 사용되지 않습니다.",
                                             onPositiveClick = {
-                                                onAction(FriendAction.CreateCode)
+                                                onAction(FriendAction.CreateFriendCode)
                                             }
                                         )
                                     )
