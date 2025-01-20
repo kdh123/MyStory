@@ -5,6 +5,10 @@ import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
 import com.dhkim.trip.data.di.TripModule
 import com.dhkim.trip.domain.repository.TripRepository
+import com.dhkim.trip.domain.usecase.DeleteTripImageUseCase
+import com.dhkim.trip.domain.usecase.DeleteTripUseCase
+import com.dhkim.trip.domain.usecase.GetTripUseCase
+import com.dhkim.trip.domain.usecase.UpdateTripUseCase
 import com.dhkim.trip.presentation.detail.TripDetailAction
 import com.dhkim.trip.presentation.detail.TripDetailViewModel
 import dagger.Binds
@@ -17,7 +21,6 @@ import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
@@ -54,12 +57,27 @@ class TripDetailViewModelTest {
     private lateinit var viewModel: TripDetailViewModel
 
     @Inject
-    lateinit var tripRepository: TripRepository
+    lateinit var getTripUseCase: GetTripUseCase
+
+    @Inject
+    lateinit var deleteTripUseCase: DeleteTripUseCase
+
+    @Inject
+    lateinit var updateTripUseCase: UpdateTripUseCase
+
+    @Inject
+    lateinit var deleteTripImageUseCase: DeleteTripImageUseCase
 
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = TripDetailViewModel(tripRepository = tripRepository, ioDispatcher = UnconfinedTestDispatcher())
+        viewModel = TripDetailViewModel(
+            getTripUseCase = getTripUseCase,
+            deleteTripUseCase = deleteTripUseCase,
+            updateTripUseCase = updateTripUseCase,
+            deleteTripImageUseCase = deleteTripImageUseCase,
+            ioDispatcher = UnconfinedTestDispatcher()
+        )
     }
 
     @Test
