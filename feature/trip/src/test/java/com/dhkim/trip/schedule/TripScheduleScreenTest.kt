@@ -13,7 +13,7 @@ import com.dhkim.trip.FakeTripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
 import com.dhkim.trip.data.di.TripModule
-import com.dhkim.trip.domain.TripRepository
+import com.dhkim.trip.domain.repository.TripRepository
 import com.dhkim.trip.presentation.schedule.TripScheduleScreen
 import com.dhkim.trip.presentation.schedule.TripScheduleViewModel
 import dagger.Binds

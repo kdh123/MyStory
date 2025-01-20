@@ -25,7 +25,8 @@ fun TripEntity.toTrip(): Trip {
         images = images.map { it.toTripImage() },
         videos = videos.map { it.toTripVideo() },
         isNextTrip = !DateUtil.isAfter(startDate),
-        isDomestic = isDomestic
+        isDomestic = isDomestic,
+        isInit = isInit
     )
 }
 
@@ -56,7 +57,8 @@ fun Trip.toTripEntity(): TripEntity {
         endDate = endDate,
         places = places,
         images = images.map { it.toTripImageDto() },
-        videos = videos.map { it.toTripVideoDto() }
+        videos = videos.map { it.toTripVideoDto() },
+        isInit = isInit
     )
 }
 

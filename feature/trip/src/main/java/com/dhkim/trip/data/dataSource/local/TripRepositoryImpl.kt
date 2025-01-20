@@ -1,6 +1,6 @@
 package com.dhkim.trip.data.dataSource.local
 
-import com.dhkim.trip.domain.TripRepository
+import com.dhkim.trip.domain.repository.TripRepository
 import com.dhkim.trip.domain.model.Trip
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -13,7 +13,7 @@ class TripRepositoryImpl @Inject constructor(
         return localDataSource.getAllTrip()
     }
 
-    override suspend fun getTrip(id: String): Flow<Trip?> {
+    override fun getTrip(id: String): Flow<Trip?> {
         return localDataSource.getTrip(id)
     }
 

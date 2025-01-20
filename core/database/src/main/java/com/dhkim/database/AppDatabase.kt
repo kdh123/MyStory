@@ -23,7 +23,7 @@ import com.dhkim.database.entity.TripEntity
         FriendEntity::class,
         TripEntity::class
     ],
-    version = 2
+    version = 3
 )
 @TypeConverters(RoomConverter::class)
 abstract class AppDatabase : RoomDatabase() {

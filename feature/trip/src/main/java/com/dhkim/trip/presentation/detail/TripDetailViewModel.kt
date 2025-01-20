@@ -4,10 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
-import com.dhkim.trip.domain.TripRepository
 import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.domain.model.TripImage
 import com.dhkim.trip.domain.model.toTripType
+import com.dhkim.trip.domain.usecase.DeleteTripImageUseCase
+import com.dhkim.trip.domain.usecase.DeleteTripUseCase
+import com.dhkim.trip.domain.usecase.GetTripUseCase
+import com.dhkim.trip.domain.usecase.UpdateTripUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -15,7 +18,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -24,7 +26,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
-    private val tripRepository: TripRepository,
+    private val getTripUseCase: GetTripUseCase,
+    private val deleteTripUseCase: DeleteTripUseCase,
+    private val updateTripUseCase: UpdateTripUseCase,
+    private val deleteTripImageUseCase: DeleteTripImageUseCase,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -39,72 +44,18 @@ class TripDetailViewModel @Inject constructor(
 
     fun onAction(action: TripDetailAction) {
         when (action) {
-            is TripDetailAction.InitTrip -> {
-                initTrip(tripId = action.tripId)
-            }
-
-            is TripDetailAction.LoadImages -> {
-                loadImages(tripId = action.tripId, images = action.images)
-            }
-
-            is TripDetailAction.UpdateTrip -> {
-                updateTrip(trip = action.trip)
-            }
-
-            is TripDetailAction.DeleteTrip -> {
-                deleteTrip(tripId = action.tripId)
-            }
-
-            is TripDetailAction.SelectDate -> {
-                selectDate(selectedIndex = action.selectedIndex)
-            }
-
-            is TripDetailAction.DeleteImage -> {
-                deleteImage(tripId = action.tripId, imageId = action.imageId)
-            }
-        }
-    }
-
-    private fun deleteImage(tripId: String, imageId: String) {
-        viewModelScope.launch(ioDispatcher) {
-            tripAllImages.value = tripAllImages.value.filter { it.id != imageId }
-            val updateTrip = tripRepository.getTrip(id = tripId).first()?.copy(images = tripAllImages.value) ?: return@launch
-            tripRepository.updateTrip(updateTrip)
-            val updateImages = _uiState.value.images?.filter { it.id != imageId }?.toImmutableList()
-            _uiState.update { it.copy(images = updateImages) }
-        }
-    }
-
-    private fun updateTrip(trip: Trip) {
-        viewModelScope.launch(ioDispatcher) {
-            tripRepository.updateTrip(trip = trip.copy(images = listOf(), videos = listOf()))
-            _sideEffect.send(
-                TripDetailSideEffect.LoadImages(
-                    startDate = trip.startDate,
-                    endDate = trip.endDate
-                )
-            )
-        }
-    }
-
-    private fun deleteTrip(tripId: String) {
-        viewModelScope.launch(ioDispatcher) {
-            tripRepository.deleteTrip(id = tripId)
-        }
-    }
-
-    private fun selectDate(selectedIndex: Int) {
-        viewModelScope.launch(ioDispatcher) {
-            val date = _uiState.value.tripDates[selectedIndex].date
-            val strDate = "${date.first}-${date.second}-${date.third}"
-            val images = tripAllImages.value.filter { it.date == strDate }.toImmutableList()
-            _uiState.update { it.copy(selectedIndex = selectedIndex, images = images) }
+            is TripDetailAction.InitTrip -> initTrip(tripId = action.tripId)
+            is TripDetailAction.LoadImages -> loadImages(tripId = action.tripId, images = action.images)
+            is TripDetailAction.UpdateTrip -> updateTrip(trip = action.trip)
+            is TripDetailAction.DeleteTrip -> deleteTrip(tripId = action.tripId)
+            is TripDetailAction.SelectDate -> selectDate(selectedIndex = action.selectedIndex)
+            is TripDetailAction.DeleteImage -> deleteTripImage(tripId = action.tripId, imageId = action.imageId)
         }
     }
 
     private fun initTrip(tripId: String) {
         viewModelScope.launch(ioDispatcher) {
-            tripRepository.getTrip(id = tripId)
+            getTripUseCase(tripId = tripId)
                 .catch { }
                 .collect { currentTrip ->
                     currentTrip ?: return@collect
@@ -118,7 +69,7 @@ class TripDetailViewModel @Inject constructor(
                     }
                     title.append(" 여행")
                     val currentIndex = _uiState.value.selectedIndex
-                    if (currentTrip.images.isEmpty()) {
+                    if (!currentTrip.isInit) {
                         with(currentTrip) {
                             _uiState.update {
                                 it.copy(
@@ -167,17 +118,49 @@ class TripDetailViewModel @Inject constructor(
         }
     }
 
+    private fun deleteTripImage(tripId: String, imageId: String) {
+        viewModelScope.launch(ioDispatcher) {
+            tripAllImages.value = tripAllImages.value.filter { it.id != imageId }
+            deleteTripImageUseCase(tripId = tripId, imageId = imageId)
+        }
+    }
+
+    private fun updateTrip(trip: Trip) {
+        viewModelScope.launch(ioDispatcher) {
+            updateTripUseCase(trip = trip.copy(images = listOf(), videos = listOf(), isInit = false))
+            _sideEffect.send(
+                TripDetailSideEffect.LoadImages(
+                    startDate = trip.startDate,
+                    endDate = trip.endDate
+                )
+            )
+        }
+    }
+
+    private fun deleteTrip(tripId: String) {
+        viewModelScope.launch(ioDispatcher) {
+            deleteTripUseCase(id = tripId)
+        }
+    }
+
+    private fun selectDate(selectedIndex: Int) {
+        viewModelScope.launch(ioDispatcher) {
+            val date = _uiState.value.tripDates[selectedIndex].date
+            val strDate = "${date.first}-${date.second}-${date.third}"
+            val images = tripAllImages.value.filter { it.date == strDate }.toImmutableList()
+            _uiState.update { it.copy(selectedIndex = selectedIndex, images = images) }
+        }
+    }
+
     private fun loadImages(tripId: String, images: List<TripImage>) {
         viewModelScope.launch(ioDispatcher) {
-            val currentTrip = tripRepository.getTrip(id = tripId).firstOrNull() ?: return@launch
+            val currentTrip = getTripUseCase(tripId = tripId).firstOrNull() ?: return@launch
 
             tripAllImages.value = images
             val title = StringBuilder()
             currentTrip.places.forEachIndexed { index, place ->
                 title.append(place)
-                if (index < currentTrip.places.size - 1) {
-                    title.append(", ")
-                }
+                if (index < currentTrip.places.size - 1) title.append(", ")
             }
             title.append(" 여행")
 
@@ -194,11 +177,7 @@ class TripDetailViewModel @Inject constructor(
                 }
             }
             selectDate(0)
-            if (tripAllImages.value.isNotEmpty()) {
-                tripRepository.updateTrip(currentTrip.copy(images = tripAllImages.value))
-            } else {
-                tripRepository.updateTrip(currentTrip.copy(images = listOf(TripImage())))
-            }
+            updateTripUseCase(currentTrip.copy(images = tripAllImages.value, isInit = true))
         }
     }
 }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -92,30 +93,34 @@ class MapViewModel @Inject constructor(
 
     private fun selectPlace(place: Place) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                query = place.name,
-                category = Category.None,
-                selectedPlace = place,
-                places = MutableStateFlow(PagingData.empty())
-            )
+            _uiState.update {
+                it.copy(
+                    query = place.name,
+                    category = Category.None,
+                    selectedPlace = place,
+                    places = MutableStateFlow(PagingData.empty())
+                )
+            }
 
             _sideEffect.send(MapSideEffect.BottomSheet(isHide = true))
         }
     }
 
-    private fun closeSearch(isPlaceSlected: Boolean) {
-        _uiState.value = if (isPlaceSlected) {
-            _uiState.value.copy(
-                places = MutableStateFlow(PagingData.empty()),
-                category = Category.None
-            )
-        } else {
-            _uiState.value.copy(
-                query = "",
-                places = MutableStateFlow(PagingData.empty()),
-                category = Category.None,
-                selectedPlace = null
-            )
+    private fun closeSearch(isPlaceSelected: Boolean) {
+        _uiState.update {
+            if (isPlaceSelected) {
+                it.copy(
+                    places = MutableStateFlow(PagingData.empty()),
+                    category = Category.None
+                )
+            } else {
+                it.copy(
+                    query = "",
+                    places = MutableStateFlow(PagingData.empty()),
+                    category = Category.None,
+                    selectedPlace = null
+                )
+            }
         }
 
         viewModelScope.launch {

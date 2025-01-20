@@ -14,5 +14,6 @@ data class TripEntity(
     @ColumnInfo(name = "endDate") val endDate: String,
     @ColumnInfo(name = "places") val places: List<String>,
     @ColumnInfo(name = "images") val images: List<TripImageDto>,
-    @ColumnInfo(name = "videos") val videos: List<TripVideoDto>
+    @ColumnInfo(name = "videos") val videos: List<TripVideoDto>,
+    @ColumnInfo(name = "isInit") val isInit: Boolean
 )
