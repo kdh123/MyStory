@@ -49,7 +49,8 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
                             endDate = "2026-03-03",
                             places = listOf("서울", "부산"),
                             images = images,
-                            videos = listOf()
+                            videos = listOf(),
+                            isInit = true
                         )
                     } else {
                         TripEntity(
@@ -59,7 +60,8 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
                             endDate = "2024-03-03",
                             places = listOf("서울", "부산"),
                             images = images,
-                            videos = listOf()
+                            videos = listOf(),
+                            isInit = true
                         )
                     }
                 )
@@ -73,7 +75,7 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
         return trips
     }
 
-    override suspend fun getTrip(id: String): Flow<Trip?> {
+    override fun getTrip(id: String): Flow<Trip?> {
         return flowOf(trips.value.first { it.id == id })
     }
 

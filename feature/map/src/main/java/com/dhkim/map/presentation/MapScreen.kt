@@ -66,6 +66,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -120,14 +121,8 @@ fun MapScreen(
     val context = LocalContext.current
     val places = uiState.places.collectAsLazyPagingItems()
     val paddingValues = WindowInsets.navigationBars.asPaddingValues()
-    val peekHeight = if (uiState.category != Category.None) {
-        300.dp
-    } else {
-        0.dp
-    }
-    var currentLocation by remember {
-        mutableStateOf(Constants.defaultLocation)
-    }
+    val peekHeight = if (uiState.category != Category.None) 300.dp  else 0.dp
+    var currentLocation by remember { mutableStateOf(Constants.defaultLocation) }
     val cameraPositionState = rememberCameraPositionState()
     val mapProperties by remember {
         mutableStateOf(
@@ -182,7 +177,7 @@ fun MapScreen(
             }
 
             uiState.selectedPlace != null -> {
-                LatLng(uiState.selectedPlace.lat.toDouble(), uiState.selectedPlace!!.lng.toDouble())
+                LatLng(uiState.selectedPlace.lat.toDouble(), uiState.selectedPlace.lng.toDouble())
             }
 
             else -> {
@@ -201,9 +196,7 @@ fun MapScreen(
     }
 
     LaunchedEffect(place()?.id) {
-        place()?.let {
-            onAction(MapAction.SelectPlace(it))
-        }
+        place()?.let(MapAction::SelectPlace)
     }
 
     val fusedLocationClient = remember {
@@ -236,10 +229,7 @@ fun MapScreen(
         sheetPeekHeight = peekHeight,
         sheetContent = {
             if (places.itemCount == 0) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
+                Box(modifier = Modifier.fillMaxWidth()) {
                     LoadingProgressBar(
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -626,7 +616,11 @@ private fun CategoryChipPreview() {
 }
 
 @Composable
-fun PlaceList(uiState: MapUiState, onAction: (MapAction) -> Unit, onHide: () -> Unit) {
+fun PlaceList(
+    uiState: MapUiState,
+    onAction: (MapAction) -> Unit,
+    onHide: () -> Unit
+) {
     val places = uiState.places.collectAsLazyPagingItems()
     val state = places.loadState.refresh
     if (state is LoadState.Error) {
@@ -636,13 +630,12 @@ fun PlaceList(uiState: MapUiState, onAction: (MapAction) -> Unit, onHide: () -> 
         Log.e("errr", "err")
     }
     LazyColumn(
-        modifier = Modifier.fillMaxHeight(0.9f)
+        modifier = Modifier
+            .fillMaxHeight(0.9f)
     ) {
         items(
             count = places.itemCount,
-            key = places.itemKey(key = {
-                it.id
-            }),
+            key = places.itemKey(key = { it.id }),
             contentType = places.itemContentType()
         ) { index ->
             val item = places[index]

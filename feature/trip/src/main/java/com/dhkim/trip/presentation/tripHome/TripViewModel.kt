@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.common.onetimeRestartableStateIn
-import com.dhkim.trip.domain.TripRepository
+import com.dhkim.trip.domain.repository.TripRepository
 import com.dhkim.trip.domain.model.Trip
+import com.dhkim.trip.domain.usecase.DeleteTripUseCase
+import com.dhkim.trip.domain.usecase.GetAllTripsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,11 +21,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TripViewModel @Inject constructor(
-    private val tripRepository: TripRepository,
+    private val getAllTripsUseCase: GetAllTripsUseCase,
+    private val deleteTripUseCase: DeleteTripUseCase,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    val uiState = tripRepository.getAllTrip()
+    val uiState = getAllTripsUseCase()
         .flowOn(ioDispatcher)
         .map { it.toUiState() }
         .onetimeRestartableStateIn(
@@ -42,7 +45,7 @@ class TripViewModel @Inject constructor(
 
     private fun deleteTrip(tripId: String) {
         viewModelScope.launch(ioDispatcher) {
-            tripRepository.deleteTrip(id = tripId)
+            deleteTripUseCase(id = tripId)
         }
     }
 }
