@@ -11,6 +11,12 @@ import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.user.model.Friend
 import com.dhkim.user.model.User
 import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.usecase.AcceptFriendUseCase
+import com.dhkim.user.usecase.AddFriendUseCase
+import com.dhkim.user.usecase.DeleteFriendUseCase
+import com.dhkim.user.usecase.CreateFriendCodeUseCase
+import com.dhkim.user.usecase.GetMyInfoUseCase
+import com.dhkim.user.usecase.SearchFriendUseCase
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +25,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,7 +33,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FriendViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val deleteFriendUseCase: DeleteFriendUseCase,
+    private val createFriendCodeUseCase: CreateFriendCodeUseCase,
+    private val addFriendUseCase: AddFriendUseCase,
+    private val acceptFriendUseCase: AcceptFriendUseCase,
+    private val searchFriendUseCase: SearchFriendUseCase,
+    private val getMyInfoUseCase: GetMyInfoUseCase,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -36,7 +47,7 @@ class FriendViewModel @Inject constructor(
     val uiState: RestartableStateFlow<FriendUiState> = combine(
         creatingCodeFlow,
         searchResultFlow,
-        userRepository.getMyInfo()
+        getMyInfoUseCase()
     ) { isCreating, searchResult, myInfo ->
         myInfo.toUiState(isCreatingCode = isCreating, searchResult = searchResult)
     }.onetimeRestartableStateIn(
@@ -77,13 +88,13 @@ class FriendViewModel @Inject constructor(
                 searchUser()
             }
 
-            FriendAction.CreateCode -> {
-                createCode()
+            FriendAction.CreateFriendCode -> {
+                createFriendCode()
             }
         }
     }
 
-    private fun createCode() {
+    private fun createFriendCode() {
         creatingCodeFlow.value = true
         viewModelScope.launch {
             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -96,30 +107,13 @@ class FriendViewModel @Inject constructor(
                 viewModelScope.launch {
                     val fcmToken = task.result
                     val profileImage = profileImages[(0..3).random()]
-
-                    val userId = StringBuilder().apply {
-                        repeat(6) {
-                            when ((0..2).random()) {
-                                0 -> append(('0'.code..'9'.code).random().toChar())
-                                1 -> append(('A'.code..'Z'.code).random().toChar())
-                                2 -> append(('a'.code..'z'.code).random().toChar())
-                            }
-                        }
-                    }
-
-                    val isSuccessful = userRepository.signUp(
-                        userId = "$userId",
-                        profileImage = "$profileImage",
-                        fcmToken = fcmToken
-                    )
-
+                    val isSuccessful = createFriendCodeUseCase(fcmToken = fcmToken, profileImage = profileImage).first()
                     if (isSuccessful) {
-                        creatingCodeFlow.value = false
                         uiState.restart()
                     } else {
-                        creatingCodeFlow.value = false
                         _sideEffect.send(FriendSideEffect.Message(message = "코드 생성에 실패하였습니다. 다시 시도해주세요."))
                     }
+                    creatingCodeFlow.value = false
                 }
             }).addOnFailureListener {
                 viewModelScope.launch {
@@ -131,60 +125,39 @@ class FriendViewModel @Inject constructor(
     }
 
     private fun onQuery(query: String) {
-        searchResultFlow.update {
-            searchResultFlow.value.copy(query = query)
-        }
+        searchResultFlow.update { it.copy(query = query) }
     }
 
     private fun addFriend() {
         viewModelScope.launch {
             val searchUserId = uiState.value.searchResult.userId ?: ""
             val searchUserProfileImage = uiState.value.searchResult.userProfileImage
+            val isSuccessful = addFriendUseCase(searchUserId, searchUserProfileImage).first()
 
-            userRepository.addFriend(searchUserId, searchUserProfileImage)
-                .catch {
-                    _sideEffect.send(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
-                }
-                .collect { isSuccessful ->
-                    if (isSuccessful) {
-                        _sideEffect.send(FriendSideEffect.ShowKeyboard(show = false))
-                    } else {
-                        _sideEffect.send(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
-                    }
-                }
+            if (isSuccessful) {
+                _sideEffect.send(FriendSideEffect.ShowKeyboard(show = false))
+            } else {
+                _sideEffect.send(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
+            }
         }
     }
 
     private fun deleteFriend(userId: String) {
         viewModelScope.launch(ioDispatcher) {
-            userRepository.deleteFriend(userId = userId)
-                .onCompletion {
-                    _sideEffect.send(FriendSideEffect.ShowDialog(show = false))
-                }
-                .catch {
-                    _sideEffect.send(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
-                }.collect { isSuccessful ->
-                    if (isSuccessful) {
-                        userRepository.deleteLocalFriend(userId)
-                        _sideEffect.send(FriendSideEffect.ShowKeyboard(show = false))
-                    } else {
-                        _sideEffect.send(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
-                    }
-                }
+            val isSuccessful = deleteFriendUseCase(userId).first()
+            if (isSuccessful) {
+                _sideEffect.send(FriendSideEffect.ShowKeyboard(show = false))
+            } else {
+                _sideEffect.send(FriendSideEffect.Message(message = "친구 삭제에 실패하였습니다."))
+            }
+            _sideEffect.send(FriendSideEffect.ShowDialog(show = false))
         }
     }
 
     private fun acceptFriend(friend: Friend) {
         viewModelScope.launch {
-            userRepository.acceptFriend(friend.id, friend.profileImage, friend.uuid)
-                .catch {
-                    _sideEffect.send(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
-                }
-                .collect { isSuccessful ->
-                    if (!isSuccessful) {
-                        _sideEffect.send(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
-                    }
-                }
+            val isSuccessful = acceptFriendUseCase(friend.id, friend.profileImage, friend.uuid).first()
+            if (!isSuccessful) _sideEffect.send(FriendSideEffect.Message(message = "친구 추가에 실패하였습니다."))
         }
     }
 
@@ -192,34 +165,24 @@ class FriendViewModel @Inject constructor(
         viewModelScope.launch {
             val myId = uiState.value.myInfo.id
             val searchResult = uiState.value.searchResult
+            val result = searchFriendUseCase(userId = searchResult.query).first()
 
-            userRepository.searchUser(searchResult.query)
-                .catch {
-                    _sideEffect.send(FriendSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
-                }
-                .collect { result ->
-                    when (result) {
-                        is CommonResult.Success -> {
-                            val user = result.data
-                            searchResultFlow.update {
-                                if (user != null) {
-                                    val isMe = searchResult.query == myId
-                                    searchResult.copy(
-                                        userId = user.id,
-                                        userProfileImage = user.profileImage,
-                                        isMe = isMe
-                                    )
-                                } else {
-                                    searchResult.copy(userId = null)
-                                }
-                            }
-                        }
-
-                        is CommonResult.Error -> {
-                            _sideEffect.send(FriendSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
+            when (result) {
+                is CommonResult.Success -> {
+                    val user = result.data
+                    searchResultFlow.update {
+                        if (user != null) {
+                            searchResult.copy(userId = user.id, userProfileImage = user.profileImage, isMe = searchResult.query == myId)
+                        } else {
+                            searchResult.copy(userId = null)
                         }
                     }
                 }
+
+                is CommonResult.Error -> {
+                    _sideEffect.send(FriendSideEffect.Message(message = "친구 찾기에 실패하였습니다."))
+                }
+            }
         }
     }
 }

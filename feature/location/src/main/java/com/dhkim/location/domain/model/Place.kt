@@ -1,4 +1,4 @@
-package com.dhkim.location.domain
+package com.dhkim.location.domain.model
 
 import java.io.Serializable
 

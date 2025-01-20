@@ -2,7 +2,7 @@ package com.dhkim.location.data.dataSource.remote
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.model.Place
 import retrofit2.HttpException
 import java.io.IOException
 

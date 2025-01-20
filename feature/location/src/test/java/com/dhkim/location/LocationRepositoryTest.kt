@@ -7,23 +7,12 @@ import androidx.paging.PagingSource
 import androidx.paging.testing.TestPager
 import androidx.paging.testing.asSnapshot
 import androidx.test.core.app.ApplicationProvider
-import com.dhkim.location.data.dataSource.remote.LocationApi
-import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
-import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSourceImpl
 import com.dhkim.location.data.dataSource.remote.SearchPlaceByKeywordPagingSource
-import com.dhkim.location.data.di.LocationApiModule
-import com.dhkim.location.data.di.LocationModule
 import com.dhkim.location.data.model.PlaceDocument
-import com.dhkim.location.data.repository.LocationRepositoryImpl
-import com.dhkim.location.domain.LocationRepository
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
+import com.dhkim.location.domain.repository.LocationRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import dagger.hilt.android.testing.UninstallModules
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -36,7 +25,6 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.Locale
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)

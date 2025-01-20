@@ -1,6 +1,6 @@
 package com.dhkim.location.data.model
 
-import com.dhkim.location.domain.Places
+import com.dhkim.location.domain.model.Places
 
 data class PlaceDto(
     val documents: List<PlaceDocument>,

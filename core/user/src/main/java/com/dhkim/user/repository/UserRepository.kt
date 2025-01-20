@@ -9,24 +9,23 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
 
-    fun getAllFriend(): Flow<List<LocalFriend>>
     fun getFriend(id: String): LocalFriend?
-    fun saveFriend(localFriend: LocalFriend)
-    suspend fun updateFriend(friend: Friend)
+    fun updateFriend(friend: Friend): Flow<isSuccessful>
     fun deleteLocalFriend(id: String)
 
-    fun getMyInfo(): Flow<User>
+    fun getMyInfo(myId: String): Flow<User>
     suspend fun getMyId(): String
-    suspend fun signUp(userId: String, profileImage: String, fcmToken: String): isSuccessful
-    fun updateUser(user: User)
-    suspend fun searchUser(userId: String): Flow<CommonResult<User?>>
+    fun updateUser(user: User): Flow<isSuccessful>
+    fun searchUser(userId: String): Flow<CommonResult<User?>>
 
     suspend fun addFriend(userId: String, userProfileImage: String): Flow<isSuccessful>
-    suspend fun deleteFriend(userId: String): Flow<isSuccessful>
+    fun deleteFriend(userId: String): Flow<isSuccessful>
     suspend fun addRequests(userId: String): Flow<isSuccessful>
-    suspend fun acceptFriend(userId: String, userProfileImage: String, userUuid: String): Flow<isSuccessful>
+    fun acceptFriend(userId: String, userProfileImage: String, userUuid: String): Flow<isSuccessful>
 
+    suspend fun updateUserId(userId: String)
     suspend fun getFcmToken(): String
+    suspend fun updateFcmToken(fcmToken: String)
     suspend fun updateLocalFcmToken(fcmToken: String)
     suspend fun getProfileImage(): Int
     suspend fun updateProfileImage(profileImage: String)

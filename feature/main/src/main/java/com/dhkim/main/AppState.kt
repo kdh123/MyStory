@@ -19,7 +19,7 @@ import com.dhkim.home.presentation.navigation.navigateToDetailFromOpen
 import com.dhkim.home.presentation.navigation.navigateToImageDetail
 import com.dhkim.home.presentation.navigation.navigateToMore
 import com.dhkim.home.presentation.navigation.navigateToOpenTimeCapsule
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.model.Place
 import com.dhkim.location.presentation.navigation.navigateToSearch
 import com.dhkim.map.presentation.navigation.MAP_ROUTE
 import com.dhkim.notification.navigation.navigateToNotification

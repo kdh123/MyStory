@@ -9,7 +9,8 @@ import com.dhkim.location.data.di.LocationApiModule
 import com.dhkim.location.data.di.LocationModule
 import com.dhkim.location.data.model.PlaceDocument
 import com.dhkim.location.data.repository.LocationRepositoryImpl
-import com.dhkim.location.domain.LocationRepository
+import com.dhkim.location.domain.repository.LocationRepository
+import com.dhkim.location.domain.usecase.GetNearPlacesByKeywordUseCase
 import com.dhkim.location.presentation.SearchViewModel
 import dagger.Binds
 import dagger.Module
@@ -50,6 +51,9 @@ class SearchViewModelTest {
     @get:Rule
     var mainDispatcherRule = MainDispatcherRule()
 
+    @Inject
+    lateinit var getNearPlacesByKeywordUseCase: GetNearPlacesByKeywordUseCase
+
     @Before
     fun setup() {
         val savedStateHandle = SavedStateHandle().apply {
@@ -58,7 +62,7 @@ class SearchViewModelTest {
         }
 
         hiltRule.inject()
-        viewModel = SearchViewModel(locationRepository,savedStateHandle)
+        viewModel = SearchViewModel(getNearPlacesByKeywordUseCase, savedStateHandle)
     }
 
     @Module

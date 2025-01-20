@@ -8,7 +8,7 @@ import com.dhkim.common.RestartableStateFlow
 import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.common.onetimeRestartableStateIn
 import com.dhkim.home.domain.model.TimeCapsule
-import com.dhkim.home.domain.repository.TimeCapsuleRepository
+import com.dhkim.home.domain.usecase.DeleteTimeCapsuleUseCase
 import com.dhkim.home.domain.usecase.GetTimeCapsuleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,8 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimeCapsuleDetailViewModel @Inject constructor(
-    private val timeCapsuleRepository: TimeCapsuleRepository,
     private val getTimeCapsuleUseCase: GetTimeCapsuleUseCase,
+    private val deleteTimeCapsuleUseCase: DeleteTimeCapsuleUseCase,
     private val savedStateHandle: SavedStateHandle,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -50,12 +50,13 @@ class TimeCapsuleDetailViewModel @Inject constructor(
 
     private fun deleteTImeCapsule() {
         viewModelScope.launch(ioDispatcher) {
-            if (uiState.value.isReceived) {
-                timeCapsuleRepository.deleteReceivedTimeCapsule(timeCapsuleId)
+            val isSuccessful = deleteTimeCapsuleUseCase(timeCapsuleId = timeCapsuleId, isReceived = uiState.value.isReceived)
+
+            if (isSuccessful) {
+                _sideEffect.send(TimeCapsuleDetailSideEffect.Completed(isCompleted = true))
             } else {
-                timeCapsuleRepository.deleteMyTimeCapsule(timeCapsuleId)
+                _sideEffect.send(TimeCapsuleDetailSideEffect.Message(message = "삭제에 실패하였습니다"))
             }
-            _sideEffect.send(TimeCapsuleDetailSideEffect.Completed(isCompleted = true))
         }
     }
 }

@@ -7,6 +7,7 @@ import com.dhkim.user.di.UserModule
 import com.dhkim.user.model.Friend
 import com.dhkim.user.model.User
 import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.usecase.GetMyInfoUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -55,6 +56,9 @@ class UserRepositoryTest {
     var hiltRule = HiltAndroidRule(this)
 
     @Inject
+    lateinit var getMyInfoUseCase: GetMyInfoUseCase
+    
+    @Inject
     lateinit var userRepository: UserRepository
 
     @Before
@@ -64,7 +68,7 @@ class UserRepositoryTest {
 
     @Test
     fun `remote 내 정보 가져오기`() = runTest {
-        val data = userRepository.getMyInfo().first()
+        val data = getMyInfoUseCase().first()
         val user = User(
             id = "id0",
             profileImage = "1230",
@@ -84,7 +88,7 @@ class UserRepositoryTest {
 
     @Test
     fun `친구 추가(요청)`() = runTest {
-        val myInfo = userRepository.getMyInfo().first()
+        val myInfo = getMyInfoUseCase().first()
         val prevFriendSize = myInfo.friends.size
 
         userRepository.addFriend(
@@ -92,14 +96,14 @@ class UserRepositoryTest {
             userProfileImage = "84561"
         )
 
-        val currentFriendSize = userRepository.getMyInfo().first().friends.size
+        val currentFriendSize = getMyInfoUseCase().first().friends.size
 
         assertEquals(prevFriendSize + 1, currentFriendSize)
     }
 
     @Test
     fun `친구 승낙`() = runTest {
-        val myInfo = userRepository.getMyInfo().first()
+        val myInfo = getMyInfoUseCase().first()
         val prevFriendSize = myInfo.friends.filter { it.isPending }.size
 
         userRepository.acceptFriend(
@@ -108,29 +112,29 @@ class UserRepositoryTest {
             userUuid = "uuid7"
         )
 
-        val currentFriendSize = userRepository.getMyInfo().first().friends.filter { it.isPending }.size
+        val currentFriendSize = getMyInfoUseCase().first().friends.filter { it.isPending }.size
         assertEquals(prevFriendSize -1, currentFriendSize)
     }
 
     @Test
     fun `친구 삭제`() = runTest {
-        val myInfo = userRepository.getMyInfo().first()
+        val myInfo = getMyInfoUseCase().first()
         val prevFriendSize = myInfo.friends.size
 
         userRepository.deleteFriend("id7")
 
-        val currentFriendSize = userRepository.getMyInfo().first().friends.size
+        val currentFriendSize = getMyInfoUseCase().first().friends.size
         assertEquals(prevFriendSize -1, currentFriendSize)
     }
 
     @Test
     fun `친구 정보 변경`() = runTest {
-        val myInfo = userRepository.getMyInfo().first()
+        val myInfo = getMyInfoUseCase().first()
         val prevFriendSize = myInfo.friends.size
 
         userRepository.updateFriend(friend = Friend(id = "id7", profileImage = "0ef", uuid = "1038", nickname = "홍길동"))
 
         advanceTimeBy(1000L)
-        assertEquals(userRepository.getMyInfo().first().friends.first { it.id == "id7" }.nickname, "홍길동")
+        assertEquals(getMyInfoUseCase().first().friends.first { it.id == "id7" }.nickname, "홍길동")
     }
 }
