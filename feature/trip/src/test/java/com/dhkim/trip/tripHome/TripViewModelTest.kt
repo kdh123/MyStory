@@ -4,8 +4,10 @@ import com.dhkim.trip.FakeTripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
 import com.dhkim.trip.data.di.TripModule
-import com.dhkim.trip.domain.TripRepository
+import com.dhkim.trip.domain.repository.TripRepository
 import com.dhkim.trip.domain.model.Trip
+import com.dhkim.trip.domain.usecase.DeleteTripUseCase
+import com.dhkim.trip.domain.usecase.GetAllTripsUseCase
 import com.dhkim.trip.presentation.tripHome.TripAction
 import com.dhkim.trip.presentation.tripHome.TripViewModel
 import dagger.Binds
@@ -53,12 +55,23 @@ class TripViewModelTest {
     var hiltRule = HiltAndroidRule(this)
 
     private lateinit var viewModel: TripViewModel
+
     @Inject lateinit var tripRepository: TripRepository
+
+    @Inject
+    lateinit var getAllTripsUseCase: GetAllTripsUseCase
+
+    @Inject
+    lateinit var deleteTripUseCase: DeleteTripUseCase
 
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = TripViewModel(tripRepository = tripRepository, ioDispatcher = UnconfinedTestDispatcher())
+        viewModel = TripViewModel(
+            getAllTripsUseCase = getAllTripsUseCase,
+            deleteTripUseCase = deleteTripUseCase,
+            ioDispatcher = UnconfinedTestDispatcher()
+        )
     }
 
     @Test

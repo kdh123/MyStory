@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
-import com.dhkim.trip.domain.TripRepository
 import com.dhkim.trip.domain.model.Trip
 import com.dhkim.trip.domain.model.TripImage
 import com.dhkim.trip.domain.model.toTripType
+import com.dhkim.trip.domain.repository.TripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -77,7 +77,7 @@ class TripDetailViewModel @Inject constructor(
 
     private fun updateTrip(trip: Trip) {
         viewModelScope.launch(ioDispatcher) {
-            tripRepository.updateTrip(trip = trip.copy(images = listOf(), videos = listOf()))
+            tripRepository.updateTrip(trip = trip.copy(images = listOf(), videos = listOf(), isInit = false))
             _sideEffect.send(
                 TripDetailSideEffect.LoadImages(
                     startDate = trip.startDate,
@@ -118,7 +118,7 @@ class TripDetailViewModel @Inject constructor(
                     }
                     title.append(" 여행")
                     val currentIndex = _uiState.value.selectedIndex
-                    if (currentTrip.images.isEmpty()) {
+                    if (!currentTrip.isInit) {
                         with(currentTrip) {
                             _uiState.update {
                                 it.copy(
@@ -175,9 +175,7 @@ class TripDetailViewModel @Inject constructor(
             val title = StringBuilder()
             currentTrip.places.forEachIndexed { index, place ->
                 title.append(place)
-                if (index < currentTrip.places.size - 1) {
-                    title.append(", ")
-                }
+                if (index < currentTrip.places.size - 1) title.append(", ")
             }
             title.append(" 여행")
 
@@ -195,9 +193,9 @@ class TripDetailViewModel @Inject constructor(
             }
             selectDate(0)
             if (tripAllImages.value.isNotEmpty()) {
-                tripRepository.updateTrip(currentTrip.copy(images = tripAllImages.value))
+                tripRepository.updateTrip(currentTrip.copy(images = tripAllImages.value, isInit = true))
             } else {
-                tripRepository.updateTrip(currentTrip.copy(images = listOf(TripImage())))
+                tripRepository.updateTrip(currentTrip.copy(images = listOf(TripImage()), isInit = true))
             }
         }
     }
