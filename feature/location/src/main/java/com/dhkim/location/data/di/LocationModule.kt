@@ -4,7 +4,7 @@ import com.dhkim.location.data.dataSource.remote.LocationApi
 import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
 import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSourceImpl
 import com.dhkim.location.data.repository.LocationRepositoryImpl
-import com.dhkim.location.domain.LocationRepository
+import com.dhkim.location.domain.repository.LocationRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

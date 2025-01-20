@@ -35,26 +35,10 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
             profileImage = myProfileImage,
             openDate = openDate,
             content = content,
-            lat = if (checkLocation) {
-                lat
-            } else {
-                "0.0"
-            },
-            lng = if (checkLocation) {
-                lng
-            } else {
-                "0.0"
-            },
-            placeName = if (checkLocation) {
-                placeName
-            } else {
-                ""
-            },
-            address = if (checkLocation) {
-                address
-            } else {
-                ""
-            },
+            lat = if (checkLocation) lat  else "0.0" ,
+            lng = if (checkLocation) lng else "0.0",
+            placeName = if (checkLocation) placeName else "",
+            address = if (checkLocation) address else "",
             checkLocation = checkLocation
         )
         val gson = Gson()
@@ -64,16 +48,8 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
         val payloadJson = gson.toJson(payload)
 
         return try {
-            val result = pushService.shareTimeCapsule(
-                toUserIds = friendsJson,
-                body = payloadJson
-            )
-
-            if (result.isSuccessful) {
-                CommonResult.Success(true)
-            } else {
-                CommonResult.Error(-1)
-            }
+            val result = pushService.shareTimeCapsule(toUserIds = friendsJson, body = payloadJson)
+            if (result.isSuccessful) CommonResult.Success(true) else CommonResult.Error(-1)
         } catch (e: HttpException) {
             CommonResult.Error(e.code())
         } catch (e: Exception) {
@@ -82,29 +58,15 @@ class TimeCapsuleRemoteDataSource @Inject constructor(
     }
 
     suspend fun deleteTimeCapsule(myId: String, sharedFriends: List<Uuid>, timeCapsuleId: String): CommonResult<isSuccessful> {
-        val data = DeleteTimeCapsule(
-            isDelete = true,
-            sender = myId,
-            timeCapsuleId = timeCapsuleId
-        )
-
+        val data = DeleteTimeCapsule(isDelete = true, sender = myId, timeCapsuleId = timeCapsuleId)
         val gson = Gson()
         val payload = PushMessage(FcmData(custom_field = data))
-
         val friendsJson = gson.toJson(sharedFriends)
         val payloadJson = gson.toJson(payload)
 
         return try {
-            val result = pushService.shareTimeCapsule(
-                toUserIds = friendsJson,
-                body = payloadJson
-            )
-
-            if (result.isSuccessful) {
-                CommonResult.Success(true)
-            } else {
-                CommonResult.Error(-1)
-            }
+            val result = pushService.shareTimeCapsule(toUserIds = friendsJson, body = payloadJson)
+            if (result.isSuccessful) CommonResult.Success(true) else CommonResult.Error(-1)
         } catch (e: HttpException) {
             CommonResult.Error(e.code())
         } catch (e: Exception) {

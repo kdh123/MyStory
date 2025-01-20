@@ -6,11 +6,13 @@ import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.user.model.Friend
 import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.usecase.UpdateFriendInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChangeFriendInfoViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val updateFriendInfoUseCase: UpdateFriendInfoUseCase,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -46,8 +49,13 @@ class ChangeFriendInfoViewModel @Inject constructor(
                 }
 
                 else -> {
-                    userRepository.updateFriend(_uiState.value.friend)
-                    _sideEffect.send(ChangeFriendInfoSideEffect.Completed(isCompleted = true))
+                    val isSuccessful = updateFriendInfoUseCase(_uiState.value.friend).first()
+                    if (isSuccessful) {
+                        _sideEffect.send(ChangeFriendInfoSideEffect.Completed(isCompleted = true))
+
+                    } else {
+                        _sideEffect.send(ChangeFriendInfoSideEffect.Message("친구 정보를 수정하지 못했습니다."))
+                    }
                 }
             }
         }

@@ -10,7 +10,7 @@ typealias isSuccessful = Boolean
 
 interface TimeCapsuleRepository {
 
-    suspend fun shareTimeCapsule(
+    fun shareTimeCapsule(
         myId: String,
         myProfileImage: String,
         timeCapsuleId: String,
@@ -22,7 +22,7 @@ interface TimeCapsuleRepository {
         placeName: String,
         address: String,
         checkLocation: Boolean
-    ): isSuccessful
+    ): Flow<isSuccessful>
 
     suspend fun deleteTimeCapsule(
         myId: String,

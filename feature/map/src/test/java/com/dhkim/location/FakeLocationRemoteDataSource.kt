@@ -8,10 +8,11 @@ import com.dhkim.common.CommonResult
 import com.dhkim.location.data.dataSource.remote.LocationApi
 import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
 import com.dhkim.location.data.dataSource.remote.SearchPlaceByKeywordPagingSource
-import com.dhkim.location.domain.Address
-import com.dhkim.location.domain.Category
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.model.Address
+import com.dhkim.location.domain.model.Category
+import com.dhkim.location.domain.model.Place
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class FakeLocationRemoteDataSource @Inject constructor(
@@ -67,7 +68,7 @@ class FakeLocationRemoteDataSource @Inject constructor(
         }.flow
     }
 
-    override suspend fun getAddress(lat: String, lng: String): CommonResult<Address> {
-        return CommonResult.Success(data = Address("힐푸", "남주길 150"))
+    override fun getAddress(lat: String, lng: String): Flow<CommonResult<Address>> {
+        return flowOf(CommonResult.Success(data = Address("힐푸", "남주길 150")))
     }
 }

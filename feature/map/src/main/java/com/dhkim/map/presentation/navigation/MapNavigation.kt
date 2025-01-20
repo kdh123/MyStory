@@ -6,7 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.model.Place
 import com.dhkim.map.presentation.MapScreen
 import com.dhkim.map.presentation.MapViewModel
 

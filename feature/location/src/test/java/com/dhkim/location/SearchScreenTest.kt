@@ -17,8 +17,9 @@ import com.dhkim.location.data.di.LocationApiModule
 import com.dhkim.location.data.di.LocationModule
 import com.dhkim.location.data.model.PlaceDocument
 import com.dhkim.location.data.repository.LocationRepositoryImpl
-import com.dhkim.location.domain.LocationRepository
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.repository.LocationRepository
+import com.dhkim.location.domain.model.Place
+import com.dhkim.location.domain.usecase.GetNearPlacesByKeywordUseCase
 import com.dhkim.location.presentation.SearchScreen
 import com.dhkim.location.presentation.SearchViewModel
 import dagger.Binds
@@ -75,7 +76,7 @@ class SearchScreenTest {
     val composeRule = createComposeRule()
 
     @Inject
-    lateinit var locationRepository: LocationRepository
+    lateinit var getNearPlacesByKeywordUseCase: GetNearPlacesByKeywordUseCase
 
     private lateinit var viewModel: SearchViewModel
 
@@ -86,7 +87,7 @@ class SearchScreenTest {
             set("lat", "37.572389")
             set("lng", "126.9769117")
         }
-        viewModel = SearchViewModel(locationRepository = locationRepository, savedStateHandle = savedStateHandle)
+        viewModel = SearchViewModel(getNearPlacesByKeywordUseCase = getNearPlacesByKeywordUseCase, savedStateHandle = savedStateHandle)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

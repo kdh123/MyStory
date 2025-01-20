@@ -2,6 +2,7 @@ package com.dhkim.home.presentation.detail
 
 import android.annotation.SuppressLint
 import android.view.MotionEvent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -81,6 +83,7 @@ fun TimeCapsuleDetailScreen(
     showPopup: (Popup) -> Unit,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
     val scrollState = rememberScrollState()
     val cameraPositionState = rememberCameraPositionState()
@@ -90,12 +93,9 @@ fun TimeCapsuleDetailScreen(
         )
     }
     val mapUiSettings by remember {
-        mutableStateOf(
-            MapUiSettings(
-                isLocationButtonEnabled = false
-            )
-        )
+        mutableStateOf(MapUiSettings(isLocationButtonEnabled = false))
     }
+
     var enableScroll by remember {
         mutableStateOf(true)
     }
@@ -118,6 +118,10 @@ fun TimeCapsuleDetailScreen(
         when (it) {
             is TimeCapsuleDetailSideEffect.Completed -> {
                 onBack()
+            }
+
+            is TimeCapsuleDetailSideEffect.Message -> {
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
             }
         }
     }

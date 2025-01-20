@@ -10,8 +10,10 @@ import com.dhkim.location.data.di.LocationApiModule
 import com.dhkim.location.data.di.LocationModule
 import com.dhkim.location.data.model.PlaceDocument
 import com.dhkim.location.data.repository.LocationRepositoryImpl
-import com.dhkim.location.domain.Category
-import com.dhkim.location.domain.LocationRepository
+import com.dhkim.location.domain.model.Category
+import com.dhkim.location.domain.repository.LocationRepository
+import com.dhkim.location.domain.usecase.GetNearPlacesByKeywordUseCase
+import com.dhkim.location.domain.usecase.GetPlacesByCategoryUseCase
 import com.dhkim.map.presentation.MapAction
 import com.dhkim.map.presentation.MapViewModel
 import dagger.Binds
@@ -45,7 +47,10 @@ class MapViewModelTest {
     var hiltRule = HiltAndroidRule(this)
 
     @Inject
-    lateinit var locationRepository: LocationRepository
+    lateinit var getPlacesByCategoryUseCase: GetPlacesByCategoryUseCase
+
+    @Inject
+    lateinit var getNearPlaceByKeywordUseCase: GetNearPlacesByKeywordUseCase
 
     private lateinit var viewModel: MapViewModel
 
@@ -55,7 +60,7 @@ class MapViewModelTest {
     @Before
     fun setup() {
         hiltRule.inject()
-        viewModel = MapViewModel(locationRepository)
+        viewModel = MapViewModel(getNearPlaceByKeywordUseCase, getPlacesByCategoryUseCase)
     }
 
     @Module

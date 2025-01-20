@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.dhkim.location.domain.Category
-import com.dhkim.location.domain.LocationRepository
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.model.Category
+import com.dhkim.location.domain.model.Place
+import com.dhkim.location.domain.usecase.GetNearPlacesByKeywordUseCase
+import com.dhkim.location.domain.usecase.GetPlacesByCategoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val locationRepository: LocationRepository
+    private val getNearPlaceByKeywordUseCase: GetNearPlacesByKeywordUseCase,
+    private val getPlacesByCategoryUseCase: GetPlacesByCategoryUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
@@ -50,7 +52,7 @@ class MapViewModel @Inject constructor(
 
     private fun searchPlacesByCategory(category: Category, lat: String, lng: String) {
         viewModelScope.launch {
-            locationRepository.getPlaceByCategory(
+            getPlacesByCategoryUseCase(
                 category = category,
                 lat = lat,
                 lng = lng
@@ -70,7 +72,7 @@ class MapViewModel @Inject constructor(
 
     private fun searchPlacesByKeyword(query: String, lat: String, lng: String) {
         viewModelScope.launch {
-            locationRepository.getNearPlaceByKeyword(
+            getNearPlaceByKeywordUseCase(
                 query = query,
                 lat = lat,
                 lng = lng

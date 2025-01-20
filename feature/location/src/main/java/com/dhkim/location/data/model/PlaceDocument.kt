@@ -1,6 +1,6 @@
 package com.dhkim.location.data.model
 
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.model.Place
 import java.math.RoundingMode
 import java.text.DecimalFormat
 

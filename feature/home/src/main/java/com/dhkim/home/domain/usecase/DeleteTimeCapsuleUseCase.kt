@@ -3,13 +3,15 @@ package com.dhkim.home.domain.usecase
 import com.dhkim.home.domain.repository.TimeCapsuleRepository
 import com.dhkim.home.domain.repository.isSuccessful
 import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.usecase.GetMyInfoUseCase
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class DeleteTimeCapsuleUseCase @Inject constructor(
     private val timeCapsuleRepository: TimeCapsuleRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val getMyInfoUseCase: GetMyInfoUseCase
 ) {
 
     suspend operator fun invoke(timeCapsuleId: String, isReceived: Boolean): isSuccessful {
@@ -20,7 +22,7 @@ class DeleteTimeCapsuleUseCase @Inject constructor(
             } else {
                 val sharedFriends = getMyTimeCapsule(timeCapsuleId)?.sharedFriends ?: listOf()
                 val myId = userRepository.getMyId()
-                val sharedFriendsUuids = userRepository.getMyInfo().catch { }
+                val sharedFriendsUuids = getMyInfoUseCase().catch { }
                     .firstOrNull()?.friends
                     ?.filter {
                         sharedFriends.contains(it.id)

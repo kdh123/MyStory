@@ -6,7 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.dhkim.location.domain.LocationRepository
+import com.dhkim.location.domain.usecase.GetNearPlacesByKeywordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val locationRepository: LocationRepository,
+    private val getNearPlacesByKeywordUseCase: GetNearPlacesByKeywordUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -34,7 +34,7 @@ class SearchViewModel @Inject constructor(
     val uiState: StateFlow<SearchUiState> = query.debounce(1_000)
         .flatMapLatest {
             loadingFlow.value = false
-            locationRepository.getNearPlaceByKeyword(query = it, lat = lat, lng = lng)
+            getNearPlacesByKeywordUseCase(query = it, lat = lat, lng = lng)
         }
         .cachedIn(viewModelScope)
         .combine(loadingFlow) { pagingData, isLoading ->

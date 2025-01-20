@@ -1,7 +1,7 @@
 package com.dhkim.map.presentation
 
-import com.dhkim.location.domain.Category
-import com.dhkim.location.domain.Place
+import com.dhkim.location.domain.model.Category
+import com.dhkim.location.domain.model.Place
 
 sealed interface MapAction {
 
