@@ -2,32 +2,32 @@ package com.dhkim.setting.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.setting.domain.SettingRepository
+import com.dhkim.setting.domain.usecase.GetNotificationSettingUseCase
+import com.dhkim.setting.domain.usecase.UpdateNotificationSettingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
-    private val settingRepository: SettingRepository
+    private val getNotificationSettingUseCase: GetNotificationSettingUseCase,
+    private val updateNotificationSettingUseCase: UpdateNotificationSettingUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SettingUiState())
-    val uiState = _uiState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            settingRepository.getNotificationSetting().collect {
-                _uiState.value = _uiState.value.copy(isNotificationChecked = it)
-            }
-        }
-    }
+    val uiState = getNotificationSettingUseCase()
+        .map { SettingUiState(isNotificationChecked = it) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = SettingUiState()
+        )
 
     fun changeNotificationSetting(isChecked: Boolean) {
         viewModelScope.launch {
-            settingRepository.updateNotificationSetting(isChecked)
+            updateNotificationSettingUseCase(isChecked = isChecked)
         }
     }
 }
