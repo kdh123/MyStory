@@ -1,7 +1,7 @@
 package com.dhkim.setting.data.repository
 
 import com.dhkim.setting.data.dataSource.SettingLocalDataSource
-import com.dhkim.setting.domain.SettingRepository
+import com.dhkim.setting.domain.repository.SettingRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -9,7 +9,7 @@ class SettingRepositoryImpl @Inject constructor(
     private val localDataSource: SettingLocalDataSource
 ) : SettingRepository {
 
-    override suspend fun getGuideSetting(): Flow<Boolean> {
+    override fun getGuideSetting(): Flow<Boolean> {
         return localDataSource.getGuideSetting()
     }
 
@@ -17,7 +17,7 @@ class SettingRepositoryImpl @Inject constructor(
         localDataSource.updateGuideSetting(show)
     }
 
-    override suspend fun getNotificationSetting(): Flow<Boolean> {
+    override fun getNotificationSetting(): Flow<Boolean> {
         return localDataSource.getNotificationSetting()
     }
 

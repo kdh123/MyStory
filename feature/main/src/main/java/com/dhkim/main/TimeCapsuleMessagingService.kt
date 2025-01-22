@@ -9,7 +9,7 @@ import com.dhkim.home.data.dataSource.remote.DeleteTimeCapsule
 import com.dhkim.home.domain.model.ReceivedTimeCapsule
 import com.dhkim.home.domain.model.SharedTimeCapsule
 import com.dhkim.home.domain.repository.TimeCapsuleRepository
-import com.dhkim.user.repository.UserRepository
+import com.dhkim.setting.domain.repository.SettingRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
@@ -25,13 +25,10 @@ import javax.inject.Inject
 class TimeCapsuleMessagingService : FirebaseMessagingService() {
 
     @Inject
-    lateinit var userRepository: UserRepository
-
-    @Inject
     lateinit var timeCapsuleRepository: TimeCapsuleRepository
 
     @Inject
-    lateinit var settingRepository: com.dhkim.setting.domain.SettingRepository
+    lateinit var settingRepository: SettingRepository
 
     @Inject
     lateinit var notificationManager: NotificationManager
@@ -123,15 +120,5 @@ class TimeCapsuleMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
-        /*CoroutineScope(Dispatchers.IO).launch {
-            userRepository.run {
-                val isSuccessful = registerPush(uuid = getMyUuid(), fcmToken = token)
-                if (isSuccessful) {
-                    updateLocalFcmToken(fcmToken = token)
-                } else {
-                    updateLocalFcmToken(fcmToken = "")
-                }
-            }
-        }*/
     }
 }

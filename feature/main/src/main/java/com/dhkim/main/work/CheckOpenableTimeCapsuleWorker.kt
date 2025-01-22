@@ -5,17 +5,14 @@ import android.content.Intent
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.dhkim.common.DateUtil
 import com.dhkim.common.NotificationManager
+import com.dhkim.home.domain.usecase.CanOpenTimeCapsuleUseCase
 import com.dhkim.main.MainActivity
-import com.dhkim.home.domain.repository.TimeCapsuleRepository
+import com.dhkim.setting.domain.usecase.GetNotificationSettingUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -23,8 +20,8 @@ import javax.inject.Inject
 class CheckOpenableTimeCapsuleWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val timeCapsuleRepository: TimeCapsuleRepository,
-    private val settingRepository: com.dhkim.setting.domain.SettingRepository,
+    private val canOpenTimeCapsuleUseCase: CanOpenTimeCapsuleUseCase,
+    private val getNotificationSettingUseCase: GetNotificationSettingUseCase,
 ) : CoroutineWorker(context, params) {
 
     private val workerContext = context
@@ -37,20 +34,8 @@ class CheckOpenableTimeCapsuleWorker @AssistedInject constructor(
             val intent = Intent(workerContext, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
-            val isNotificationSettingOn = settingRepository.getNotificationSetting().first()
-            val isOpenableTimeCapsuleExist = combine(
-                timeCapsuleRepository.getMyAllTimeCapsule(),
-                timeCapsuleRepository.getReceivedAllTimeCapsule()
-            ) { myTimeCapsules, receivedTimeCapsules ->
-                val openableMyTimeCapsules = myTimeCapsules
-                    .filter { (!it.isOpened && DateUtil.isAfter(strDate = it.openDate)) }
-                val openableReceivedTimeCapsules = receivedTimeCapsules
-                    .filter { (!it.isOpened && DateUtil.isAfter(strDate = it.openDate)) }
-
-                openableMyTimeCapsules.isNotEmpty() || openableReceivedTimeCapsules.isNotEmpty()
-            }.catch { }.firstOrNull() ?: false
-
-            if (isOpenableTimeCapsuleExist) {
+            val isNotificationSettingOn = getNotificationSettingUseCase().first()
+            if (canOpenTimeCapsuleUseCase()) {
                 notificationManager.showNotification(
                     title = "알림",
                     desc = "오늘 개봉할 수 있는 타임캡슐이 존재합니다.",
