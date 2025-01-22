@@ -5,16 +5,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.dhkim.setting.domain.SettingRepository
 import com.dhkim.main.work.CheckOpenableTimeCapsuleWorker
+import com.dhkim.setting.domain.usecase.GetGuideSettingUseCase
+import com.dhkim.setting.domain.usecase.UpdateGuideSettingUseCase
 import com.dhkim.ui.Popup
-import com.dhkim.user.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -23,8 +22,8 @@ const val CHECK_OPENABLE_TIME_CAPSULE_WORK_NAME = "checkOpenableTimeCapsuleWork"
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val settingRepository: SettingRepository,
+    private val getGuideSettingUseCase: GetGuideSettingUseCase,
+    private val updateGuideSettingUseCase: UpdateGuideSettingUseCase,
     private val workManager: WorkManager
 ) : ViewModel() {
 
@@ -40,7 +39,7 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val showGuide = settingRepository.getGuideSetting().first()
+            val showGuide = getGuideSettingUseCase()
             _showGuide.emit(showGuide)
         }
 
@@ -63,18 +62,8 @@ class MainViewModel @Inject constructor(
 
     fun neverShowGuideAgain() {
         viewModelScope.launch {
-            settingRepository.updateGuideSetting(show = false)
+            updateGuideSettingUseCase(show = false)
             _showGuide.emit(false)
-        }
-    }
-
-    fun updateFcmToken(fcmToken: String) {
-        viewModelScope.launch {
-            userRepository.run {
-                /*if (getFcmToken().isEmpty()) {
-                    registerPush(getMyUuid(), fcmToken)
-                }*/
-            }
         }
     }
 }

@@ -1,11 +1,11 @@
-package com.dhkim.setting.domain
+package com.dhkim.setting.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 
 interface SettingRepository {
 
-    suspend fun getGuideSetting(): Flow<Boolean>
+    fun getGuideSetting(): Flow<Boolean>
     suspend fun updateGuideSetting(show: Boolean)
-    suspend fun getNotificationSetting(): Flow<Boolean>
+    fun getNotificationSetting(): Flow<Boolean>
     suspend fun updateNotificationSetting(isChecked: Boolean)
 }

@@ -1,7 +1,7 @@
 package com.dhkim.setting.data.di
 
 import com.dhkim.setting.data.repository.SettingRepositoryImpl
-import com.dhkim.setting.domain.SettingRepository
+import com.dhkim.setting.domain.repository.SettingRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

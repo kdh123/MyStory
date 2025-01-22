@@ -2,7 +2,7 @@ package com.dhkim.notification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.home.domain.repository.TimeCapsuleRepository
+import com.dhkim.home.domain.usecase.GetReceivedAllTimeCapsuleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,10 +13,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotificationViewModel @Inject constructor(
-    private val timeCapsuleRepository: TimeCapsuleRepository
+    private val getReceivedAllTimeCapsuleUseCase: GetReceivedAllTimeCapsuleUseCase
 ) : ViewModel() {
 
-    val uiState: StateFlow<NotificationUiState> = timeCapsuleRepository.getReceivedAllTimeCapsule()
+    val uiState: StateFlow<NotificationUiState> = getReceivedAllTimeCapsuleUseCase()
         .map { NotificationUiState(timeCapsules = it) }
         .catch { }
         .stateIn(
