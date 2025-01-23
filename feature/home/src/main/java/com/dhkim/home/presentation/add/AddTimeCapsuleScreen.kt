@@ -92,9 +92,9 @@ import com.dhkim.dhcamera.camera.DhCamera
 import com.dhkim.dhcamera.model.BackgroundText
 import com.dhkim.dhcamera.model.FontElement
 import com.dhkim.home.R
-import com.dhkim.home.domain.model.SharedFriend
 import com.dhkim.home.presentation.LocationSearchScreen
 import com.dhkim.location.domain.model.Place
+import com.dhkim.story.domain.model.SharedFriend
 import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted

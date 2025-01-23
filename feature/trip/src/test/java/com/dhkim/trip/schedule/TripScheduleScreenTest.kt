@@ -14,6 +14,9 @@ import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
 import com.dhkim.trip.data.di.TripModule
 import com.dhkim.trip.domain.repository.TripRepository
+import com.dhkim.trip.domain.usecase.GetTripUseCase
+import com.dhkim.trip.domain.usecase.SaveTripUseCase
+import com.dhkim.trip.domain.usecase.UpdateTripUseCase
 import com.dhkim.trip.presentation.schedule.TripScheduleScreen
 import com.dhkim.trip.presentation.schedule.TripScheduleViewModel
 import dagger.Binds
@@ -67,11 +70,22 @@ class TripScheduleScreenTest {
     @Inject
     lateinit var tripRepository: TripRepository
 
+    @Inject
+    lateinit var getTripUseCase: GetTripUseCase
+
+    @Inject
+    lateinit var saveTripUseCase: SaveTripUseCase
+
+    @Inject
+    lateinit var updateTripUseCase: UpdateTripUseCase
+
     @Before
     fun setup() {
         hiltRule.inject()
         viewModel = TripScheduleViewModel(
-            tripRepository = tripRepository,
+            getTripUseCase = getTripUseCase,
+            saveTripUseCase = saveTripUseCase,
+            updateTripUseCase = updateTripUseCase,
             savedStateHandle = SavedStateHandle(),
             ioDispatcher = UnconfinedTestDispatcher()
         )

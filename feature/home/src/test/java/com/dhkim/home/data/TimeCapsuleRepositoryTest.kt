@@ -2,7 +2,7 @@ package com.dhkim.home.data
 
 import com.dhkim.database.entity.MyTimeCapsuleEntity
 import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
-import com.dhkim.home.data.dataSource.toMyTimeCapsule
+import com.dhkim.story.data.dataSource.toMyTimeCapsule
 import com.dhkim.home.data.di.TimeCapsuleModule
 import com.dhkim.home.domain.repository.TimeCapsuleRepository
 import dagger.Binds

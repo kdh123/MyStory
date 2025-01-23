@@ -5,11 +5,11 @@ import android.content.Intent
 import android.util.Log
 import com.dhkim.common.DateUtil
 import com.dhkim.common.NotificationManager
-import com.dhkim.home.data.dataSource.remote.DeleteTimeCapsule
-import com.dhkim.home.domain.model.ReceivedTimeCapsule
-import com.dhkim.home.domain.model.SharedTimeCapsule
-import com.dhkim.home.domain.repository.TimeCapsuleRepository
 import com.dhkim.setting.domain.repository.SettingRepository
+import com.dhkim.story.data.dataSource.remote.DeleteTimeCapsule
+import com.dhkim.story.domain.model.ReceivedTimeCapsule
+import com.dhkim.story.domain.model.SharedTimeCapsule
+import com.dhkim.story.domain.repository.TimeCapsuleRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson

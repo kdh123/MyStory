@@ -11,18 +11,18 @@ import com.dhkim.home.data.FakeTimeCapsuleLocalDataSource
 import com.dhkim.home.data.FakeTimeCapsuleRepository
 import com.dhkim.home.data.FakeUserLocalDataSource
 import com.dhkim.home.data.FakeUserRemoteDataSource
-import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
-import com.dhkim.home.data.di.TimeCapsuleModule
-import com.dhkim.home.domain.usecase.DeleteTimeCapsuleUseCase
-import com.dhkim.home.domain.usecase.GetAllTimeCapsuleUseCase
-import com.dhkim.home.domain.repository.TimeCapsuleRepository
 import com.dhkim.home.presentation.TimeCapsuleScreen
 import com.dhkim.home.presentation.TimeCapsuleViewModel
-import com.dhkim.user.repository.UserRepositoryImpl
+import com.dhkim.story.data.dataSource.local.TimeCapsuleLocalDataSource
+import com.dhkim.story.data.di.TimeCapsuleModule
+import com.dhkim.story.domain.repository.TimeCapsuleRepository
+import com.dhkim.story.domain.usecase.DeleteTimeCapsuleUseCase
+import com.dhkim.story.domain.usecase.GetAllTimeCapsuleUseCase
 import com.dhkim.user.datasource.UserLocalDataSource
 import com.dhkim.user.datasource.UserRemoteDataSource
 import com.dhkim.user.di.UserModule
 import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.repository.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -91,12 +91,6 @@ class TimeCapsuleScreenTest {
 
     @get:Rule
     val composeRule = createComposeRule()
-
-    @Inject
-    lateinit var timeCapsuleRepository: TimeCapsuleRepository
-
-    @Inject
-    lateinit var userRepository: UserRepository
 
     @Inject
     lateinit var getAllTimeCapsuleUseCase: GetAllTimeCapsuleUseCase

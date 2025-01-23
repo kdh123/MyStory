@@ -8,11 +8,11 @@ import androidx.paging.cachedIn
 import com.dhkim.common.CommonResult
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
-import com.dhkim.home.domain.model.SharedFriend
-import com.dhkim.home.domain.usecase.SaveMyTimeCapsuleUseCase
 import com.dhkim.location.domain.model.Place
 import com.dhkim.location.domain.usecase.GetAddressUseCase
 import com.dhkim.location.domain.usecase.GetPlacesByKeywordUseCase
+import com.dhkim.story.domain.model.SharedFriend
+import com.dhkim.story.domain.usecase.SaveMyTimeCapsuleUseCase
 import com.dhkim.user.model.UserId
 import com.dhkim.user.usecase.GetMyInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

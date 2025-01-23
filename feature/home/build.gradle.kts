@@ -62,6 +62,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:user"))
     implementation(project(":core:ui"))
+    implementation(project(":core:story"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)

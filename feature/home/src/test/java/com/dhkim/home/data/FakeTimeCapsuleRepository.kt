@@ -2,8 +2,8 @@ package com.dhkim.home.data
 
 import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
 import com.dhkim.home.data.dataSource.remote.Uuid
-import com.dhkim.home.data.dataSource.toMyTimeCapsule
-import com.dhkim.home.data.dataSource.toReceivedTimeCapsule
+import com.dhkim.story.data.dataSource.toMyTimeCapsule
+import com.dhkim.story.data.dataSource.toReceivedTimeCapsule
 import com.dhkim.home.domain.model.MyTimeCapsule
 import com.dhkim.home.domain.model.ReceivedTimeCapsule
 import com.dhkim.home.domain.model.SendTimeCapsule
