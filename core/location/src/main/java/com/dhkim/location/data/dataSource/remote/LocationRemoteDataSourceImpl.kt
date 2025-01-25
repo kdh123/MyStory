@@ -19,7 +19,13 @@ class LocationRemoteDataSourceImpl @Inject constructor(
 
     override fun getNearPlaceByKeyword(query: String, lat: String, lng: String): Flow<PagingData<Place>> {
         return Pager(PagingConfig(pageSize = 15)) {
-            SearchPlaceByKeywordPagingSource(api = service, query = query, lat = lat, lng = lng, isNear = true)
+            SearchPlaceByKeywordPagingSource(
+                api = service,
+                query = query,
+                lat = lat,
+                lng = lng,
+                isNear = true
+            )
         }.flow
     }
 

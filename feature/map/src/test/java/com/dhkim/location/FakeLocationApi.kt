@@ -13,7 +13,7 @@ import com.dhkim.location.data.model.SameName
 import retrofit2.Response
 import javax.inject.Inject
 
-class FakeLocationApi @Inject constructor() : LocationApi {
+class FakeLocationApi @Inject constructor() : com.dhkim.location.data.dataSource.remote.LocationApi {
 
     private var isError = false
 

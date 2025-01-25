@@ -16,8 +16,8 @@ import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class FakeLocationRemoteDataSource @Inject constructor(
-    private val locationApi: LocationApi
-) : LocationRemoteDataSource {
+    private val locationApi: com.dhkim.location.data.dataSource.remote.LocationApi
+) : com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource {
 
     private val items = mutableListOf<Place>().apply {
         repeat(30) {

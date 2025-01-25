@@ -121,7 +121,7 @@ fun MapScreen(
     val context = LocalContext.current
     val places = uiState.places.collectAsLazyPagingItems()
     val paddingValues = WindowInsets.navigationBars.asPaddingValues()
-    val peekHeight = if (uiState.category != Category.None) 300.dp  else 0.dp
+    val peekHeight = if (uiState.category != Category.None) 300.dp else 0.dp
     var currentLocation by remember { mutableStateOf(Constants.defaultLocation) }
     val cameraPositionState = rememberCameraPositionState()
     val mapProperties by remember {
@@ -320,18 +320,20 @@ fun MapScreen(
                             category = it, isSelected = it == uiState.category
                         ) { category ->
                             if (isCategory(category)) {
-                                onAction(MapAction.SearchPlacesByCategory(
-                                    category = it,
-                                    lat = "${currentLocation.latitude}",
-                                    lng = "${currentLocation.longitude}"
-                                )
+                                onAction(
+                                    MapAction.SearchPlacesByCategory(
+                                        category = it,
+                                        lat = "${currentLocation.latitude}",
+                                        lng = "${currentLocation.longitude}"
+                                    )
                                 )
                             } else {
-                                onAction(MapAction.SearchPlacesByKeyword(
-                                    query = category.type,
-                                    lat = "${currentLocation.latitude}",
-                                    lng = "${currentLocation.longitude}"
-                                )
+                                onAction(
+                                    MapAction.SearchPlacesByKeyword(
+                                        query = category.type,
+                                        lat = "${currentLocation.latitude}",
+                                        lng = "${currentLocation.longitude}"
+                                    )
                                 )
                             }
                         }
@@ -594,7 +596,7 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
         ) {
             Icon(
                 tint = Color.Unspecified,
-                painter = painterResource(id = category.resId),
+                painter = painterResource(id = category.resId()),
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
@@ -606,6 +608,23 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
                     .align(Alignment.CenterVertically)
             )
         }
+    }
+}
+
+fun Category.resId(): Int {
+    return when (code) {
+        "Popular" -> com.dhkim.location.R.drawable.ic_star_red
+        "FD6" -> com.dhkim.location.R.drawable.ic_restaurant_gray
+        "CE7" -> com.dhkim.location.R.drawable.ic_cafe_orange
+        "EC1" -> com.dhkim.location.R.drawable.ic_run_primary
+        "BG2" -> com.dhkim.location.R.drawable.ic_board_purple
+        "PC3" -> com.dhkim.location.R.drawable.ic_computer_orange
+        "CT5" -> com.dhkim.location.R.drawable.ic_book_skyblue
+        "AT4" -> com.dhkim.location.R.drawable.ic_camera_green
+        "CT1" -> com.dhkim.location.R.drawable.ic_attraction_sky_blue
+        "DOG" -> com.dhkim.location.R.mipmap.ic_dog_orange
+        "AD5" -> com.dhkim.location.R.drawable.ic_hotel_purple
+        else -> com.dhkim.location.R.drawable.ic_time_primary
     }
 }
 

@@ -1,6 +1,6 @@
 package com.dhkim.location.data.dataSource.remote
 
-import com.dhkim.location.BuildConfig
+import com.dhkim.core.location.BuildConfig
 import com.dhkim.location.data.model.AddressDto
 import com.dhkim.location.data.model.PlaceDto
 import retrofit2.Response

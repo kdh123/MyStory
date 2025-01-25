@@ -13,7 +13,7 @@ val localProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.dhkim.location"
+    namespace = "com.dhkim.core.location"
     compileSdk = 34
 
     defaultConfig {
@@ -22,12 +22,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "KAKAO_API_KEY", localProperties["KAKAO_API_KEY"] as String)
-
-        testOptions {
-            unitTests {
-                isIncludeAndroidResources = true
-            }
-        }
     }
 
     buildTypes {
@@ -36,17 +30,16 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     buildFeatures {
-        compose = true
         buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -54,14 +47,11 @@ android {
 
 dependencies {
 
-    implementation(project(":core:location"))
     implementation(project(":core:common"))
     implementation(project(":core:network"))
 
-    implementation(libs.bundles.androidx.compose.main)
-    implementation(libs.bundles.androidx.compose.side)
     implementation(libs.bundles.naver.map)
-    implementation(libs.bundles.androidx.paging3)
+    implementation(libs.androidx.paging.common)
     implementation(libs.bundles.retrofit)
 
     implementation(libs.hilt)
@@ -70,16 +60,12 @@ dependencies {
 
     //test
     testImplementation(libs.bundles.androidx.paging3)
+    testImplementation(libs.androidx.paging.testing)
     testImplementation(libs.bundles.test)
     kaptTest(libs.hilt.compiler)
     testAnnotationProcessor(libs.hilt.compiler)
-    androidTestImplementation(libs.bundles.androidx.ui.test)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     kaptAndroidTest(libs.hilt.compiler)
     androidTestAnnotationProcessor(libs.hilt.compiler)
-    debugImplementation(libs.bundles.debug.ui.test)
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
 }

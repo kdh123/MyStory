@@ -1,8 +1,5 @@
 package com.dhkim.location.data.di
 
-import com.dhkim.location.data.dataSource.remote.LocationApi
-import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
-import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSourceImpl
 import com.dhkim.location.data.repository.LocationRepositoryImpl
 import com.dhkim.location.domain.repository.LocationRepository
 import dagger.Binds
@@ -23,7 +20,7 @@ abstract class LocationModule {
 
     @Binds
     @Singleton
-    abstract fun bindLocationRemoteDataSource(locationRemoteDataSourceImpl: LocationRemoteDataSourceImpl): LocationRemoteDataSource
+    abstract fun bindLocationRemoteDataSource(locationRemoteDataSourceImpl: com.dhkim.location.data.dataSource.remote.LocationRemoteDataSourceImpl): com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
 }
 
 @Module
@@ -32,7 +29,7 @@ object LocationApiModule {
 
     @Provides
     @Singleton
-    fun provideLocationApi(@com.dhkim.network.di.RetrofitModule.KakaoLocal retrofit: Retrofit): LocationApi {
-        return retrofit.create(LocationApi::class.java)
+    fun provideLocationApi(@com.dhkim.network.di.RetrofitModule.KakaoLocal retrofit: Retrofit): com.dhkim.location.data.dataSource.remote.LocationApi {
+        return retrofit.create(com.dhkim.location.data.dataSource.remote.LocationApi::class.java)
     }
 }

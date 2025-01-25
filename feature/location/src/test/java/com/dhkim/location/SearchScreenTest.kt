@@ -59,11 +59,11 @@ class SearchScreenTest {
 
         @Binds
         @Singleton
-        abstract fun bindLocationRemoteDataSource(locationRemoteDataSource: FakeLocationRemoteDataSource): LocationRemoteDataSource
+        abstract fun bindLocationRemoteDataSource(locationRemoteDataSource: FakeLocationRemoteDataSource): com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
 
         @Binds
         @Singleton
-        abstract fun bindFakeLocationApi(fakeLocationApi: FakeLocationApi): LocationApi
+        abstract fun bindFakeLocationApi(fakeLocationApi: FakeLocationApi): com.dhkim.location.data.dataSource.remote.LocationApi
     }
 
     @get:Rule

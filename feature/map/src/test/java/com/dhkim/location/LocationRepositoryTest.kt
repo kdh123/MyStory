@@ -4,9 +4,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.testing.TestPager
 import androidx.paging.testing.asSnapshot
-import com.dhkim.location.data.dataSource.remote.LocationApi
-import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
-import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSourceImpl
 import com.dhkim.location.data.dataSource.remote.SearchPlaceByKeywordPagingSource
 import com.dhkim.location.data.di.LocationApiModule
 import com.dhkim.location.data.di.LocationModule
@@ -65,11 +62,11 @@ class LocationRepositoryTest {
 
         @Binds
         @Singleton
-        abstract fun bindLocationRemoteDataSource(locationRemoteDataSource: LocationRemoteDataSourceImpl): LocationRemoteDataSource
+        abstract fun bindLocationRemoteDataSource(locationRemoteDataSource: com.dhkim.location.data.dataSource.remote.LocationRemoteDataSourceImpl): com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
 
         @Binds
         @Singleton
-        abstract fun bindFakeLocationApi(fakeLocationApi: FakeLocationApi): LocationApi
+        abstract fun bindFakeLocationApi(fakeLocationApi: FakeLocationApi): com.dhkim.location.data.dataSource.remote.LocationApi
 
         //아래와 같이 LocationRemoteDataSourceImpl(상용 데이터 소스)를 사용하면 실제 서버에서 데이터 가져옴
         /*@Binds

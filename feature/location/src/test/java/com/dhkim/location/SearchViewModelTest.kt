@@ -43,9 +43,6 @@ class SearchViewModelTest {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
-    @Inject
-    lateinit var locationRepository: LocationRepository
-
     private lateinit var viewModel: SearchViewModel
 
     @get:Rule
@@ -75,11 +72,11 @@ class SearchViewModelTest {
 
         @Binds
         @Singleton
-        abstract fun bindLocationRemoteDataSource(locationRemoteDataSource: LocationRemoteDataSourceImpl): LocationRemoteDataSource
+        abstract fun bindLocationRemoteDataSource(locationRemoteDataSource: com.dhkim.location.data.dataSource.remote.LocationRemoteDataSourceImpl): com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
 
         @Binds
         @Singleton
-        abstract fun bindFakeLocationApi(fakeLocationApi: FakeLocationApi): LocationApi
+        abstract fun bindFakeLocationApi(fakeLocationApi: FakeLocationApi): com.dhkim.location.data.dataSource.remote.LocationApi
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

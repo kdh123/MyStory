@@ -46,6 +46,7 @@ android {
 dependencies {
 
     implementation(project(":core:story"))
+    implementation(project(":core:location"))
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
     implementation(project(":core:user"))
