@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TripDetailViewModel @Inject constructor(
+internal class TripDetailViewModel @Inject constructor(
     private val getTripUseCase: GetTripUseCase,
     private val deleteTripUseCase: DeleteTripUseCase,
     private val updateTripUseCase: UpdateTripUseCase,

@@ -135,7 +135,7 @@ class AppState(
 
 @SuppressLint("ComposableNaming")
 @Composable
-fun rememberMyStoryAppState(
+internal fun rememberMyStoryAppState(
     navController: NavHostController = rememberNavController(),
 ): AppState {
     return remember(

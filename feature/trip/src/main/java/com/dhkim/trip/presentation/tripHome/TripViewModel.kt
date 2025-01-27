@@ -20,7 +20,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class TripViewModel @Inject constructor(
+internal class TripViewModel @Inject constructor(
     private val getAllTripsUseCase: GetAllTripsUseCase,
     private val deleteTripUseCase: DeleteTripUseCase,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher

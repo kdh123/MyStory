@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MapViewModel @Inject constructor(
+internal class MapViewModel @Inject constructor(
     private val getNearPlaceByKeywordUseCase: GetNearPlacesByKeywordUseCase,
     private val getPlacesByCategoryUseCase: GetPlacesByCategoryUseCase,
 ) : ViewModel() {

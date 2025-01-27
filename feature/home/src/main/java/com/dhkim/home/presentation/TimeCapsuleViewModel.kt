@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TimeCapsuleViewModel @Inject constructor(
+internal class TimeCapsuleViewModel @Inject constructor(
     private val getAllTimeCapsuleUseCase: GetAllTimeCapsuleUseCase,
     private val deleteTimeCapsuleUseCase: DeleteTimeCapsuleUseCase,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher

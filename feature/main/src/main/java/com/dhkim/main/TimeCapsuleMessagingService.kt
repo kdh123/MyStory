@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 @AndroidEntryPoint
-class TimeCapsuleMessagingService : FirebaseMessagingService() {
+internal class TimeCapsuleMessagingService : FirebaseMessagingService() {
 
     @Inject
     lateinit var timeCapsuleRepository: TimeCapsuleRepository

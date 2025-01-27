@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchViewModel @Inject constructor(
+internal class SearchViewModel @Inject constructor(
     private val getNearPlacesByKeywordUseCase: GetNearPlacesByKeywordUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
