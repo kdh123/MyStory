@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.dhkim.setting"
+    namespace = "com.dhkim.core.setting"
     compileSdk = 34
 
     defaultConfig {
@@ -26,12 +26,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -40,20 +34,15 @@ android {
 dependencies {
 
     implementation(project(":core:datastore"))
-    implementation(project(":core:setting"))
 
-    //implementation(libs.bundles.androidx.datastore)
-    implementation(libs.bundles.androidx.compose.main)
-    implementation(libs.bundles.androidx.compose.side)
+    implementation(libs.bundles.androidx.datastore)
+    implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.hilt)
     kapt(libs.androidx.hilt.compiler)
     kapt(libs.hilt.compiler)
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }

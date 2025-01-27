@@ -45,6 +45,7 @@ android {
 
 dependencies {
 
+    implementation(project(":core:setting"))
     implementation(project(":core:story"))
     implementation(project(":core:location"))
     implementation(project(":core:common"))
@@ -52,9 +53,9 @@ dependencies {
     implementation(project(":core:user"))
     implementation(project(":feature:friend"))
     implementation(project(":feature:location"))
+    implementation(project(":feature:setting"))
     implementation(project(":feature:map"))
     implementation(project(":feature:notification"))
-    implementation(project(":feature:setting"))
     implementation(project(":feature:home"))
     implementation(project(":feature:trip"))
 
