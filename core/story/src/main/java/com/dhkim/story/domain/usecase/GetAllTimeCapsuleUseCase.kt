@@ -4,7 +4,7 @@ import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.story.domain.repository.TimeCapsuleRepository
-import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

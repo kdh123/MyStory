@@ -1,8 +1,8 @@
-package com.dhkim.user.datasource
+package com.dhkim.user.data.datasource
 
 import com.dhkim.common.CommonResult
-import com.dhkim.user.model.Friend
-import com.dhkim.user.model.User
+import com.dhkim.user.domain.model.Friend
+import com.dhkim.user.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface UserRemoteDataSource {

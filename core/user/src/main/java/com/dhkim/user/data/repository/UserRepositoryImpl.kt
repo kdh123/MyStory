@@ -1,23 +1,18 @@
-package com.dhkim.user.repository
+package com.dhkim.user.data.repository
 
 import com.dhkim.common.CommonResult
-import com.dhkim.user.datasource.UserLocalDataSource
-import com.dhkim.user.model.toEntity
-import com.dhkim.user.model.toLocalFriend
-import com.dhkim.user.model.Friend
-import com.dhkim.user.model.LocalFriend
-import com.dhkim.user.model.User
-import com.dhkim.user.datasource.UserRemoteDataSource
-import com.dhkim.user.datasource.isSuccessful
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.dhkim.user.data.datasource.UserLocalDataSource
+import com.dhkim.user.domain.model.toLocalFriend
+import com.dhkim.user.domain.model.Friend
+import com.dhkim.user.domain.model.LocalFriend
+import com.dhkim.user.domain.model.User
+import com.dhkim.user.data.datasource.UserRemoteDataSource
+import com.dhkim.user.data.datasource.isSuccessful
+import com.dhkim.user.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 

@@ -1,4 +1,4 @@
-package com.dhkim.user.model
+package com.dhkim.user.domain.model
 
 data class LocalFriend(
     val id: String = "",

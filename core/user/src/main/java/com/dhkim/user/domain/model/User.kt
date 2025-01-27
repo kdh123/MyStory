@@ -1,4 +1,4 @@
-package com.dhkim.user.model
+package com.dhkim.user.domain.model
 
 typealias UserId = String
 typealias Nickname = String

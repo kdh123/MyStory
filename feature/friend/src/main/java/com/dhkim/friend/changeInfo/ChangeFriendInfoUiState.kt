@@ -1,6 +1,6 @@
 package com.dhkim.friend.changeInfo
 
-import com.dhkim.user.model.Friend
+import com.dhkim.user.domain.model.Friend
 
 data class ChangeFriendInfoUiState(
     val isLoading: Boolean = false,

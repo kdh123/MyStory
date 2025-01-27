@@ -1,13 +1,13 @@
 package com.dhkim.user
 
-import com.dhkim.user.repository.UserRepositoryImpl
-import com.dhkim.user.datasource.UserLocalDataSource
-import com.dhkim.user.datasource.UserRemoteDataSource
-import com.dhkim.user.di.UserModule
-import com.dhkim.user.model.Friend
-import com.dhkim.user.model.User
-import com.dhkim.user.repository.UserRepository
-import com.dhkim.user.usecase.GetMyInfoUseCase
+import com.dhkim.user.data.repository.UserRepositoryImpl
+import com.dhkim.user.data.datasource.UserLocalDataSource
+import com.dhkim.user.data.datasource.UserRemoteDataSource
+import com.dhkim.user.data.di.UserModule
+import com.dhkim.user.domain.model.Friend
+import com.dhkim.user.domain.model.User
+import com.dhkim.user.domain.repository.UserRepository
+import com.dhkim.user.domain.usecase.GetMyInfoUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

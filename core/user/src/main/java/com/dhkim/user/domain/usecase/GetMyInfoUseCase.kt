@@ -1,7 +1,7 @@
-package com.dhkim.user.usecase
+package com.dhkim.user.domain.usecase
 
-import com.dhkim.user.model.User
-import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.domain.model.User
+import com.dhkim.user.domain.repository.UserRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest

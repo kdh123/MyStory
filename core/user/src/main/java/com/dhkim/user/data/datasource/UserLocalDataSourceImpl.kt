@@ -1,4 +1,4 @@
-package com.dhkim.user.datasource
+package com.dhkim.user.data.datasource
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

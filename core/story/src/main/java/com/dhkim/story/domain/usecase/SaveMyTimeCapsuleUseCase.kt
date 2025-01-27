@@ -4,7 +4,7 @@ import com.dhkim.common.DateUtil
 import com.dhkim.story.domain.model.MyTimeCapsule
 import com.dhkim.story.domain.model.SharedFriend
 import com.dhkim.story.domain.repository.TimeCapsuleRepository
-import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow

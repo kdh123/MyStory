@@ -12,11 +12,11 @@ import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.story.domain.repository.TimeCapsuleRepository
 import com.dhkim.story.domain.usecase.DeleteTimeCapsuleUseCase
 import com.dhkim.story.domain.usecase.GetAllTimeCapsuleUseCase
-import com.dhkim.user.datasource.UserLocalDataSource
-import com.dhkim.user.datasource.UserRemoteDataSource
-import com.dhkim.user.di.UserModule
-import com.dhkim.user.repository.UserRepository
-import com.dhkim.user.repository.UserRepositoryImpl
+import com.dhkim.user.data.datasource.UserLocalDataSource
+import com.dhkim.user.data.datasource.UserRemoteDataSource
+import com.dhkim.user.data.di.UserModule
+import com.dhkim.user.domain.repository.UserRepository
+import com.dhkim.user.data.repository.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -1,8 +1,8 @@
 package com.dhkim.story.domain.usecase
 
 import com.dhkim.story.domain.repository.TimeCapsuleRepository
-import com.dhkim.user.repository.UserRepository
-import com.dhkim.user.usecase.GetMyInfoUseCase
+import com.dhkim.user.domain.repository.UserRepository
+import com.dhkim.user.domain.usecase.GetMyInfoUseCase
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject

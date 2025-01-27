@@ -13,8 +13,8 @@ import com.dhkim.location.domain.usecase.GetAddressUseCase
 import com.dhkim.location.domain.usecase.GetPlacesByKeywordUseCase
 import com.dhkim.story.domain.model.SharedFriend
 import com.dhkim.story.domain.usecase.SaveMyTimeCapsuleUseCase
-import com.dhkim.user.model.UserId
-import com.dhkim.user.usecase.GetMyInfoUseCase
+import com.dhkim.user.domain.model.UserId
+import com.dhkim.user.domain.usecase.GetMyInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi

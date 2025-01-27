@@ -1,4 +1,4 @@
-package com.dhkim.user.datasource
+package com.dhkim.user.data.datasource
 
 import com.dhkim.network.BuildConfig
 import retrofit2.Response

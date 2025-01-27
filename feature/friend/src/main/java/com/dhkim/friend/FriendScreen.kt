@@ -75,8 +75,8 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.Popup
 import com.dhkim.ui.onStartCollect
-import com.dhkim.user.model.Friend
-import com.dhkim.user.model.User
+import com.dhkim.user.domain.model.Friend
+import com.dhkim.user.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 

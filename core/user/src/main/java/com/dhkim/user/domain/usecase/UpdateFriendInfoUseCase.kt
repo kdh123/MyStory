@@ -1,8 +1,8 @@
-package com.dhkim.user.usecase
+package com.dhkim.user.domain.usecase
 
-import com.dhkim.user.datasource.isSuccessful
-import com.dhkim.user.model.Friend
-import com.dhkim.user.repository.UserRepository
+import com.dhkim.user.data.datasource.isSuccessful
+import com.dhkim.user.domain.model.Friend
+import com.dhkim.user.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

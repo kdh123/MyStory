@@ -1,10 +1,10 @@
 package com.dhkim.user
 
 import com.dhkim.common.CommonResult
-import com.dhkim.user.datasource.UserRemoteDataSource
-import com.dhkim.user.datasource.isSuccessful
-import com.dhkim.user.model.Friend
-import com.dhkim.user.model.User
+import com.dhkim.user.data.datasource.UserRemoteDataSource
+import com.dhkim.user.data.datasource.isSuccessful
+import com.dhkim.user.domain.model.Friend
+import com.dhkim.user.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf

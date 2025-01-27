@@ -1,10 +1,10 @@
-package com.dhkim.user.repository
+package com.dhkim.user.domain.repository
 
 import com.dhkim.common.CommonResult
-import com.dhkim.user.datasource.isSuccessful
-import com.dhkim.user.model.Friend
-import com.dhkim.user.model.LocalFriend
-import com.dhkim.user.model.User
+import com.dhkim.user.data.datasource.isSuccessful
+import com.dhkim.user.domain.model.Friend
+import com.dhkim.user.domain.model.LocalFriend
+import com.dhkim.user.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
