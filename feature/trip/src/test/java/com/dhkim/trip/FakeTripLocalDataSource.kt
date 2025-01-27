@@ -1,11 +1,11 @@
 package com.dhkim.trip
 
+import com.dhkim.core.trip.data.dataSource.local.TripLocalDataSource
+import com.dhkim.core.trip.data.toTrip
+import com.dhkim.core.trip.domain.model.Trip
+import com.dhkim.core.trip.domain.model.TripType
 import com.dhkim.database.TripImageDto
 import com.dhkim.database.entity.TripEntity
-import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
-import com.dhkim.trip.data.toTrip
-import com.dhkim.trip.domain.model.Trip
-import com.dhkim.trip.domain.model.TripType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf

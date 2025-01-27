@@ -9,14 +9,14 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dhkim.core.trip.data.dataSource.local.TripLocalDataSource
+import com.dhkim.core.trip.data.dataSource.local.TripRepositoryImpl
+import com.dhkim.core.trip.data.di.TripModule
+import com.dhkim.core.trip.domain.repository.TripRepository
+import com.dhkim.core.trip.domain.usecase.GetTripUseCase
+import com.dhkim.core.trip.domain.usecase.SaveTripUseCase
+import com.dhkim.core.trip.domain.usecase.UpdateTripUseCase
 import com.dhkim.trip.FakeTripLocalDataSource
-import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
-import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
-import com.dhkim.trip.data.di.TripModule
-import com.dhkim.trip.domain.repository.TripRepository
-import com.dhkim.trip.domain.usecase.GetTripUseCase
-import com.dhkim.trip.domain.usecase.SaveTripUseCase
-import com.dhkim.trip.domain.usecase.UpdateTripUseCase
 import com.dhkim.trip.presentation.schedule.TripScheduleScreen
 import com.dhkim.trip.presentation.schedule.TripScheduleViewModel
 import dagger.Binds
@@ -66,9 +66,6 @@ class TripScheduleScreenTest {
     val composeTestRule = createComposeRule()
 
     private lateinit var viewModel: TripScheduleViewModel
-
-    @Inject
-    lateinit var tripRepository: TripRepository
 
     @Inject
     lateinit var getTripUseCase: GetTripUseCase

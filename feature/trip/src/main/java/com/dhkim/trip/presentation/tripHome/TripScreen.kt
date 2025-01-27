@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.trip.R
-import com.dhkim.trip.domain.model.Trip
+import com.dhkim.core.trip.domain.model.Trip
 import com.dhkim.ui.Popup
 import com.dhkim.ui.noRippleClick
 import com.skydoves.landscapist.glide.GlideImage

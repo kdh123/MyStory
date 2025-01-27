@@ -2,14 +2,14 @@ package com.dhkim.trip.schedule
 
 import androidx.lifecycle.SavedStateHandle
 import com.dhkim.trip.FakeTripLocalDataSource
-import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
-import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
-import com.dhkim.trip.data.di.TripModule
-import com.dhkim.trip.domain.repository.TripRepository
-import com.dhkim.trip.domain.model.TripPlace
-import com.dhkim.trip.domain.usecase.GetTripUseCase
-import com.dhkim.trip.domain.usecase.SaveTripUseCase
-import com.dhkim.trip.domain.usecase.UpdateTripUseCase
+import com.dhkim.core.trip.data.dataSource.local.TripLocalDataSource
+import com.dhkim.core.trip.data.dataSource.local.TripRepositoryImpl
+import com.dhkim.core.trip.data.di.TripModule
+import com.dhkim.core.trip.domain.repository.TripRepository
+import com.dhkim.core.trip.domain.model.TripPlace
+import com.dhkim.core.trip.domain.usecase.GetTripUseCase
+import com.dhkim.core.trip.domain.usecase.SaveTripUseCase
+import com.dhkim.core.trip.domain.usecase.UpdateTripUseCase
 import com.dhkim.trip.presentation.schedule.TripScheduleAction
 import com.dhkim.trip.presentation.schedule.TripScheduleViewModel
 import dagger.Binds
@@ -39,7 +39,7 @@ import javax.inject.Singleton
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
-@UninstallModules(TripModule::class)
+@UninstallModules(com.dhkim.core.trip.data.di.TripModule::class)
 class TripScheduleViewModelTest {
 
     @Module
@@ -48,11 +48,11 @@ class TripScheduleViewModelTest {
 
         @Binds
         @Singleton
-        abstract fun bindTripRepository(tripRepositoryImpl: TripRepositoryImpl): TripRepository
+        abstract fun bindTripRepository(tripRepositoryImpl: com.dhkim.core.trip.data.dataSource.local.TripRepositoryImpl): com.dhkim.core.trip.domain.repository.TripRepository
 
         @Binds
         @Singleton
-        abstract fun bindTripLocalDataSource(fakeTripLocalDataSourceImpl: FakeTripLocalDataSource): TripLocalDataSource
+        abstract fun bindTripLocalDataSource(fakeTripLocalDataSourceImpl: FakeTripLocalDataSource): com.dhkim.core.trip.data.dataSource.local.TripLocalDataSource
     }
 
     @get:Rule
@@ -60,16 +60,16 @@ class TripScheduleViewModelTest {
 
     private lateinit var viewModel: TripScheduleViewModel
 
-    @Inject lateinit var tripRepository: TripRepository
+    @Inject lateinit var tripRepository: com.dhkim.core.trip.domain.repository.TripRepository
 
     @Inject
-    lateinit var getTripUseCase: GetTripUseCase
+    lateinit var getTripUseCase: com.dhkim.core.trip.domain.usecase.GetTripUseCase
 
     @Inject
-    lateinit var saveTripUseCase: SaveTripUseCase
+    lateinit var saveTripUseCase: com.dhkim.core.trip.domain.usecase.SaveTripUseCase
 
     @Inject
-    lateinit var updateTripUseCase: UpdateTripUseCase
+    lateinit var updateTripUseCase: com.dhkim.core.trip.domain.usecase.UpdateTripUseCase
 
     @Before
     fun setup() {
@@ -94,9 +94,9 @@ class TripScheduleViewModelTest {
     @Test
     fun `여행 장소 선택 테스트`() = runBlocking {
         viewModel.uiState.first()
-        viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.Seoul))
-        viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.Gyeongi))
-        viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.AbroadPlace.USA))
+        viewModel.onAction(TripScheduleAction.UpdatePlaces(com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace.Seoul))
+        viewModel.onAction(TripScheduleAction.UpdatePlaces(com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace.Gyeongi))
+        viewModel.onAction(TripScheduleAction.UpdatePlaces(com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace.USA))
 
         delay(100)
         assertEquals(viewModel.uiState.value.tripPlaces.size, 3)

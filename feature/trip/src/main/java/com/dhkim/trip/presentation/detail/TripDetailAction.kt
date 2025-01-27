@@ -1,7 +1,7 @@
 package com.dhkim.trip.presentation.detail
 
-import com.dhkim.trip.domain.model.Trip
-import com.dhkim.trip.domain.model.TripImage
+import com.dhkim.core.trip.domain.model.Trip
+import com.dhkim.core.trip.domain.model.TripImage
 
 sealed interface TripDetailAction {
 

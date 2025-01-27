@@ -49,6 +49,7 @@ android {
 
 dependencies {
 
+    implementation(project(":core:trip"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
     implementation(project(":feature:setting"))

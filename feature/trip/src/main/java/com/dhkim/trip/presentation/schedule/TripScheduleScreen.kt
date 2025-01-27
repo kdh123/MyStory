@@ -54,9 +54,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
 import com.dhkim.trip.R
-import com.dhkim.trip.domain.model.TripPlace
-import com.dhkim.trip.domain.model.TripType
-import com.dhkim.trip.domain.model.toTripType
+import com.dhkim.core.trip.domain.model.TripPlace
+import com.dhkim.core.trip.domain.model.TripType
+import com.dhkim.core.trip.domain.model.toTripType
 import com.dhkim.ui.noRippleClick
 import com.dhkim.ui.onStartCollect
 import kotlinx.collections.immutable.ImmutableList
@@ -312,7 +312,7 @@ private fun TripTypeScreen(
                 .height(0.dp)
                 .weight(1f)
         ) {
-            itemsIndexed(items = TripType.entries.toTypedArray(), key = { _, item ->
+            itemsIndexed(items = com.dhkim.core.trip.domain.model.TripType.entries.toTypedArray(), key = { _, item ->
                 item.type
             }) { index, item ->
                 TripTypeItem(
@@ -623,7 +623,7 @@ fun TripPlaceBottom(
 
 @Composable
 private fun DomesticPlaces(
-    tripPlaces: ImmutableList<TripPlace>,
+    tripPlaces: ImmutableList<com.dhkim.core.trip.domain.model.TripPlace>,
     onAction: (TripScheduleAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -632,12 +632,12 @@ private fun DomesticPlaces(
         modifier = modifier
     ) {
         itemsIndexed(
-            items = TripPlace.DomesticPlace.entries.toTypedArray(),
+            items = com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace.entries.toTypedArray(),
             key = { index, _ ->
                 index
             }) { index, item ->
             val isDomesticSelected = tripPlaces
-                .filterIsInstance<TripPlace.DomesticPlace>()
+                .filterIsInstance<com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace>()
                 .map { it.placeName }
                 .contains(item.placeName)
             PlaceItem(
@@ -703,7 +703,7 @@ fun PlaceItem(
                 .align(Alignment.CenterVertically)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .noRippleClick {
-                    val entries = if (isDomestic) TripPlace.DomesticPlace.entries else TripPlace.AbroadPlace.entries
+                    val entries = if (isDomestic) com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace.entries else com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace.entries
                     onAction(TripScheduleAction.UpdatePlaces(entries[index]))
                 }
                 .testTag(placeName)
@@ -713,7 +713,7 @@ fun PlaceItem(
 
 @Composable
 private fun AbroadPlaces(
-    tripPlaces: ImmutableList<TripPlace>,
+    tripPlaces: ImmutableList<com.dhkim.core.trip.domain.model.TripPlace>,
     onAction: (TripScheduleAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -722,12 +722,12 @@ private fun AbroadPlaces(
         modifier = modifier
     ) {
         itemsIndexed(
-            items = TripPlace.AbroadPlace.entries.toTypedArray(),
+            items = com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace.entries.toTypedArray(),
             key = { index, _ ->
                 index
             }) { index, item ->
             val isAbroadSelected = tripPlaces
-                .filterIsInstance<TripPlace.AbroadPlace>()
+                .filterIsInstance<com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace>()
                 .map { it.placeName }
                 .contains(item.placeName)
 
