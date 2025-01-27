@@ -7,7 +7,7 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Header
 import retrofit2.http.POST
 
-interface TimeCapsuleApi {
+internal interface TimeCapsuleApi {
 
     @FormUrlEncoded
     @POST("send")

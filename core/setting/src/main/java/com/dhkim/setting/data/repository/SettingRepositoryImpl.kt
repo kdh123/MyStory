@@ -5,7 +5,7 @@ import com.dhkim.setting.domain.repository.SettingRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class SettingRepositoryImpl @Inject constructor(
+internal class SettingRepositoryImpl @Inject constructor(
     private val localDataSource: SettingLocalDataSource
 ) : SettingRepository {
 

@@ -7,7 +7,7 @@ import com.dhkim.database.entity.SendTimeCapsuleEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class TimeCapsuleLocalDataSourceImpl @Inject constructor(
+internal class TimeCapsuleLocalDataSourceImpl @Inject constructor(
     private val db: AppDatabase
 ) : TimeCapsuleLocalDataSource {
 

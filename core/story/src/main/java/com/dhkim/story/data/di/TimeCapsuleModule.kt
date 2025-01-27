@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class TimeCapsuleModule {
+internal abstract class TimeCapsuleModule {
 
     @Binds
     @Singleton

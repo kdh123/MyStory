@@ -8,7 +8,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query
 
-interface LocationApi {
+internal interface LocationApi {
 
     @GET("search/keyword")
     suspend fun getNearPlaceByKeyword(

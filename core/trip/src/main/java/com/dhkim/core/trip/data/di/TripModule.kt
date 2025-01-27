@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class TripModule {
+internal abstract class TripModule {
 
     @Binds
     @Singleton

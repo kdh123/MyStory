@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class UserLocalDataSourceImpl @Inject constructor(
+internal class UserLocalDataSourceImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val db: AppDatabase
 ) : UserLocalDataSource {

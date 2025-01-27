@@ -4,7 +4,7 @@ import com.dhkim.location.domain.model.Place
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
-data class PlaceDocument(
+internal data class PlaceDocument(
     val address_name: String,
     val category_group_code: String,
     val category_group_name: String,

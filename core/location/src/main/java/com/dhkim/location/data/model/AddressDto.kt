@@ -2,7 +2,7 @@ package com.dhkim.location.data.model
 
 import com.dhkim.location.domain.model.Address
 
-data class AddressDto(
+internal data class AddressDto(
     val documents: List<AddressDocument>,
     val meta: AddressMeta
 ) {

@@ -3,7 +3,7 @@ package com.dhkim.user.data.datasource
 import com.dhkim.database.entity.FriendEntity
 import kotlinx.coroutines.flow.Flow
 
-interface UserLocalDataSource {
+internal interface UserLocalDataSource {
 
     fun getAllFriend(): Flow<List<FriendEntity>?>
     fun getFriend(id: String): FriendEntity?

@@ -1,6 +1,6 @@
 package com.dhkim.location.data.model
 
-data class Address(
+internal data class Address(
     val address_name: String,
     val main_address_no: String,
     val mountain_yn: String,

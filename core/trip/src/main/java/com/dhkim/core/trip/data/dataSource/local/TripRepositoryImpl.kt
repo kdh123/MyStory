@@ -5,7 +5,7 @@ import com.dhkim.core.trip.domain.model.Trip
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class TripRepositoryImpl @Inject constructor(
+internal class TripRepositoryImpl @Inject constructor(
     private val localDataSource: TripLocalDataSource
 ) : TripRepository {
 

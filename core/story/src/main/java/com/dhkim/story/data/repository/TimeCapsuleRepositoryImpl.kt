@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 typealias isSuccessful = Boolean
 
-class TimeCapsuleRepositoryImpl @Inject constructor(
+internal class TimeCapsuleRepositoryImpl @Inject constructor(
     private val localDataSource: TimeCapsuleLocalDataSource,
     private val remoteDataSource: TimeCapsuleRemoteDataSource
 ) : TimeCapsuleRepository {

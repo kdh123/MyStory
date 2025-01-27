@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class TripLocalDataSourceImpl @Inject constructor(
+internal class TripLocalDataSourceImpl @Inject constructor(
     private val db: AppDatabase
 ) : TripLocalDataSource {
 

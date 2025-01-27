@@ -1,5 +1,5 @@
 package com.dhkim.story.data.dataSource.remote
 
-data class SendTimeCapsuleResponse(
+internal data class SendTimeCapsuleResponse(
     val name: String
 )

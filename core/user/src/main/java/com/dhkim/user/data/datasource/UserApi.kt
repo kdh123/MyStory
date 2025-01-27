@@ -9,7 +9,7 @@ import retrofit2.http.POST
 
 typealias expiredDate = Int
 
-interface UserApi {
+internal interface UserApi {
     @FormUrlEncoded
     @POST("register")
     suspend fun registerPush(

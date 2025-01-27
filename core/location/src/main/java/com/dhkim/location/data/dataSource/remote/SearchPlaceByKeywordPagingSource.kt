@@ -6,7 +6,7 @@ import com.dhkim.location.domain.model.Place
 import retrofit2.HttpException
 import java.io.IOException
 
-class SearchPlaceByKeywordPagingSource(
+internal class SearchPlaceByKeywordPagingSource(
     private val api: LocationApi,
     private val query: String,
     private val lat: String = "",

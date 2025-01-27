@@ -9,7 +9,7 @@ import javax.inject.Inject
 typealias isSuccessful = Boolean
 typealias Uuid = String
 
-class TimeCapsuleRemoteDataSource @Inject constructor(
+internal class TimeCapsuleRemoteDataSource @Inject constructor(
     @com.dhkim.network.di.RetrofitModule.Fcm private val api: Retrofit,
     @com.dhkim.network.di.RetrofitModule.KakaoPush private val pushApi: Retrofit
 ) {

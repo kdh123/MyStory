@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 typealias isSuccessful = Boolean
 
-class UserRemoteDataSourceImpl @Inject constructor(
+internal class UserRemoteDataSourceImpl @Inject constructor(
     @com.dhkim.network.di.RetrofitModule.KakaoPush private val pushApi: Retrofit,
     @FirebaseModule.FirebaseDatabase private val database: DatabaseReference,
     @FirebaseModule.UserFirebaseDatabase private val userDatabase: DatabaseReference

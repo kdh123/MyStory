@@ -1,6 +1,6 @@
 package com.dhkim.story.data.dataSource.remote
 
-data class SendTimeCapsuleData(
+internal data class SendTimeCapsuleData(
     val id: String = "${System.currentTimeMillis()}",
     val address: String = "",
     val content: String = "",

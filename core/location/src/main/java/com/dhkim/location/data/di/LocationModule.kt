@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class LocationModule {
+internal abstract class LocationModule {
 
     @Binds
     @Singleton
@@ -25,7 +25,7 @@ abstract class LocationModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object LocationApiModule {
+internal object LocationApiModule {
 
     @Provides
     @Singleton

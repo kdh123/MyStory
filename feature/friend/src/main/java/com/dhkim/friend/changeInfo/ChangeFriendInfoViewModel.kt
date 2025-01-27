@@ -19,8 +19,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ChangeFriendInfoViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+internal class ChangeFriendInfoViewModel @Inject constructor(
     private val updateFriendInfoUseCase: UpdateFriendInfoUseCase,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {

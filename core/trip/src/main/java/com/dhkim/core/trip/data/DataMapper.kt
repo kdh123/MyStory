@@ -9,7 +9,7 @@ import com.dhkim.core.trip.domain.model.TripImage
 import com.dhkim.core.trip.domain.model.TripPlace
 import com.dhkim.core.trip.domain.model.TripVideo
 
-fun TripEntity.toTrip(): Trip {
+internal fun TripEntity.toTrip(): Trip {
     val isDomestic = places.firstOrNull { place ->
         com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace.entries.map {
             it.placeName
@@ -30,7 +30,7 @@ fun TripEntity.toTrip(): Trip {
     )
 }
 
-fun TripImageDto.toTripImage(): TripImage {
+internal fun TripImageDto.toTripImage(): TripImage {
     return TripImage(
         id = id,
         date = date,
@@ -40,7 +40,7 @@ fun TripImageDto.toTripImage(): TripImage {
     )
 }
 
-fun TripVideoDto.toTripVideo(): TripVideo {
+internal fun TripVideoDto.toTripVideo(): TripVideo {
     return TripVideo(
         date = date,
         memo = memo,
@@ -49,7 +49,7 @@ fun TripVideoDto.toTripVideo(): TripVideo {
     )
 }
 
-fun Trip.toTripEntity(): TripEntity {
+internal fun Trip.toTripEntity(): TripEntity {
     return TripEntity(
         id = id,
         type = type,
@@ -62,13 +62,13 @@ fun Trip.toTripEntity(): TripEntity {
     )
 }
 
-fun TripImage.toTripImageDto(): TripImageDto {
+internal fun TripImage.toTripImageDto(): TripImageDto {
     return TripImageDto(
         id, date, memo, lat, lng, address, imageUrl
     )
 }
 
-fun TripVideo.toTripVideoDto(): TripVideoDto {
+internal fun TripVideo.toTripVideoDto(): TripVideoDto {
     return TripVideoDto(
         date, memo, lat, lng, address, videoUrl
     )

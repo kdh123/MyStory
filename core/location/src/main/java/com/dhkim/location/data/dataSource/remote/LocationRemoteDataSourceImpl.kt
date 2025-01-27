@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import javax.inject.Inject
 
-class LocationRemoteDataSourceImpl @Inject constructor(
+internal class LocationRemoteDataSourceImpl @Inject constructor(
     private val service: LocationApi
 ) : LocationRemoteDataSource {
 

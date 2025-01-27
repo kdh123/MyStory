@@ -10,7 +10,7 @@ import com.dhkim.location.domain.model.Place
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class LocationRepositoryImpl @Inject constructor(
+internal class LocationRepositoryImpl @Inject constructor(
     private val remoteDataSource: LocationRemoteDataSource
 ) : LocationRepository {
 

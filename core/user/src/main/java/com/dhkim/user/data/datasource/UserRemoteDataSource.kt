@@ -5,7 +5,7 @@ import com.dhkim.user.domain.model.Friend
 import com.dhkim.user.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
-interface UserRemoteDataSource {
+internal interface UserRemoteDataSource {
 
     fun getMyInfo(myId: String): Flow<User>
 

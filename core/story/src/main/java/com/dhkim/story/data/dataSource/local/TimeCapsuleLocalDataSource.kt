@@ -5,7 +5,7 @@ import com.dhkim.database.entity.ReceivedTimeCapsuleEntity
 import com.dhkim.database.entity.SendTimeCapsuleEntity
 import kotlinx.coroutines.flow.Flow
 
-interface TimeCapsuleLocalDataSource {
+internal interface TimeCapsuleLocalDataSource {
 
     fun getMyAllTimeCapsule(): Flow<List<MyTimeCapsuleEntity>?>
     fun getMyTimeCapsule(id: String): MyTimeCapsuleEntity?

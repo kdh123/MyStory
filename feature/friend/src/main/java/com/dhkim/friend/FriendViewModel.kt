@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FriendViewModel @Inject constructor(
+internal class FriendViewModel @Inject constructor(
     private val deleteFriendUseCase: DeleteFriendUseCase,
     private val createFriendCodeUseCase: CreateFriendCodeUseCase,
     private val addFriendUseCase: AddFriendUseCase,
