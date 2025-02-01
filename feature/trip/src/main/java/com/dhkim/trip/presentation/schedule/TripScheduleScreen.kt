@@ -53,10 +53,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
-import com.dhkim.trip.R
 import com.dhkim.core.trip.domain.model.TripPlace
 import com.dhkim.core.trip.domain.model.TripType
 import com.dhkim.core.trip.domain.model.toTripType
+import com.dhkim.trip.R
 import com.dhkim.ui.noRippleClick
 import com.dhkim.ui.onStartCollect
 import kotlinx.collections.immutable.ImmutableList
@@ -75,22 +75,14 @@ fun TripScheduleScreen(
 ) {
     val lifecycle = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(pageCount = {
-        3
-    })
-    var currentPage by remember {
-        mutableIntStateOf(1)
-    }
+    val pagerState = rememberPagerState(pageCount = { 3 })
+    var currentPage by remember { mutableIntStateOf(1) }
     val progressAnimation by animateFloatAsState(
         targetValue = uiState.progress,
         animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing), label = ""
     )
-    var showStartDateDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showEndDateDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var showStartDateDialog by rememberSaveable { mutableStateOf(false) }
+    var showEndDateDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -166,12 +158,8 @@ fun TripScheduleScreen(
                                     pagerState.scrollToPage(it)
                                 }
                             },
-                            onShowStartDateDialog = {
-                                showStartDateDialog = true
-                            },
-                            onShowEndDateDialog = {
-                                showEndDateDialog = true
-                            }
+                            onShowStartDateDialog = { showStartDateDialog = true },
+                            onShowEndDateDialog = { showEndDateDialog = true }
                         )
                     }
                 }
@@ -232,28 +220,18 @@ fun Calender(
                     datePickerState.selectedDateMillis?.let {
                         val date = DateUtil.millsToDate(it)
                         if (isStartDate) {
-                            if (uiState.endDate.isEmpty() || DateUtil.isBefore(
-                                    date,
-                                    uiState.endDate
-                                )
-                            ) {
+                            if (uiState.endDate.isEmpty() || DateUtil.isBefore(date, uiState.endDate)) {
                                 onSave(date)
                                 onDismiss()
                             } else {
-                                Toast.makeText(context, "여행 종료 날짜 이전으로 설정해주세요.", Toast.LENGTH_SHORT)
-                                    .show()
+                                Toast.makeText(context, "여행 종료 날짜 이전으로 설정해주세요.", Toast.LENGTH_SHORT).show()
                             }
                         } else {
-                            if (uiState.startDate.isEmpty() || DateUtil.isAfter(
-                                    date,
-                                    uiState.startDate
-                                )
-                            ) {
+                            if (uiState.startDate.isEmpty() || DateUtil.isAfter(date, uiState.startDate)) {
                                 onSave(date)
                                 onDismiss()
                             } else {
-                                Toast.makeText(context, "여행 시작 날짜 이후로 설정해주세요.", Toast.LENGTH_SHORT)
-                                    .show()
+                                Toast.makeText(context, "여행 시작 날짜 이후로 설정해주세요.", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -263,16 +241,12 @@ fun Calender(
             }
         },
         dismissButton = {
-            Button(onClick = {
-                onDismiss()
-            }) {
+            Button(onClick = { onDismiss() }) {
                 Text(text = "취소")
             }
         }
     ) {
-        DatePicker(
-            state = datePickerState
-        )
+        DatePicker(state = datePickerState)
     }
 }
 
@@ -312,9 +286,7 @@ private fun TripTypeScreen(
                 .height(0.dp)
                 .weight(1f)
         ) {
-            itemsIndexed(items = com.dhkim.core.trip.domain.model.TripType.entries.toTypedArray(), key = { _, item ->
-                item.type
-            }) { index, item ->
+            itemsIndexed(items = TripType.entries.toTypedArray(), key = { _, item -> item.type }) { index, item ->
                 TripTypeItem(
                     index = index,
                     desc = item.desc,
@@ -385,16 +357,10 @@ fun TripTypeItem(
                 }
             }
             .background(
-                color = if (isSelected) {
-                    colorResource(id = R.color.white)
-                } else {
-                    colorResource(id = R.color.light_gray)
-                }
+                color = if (isSelected) colorResource(id = R.color.white) else colorResource(id = R.color.light_gray)
             )
             .padding(vertical = 14.dp)
-            .noRippleClick {
-                onAction(TripScheduleAction.UpdateType(index.toTripType()))
-            }
+            .noRippleClick { onAction(TripScheduleAction.UpdateType(index.toTripType())) }
             .testTag("tripType$index")
     )
 }
@@ -469,10 +435,12 @@ private fun TripPlaceScreen(
                 onAction(TripScheduleAction.UpdateProgress(0.33f))
             }
         }
-        val onNextClick = remember {
+        val onNextClick = remember(isCompleted) {
             {
-                onMoveToPage(2)
-                onAction(TripScheduleAction.UpdateProgress(1f))
+                if (isCompleted) {
+                    onMoveToPage(2)
+                    onAction(TripScheduleAction.UpdateProgress(1f))
+                }
             }
         }
         TripPlaceBottom(
@@ -484,31 +452,18 @@ private fun TripPlaceScreen(
 }
 
 @Composable
-fun TripPlaceTypes(
-    isDomestic: Boolean,
-    onClick: (Int) -> Unit
-) {
+fun TripPlaceTypes(isDomestic: Boolean, onClick: (Int) -> Unit) {
     Row {
         Text(
             text = "국내",
-            color = if (isDomestic) {
-                colorResource(id = R.color.primary)
-            } else {
-                colorResource(id = R.color.black)
-            },
+            color = if (isDomestic) colorResource(id = R.color.primary) else colorResource(id = R.color.black),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(top = 10.dp, end = 10.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .background(
-                    color = colorResource(
-                        id = if (isDomestic) {
-                            R.color.white
-                        } else {
-                            R.color.light_gray
-                        }
-                    )
+                    color = colorResource(id = if (isDomestic) R.color.white else R.color.light_gray)
                 )
                 .run {
                     if (isDomestic) {
@@ -522,9 +477,7 @@ fun TripPlaceTypes(
                     }
                 }
                 .padding(horizontal = 10.dp, vertical = 8.dp)
-                .noRippleClick {
-                    onClick(0)
-                }
+                .noRippleClick { onClick(0) }
                 .testTag("domestic")
         )
 
@@ -623,7 +576,7 @@ fun TripPlaceBottom(
 
 @Composable
 private fun DomesticPlaces(
-    tripPlaces: ImmutableList<com.dhkim.core.trip.domain.model.TripPlace>,
+    tripPlaces: ImmutableList<TripPlace>,
     onAction: (TripScheduleAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -632,12 +585,12 @@ private fun DomesticPlaces(
         modifier = modifier
     ) {
         itemsIndexed(
-            items = com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace.entries.toTypedArray(),
+            items = TripPlace.DomesticPlace.entries.toTypedArray(),
             key = { index, _ ->
                 index
             }) { index, item ->
             val isDomesticSelected = tripPlaces
-                .filterIsInstance<com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace>()
+                .filterIsInstance<TripPlace.DomesticPlace>()
                 .map { it.placeName }
                 .contains(item.placeName)
             PlaceItem(
@@ -703,7 +656,8 @@ fun PlaceItem(
                 .align(Alignment.CenterVertically)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .noRippleClick {
-                    val entries = if (isDomestic) com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace.entries else com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace.entries
+                    val entries =
+                        if (isDomestic) TripPlace.DomesticPlace.entries else TripPlace.AbroadPlace.entries
                     onAction(TripScheduleAction.UpdatePlaces(entries[index]))
                 }
                 .testTag(placeName)
@@ -713,7 +667,7 @@ fun PlaceItem(
 
 @Composable
 private fun AbroadPlaces(
-    tripPlaces: ImmutableList<com.dhkim.core.trip.domain.model.TripPlace>,
+    tripPlaces: ImmutableList<TripPlace>,
     onAction: (TripScheduleAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -722,12 +676,12 @@ private fun AbroadPlaces(
         modifier = modifier
     ) {
         itemsIndexed(
-            items = com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace.entries.toTypedArray(),
+            items = TripPlace.AbroadPlace.entries.toTypedArray(),
             key = { index, _ ->
                 index
             }) { index, item ->
             val isAbroadSelected = tripPlaces
-                .filterIsInstance<com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace>()
+                .filterIsInstance<TripPlace.AbroadPlace>()
                 .map { it.placeName }
                 .contains(item.placeName)
 
@@ -826,7 +780,6 @@ private fun TripDateScreen(
                     } else {
                         onAction(TripScheduleAction.SaveTrip)
                     }
-
                 }
             }
         }

@@ -651,6 +651,7 @@ fun PlaceList(
     LazyColumn(
         modifier = Modifier
             .fillMaxHeight(0.9f)
+            .padding(bottom = 80.dp)
     ) {
         items(
             count = places.itemCount,
