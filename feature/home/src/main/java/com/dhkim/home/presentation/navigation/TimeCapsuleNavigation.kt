@@ -1,8 +1,15 @@
 package com.dhkim.home.presentation.navigation
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.location.Location
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -22,6 +29,10 @@ import com.dhkim.home.presentation.more.MoreTimeCapsuleScreen
 import com.dhkim.home.presentation.more.MoreTimeCapsuleViewModel
 import com.dhkim.location.domain.model.Place
 import com.dhkim.ui.Popup
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.location.LocationServices
+import com.naver.maps.geometry.LatLng
 
 const val TIME_CAPSULE_MAIN_ROUTE = "mainTimeCapsule"
 const val TIME_CAPSULE_OPEN_ROUTE = "timeCapsuleOpen"
@@ -58,6 +69,8 @@ fun NavGraphBuilder.addTimeCapsuleScreen(
     }
 }
 
+@SuppressLint("MissingPermission")
+@OptIn(ExperimentalPermissionsApi::class)
 fun NavGraphBuilder.timeCapsuleScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToOpen: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
@@ -74,21 +87,35 @@ fun NavGraphBuilder.timeCapsuleScreen(
 ) {
     navigation(startDestination = TIME_CAPSULE_ROUTE, route = TIME_CAPSULE_MAIN_ROUTE) {
         composable(TIME_CAPSULE_ROUTE) {
+            val context = LocalContext.current
             val viewModel = hiltViewModel<TimeCapsuleViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val sideEffect = remember {
-                {
-                    viewModel.sideEffect
+            val sideEffect = remember { { viewModel.sideEffect } }
+            val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+            val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+            val requestPermissionLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                if (isGranted) {
+                    fusedLocationClient.lastLocation
+                        .addOnSuccessListener { location: Location? ->
+                            val currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+                            viewModel.updateCurrentLocation(currentLocation)
+                        }
                 }
             }
 
             TimeCapsuleScreen(
                 uiState = uiState,
                 sideEffect = sideEffect,
+                permissionState = locationPermissionState,
                 modifier = modifier,
-                onDeleteTimeCapsule = remember(viewModel) {
-                    viewModel::deleteTimeCapsule
+                requestPermission = {
+                    LaunchedEffect(locationPermissionState) {
+                        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
                 },
+                onDeleteTimeCapsule = remember(viewModel) { viewModel::deleteTimeCapsule },
                 onNavigateToAdd = onNavigateToAdd,
                 onNavigateToOpen = onNavigateToOpen,
                 onNavigateToDetail = onNavigateToDetail,
