@@ -7,11 +7,9 @@
 
 package com.dhkim.home.presentation.add
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -86,22 +84,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
 import com.dhkim.dhcamera.camera.DhCamera
 import com.dhkim.dhcamera.model.BackgroundText
 import com.dhkim.dhcamera.model.FontElement
 import com.dhkim.home.R
+import com.dhkim.home.presentation.DefaultPermissionState
 import com.dhkim.home.presentation.LocationSearchScreen
-import com.dhkim.location.domain.model.Place
 import com.dhkim.story.domain.model.SharedFriend
 import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
-import com.google.android.gms.location.LocationServices
-import com.naver.maps.geometry.LatLng
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -116,8 +111,9 @@ fun AddTimeCapsuleScreen(
     uiState: AddTimeCapsuleUiState,
     sideEffect: () -> Flow<AddTimeCapsuleSideEffect>,
     onAction: (AddTimeCapsuleAction) -> Unit,
+    permissionState: PermissionState,
+    requestLocationPermission: @Composable () -> Unit,
     imageUrl: String,
-    place: Place,
     friendId: String,
     onBack: () -> Unit,
 ) {
@@ -128,7 +124,13 @@ fun AddTimeCapsuleScreen(
 
     val scrollState = rememberScrollState()
     val context = LocalContext.current
-
+    var showLocationBottomSheet by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var showDateDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
+    val locationBottomSheetState = rememberModalBottomSheetState()
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
@@ -138,44 +140,6 @@ fun AddTimeCapsuleScreen(
                 context.contentResolver.takePersistableUriPermission(it, flag)
             }
             onAction(AddTimeCapsuleAction.AddImage(imageUrl = "$it"))
-        }
-    }
-    var showLocationBottomSheet by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showDateDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var currentLocation by remember {
-        mutableStateOf(Constants.defaultLocation)
-    }
-    val fusedLocationClient = remember {
-        LocationServices.getFusedLocationProviderClient(context)
-    }
-    val locationBottomSheetState = rememberModalBottomSheetState()
-    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            // Permission granted
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
-                    // Got last known location. In some rare situations this can be null.
-                    if (place.lat == "" || place.lng == "") {
-                        currentLocation =
-                            LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-                        onAction(
-                            AddTimeCapsuleAction.SearchAddress(
-                                "${currentLocation.latitude}",
-                                "${currentLocation.longitude}"
-                            )
-                        )
-                    } else {
-                        onAction(AddTimeCapsuleAction.InitPlace(place = place))
-                    }
-                }
-        } else {
         }
     }
     var contentHeight by remember {
@@ -207,12 +171,10 @@ fun AddTimeCapsuleScreen(
         }
     }
 
-    LaunchedEffect(locationPermissionState) {
-        if (!locationPermissionState.status.isGranted && locationPermissionState.status.shouldShowRationale) {
-            // Show rationale if needed
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
+    if (!permissionState.status.isGranted && permissionState.status.shouldShowRationale) {
+        // Show rationale if needed
+    } else {
+        requestLocationPermission()
     }
 
     BackHandler {
@@ -660,19 +622,6 @@ private fun SharedFriendItem(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun SharedFriendItemPreview() {
-    val sharedFriend = SharedFriend(
-        userId = "hihi",
-        isChecked = true,
-        uuid = "12345"
-    )
-    SharedFriendItem(sharedFriend) {
-
-    }
-}
-
 @Composable
 private fun SaveButton(modifier: Modifier, onClick: () -> Unit) {
     Card(
@@ -695,14 +644,6 @@ private fun SaveButton(modifier: Modifier, onClick: () -> Unit) {
                 .align(Alignment.CenterHorizontally)
 
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SaveButtonPreview() {
-    SaveButton(Modifier) {
-
     }
 }
 
@@ -736,28 +677,17 @@ fun BottomMenuItem(resId: Int, title: String, onClick: () -> Unit) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun BottomMenuItemPreview() {
-    BottomMenuItem(resId = R.drawable.ic_camera_graphic, title = "카메라") {
-
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Calender(
     onAction: (AddTimeCapsuleAction) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val startDate = DateUtil.dateAfterMonths(3)
-
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = DateUtil.dateToMills(DateUtil.dateAfterDays(1)),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return utcTimeMillis >= DateUtil.dateToMills(DateUtil.todayDate())
-                //return utcTimeMillis >= DateUtil.dateToMills(startDate)
             }
         }
     )
@@ -785,9 +715,7 @@ fun Calender(
             }
         }
     ) {
-        DatePicker(
-            state = datePickerState
-        )
+        DatePicker(state = datePickerState)
     }
 }
 
@@ -844,19 +772,6 @@ private fun SwitchMenuItem(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SwitchMenuItemPreview() {
-    SwitchMenuItem(
-        resId = R.drawable.ic_map_black,
-        isChecked = true,
-        title = "위치 체크",
-        subTitle = "이 위치 근처에서 타임캡슐을 개봉할 수 있습니다."
-    ) {
-
     }
 }
 
@@ -930,14 +845,6 @@ private fun MenuItem(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun MenuItemPreview() {
-    MenuItem(resId = R.drawable.ic_calender_black, "개봉 날짜") {
-
-    }
-}
-
 @Composable
 private fun ImageListView(
     imageUrls: List<String>,
@@ -972,13 +879,7 @@ private fun ImageListView(
     }
 }
 
-@Preview
-@Composable
-private fun ImageListViewPreview() {
-    ImageListView(imageUrls = listOf("1", "2")) {
 
-    }
-}
 
 @Composable
 private fun ImageView(imageUrl: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
@@ -1005,13 +906,6 @@ private fun ImageView(imageUrl: String, modifier: Modifier = Modifier, onClick: 
     }
 }
 
-@Preview
-@Composable
-private fun ImageViewPreview() {
-    ImageView(imageUrl = "") {
-
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1051,13 +945,6 @@ private fun ContentsView(
     }
 }
 
-@Preview
-@Composable
-private fun ContentViewPreview() {
-    ContentsView(content = "안녕하세요안녕하세요안녕하세요안녕하세요") {
-
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -1067,8 +954,9 @@ private fun AddTimeCapsuleScreenPreview() {
         sideEffect = { flowOf() },
         onAction = {},
         imageUrl = "imageUrl2",
-        place = Place(),
         friendId = "",
-        onBack = { }
+        onBack = { },
+        requestLocationPermission = {},
+        permissionState = DefaultPermissionState()
     )
 }

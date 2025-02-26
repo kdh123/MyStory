@@ -28,6 +28,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.dhkim.home.presentation.TimeCapsuleScreen
 import com.dhkim.home.presentation.TimeCapsuleViewModel
+import com.dhkim.home.presentation.add.AddTimeCapsuleAction
 import com.dhkim.home.presentation.add.AddTimeCapsuleScreen
 import com.dhkim.home.presentation.add.AddTimeCapsuleViewModel
 import com.dhkim.home.presentation.detail.ImageDetailScreen
@@ -61,27 +62,49 @@ const val IMAGE_DETAIL_ROUTE = "imageDetail"
 const val MORE_TIME_CAPSULE = "moreTimeCapsule"
 const val TIME_CAPSULE_DETAIL = "timeCapsuleDetail"
 
+@SuppressLint("MissingPermission")
+@OptIn(ExperimentalPermissionsApi::class)
 fun NavGraphBuilder.addTimeCapsuleScreen(
     onBack: () -> Unit,
 ) {
     composable("addTimeCapsule/{friendId}") { backStackEntry ->
+        val context = LocalContext.current
         val viewModel = hiltViewModel<AddTimeCapsuleViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        val sideEffect = remember {
-            viewModel.sideEffect
-        }
+        val sideEffect = remember { viewModel.sideEffect }
         val place = backStackEntry.savedStateHandle.get<Place>("place") ?: Place()
         val imageUrl = backStackEntry.savedStateHandle.get<String>("imageUrl") ?: ""
         val friendId = backStackEntry.arguments?.getString("friendId") ?: ""
-
+        val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+        val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+        val requestPermissionLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                // Permission granted
+                fusedLocationClient.lastLocation
+                    .addOnSuccessListener { location: Location? ->
+                        // Got last known location. In some rare situations this can be null.
+                        if (place.lat == "" || place.lng == "") {
+                            val currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+                            viewModel.onAction(AddTimeCapsuleAction.SearchAddress("${currentLocation.latitude}", "${currentLocation.longitude}"))
+                        } else {
+                            viewModel.onAction(AddTimeCapsuleAction.InitPlace(place = place))
+                        }
+                    }
+            }
+        }
         AddTimeCapsuleScreen(
             uiState = uiState,
             sideEffect = { sideEffect },
-            onAction = remember(viewModel) {
-                viewModel::onAction
+            onAction = remember(viewModel) { viewModel::onAction },
+            permissionState = locationPermissionState,
+            requestLocationPermission = {
+                LaunchedEffect(locationPermissionState) {
+                    requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                }
             },
             imageUrl = imageUrl,
-            place = place,
             friendId = friendId.ifBlank { "" },
             onBack = onBack
         )
