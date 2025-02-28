@@ -8,6 +8,7 @@ import com.dhkim.location.domain.model.Category
 import com.dhkim.location.domain.model.Place
 import com.dhkim.location.domain.usecase.GetNearPlacesByKeywordUseCase
 import com.dhkim.location.domain.usecase.GetPlacesByCategoryUseCase
+import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +49,15 @@ internal class MapViewModel @Inject constructor(
             is MapAction.SelectPlace -> {
                 selectPlace(action.place)
             }
+
+            is MapAction.UpdateCurrentLocation -> {
+                updateCurrentLocation(action.location)
+            }
         }
+    }
+
+    private fun updateCurrentLocation(location: LatLng) {
+        _uiState.update { it.copy(currentLocation = location) }
     }
 
     private fun searchPlacesByCategory(category: Category, lat: String, lng: String) {

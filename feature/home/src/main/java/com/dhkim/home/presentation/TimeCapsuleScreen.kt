@@ -61,7 +61,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
 import com.dhkim.common.DistanceManager
 import com.dhkim.home.R
@@ -72,6 +71,7 @@ import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
 import com.naver.maps.geometry.LatLng
@@ -1006,5 +1006,17 @@ private fun LockTimeCapsule(
                     .padding(10.dp)
             )
         }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+class DefaultPermissionState : PermissionState {
+    override val permission: String
+        get() = ""
+    override val status: PermissionStatus
+        get() = PermissionStatus.Granted
+
+    override fun launchPermissionRequest() {
+
     }
 }

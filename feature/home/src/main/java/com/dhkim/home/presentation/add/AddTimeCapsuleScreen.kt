@@ -89,12 +89,12 @@ import com.dhkim.dhcamera.camera.DhCamera
 import com.dhkim.dhcamera.model.BackgroundText
 import com.dhkim.dhcamera.model.FontElement
 import com.dhkim.home.R
-import com.dhkim.home.presentation.DefaultPermissionState
 import com.dhkim.home.presentation.LocationSearchScreen
 import com.dhkim.story.domain.model.SharedFriend
 import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
 import com.skydoves.landscapist.glide.GlideImage
@@ -959,4 +959,16 @@ private fun AddTimeCapsuleScreenPreview() {
         requestLocationPermission = {},
         permissionState = DefaultPermissionState()
     )
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+class DefaultPermissionState : PermissionState {
+    override val permission: String
+        get() = ""
+    override val status: PermissionStatus
+        get() = PermissionStatus.Granted
+
+    override fun launchPermissionRequest() {
+
+    }
 }

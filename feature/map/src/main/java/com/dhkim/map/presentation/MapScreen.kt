@@ -1,20 +1,14 @@
 @file:OptIn(
     ExperimentalPermissionsApi::class,
     ExperimentalMaterial3Api::class,
-    ExperimentalNaverMapApi::class
 )
 
 package com.dhkim.map.presentation
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.location.Location
 import android.util.Log
-import android.view.Gravity
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,11 +45,8 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,7 +57,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -74,45 +64,36 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.dhkim.common.Constants
 import com.dhkim.location.domain.model.Category
 import com.dhkim.location.domain.model.Place
 import com.dhkim.map.R
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
-import com.google.android.gms.location.LocationServices
-import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.CameraPosition
-import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.compose.ExperimentalNaverMapApi
-import com.naver.maps.map.compose.LocationTrackingMode
-import com.naver.maps.map.compose.MapProperties
-import com.naver.maps.map.compose.MapUiSettings
-import com.naver.maps.map.compose.Marker
-import com.naver.maps.map.compose.MarkerState
-import com.naver.maps.map.compose.NaverMap
-import com.naver.maps.map.compose.rememberCameraPositionState
-import com.naver.maps.map.compose.rememberFusedLocationSource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 @SuppressLint("MissingPermission")
-@OptIn(ExperimentalNaverMapApi::class)
 @Composable
 fun MapScreen(
     uiState: MapUiState,
     sideEffect: () -> Flow<MapSideEffect>,
     onAction: (MapAction) -> Unit,
+    locationPermissionState: PermissionState,
     place: () -> Place?,
     onNavigateToSearch: (Double, Double) -> Unit,
     onNavigateToAddScreen: (Place) -> Unit,
     onHideBottomNav: (Place?) -> Unit,
-    onInitSavedState: () -> Unit
+    onInitSavedState: () -> Unit,
+    naverMap: @Composable () -> Unit,
+    requestPermission: @Composable () -> Unit
 ) {
     val bottomSheetState = rememberStandardBottomSheetState(skipHiddenState = false)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState)
@@ -122,26 +103,6 @@ fun MapScreen(
     val places = uiState.places.collectAsLazyPagingItems()
     val paddingValues = WindowInsets.navigationBars.asPaddingValues()
     val peekHeight = if (uiState.category != Category.None) 300.dp else 0.dp
-    var currentLocation by remember { mutableStateOf(Constants.defaultLocation) }
-    val cameraPositionState = rememberCameraPositionState()
-    val mapProperties by remember {
-        mutableStateOf(
-            MapProperties(
-                maxZoom = 20.0,
-                minZoom = 5.0,
-                locationTrackingMode = LocationTrackingMode.NoFollow
-            )
-        )
-    }
-    val mapUiSettings by remember {
-        mutableStateOf(
-            MapUiSettings(
-                logoMargin = PaddingValues(bottom = 86.dp, end = 10.dp),
-                logoGravity = Gravity.BOTTOM or Gravity.END,
-                isLocationButtonEnabled = false
-            )
-        )
-    }
 
     lifecycle.onStartCollect(sideEffect()) {
         when (it) {
@@ -170,59 +131,15 @@ fun MapScreen(
         onHideBottomNav(uiState.selectedPlace)
     }
 
-    LaunchedEffect(places.itemSnapshotList, uiState.selectedPlace, currentLocation) {
-        val latLng = when {
-            places.itemCount > 0 -> {
-                LatLng(places[0]?.lat?.toDouble() ?: 0.0, places[0]?.lng?.toDouble() ?: 0.0)
-            }
-
-            uiState.selectedPlace != null -> {
-                LatLng(uiState.selectedPlace.lat.toDouble(), uiState.selectedPlace.lng.toDouble())
-            }
-
-            else -> {
-                currentLocation
-            }
-        }
-
-        cameraPositionState.move(
-            CameraUpdate.toCameraPosition(
-                CameraPosition(
-                    latLng,
-                    15.0
-                )
-            )
-        )
-    }
-
     LaunchedEffect(place()?.id) {
         place()?.let(MapAction::SelectPlace)
     }
 
-    val fusedLocationClient = remember {
-        LocationServices.getFusedLocationProviderClient(context)
+    if (!locationPermissionState.status.isGranted && locationPermissionState.status.shouldShowRationale) {
+        // Show rationale if needed
+    } else {
+        requestPermission()
     }
-    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
-                    currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-                }
-        }
-    }
-
-    LaunchedEffect(locationPermissionState) {
-        if (!locationPermissionState.status.isGranted && locationPermissionState.status.shouldShowRationale) {
-            // Show rationale if needed
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-    }
-
-    val locationSource = rememberFusedLocationSource()
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
@@ -251,54 +168,14 @@ fun MapScreen(
                 .padding(bottom = paddingValues.calculateBottomPadding())
         ) {
             Box(Modifier.fillMaxSize()) {
-                NaverMap(
-                    locationSource = locationSource,
-                    cameraPositionState = cameraPositionState,
-                    properties = mapProperties,
-                    uiSettings = mapUiSettings,
-                    modifier = Modifier.padding()
-                ) {
-                    if (uiState.selectedPlace != null) {
-                        Marker(
-                            state = MarkerState(
-                                position = LatLng(
-                                    uiState.selectedPlace.lat.toDouble(),
-                                    uiState.selectedPlace.lng.toDouble()
-                                )
-                            ),
-                            onClick = {
-                                place()?.let {
-                                    onAction(MapAction.SelectPlace(it))
-                                }
-                                true
-                            },
-                            captionText = uiState.selectedPlace.name
-                        )
-                    } else {
-                        uiState.places.collectAsLazyPagingItems().itemSnapshotList.items.forEach { place ->
-                            Marker(
-                                state = MarkerState(
-                                    position = LatLng(
-                                        place.lat.toDouble(),
-                                        place.lng.toDouble()
-                                    )
-                                ),
-                                onClick = {
-                                    onAction(MapAction.SelectPlace(place))
-                                    true
-                                },
-                                captionText = place.name
-                            )
-                        }
-                    }
-                }
+                naverMap()
             }
 
             Column(modifier = Modifier.wrapContentWidth()) {
                 SearchBar(
                     query = uiState.query,
-                    lat = currentLocation.latitude,
-                    lng = currentLocation.longitude,
+                    lat = uiState.currentLocation.latitude,
+                    lng = uiState.currentLocation.longitude,
                     showClose = uiState.category != Category.None || uiState.selectedPlace != null,
                     onAction = onAction,
                     onNavigateToSearch = onNavigateToSearch,
@@ -323,16 +200,16 @@ fun MapScreen(
                                 onAction(
                                     MapAction.SearchPlacesByCategory(
                                         category = it,
-                                        lat = "${currentLocation.latitude}",
-                                        lng = "${currentLocation.longitude}"
+                                        lat = "${uiState.currentLocation.latitude}",
+                                        lng = "${uiState.currentLocation.longitude}"
                                     )
                                 )
                             } else {
                                 onAction(
                                     MapAction.SearchPlacesByKeyword(
                                         query = category.type,
-                                        lat = "${currentLocation.latitude}",
-                                        lng = "${currentLocation.longitude}"
+                                        lat = "${uiState.currentLocation.latitude}",
+                                        lng = "${uiState.currentLocation.longitude}"
                                     )
                                 )
                             }
@@ -721,5 +598,43 @@ fun PlaceItem(place: Place, onAction: ((MapAction) -> Unit)? = null, onHide: () 
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MapScreenPreView() {
+    MapScreen(
+        uiState = MapUiState(),
+        sideEffect = { flowOf() },
+        onAction = {},
+        locationPermissionState = DefaultPermissionState(),
+        place = { null },
+        onNavigateToSearch = { _, _ -> },
+        onNavigateToAddScreen = {},
+        onHideBottomNav = {},
+        onInitSavedState = {},
+        requestPermission = {},
+        naverMap = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.LightGray)
+            ) {
+
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+class DefaultPermissionState : PermissionState {
+    override val permission: String
+        get() = ""
+    override val status: PermissionStatus
+        get() = PermissionStatus.Granted
+
+    override fun launchPermissionRequest() {
+
     }
 }
