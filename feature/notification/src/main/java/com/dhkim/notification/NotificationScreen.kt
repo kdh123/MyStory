@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -40,9 +41,7 @@ fun NotificationScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .padding(start = 10.dp, top = 10.dp)
-                    .clickable {
-                        onBack()
-                    }
+                    .clickable { onBack() }
             )
             if (uiState.timeCapsules.isNotEmpty()) {
                 LazyColumn(
@@ -51,10 +50,11 @@ fun NotificationScreen(
                     modifier = Modifier
                         .padding(bottom = it.calculateBottomPadding())
                 ) {
-                    items(items = uiState.timeCapsules, key = {
-                        it.id
-                    }) {
-                        NotificationItem(timeCapsule = it, onNavigateToTimeCapsule = onNavigateToTimeCapsule)
+                    items(items = uiState.timeCapsules, key = { it.id }) {
+                        NotificationItem(
+                            timeCapsule = it,
+                            onNavigateToTimeCapsule = onNavigateToTimeCapsule
+                        )
                     }
                 }
             } else {
@@ -75,14 +75,16 @@ fun NotificationItem(
     timeCapsule: ReceivedTimeCapsule,
     onNavigateToTimeCapsule: () -> Unit
 ) {
-    val profileImage = timeCapsule.profileImage.toInt()
+    val profileImage = if (LocalInspectionMode.current) {
+        com.dhkim.common.R.drawable.ic_smile_blue
+    } else {
+        timeCapsule.profileImage.toInt()
+    }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onNavigateToTimeCapsule()
-            }
+            .clickable { onNavigateToTimeCapsule() }
             .padding(horizontal = 10.dp)
     ) {
         Image(
@@ -136,22 +138,9 @@ private fun NotificationScreenPreview() {
 
     NotificationScreen(
         uiState = uiState,
-        onNavigateToTimeCapsule = {
-
-        },
-        onBack = {
-
-        }
+        onNavigateToTimeCapsule = {},
+        onBack = {}
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun NotificationItemPreview() {
-    val timeCapsule = ReceivedTimeCapsule(
-        sender = "kdh123"
-    )
-    NotificationItem(timeCapsule = timeCapsule, onNavigateToTimeCapsule = {})
 }
 
 
