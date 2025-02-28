@@ -116,7 +116,7 @@ fun TripScreen(
                 }
             )
             TripSchedules(
-                items = uiState.trips ?: persistentListOf(),
+                items = uiState.trips,
                 showDeleteDialog = {
                     showPopup(
                         Popup.Warning(
@@ -389,7 +389,7 @@ private fun TripScreenPreview() {
     items.add(TripItem(id = "${UUID.randomUUID()}", data = "다음 여행"))
     items.addAll(trips.map { TripItem(id = it.id, data = it) })
 
-    val uiState = TripUiState(trips = items.toImmutableList())
+    val uiState = TripUiState(isLoading = false, trips = items.toImmutableList())
 
     TripScreen(
         uiState = uiState,
