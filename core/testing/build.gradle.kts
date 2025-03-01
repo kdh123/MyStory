@@ -33,6 +33,7 @@ dependencies {
 
     implementation(project(":core:user"))
     implementation(project(":core:location"))
+    implementation(project(":core:trip"))
     implementation(project(":core:common"))
     implementation(project(":core:database"))
 

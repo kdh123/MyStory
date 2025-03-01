@@ -1,15 +1,14 @@
 package com.dhkim.core.trip.data
 
 import com.dhkim.common.DateUtil
+import com.dhkim.core.trip.domain.model.Trip
+import com.dhkim.core.trip.domain.model.TripImage
+import com.dhkim.core.trip.domain.model.TripVideo
 import com.dhkim.database.TripImageDto
 import com.dhkim.database.TripVideoDto
 import com.dhkim.database.entity.TripEntity
-import com.dhkim.core.trip.domain.model.Trip
-import com.dhkim.core.trip.domain.model.TripImage
-import com.dhkim.core.trip.domain.model.TripPlace
-import com.dhkim.core.trip.domain.model.TripVideo
 
-internal fun TripEntity.toTrip(): Trip {
+fun TripEntity.toTrip(): Trip {
     val isDomestic = places.firstOrNull { place ->
         com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace.entries.map {
             it.placeName

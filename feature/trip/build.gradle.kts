@@ -56,6 +56,7 @@ dependencies {
     implementation(project(":feature:location"))
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
+    testImplementation(project(":core:testing"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

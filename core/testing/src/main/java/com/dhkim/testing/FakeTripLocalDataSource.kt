@@ -1,4 +1,4 @@
-package com.dhkim.trip
+package com.dhkim.testing
 
 import com.dhkim.core.trip.data.dataSource.local.TripLocalDataSource
 import com.dhkim.core.trip.data.toTrip
@@ -9,9 +9,8 @@ import com.dhkim.database.entity.TripEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import javax.inject.Inject
 
-class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
+class FakeTripLocalDataSource : TripLocalDataSource {
 
     private val trips = MutableStateFlow(listOf<Trip>())
 
@@ -76,7 +75,7 @@ class FakeTripLocalDataSource @Inject constructor() : TripLocalDataSource {
     }
 
     override fun getTrip(id: String): Flow<Trip?> {
-        return flowOf(trips.value.first { it.id == id })
+        return flowOf(trips.value.firstOrNull { it.id == id })
     }
 
     override suspend fun saveTrip(trip: Trip) {

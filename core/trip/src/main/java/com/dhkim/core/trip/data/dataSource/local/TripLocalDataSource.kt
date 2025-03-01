@@ -3,7 +3,7 @@ package com.dhkim.core.trip.data.dataSource.local
 import com.dhkim.core.trip.domain.model.Trip
 import kotlinx.coroutines.flow.Flow
 
-internal interface TripLocalDataSource {
+interface TripLocalDataSource {
 
     fun getAllTrip(): Flow<List<Trip>>
     fun getTrip(id: String): Flow<Trip?>
