@@ -104,6 +104,12 @@ fun NavGraphBuilder.mapScreen(
             }
         }
 
+        LaunchedEffect(place) {
+            place?.let {
+                viewModel.onAction(MapAction.SelectPlace(it))
+            }
+        }
+
         LaunchedEffect(places.itemSnapshotList, uiState.selectedPlace, uiState.currentLocation) {
             cameraPositionState.move(
                 CameraUpdate.toCameraPosition(
@@ -120,7 +126,6 @@ fun NavGraphBuilder.mapScreen(
             sideEffect = { sideEffect },
             onAction = remember(viewModel) { viewModel::onAction },
             locationPermissionState = locationPermissionState,
-            place = { place },
             onNavigateToSearch = onNavigateToSearch,
             onHideBottomNav = onHideBottomNav,
             onInitSavedState = onInitSavedState,

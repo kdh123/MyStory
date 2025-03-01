@@ -74,7 +74,6 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
-import com.naver.maps.map.compose.ExperimentalNaverMapApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -87,7 +86,6 @@ fun MapScreen(
     sideEffect: () -> Flow<MapSideEffect>,
     onAction: (MapAction) -> Unit,
     locationPermissionState: PermissionState,
-    place: () -> Place?,
     onNavigateToSearch: (Double, Double) -> Unit,
     onNavigateToAddScreen: (Place) -> Unit,
     onHideBottomNav: (Place?) -> Unit,
@@ -129,10 +127,6 @@ fun MapScreen(
 
     LaunchedEffect(uiState.selectedPlace) {
         onHideBottomNav(uiState.selectedPlace)
-    }
-
-    LaunchedEffect(place()?.id) {
-        place()?.let(MapAction::SelectPlace)
     }
 
     if (!locationPermissionState.status.isGranted && locationPermissionState.status.shouldShowRationale) {
@@ -609,7 +603,6 @@ private fun MapScreenPreView() {
         sideEffect = { flowOf() },
         onAction = {},
         locationPermissionState = DefaultPermissionState(),
-        place = { null },
         onNavigateToSearch = { _, _ -> },
         onNavigateToAddScreen = {},
         onHideBottomNav = {},
