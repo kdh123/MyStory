@@ -1,96 +1,143 @@
 package com.dhkim.home
 
 import com.dhkim.common.CommonResult
+import com.dhkim.home.data.FakeUserLocalDataSource
+import com.dhkim.home.data.FakeUserRemoteDataSource
 import com.dhkim.user.data.datasource.isSuccessful
 import com.dhkim.user.domain.model.Friend
 import com.dhkim.user.domain.model.LocalFriend
 import com.dhkim.user.domain.model.User
+import com.dhkim.user.domain.model.toLocalFriend
 import com.dhkim.user.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 
-class FakeUserRepository : UserRepository {
+class FakeUserRepository(
+    private val localDataSource: FakeUserLocalDataSource = FakeUserLocalDataSource(),
+    private val remoteDataSource: FakeUserRemoteDataSource = FakeUserRemoteDataSource()
+) : UserRepository {
 
     override fun getFriend(id: String): LocalFriend? {
-        TODO("Not yet implemented")
+        return localDataSource.getFriend(id)?.toLocalFriend()
     }
 
     override fun updateFriend(friend: Friend): Flow<isSuccessful> {
-        TODO("Not yet implemented")
+        return flow {
+            val myId = localDataSource.getUserId()
+            emit(remoteDataSource.updateFriend(myId, friend).first())
+        }
     }
 
     override fun deleteLocalFriend(id: String) {
-        TODO("Not yet implemented")
+        localDataSource.deleteFriend(id)
     }
 
     override fun getMyInfo(myId: String): Flow<User> {
-        TODO("Not yet implemented")
+        return remoteDataSource.getMyInfo(myId = myId)
     }
 
     override suspend fun getMyId(): String {
-        TODO("Not yet implemented")
+        return localDataSource.getUserId()
     }
 
     override fun updateUser(user: User): Flow<isSuccessful> {
-        TODO("Not yet implemented")
+        return remoteDataSource.updateUser(user = user)
     }
 
     override fun searchUser(userId: String): Flow<CommonResult<User?>> {
-        TODO("Not yet implemented")
+        return remoteDataSource.searchUser(userId)
     }
 
     override suspend fun addFriend(userId: String, userProfileImage: String): Flow<isSuccessful> {
-        TODO("Not yet implemented")
+        return remoteDataSource.addFriend(
+            myId = getMyId(),
+            myProfileImage = "${getProfileImage()}",
+            myUuid = getMyUuid(),
+            userId = userId,
+            userProfileImage = userProfileImage
+        )
     }
 
     override fun deleteFriend(userId: String): Flow<isSuccessful> {
-        TODO("Not yet implemented")
+        return flow {
+            emit(remoteDataSource.deleteFriend(myId = getMyId(), userId = userId).first())
+        }
     }
 
     override suspend fun addRequests(userId: String): Flow<isSuccessful> {
-        TODO("Not yet implemented")
+        return remoteDataSource.addRequest(
+            myId = getMyId(),
+            myProfileImage = "${getProfileImage()}",
+            userId = userId
+        )
     }
 
     override fun acceptFriend(userId: String, userProfileImage: String, userUuid: String): Flow<isSuccessful> {
-        TODO("Not yet implemented")
+        return flow {
+            val myId = getMyId()
+            val myProfileImage = getProfileImage()
+            val myUuid = getMyUuid()
+
+            val isSuccessful = remoteDataSource.acceptFriend(
+                myId = myId,
+                myProfileImage = "$myProfileImage",
+                myUuid = myUuid,
+                userId = userId,
+                userProfileImage = userProfileImage,
+                userUuid = userUuid
+            ).first()
+
+            emit(isSuccessful)
+        }
     }
 
     override suspend fun updateUserId(userId: String) {
-        TODO("Not yet implemented")
+        localDataSource.updateUserId(userId)
     }
 
     override suspend fun getFcmToken(): String {
-        TODO("Not yet implemented")
+        return localDataSource.getFcmToken()
     }
 
     override suspend fun updateFcmToken(fcmToken: String) {
-        TODO("Not yet implemented")
+        localDataSource.updateFcmToken(fcmToken)
     }
 
     override suspend fun updateLocalFcmToken(fcmToken: String) {
-        TODO("Not yet implemented")
+        localDataSource.updateFcmToken(fcmToken = fcmToken)
     }
 
     override suspend fun getProfileImage(): Int {
-        TODO("Not yet implemented")
+        return localDataSource.getProfileImage()
     }
 
     override suspend fun updateProfileImage(profileImage: String) {
-        TODO("Not yet implemented")
+        localDataSource.updateProfileImage(profileImage)
     }
 
     override suspend fun getMyUuid(): String {
-        TODO("Not yet implemented")
+        return localDataSource.getUuid()
     }
 
     override suspend fun updateUuid(uuid: String) {
-        TODO("Not yet implemented")
+        localDataSource.updateUuid(uuid)
     }
 
     override suspend fun updateRemoteFcmToken(fcmToken: String) {
-        TODO("Not yet implemented")
+        val userId = getMyId()
+        remoteDataSource.updateFcmToken(userId, fcmToken).catch { }
+            .collect { isSuccessful ->
+                if (isSuccessful) {
+                    updateLocalFcmToken(fcmToken)
+                } else {
+                    updateLocalFcmToken("")
+                }
+            }
     }
 
     override suspend fun registerPush(uuid: String, fcmToken: String): isSuccessful {
-        TODO("Not yet implemented")
+        return remoteDataSource.registerPush(uuid, fcmToken) is CommonResult.Success
     }
 }

@@ -7,7 +7,7 @@ import com.dhkim.story.domain.model.MyTimeCapsule
 import com.dhkim.story.domain.model.ReceivedTimeCapsule
 import com.dhkim.story.domain.model.SendTimeCapsule
 
-internal fun MyTimeCapsuleEntity.toMyTimeCapsule(): MyTimeCapsule {
+fun MyTimeCapsuleEntity.toMyTimeCapsule(): MyTimeCapsule {
     return MyTimeCapsule(
         id = id,
         date = date,
@@ -25,7 +25,7 @@ internal fun MyTimeCapsuleEntity.toMyTimeCapsule(): MyTimeCapsule {
     )
 }
 
-internal fun SendTimeCapsuleEntity.toSenderTimeCapsule(): SendTimeCapsule {
+fun SendTimeCapsuleEntity.toSenderTimeCapsule(): SendTimeCapsule {
     return SendTimeCapsule(
         id = id,
         date = date,
@@ -40,7 +40,7 @@ internal fun SendTimeCapsuleEntity.toSenderTimeCapsule(): SendTimeCapsule {
     )
 }
 
-internal fun ReceivedTimeCapsuleEntity.toReceivedTimeCapsule(): ReceivedTimeCapsule {
+fun ReceivedTimeCapsuleEntity.toReceivedTimeCapsule(): ReceivedTimeCapsule {
     return ReceivedTimeCapsule(
         id = id,
         date = date,
