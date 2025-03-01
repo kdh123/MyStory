@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":core:user"))
     implementation(project(":feature:home"))
     testImplementation(project(":core:database"))
+    testImplementation(project(":core:testing"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)

@@ -6,6 +6,7 @@ import com.dhkim.home.presentation.TimeCapsuleViewModel
 import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.story.domain.usecase.DeleteTimeCapsuleUseCase
 import com.dhkim.story.domain.usecase.GetAllTimeCapsuleUseCase
+import com.dhkim.testing.FakeUserRepository
 import com.dhkim.user.domain.usecase.GetMyInfoUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

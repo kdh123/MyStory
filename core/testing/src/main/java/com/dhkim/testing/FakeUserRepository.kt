@@ -1,8 +1,6 @@
-package com.dhkim.home
+package com.dhkim.testing
 
 import com.dhkim.common.CommonResult
-import com.dhkim.home.data.FakeUserLocalDataSource
-import com.dhkim.home.data.FakeUserRemoteDataSource
 import com.dhkim.user.data.datasource.isSuccessful
 import com.dhkim.user.domain.model.Friend
 import com.dhkim.user.domain.model.LocalFriend

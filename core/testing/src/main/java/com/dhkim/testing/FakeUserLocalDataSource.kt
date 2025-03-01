@@ -1,13 +1,12 @@
-package com.dhkim.home.data
+package com.dhkim.testing
 
 import com.dhkim.database.entity.FriendEntity
 import com.dhkim.user.data.datasource.UserLocalDataSource
 import com.dhkim.user.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import javax.inject.Inject
 
-class FakeUserLocalDataSource @Inject constructor() : UserLocalDataSource {
+class FakeUserLocalDataSource : UserLocalDataSource {
 
     private var myInfo = User(
         id = "myId",

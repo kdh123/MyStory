@@ -167,7 +167,15 @@ fun TimeCapsuleDetailScreen(
                 },
                 onBack = onBack
             )
-            MenuItem(resId = uiState.timeCapsule.host.profileImage.toInt(), title = "작성자 : ${uiState.writer}")
+
+            val profileResId = when (uiState.timeCapsule.host.profileImage.toInt()) {
+                0 -> R.drawable.ic_smile_blue
+                1 -> R.drawable.ic_smile_green
+                2 -> R.drawable.ic_smile_orange
+                else -> R.drawable.ic_smile_violet
+            }
+
+            MenuItem(resId = profileResId, title = "작성자 : ${uiState.writer}")
             Divider(
                 color = colorResource(id = R.color.light_gray),
                 modifier = Modifier

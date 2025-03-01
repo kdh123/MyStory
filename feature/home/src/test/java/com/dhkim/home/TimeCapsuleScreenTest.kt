@@ -13,6 +13,7 @@ import com.dhkim.home.presentation.TimeCapsuleScreen
 import com.dhkim.home.presentation.TimeCapsuleViewModel
 import com.dhkim.story.domain.usecase.DeleteTimeCapsuleUseCase
 import com.dhkim.story.domain.usecase.GetAllTimeCapsuleUseCase
+import com.dhkim.testing.FakeUserRepository
 import com.dhkim.user.domain.usecase.GetMyInfoUseCase
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.Dispatchers

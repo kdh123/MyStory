@@ -57,38 +57,19 @@ internal class FriendViewModel @Inject constructor(
     private val _sideEffect = Channel<FriendSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
-    private val profileImages = listOf(
-        R.drawable.ic_smile_blue,
-        R.drawable.ic_smile_violet,
-        R.drawable.ic_smile_green,
-        R.drawable.ic_smile_orange
-    )
-
     fun onAction(action: FriendAction) {
         when (action) {
-            is FriendAction.AcceptFriend -> {
-                acceptFriend(friend = action.friend)
-            }
+            is FriendAction.AcceptFriend -> acceptFriend(friend = action.friend)
 
-            FriendAction.AddFriend -> {
-                addFriend()
-            }
+            FriendAction.AddFriend -> addFriend()
 
-            is FriendAction.DeleteFriend -> {
-                deleteFriend(userId = action.userId)
-            }
+            is FriendAction.DeleteFriend -> deleteFriend(userId = action.userId)
 
-            is FriendAction.Query -> {
-                onQuery(query = action.query)
-            }
+            is FriendAction.Query -> onQuery(query = action.query)
 
-            FriendAction.SearchUser -> {
-                searchUser()
-            }
+            FriendAction.SearchUser -> searchUser()
 
-            FriendAction.CreateFriendCode -> {
-                createFriendCode()
-            }
+            FriendAction.CreateFriendCode -> createFriendCode()
         }
     }
 
@@ -104,7 +85,7 @@ internal class FriendViewModel @Inject constructor(
 
                 viewModelScope.launch {
                     val fcmToken = task.result
-                    val profileImage = profileImages[(0..3).random()]
+                    val profileImage = (0..3).random()
                     val isSuccessful = createFriendCodeUseCase(fcmToken = fcmToken, profileImage = profileImage).first()
                     if (isSuccessful) {
                         uiState.restart()
