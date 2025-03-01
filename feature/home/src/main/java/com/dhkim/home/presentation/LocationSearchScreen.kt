@@ -141,27 +141,6 @@ fun PlaceList(places: LazyPagingItems<Place>, onAction: (AddTimeCapsuleAction) -
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun PlaceListPreview() {
-    val list = mutableListOf<Place>()
-
-    repeat(10) {
-        val place = Place(
-            id = "$it",
-            name = "스타벅스 $it",
-            lat = "37.743",
-            lng = "146,3455",
-            address = "서울시 강남구 강남동 $it",
-            category = "음식점 > 카페",
-            distance = "500",
-            phone = "010-1234-1234",
-            url = "https://wwww.naver.com"
-        )
-        list.add(place)
-    }
-}
-
 @Composable
 fun Place(place: Place, onAction: (AddTimeCapsuleAction) -> Unit) {
     Column(

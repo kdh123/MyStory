@@ -21,7 +21,7 @@ import javax.inject.Inject
 const val CHECK_OPENABLE_TIME_CAPSULE_WORK_NAME = "checkOpenableTimeCapsuleWork"
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+internal class MainViewModel @Inject constructor(
     private val getGuideSettingUseCase: GetGuideSettingUseCase,
     private val updateGuideSettingUseCase: UpdateGuideSettingUseCase,
     private val workManager: WorkManager

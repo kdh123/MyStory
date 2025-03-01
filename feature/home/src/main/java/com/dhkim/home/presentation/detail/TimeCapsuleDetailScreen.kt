@@ -1,7 +1,6 @@
 package com.dhkim.home.presentation.detail
 
 import android.annotation.SuppressLint
-import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,11 +35,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -50,68 +47,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.home.R
-import com.dhkim.home.domain.model.TimeCapsule
+import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.DefaultBackground
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.Popup
 import com.dhkim.ui.onStartCollect
-import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.CameraPosition
-import com.naver.maps.map.CameraUpdate
-import com.naver.maps.map.compose.ExperimentalNaverMapApi
-import com.naver.maps.map.compose.LocationTrackingMode
-import com.naver.maps.map.compose.MapProperties
-import com.naver.maps.map.compose.MapUiSettings
-import com.naver.maps.map.compose.Marker
-import com.naver.maps.map.compose.MarkerState
-import com.naver.maps.map.compose.NaverMap
-import com.naver.maps.map.compose.rememberCameraPositionState
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-@OptIn(ExperimentalNaverMapApi::class, ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TimeCapsuleDetailScreen(
     uiState: TimeCapsuleDetailUiState,
     sideEffect: () -> Flow<TimeCapsuleDetailSideEffect>,
     onAction: (TimeCapsuleDetailAction) -> Unit,
+    enableScroll: Boolean,
     onNavigateToImageDetail: (String, String) -> Unit,
     showPopup: (Popup) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    naverMap: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
     val scrollState = rememberScrollState()
-    val cameraPositionState = rememberCameraPositionState()
-    val mapProperties by remember {
-        mutableStateOf(
-            MapProperties(maxZoom = 20.0, minZoom = 5.0, locationTrackingMode = LocationTrackingMode.NoFollow)
-        )
-    }
-    val mapUiSettings by remember {
-        mutableStateOf(MapUiSettings(isLocationButtonEnabled = false))
-    }
-
-    var enableScroll by remember {
-        mutableStateOf(true)
-    }
     var showOption by rememberSaveable {
         mutableStateOf(false)
-    }
-
-    LaunchedEffect(uiState) {
-        cameraPositionState.move(
-            CameraUpdate.toCameraPosition(
-                CameraPosition(
-                    LatLng(uiState.timeCapsule.lat.toDouble(), uiState.timeCapsule.lng.toDouble()),
-                    15.0
-                )
-            )
-        )
     }
 
     lifecycle.onStartCollect(sideEffect()) {
@@ -203,7 +167,15 @@ fun TimeCapsuleDetailScreen(
                 },
                 onBack = onBack
             )
-            MenuItem(resId = uiState.timeCapsule.host.profileImage.toInt(), title = "작성자 : ${uiState.writer}")
+
+            val profileResId = when (uiState.timeCapsule.host.profileImage.toInt()) {
+                0 -> R.drawable.ic_smile_blue
+                1 -> R.drawable.ic_smile_green
+                2 -> R.drawable.ic_smile_orange
+                else -> R.drawable.ic_smile_violet
+            }
+
+            MenuItem(resId = profileResId, title = "작성자 : ${uiState.writer}")
             Divider(
                 color = colorResource(id = R.color.light_gray),
                 modifier = Modifier
@@ -256,44 +228,9 @@ fun TimeCapsuleDetailScreen(
                     .height(1.dp)
             )
 
-            LaunchedEffect(cameraPositionState.isMoving) {
-                enableScroll = !cameraPositionState.isMoving
-            }
-
             if (uiState.timeCapsule.checkLocation || !uiState.timeCapsule.isReceived) {
                 MenuItem(resId = R.drawable.ic_location_black, title = uiState.timeCapsule.address)
-                NaverMap(
-                    cameraPositionState = cameraPositionState,
-                    properties = mapProperties,
-                    uiSettings = mapUiSettings,
-                    modifier = Modifier
-                        .padding(start = 15.dp, end = 15.dp, bottom = 15.dp)
-                        .fillMaxWidth()
-                        .aspectRatio(1.3f)
-                        .padding(0.dp)
-                        .pointerInteropFilter(
-                            onTouchEvent = {
-                                when (it.action) {
-                                    MotionEvent.ACTION_DOWN -> {
-                                        enableScroll = false // 터치 시작 시 화면 스크롤 비활성화
-                                        false // 이벤트를 지도에 넘김
-                                    }
-
-                                    else -> true
-                                }
-                            }
-                        )
-                ) {
-                    Marker(
-                        state = MarkerState(
-                            position = LatLng(
-                                uiState.timeCapsule.lat.toDouble(),
-                                uiState.timeCapsule.lng.toDouble()
-                            )
-                        ),
-                        captionText = uiState.timeCapsule.address
-                    )
-                }
+                naverMap()
             }
         }
     }
@@ -326,24 +263,6 @@ fun MenuItem(resId: Int, title: String) {
             fontSize = 18.sp
         )
     }
-}
-
-@Preview
-@Composable
-private fun TimeCapsuleDetailScreenPreview() {
-    val timeCapsule = TimeCapsule(
-        address = "서울시 강남구 압구정동",
-        date = "2024-07-29",
-        content = "안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 "
-    )
-    TimeCapsuleDetailScreen(
-        uiState = TimeCapsuleDetailUiState(timeCapsule = timeCapsule),
-        sideEffect = { flowOf() },
-        onAction = {},
-        onNavigateToImageDetail = { _, _ -> },
-        showPopup = {},
-        onBack = {}
-    )
 }
 
 @Composable
@@ -455,4 +374,33 @@ fun TimeCapsulePager(
             )
         }
     }
+}
+
+@Preview
+@Composable
+private fun TimeCapsuleDetailScreenPreview() {
+    val timeCapsule = TimeCapsule(
+        address = "서울시 강남구 압구정동",
+        date = "2024-07-29",
+        content = "안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 ",
+        checkLocation = true
+    )
+    TimeCapsuleDetailScreen(
+        uiState = TimeCapsuleDetailUiState(isLoading = false, timeCapsule = timeCapsule),
+        sideEffect = { flowOf() },
+        onAction = {},
+        enableScroll = true,
+        onNavigateToImageDetail = { _, _ -> },
+        showPopup = {},
+        onBack = {},
+        naverMap = {
+            Box(
+                modifier = Modifier
+                    .padding(start = 15.dp, end = 15.dp, bottom = 15.dp)
+                    .fillMaxWidth()
+                    .aspectRatio(1.3f)
+                    .background(color = Color.Blue)
+            )
+        },
+    )
 }

@@ -3,7 +3,7 @@ package com.dhkim.home.data
 import com.dhkim.database.entity.MyTimeCapsuleEntity
 import com.dhkim.database.entity.ReceivedTimeCapsuleEntity
 import com.dhkim.database.entity.SendTimeCapsuleEntity
-import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
+import com.dhkim.story.data.dataSource.local.TimeCapsuleLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject

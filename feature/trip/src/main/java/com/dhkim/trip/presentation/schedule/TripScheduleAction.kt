@@ -1,7 +1,7 @@
 package com.dhkim.trip.presentation.schedule
 
-import com.dhkim.trip.domain.model.TripPlace
-import com.dhkim.trip.domain.model.TripType
+import com.dhkim.core.trip.domain.model.TripPlace
+import com.dhkim.core.trip.domain.model.TripType
 
 sealed interface TripScheduleAction {
 

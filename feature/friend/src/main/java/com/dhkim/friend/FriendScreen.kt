@@ -75,8 +75,8 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.Popup
 import com.dhkim.ui.onStartCollect
-import com.dhkim.user.model.Friend
-import com.dhkim.user.model.User
+import com.dhkim.user.domain.model.Friend
+import com.dhkim.user.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -774,11 +774,11 @@ private fun FriendScreenPreview() {
         uiState = FriendUiState(
             myInfo = User(
                 id = "홍길동",
-                profileImage = "${R.drawable.ic_smile_blue}"
+                profileImage = "0"
             )
         ),
         showInfoBottomSheet = {},
-        showAddFriendBottomSheet = { /*TODO*/ },
+        showAddFriendBottomSheet = { },
         onFriendLongClick = {}
     ) {
 
@@ -1034,8 +1034,15 @@ fun FriendItem(
                 .fillMaxWidth()
                 .padding(10.dp)
         ) {
+            val profileResId = when (profileImage) {
+                0 -> R.drawable.ic_smile_blue
+                1 -> R.drawable.ic_smile_green
+                2 -> R.drawable.ic_smile_orange
+                else -> R.drawable.ic_smile_violet
+            }
+
             Image(
-                painter = painterResource(id = profileImage),
+                painter = painterResource(id = profileResId),
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
@@ -1048,21 +1055,5 @@ fun FriendItem(
                     .padding(start = 5.dp)
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun FriendItemPreview() {
-    FriendItem(
-        friend = Friend(
-            nickname = "홍길동",
-            profileImage = "${R.drawable.ic_smile_blue}"
-        ),
-        profileImage = R.drawable.ic_smile_blue,
-        isMe = false,
-        onClick = {}
-    ) {
-
     }
 }

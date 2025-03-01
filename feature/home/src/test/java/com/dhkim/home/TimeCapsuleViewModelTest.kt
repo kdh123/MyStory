@@ -1,101 +1,43 @@
 package com.dhkim.home
 
-import com.dhkim.home.data.FakeTimeCapsuleLocalDataSource
 import com.dhkim.home.data.FakeTimeCapsuleRepository
-import com.dhkim.home.data.FakeUserLocalDataSource
-import com.dhkim.home.data.FakeUserRemoteDataSource
-import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
-import com.dhkim.home.data.di.TimeCapsuleModule
-import com.dhkim.home.domain.model.TimeCapsule
-import com.dhkim.home.domain.repository.TimeCapsuleRepository
-import com.dhkim.home.domain.usecase.DeleteTimeCapsuleUseCase
-import com.dhkim.home.domain.usecase.GetAllTimeCapsuleUseCase
 import com.dhkim.home.presentation.TimeCapsuleType
 import com.dhkim.home.presentation.TimeCapsuleViewModel
-import com.dhkim.user.datasource.UserLocalDataSource
-import com.dhkim.user.datasource.UserRemoteDataSource
-import com.dhkim.user.di.UserModule
-import com.dhkim.user.repository.UserRepository
-import com.dhkim.user.repository.UserRepositoryImpl
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.HiltTestApplication
-import dagger.hilt.android.testing.UninstallModules
-import dagger.hilt.components.SingletonComponent
+import com.dhkim.story.domain.model.TimeCapsule
+import com.dhkim.story.domain.usecase.DeleteTimeCapsuleUseCase
+import com.dhkim.story.domain.usecase.GetAllTimeCapsuleUseCase
+import com.dhkim.testing.FakeUserRepository
+import com.dhkim.user.domain.usecase.GetMyInfoUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-@Config(application = HiltTestApplication::class)
-@HiltAndroidTest
-@UninstallModules(TimeCapsuleModule::class, UserModule::class)
 class TimeCapsuleViewModelTest {
-
-    @Module
-    @InstallIn(SingletonComponent::class)
-    abstract class FakeTimeCapsuleModule {
-
-        @Binds
-        @Singleton
-        abstract fun bindTimeCapsuleRepository(fakeTimeCapsuleRepository: FakeTimeCapsuleRepository): TimeCapsuleRepository
-
-        @Binds
-        @Singleton
-        abstract fun bindTimeCapsuleLocalDataSource(fakeTimeCapsuleLocalDataSource: FakeTimeCapsuleLocalDataSource): TimeCapsuleLocalDataSource
-    }
-
-    @Module
-    @InstallIn(SingletonComponent::class)
-    abstract class UserModule {
-
-        @Binds
-        @Singleton
-        abstract fun bindUserRepository(userRepositoryImpl: UserRepositoryImpl): UserRepository
-
-        @Binds
-        @Singleton
-        abstract fun bindUserRemoteDataSource(fakeUserRemoteDataSource: FakeUserRemoteDataSource): UserRemoteDataSource
-
-        @Binds
-        @Singleton
-        abstract fun bindUserLocalDataSource(fakeUserLocalDataSource: FakeUserLocalDataSource): UserLocalDataSource
-    }
-
-    @get:Rule
-    var hiltRule = HiltAndroidRule(this)
 
     @get:Rule
     var mainDispatcherRule = MainDispatcherRule()
 
-    @Inject lateinit var timeCapsuleRepository: TimeCapsuleRepository
-    @Inject lateinit var userRepository: UserRepository
-    @Inject lateinit var getAllTimeCapsuleUseCase: GetAllTimeCapsuleUseCase
-    @Inject lateinit var deleteTimeCapsuleUseCase: DeleteTimeCapsuleUseCase
-
+    private val timeCapsuleRepository = FakeTimeCapsuleRepository()
+    private val userRepository = FakeUserRepository()
+    private val getAllTimeCapsuleUseCase = GetAllTimeCapsuleUseCase(timeCapsuleRepository, userRepository, Dispatchers.IO)
+    private val getMyInfoUseCase = GetMyInfoUseCase(userRepository)
+    private val deleteTimeCapsuleUseCase = DeleteTimeCapsuleUseCase(timeCapsuleRepository, userRepository, getMyInfoUseCase)
 
     private lateinit var viewModel: TimeCapsuleViewModel
 
     @Before
     fun setup() {
-        hiltRule.inject()
         viewModel = TimeCapsuleViewModel(
             getAllTimeCapsuleUseCase = getAllTimeCapsuleUseCase,
             deleteTimeCapsuleUseCase = deleteTimeCapsuleUseCase,

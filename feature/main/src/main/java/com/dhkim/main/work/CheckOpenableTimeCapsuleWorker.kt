@@ -6,9 +6,9 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.dhkim.common.NotificationManager
-import com.dhkim.home.domain.usecase.CanOpenTimeCapsuleUseCase
 import com.dhkim.main.MainActivity
 import com.dhkim.setting.domain.usecase.GetNotificationSettingUseCase
+import com.dhkim.story.domain.usecase.CanOpenTimeCapsuleUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers

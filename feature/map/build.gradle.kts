@@ -48,7 +48,9 @@ dependencies {
 
     implementation(project(":core:ui"))
     implementation(project(":core:common"))
+    implementation(project(":core:location"))
     implementation(project(":feature:location"))
+    testImplementation(project(":core:testing"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)
@@ -59,6 +61,7 @@ dependencies {
     implementation(libs.bundles.retrofit)
 
     implementation(libs.hilt)
+
     kapt(libs.androidx.hilt.compiler)
     kapt(libs.hilt.compiler)
 

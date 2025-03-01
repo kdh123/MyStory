@@ -1,79 +1,37 @@
 package com.dhkim.trip.schedule
 
 import androidx.lifecycle.SavedStateHandle
-import com.dhkim.trip.FakeTripLocalDataSource
-import com.dhkim.trip.data.dataSource.local.TripLocalDataSource
-import com.dhkim.trip.data.dataSource.local.TripRepositoryImpl
-import com.dhkim.trip.data.di.TripModule
-import com.dhkim.trip.domain.repository.TripRepository
-import com.dhkim.trip.domain.model.TripPlace
-import com.dhkim.trip.domain.usecase.GetTripUseCase
-import com.dhkim.trip.domain.usecase.SaveTripUseCase
-import com.dhkim.trip.domain.usecase.UpdateTripUseCase
+import com.dhkim.core.trip.domain.usecase.GetTripUseCase
+import com.dhkim.core.trip.domain.usecase.SaveTripUseCase
+import com.dhkim.core.trip.domain.usecase.UpdateTripUseCase
+import com.dhkim.testing.FakeTripRepository
 import com.dhkim.trip.presentation.schedule.TripScheduleAction
 import com.dhkim.trip.presentation.schedule.TripScheduleViewModel
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.HiltTestApplication
-import dagger.hilt.android.testing.UninstallModules
-import dagger.hilt.components.SingletonComponent
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-@Config(application = HiltTestApplication::class)
-@HiltAndroidTest
-@UninstallModules(TripModule::class)
 class TripScheduleViewModelTest {
-
-    @Module
-    @InstallIn(SingletonComponent::class)
-    abstract class TripModule {
-
-        @Binds
-        @Singleton
-        abstract fun bindTripRepository(tripRepositoryImpl: TripRepositoryImpl): TripRepository
-
-        @Binds
-        @Singleton
-        abstract fun bindTripLocalDataSource(fakeTripLocalDataSourceImpl: FakeTripLocalDataSource): TripLocalDataSource
-    }
-
-    @get:Rule
-    var hiltRule = HiltAndroidRule(this)
 
     private lateinit var viewModel: TripScheduleViewModel
 
-    @Inject lateinit var tripRepository: TripRepository
+    private val tripRepository = FakeTripRepository()
 
-    @Inject
-    lateinit var getTripUseCase: GetTripUseCase
+    private val getTripUseCase = GetTripUseCase(tripRepository)
 
-    @Inject
-    lateinit var saveTripUseCase: SaveTripUseCase
+    private val saveTripUseCase = SaveTripUseCase(tripRepository)
 
-    @Inject
-    lateinit var updateTripUseCase: UpdateTripUseCase
+    private val updateTripUseCase = UpdateTripUseCase(tripRepository)
 
     @Before
     fun setup() {
-        hiltRule.inject()
         viewModel = TripScheduleViewModel(
             getTripUseCase = getTripUseCase,
             saveTripUseCase = saveTripUseCase,
@@ -94,9 +52,9 @@ class TripScheduleViewModelTest {
     @Test
     fun `여행 장소 선택 테스트`() = runBlocking {
         viewModel.uiState.first()
-        viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.Seoul))
-        viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.DomesticPlace.Gyeongi))
-        viewModel.onAction(TripScheduleAction.UpdatePlaces(TripPlace.AbroadPlace.USA))
+        viewModel.onAction(TripScheduleAction.UpdatePlaces(com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace.Seoul))
+        viewModel.onAction(TripScheduleAction.UpdatePlaces(com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace.Gyeongi))
+        viewModel.onAction(TripScheduleAction.UpdatePlaces(com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace.USA))
 
         delay(100)
         assertEquals(viewModel.uiState.value.tripPlaces.size, 3)

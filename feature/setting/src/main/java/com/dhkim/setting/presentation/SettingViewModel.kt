@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingViewModel @Inject constructor(
+internal class SettingViewModel @Inject constructor(
     private val getNotificationSettingUseCase: GetNotificationSettingUseCase,
     private val updateNotificationSettingUseCase: UpdateNotificationSettingUseCase,
 ) : ViewModel() {

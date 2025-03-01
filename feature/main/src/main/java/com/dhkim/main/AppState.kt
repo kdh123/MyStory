@@ -28,7 +28,7 @@ import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
 import com.dhkim.trip.presentation.navigation.navigateToTripDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripImageDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripSchedule
-import com.dhkim.user.model.Friend
+import com.dhkim.user.domain.model.Friend
 
 @Stable
 class AppState(
@@ -135,7 +135,7 @@ class AppState(
 
 @SuppressLint("ComposableNaming")
 @Composable
-fun rememberMyStoryAppState(
+internal fun rememberMyStoryAppState(
     navController: NavHostController = rememberNavController(),
 ): AppState {
     return remember(

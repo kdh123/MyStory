@@ -40,8 +40,8 @@ android {
 
 dependencies {
 
+    implementation(project(":core:story"))
     implementation(project(":core:common"))
-    implementation(project(":feature:home"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)

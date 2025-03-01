@@ -6,12 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.common.onetimeRestartableStateIn
-import com.dhkim.trip.domain.model.Trip
-import com.dhkim.trip.domain.model.TripPlace
-import com.dhkim.trip.domain.model.toTripType
-import com.dhkim.trip.domain.usecase.GetTripUseCase
-import com.dhkim.trip.domain.usecase.SaveTripUseCase
-import com.dhkim.trip.domain.usecase.UpdateTripUseCase
+import com.dhkim.core.trip.domain.model.Trip
+import com.dhkim.core.trip.domain.model.TripPlace
+import com.dhkim.core.trip.domain.model.toTripType
+import com.dhkim.core.trip.domain.usecase.GetTripUseCase
+import com.dhkim.core.trip.domain.usecase.SaveTripUseCase
+import com.dhkim.core.trip.domain.usecase.UpdateTripUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TripScheduleViewModel @Inject constructor(
+internal class TripScheduleViewModel @Inject constructor(
     private val getTripUseCase: GetTripUseCase,
     private val saveTripUseCase: SaveTripUseCase,
     private val updateTripUseCase: UpdateTripUseCase,

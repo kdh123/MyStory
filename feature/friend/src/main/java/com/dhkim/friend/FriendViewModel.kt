@@ -8,22 +8,20 @@ import com.dhkim.common.Dispatcher
 import com.dhkim.common.RestartableStateFlow
 import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.common.onetimeRestartableStateIn
-import com.dhkim.user.model.Friend
-import com.dhkim.user.model.User
-import com.dhkim.user.repository.UserRepository
-import com.dhkim.user.usecase.AcceptFriendUseCase
-import com.dhkim.user.usecase.AddFriendUseCase
-import com.dhkim.user.usecase.DeleteFriendUseCase
-import com.dhkim.user.usecase.CreateFriendCodeUseCase
-import com.dhkim.user.usecase.GetMyInfoUseCase
-import com.dhkim.user.usecase.SearchFriendUseCase
+import com.dhkim.user.domain.model.Friend
+import com.dhkim.user.domain.model.User
+import com.dhkim.user.domain.usecase.AcceptFriendUseCase
+import com.dhkim.user.domain.usecase.AddFriendUseCase
+import com.dhkim.user.domain.usecase.DeleteFriendUseCase
+import com.dhkim.user.domain.usecase.CreateFriendCodeUseCase
+import com.dhkim.user.domain.usecase.GetMyInfoUseCase
+import com.dhkim.user.domain.usecase.SearchFriendUseCase
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -32,7 +30,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FriendViewModel @Inject constructor(
+internal class FriendViewModel @Inject constructor(
     private val deleteFriendUseCase: DeleteFriendUseCase,
     private val createFriendCodeUseCase: CreateFriendCodeUseCase,
     private val addFriendUseCase: AddFriendUseCase,
@@ -59,38 +57,19 @@ class FriendViewModel @Inject constructor(
     private val _sideEffect = Channel<FriendSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
-    private val profileImages = listOf(
-        R.drawable.ic_smile_blue,
-        R.drawable.ic_smile_violet,
-        R.drawable.ic_smile_green,
-        R.drawable.ic_smile_orange
-    )
-
     fun onAction(action: FriendAction) {
         when (action) {
-            is FriendAction.AcceptFriend -> {
-                acceptFriend(friend = action.friend)
-            }
+            is FriendAction.AcceptFriend -> acceptFriend(friend = action.friend)
 
-            FriendAction.AddFriend -> {
-                addFriend()
-            }
+            FriendAction.AddFriend -> addFriend()
 
-            is FriendAction.DeleteFriend -> {
-                deleteFriend(userId = action.userId)
-            }
+            is FriendAction.DeleteFriend -> deleteFriend(userId = action.userId)
 
-            is FriendAction.Query -> {
-                onQuery(query = action.query)
-            }
+            is FriendAction.Query -> onQuery(query = action.query)
 
-            FriendAction.SearchUser -> {
-                searchUser()
-            }
+            FriendAction.SearchUser -> searchUser()
 
-            FriendAction.CreateFriendCode -> {
-                createFriendCode()
-            }
+            FriendAction.CreateFriendCode -> createFriendCode()
         }
     }
 
@@ -106,7 +85,7 @@ class FriendViewModel @Inject constructor(
 
                 viewModelScope.launch {
                     val fcmToken = task.result
-                    val profileImage = profileImages[(0..3).random()]
+                    val profileImage = (0..3).random()
                     val isSuccessful = createFriendCodeUseCase(fcmToken = fcmToken, profileImage = profileImage).first()
                     if (isSuccessful) {
                         uiState.restart()

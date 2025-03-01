@@ -2,7 +2,7 @@ package com.dhkim.notification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.home.domain.usecase.GetReceivedAllTimeCapsuleUseCase
+import com.dhkim.story.domain.usecase.GetReceivedAllTimeCapsuleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class NotificationViewModel @Inject constructor(
+internal class NotificationViewModel @Inject constructor(
     private val getReceivedAllTimeCapsuleUseCase: GetReceivedAllTimeCapsuleUseCase
 ) : ViewModel() {
 

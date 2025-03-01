@@ -65,8 +65,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
 import com.dhkim.trip.R
-import com.dhkim.trip.domain.model.TripImage
-import com.dhkim.trip.domain.model.TripType
+import com.dhkim.core.trip.domain.model.TripImage
+import com.dhkim.core.trip.domain.model.TripType
 import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.WarningDialog
 import com.dhkim.ui.noRippleClick
@@ -563,8 +563,8 @@ suspend fun getImagesFromDateRange(
     context: Context,
     startDate: String,
     endDate: String
-): List<TripImage> {
-    val tripDetails = mutableListOf<TripImage>()
+): List<com.dhkim.core.trip.domain.model.TripImage> {
+    val tripDetails = mutableListOf<com.dhkim.core.trip.domain.model.TripImage>()
     val startMillis = DateUtil.dateToMills2(startDate)
     val endMillis = DateUtil.dateToMills2(endDate)
     val projection = arrayOf(
@@ -600,7 +600,7 @@ suspend fun getImagesFromDateRange(
                 )
                 val location = getImageLocation(context, uri)
                 tripDetails.add(
-                    TripImage(
+                    com.dhkim.core.trip.domain.model.TripImage(
                         id = "${System.currentTimeMillis()}",
                         date = date,
                         lat = location?.first ?: 0.0,
@@ -656,10 +656,10 @@ private fun getAddress(context: Context, lat: Double, lng: Double): String {
 @Preview(showBackground = true)
 @Composable
 private fun TripDetailScreenPreview() {
-    val images = mutableListOf<TripImage>().apply {
+    val images = mutableListOf<com.dhkim.core.trip.domain.model.TripImage>().apply {
         repeat(10) {
             add(
-                TripImage(
+                com.dhkim.core.trip.domain.model.TripImage(
                     id = "$it"
                 )
             )
@@ -668,7 +668,7 @@ private fun TripDetailScreenPreview() {
 
     val uiState = TripDetailUiState(
         title = "서울, 경기 여행",
-        type = TripType.Family.desc,
+        type = com.dhkim.core.trip.domain.model.TripType.Family.desc,
         startDate = "2024-03-03",
         endDate = "2024-03-10",
         images = images.toImmutableList()

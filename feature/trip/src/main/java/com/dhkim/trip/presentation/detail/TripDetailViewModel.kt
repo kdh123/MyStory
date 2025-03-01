@@ -4,13 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
-import com.dhkim.trip.domain.model.Trip
-import com.dhkim.trip.domain.model.TripImage
-import com.dhkim.trip.domain.model.toTripType
-import com.dhkim.trip.domain.usecase.DeleteTripImageUseCase
-import com.dhkim.trip.domain.usecase.DeleteTripUseCase
-import com.dhkim.trip.domain.usecase.GetTripUseCase
-import com.dhkim.trip.domain.usecase.UpdateTripUseCase
+import com.dhkim.core.trip.domain.model.Trip
+import com.dhkim.core.trip.domain.model.TripImage
+import com.dhkim.core.trip.domain.model.toTripType
+import com.dhkim.core.trip.domain.usecase.DeleteTripImageUseCase
+import com.dhkim.core.trip.domain.usecase.DeleteTripUseCase
+import com.dhkim.core.trip.domain.usecase.GetTripUseCase
+import com.dhkim.core.trip.domain.usecase.UpdateTripUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TripDetailViewModel @Inject constructor(
+internal class TripDetailViewModel @Inject constructor(
     private val getTripUseCase: GetTripUseCase,
     private val deleteTripUseCase: DeleteTripUseCase,
     private val updateTripUseCase: UpdateTripUseCase,

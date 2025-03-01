@@ -1,8 +1,8 @@
 package com.dhkim.trip
 
 import com.dhkim.common.DateUtil
-import com.dhkim.trip.domain.model.TripPlace
-import com.dhkim.trip.domain.model.TripType
+import com.dhkim.core.trip.domain.model.TripPlace
+import com.dhkim.core.trip.domain.model.TripType
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
@@ -35,7 +35,7 @@ class UnitTest {
     fun `국내 여행 여부 체크 로직`() {
         val places = listOf("서울", "부산", "미국")
         val isDomestic = places.firstOrNull { place ->
-            TripPlace.AbroadPlace.entries.map {
+            com.dhkim.core.trip.domain.model.TripPlace.AbroadPlace.entries.map {
                 it.placeName
             }.contains(place)
         } == null
@@ -72,7 +72,7 @@ class UnitTest {
 
     @Test
     fun `TripPlace 전환`() {
-        val place = TripPlace.DomesticPlace.entries.first { it.placeName == "서울" }
+        val place = com.dhkim.core.trip.domain.model.TripPlace.DomesticPlace.entries.first { it.placeName == "서울" }
         println(place)
     }
 
@@ -83,13 +83,13 @@ class UnitTest {
     }
 }
 
-fun Int.toTripType(): TripType {
+fun Int.toTripType(): com.dhkim.core.trip.domain.model.TripType {
     return when (this) {
-        0 -> TripType.Alone
-        1 -> TripType.Family
-        2 -> TripType.Lover
-        3 -> TripType.Friend
-        4 -> TripType.Acquaintance
-        else -> TripType.Stranger
+        0 -> com.dhkim.core.trip.domain.model.TripType.Alone
+        1 -> com.dhkim.core.trip.domain.model.TripType.Family
+        2 -> com.dhkim.core.trip.domain.model.TripType.Lover
+        3 -> com.dhkim.core.trip.domain.model.TripType.Friend
+        4 -> com.dhkim.core.trip.domain.model.TripType.Acquaintance
+        else -> com.dhkim.core.trip.domain.model.TripType.Stranger
     }
 }

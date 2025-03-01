@@ -1,23 +1,23 @@
 package com.dhkim.home.data
 
-import com.dhkim.home.data.dataSource.local.TimeCapsuleLocalDataSource
-import com.dhkim.home.data.dataSource.remote.Uuid
-import com.dhkim.home.data.dataSource.toMyTimeCapsule
-import com.dhkim.home.data.dataSource.toReceivedTimeCapsule
-import com.dhkim.home.domain.model.MyTimeCapsule
-import com.dhkim.home.domain.model.ReceivedTimeCapsule
-import com.dhkim.home.domain.model.SendTimeCapsule
-import com.dhkim.home.domain.repository.TimeCapsuleRepository
-import com.dhkim.home.domain.repository.isSuccessful
+import com.dhkim.story.data.dataSource.local.TimeCapsuleLocalDataSource
+import com.dhkim.story.data.dataSource.remote.Uuid
+import com.dhkim.story.data.dataSource.toMyTimeCapsule
+import com.dhkim.story.data.dataSource.toReceivedTimeCapsule
+import com.dhkim.story.domain.model.MyTimeCapsule
+import com.dhkim.story.domain.model.ReceivedTimeCapsule
+import com.dhkim.story.domain.model.SendTimeCapsule
+import com.dhkim.story.domain.repository.TimeCapsuleRepository
+import com.dhkim.story.domain.repository.isSuccessful
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-class FakeTimeCapsuleRepository @Inject constructor(
-    private val localDataSource: TimeCapsuleLocalDataSource
+class FakeTimeCapsuleRepository (
+    private val localDataSource: TimeCapsuleLocalDataSource = FakeTimeCapsuleLocalDataSource()
 ) : TimeCapsuleRepository {
 
-    override suspend fun shareTimeCapsule(
+    override fun shareTimeCapsule(
         myId: String,
         myProfileImage: String,
         timeCapsuleId: String,
@@ -29,8 +29,8 @@ class FakeTimeCapsuleRepository @Inject constructor(
         placeName: String,
         address: String,
         checkLocation: Boolean
-    ): isSuccessful {
-        return true
+    ): Flow<isSuccessful> {
+        return flowOf(true)
     }
 
     override suspend fun deleteTimeCapsule(myId: String, sharedFriends: List<Uuid>, timeCapsuleId: String): isSuccessful {

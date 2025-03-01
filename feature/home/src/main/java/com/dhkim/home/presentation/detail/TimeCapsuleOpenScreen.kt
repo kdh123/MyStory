@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.home.R
-import com.dhkim.home.domain.model.TimeCapsule
+import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.drawAnimatedBorder
 import com.dhkim.ui.onStartCollect
 import com.skydoves.landscapist.glide.GlideImage

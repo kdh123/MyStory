@@ -40,8 +40,9 @@ android {
 dependencies {
 
     implementation(project(":core:datastore"))
+    implementation(project(":core:setting"))
 
-    implementation(libs.bundles.androidx.datastore)
+    //implementation(libs.bundles.androidx.datastore)
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)
 

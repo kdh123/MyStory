@@ -2,16 +2,12 @@
 
 package com.dhkim.home.presentation
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,7 +38,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,20 +61,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
 import com.dhkim.common.DistanceManager
 import com.dhkim.home.R
-import com.dhkim.home.domain.model.TimeCapsule
+import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.DefaultBackground
 import com.dhkim.ui.Popup
 import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
-import com.google.android.gms.location.LocationServices
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.CameraUpdate
@@ -103,7 +97,9 @@ import kotlinx.coroutines.flow.flowOf
 fun TimeCapsuleScreen(
     uiState: TimeCapsuleUiState,
     sideEffect: () -> Flow<TimeCapsuleSideEffect>,
+    permissionState: PermissionState,
     modifier: Modifier = Modifier,
+    requestPermission: @Composable () -> Unit,
     onDeleteTimeCapsule: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
     onNavigateToAdd: () -> Unit,
     onNavigateToOpen: (timeCapsuleId: String, isReceived: Boolean) -> Unit,
@@ -116,9 +112,6 @@ fun TimeCapsuleScreen(
 ) {
     val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
-    var currentLocation by remember {
-        mutableStateOf(Constants.defaultLocation)
-    }
     var selectedTimeCapsule by remember {
         mutableStateOf(TimeCapsule())
     }
@@ -127,20 +120,6 @@ fun TimeCapsuleScreen(
     }
     var showMenuDialog by rememberSaveable {
         mutableStateOf(false)
-    }
-    val fusedLocationClient = remember {
-        LocationServices.getFusedLocationProviderClient(context)
-    }
-    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
-                    currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
-                }
-        }
     }
 
     if (showMenuDialog) {
@@ -207,12 +186,10 @@ fun TimeCapsuleScreen(
         )
     }
 
-    LaunchedEffect(locationPermissionState) {
-        if (!locationPermissionState.status.isGranted && locationPermissionState.status.shouldShowRationale) {
-            // Show rationale if needed
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
+    if (!permissionState.status.isGranted && permissionState.status.shouldShowRationale) {
+        // Show rationale if needed
+    } else {
+        requestPermission()
     }
 
     lifecycle.onStartCollect(sideEffect()) {
@@ -345,10 +322,10 @@ fun TimeCapsuleScreen(
                                 OpenableTimeCapsules(
                                     timeCapsules = (it.data as? List<TimeCapsule>
                                         ?: listOf()).toImmutableList(),
-                                    currentLat = currentLocation.latitude,
-                                    currentLng = currentLocation.longitude,
+                                    currentLat = uiState.currentLocation.latitude,
+                                    currentLng = uiState.currentLocation.longitude,
                                     onShowLocationDialog = {
-                                        if (!locationPermissionState.status.isGranted) {
+                                        if (!permissionState.status.isGranted) {
                                             showPopup(
                                                 Popup.Warning(
                                                     title = "위치 권한 요청",
@@ -741,13 +718,14 @@ private fun UnopenedTimeCapsules(
 }
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun TimeCapsuleScreenPreview() {
     val unOpenedList = mutableListOf<TimeCapsule>()
     val openedList = mutableListOf<TimeCapsule>()
 
-    repeat(5) {
+    repeat(10) {
         if (it % 2 == 0) {
             openedList.add(
                 TimeCapsule(
@@ -758,6 +736,16 @@ private fun TimeCapsuleScreenPreview() {
                 )
             )
             unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", images = listOf("")))
+        } else if (it % 3 == 0) {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf(""),
+                    isOpened = true
+                )
+            )
         } else {
             openedList.add(
                 TimeCapsule(
@@ -771,7 +759,7 @@ private fun TimeCapsuleScreenPreview() {
             unOpenedList.add(
                 TimeCapsule(
                     id = "$it",
-                    openDate = "2024-06-28",
+                    openDate = "2099-12-24",
                     checkLocation = true,
                     images = listOf("")
                 )
@@ -780,8 +768,10 @@ private fun TimeCapsuleScreenPreview() {
     }
 
     TimeCapsuleScreen(
-        uiState = TimeCapsuleUiState(),
+        uiState = TimeCapsuleUiState(isLoading = false, timeCapsules = (unOpenedList + openedList).toItems(spaceId = 100).toImmutableList()),
         sideEffect = { flowOf() },
+        permissionState = DefaultPermissionState(),
+        requestPermission = {},
         onDeleteTimeCapsule = { _, _ -> },
         onNavigateToAdd = { },
         onNavigateToOpen = { _, _ -> },
@@ -870,28 +860,6 @@ fun OpenedBox(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun OpenedBoxPreview() {
-    val timeCapsule = TimeCapsule(
-        id = "",
-        date = "2024-06-24",
-        openDate = "2024-06-24",
-        lat = "",
-        lng = "",
-        address = "",
-        content = "",
-        images = listOf(""),
-        checkLocation = false,
-        isOpened = true,
-        sharedFriends = listOf(),
-        isReceived = false,
-        sender = ""
-    )
-
-    OpenedBox(timeCapsule, onClick = {}, onLongClick = {})
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -1041,14 +1009,14 @@ private fun LockTimeCapsule(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun LockTimeCapsulePreview() {
-    val timeCapsule = TimeCapsule(
-        images = listOf("")
-    )
+@OptIn(ExperimentalPermissionsApi::class)
+class DefaultPermissionState : PermissionState {
+    override val permission: String
+        get() = ""
+    override val status: PermissionStatus
+        get() = PermissionStatus.Granted
 
-    LockTimeCapsule(timeCapsule = timeCapsule, onLongClick = {
+    override fun launchPermissionRequest() {
 
-    })
+    }
 }

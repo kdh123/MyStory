@@ -2,33 +2,43 @@ package com.dhkim.home.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dhkim.common.Constants
 import com.dhkim.common.DateUtil
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.RestartableStateFlow
 import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.common.onetimeRestartableStateIn
-import com.dhkim.home.domain.model.TimeCapsule
-import com.dhkim.home.domain.usecase.DeleteTimeCapsuleUseCase
-import com.dhkim.home.domain.usecase.GetAllTimeCapsuleUseCase
+import com.dhkim.story.domain.model.TimeCapsule
+import com.dhkim.story.domain.usecase.DeleteTimeCapsuleUseCase
+import com.dhkim.story.domain.usecase.GetAllTimeCapsuleUseCase
+import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TimeCapsuleViewModel @Inject constructor(
+internal class TimeCapsuleViewModel @Inject constructor(
     private val getAllTimeCapsuleUseCase: GetAllTimeCapsuleUseCase,
     private val deleteTimeCapsuleUseCase: DeleteTimeCapsuleUseCase,
     @Dispatcher(TimeCapsuleDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    val uiState: RestartableStateFlow<TimeCapsuleUiState> = getAllTimeCapsuleUseCase()
-        .map { it.toUiState(spaceId = 100) }
-        .onetimeRestartableStateIn(
+    private val currentLocation = MutableStateFlow(Constants.defaultLocation)
+
+    val uiState: RestartableStateFlow<TimeCapsuleUiState> = combine(
+        currentLocation,
+        getAllTimeCapsuleUseCase()
+    ) { location, timeCapsules ->
+        TimeCapsuleUiState(isLoading = false, currentLocation = location, timeCapsules = timeCapsules.toItems(spaceId = 100))
+    }.onetimeRestartableStateIn(
             scope = viewModelScope,
             initialValue = TimeCapsuleUiState(),
             isOnetime = false
@@ -45,6 +55,24 @@ class TimeCapsuleViewModel @Inject constructor(
             }
         }
     }
+
+    internal fun updateCurrentLocation(location: LatLng) {
+        currentLocation.update { location }
+    }
+}
+
+fun List<TimeCapsule>.toItems(spaceId: Int): ImmutableList<TimeCapsuleItem> {
+    val items = getTimeCapsules(spaceId = spaceId, type = 0, timeCapsules = toOpenableTimeCapsules()) +
+            getTimeCapsules(spaceId = spaceId + 1, type = 1, timeCapsules = toOpenedTimeCapsules()) +
+            getTimeCapsules(
+                spaceId = spaceId + 2,
+                type = 2,
+                timeCapsules = toUnOpenedMyTimeCapsules() + toUnOpenedReceivedTimeCapsules()
+            )
+
+    val result = items.ifEmpty { getTimeCapsules(spaceId + 3, -1) } + getTimeCapsules(spaceId + 4, 3)
+
+    return result.toImmutableList()
 }
 
 fun List<TimeCapsule>.toUiState(spaceId: Int): TimeCapsuleUiState {

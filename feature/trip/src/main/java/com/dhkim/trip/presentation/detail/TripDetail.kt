@@ -1,8 +1,8 @@
 package com.dhkim.trip.presentation.detail
 
 import androidx.compose.runtime.Stable
-import com.dhkim.trip.domain.model.TripImage
-import com.dhkim.trip.domain.model.TripVideo
+import com.dhkim.core.trip.domain.model.TripImage
+import com.dhkim.core.trip.domain.model.TripVideo
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
