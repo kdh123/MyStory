@@ -57,6 +57,7 @@ dependencies {
     implementation(project(":core:location"))
     implementation(project(":core:common"))
     implementation(project(":core:network"))
+    testImplementation(project(":core:testing"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)

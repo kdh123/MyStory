@@ -32,11 +32,14 @@ android {
 dependencies {
 
     implementation(project(":core:user"))
+    implementation(project(":core:location"))
     implementation(project(":core:common"))
     implementation(project(":core:database"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.bundles.androidx.paging3)
+    implementation(libs.androidx.paging.testing)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

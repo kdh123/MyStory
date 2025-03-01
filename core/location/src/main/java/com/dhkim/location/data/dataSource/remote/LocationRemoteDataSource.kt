@@ -7,7 +7,7 @@ import com.dhkim.location.domain.model.Category
 import com.dhkim.location.domain.model.Place
 import kotlinx.coroutines.flow.Flow
 
-internal interface LocationRemoteDataSource {
+interface LocationRemoteDataSource {
 
     fun getNearPlaceByKeyword(query: String, lat: String, lng: String): Flow<PagingData<Place>>
     fun getPlaceByKeyword(query: String): Flow<PagingData<Place>>

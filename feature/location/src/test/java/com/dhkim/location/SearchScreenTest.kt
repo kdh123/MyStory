@@ -11,25 +11,11 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTextInput
 import androidx.lifecycle.SavedStateHandle
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.dhkim.location.data.dataSource.remote.LocationApi
-import com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
-import com.dhkim.location.data.di.LocationApiModule
-import com.dhkim.location.data.di.LocationModule
-import com.dhkim.location.data.model.PlaceDocument
-import com.dhkim.location.data.repository.LocationRepositoryImpl
-import com.dhkim.location.domain.repository.LocationRepository
 import com.dhkim.location.domain.model.Place
 import com.dhkim.location.domain.usecase.GetNearPlacesByKeywordUseCase
 import com.dhkim.location.presentation.SearchScreen
 import com.dhkim.location.presentation.SearchViewModel
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.HiltTestApplication
-import dagger.hilt.android.testing.UninstallModules
-import dagger.hilt.components.SingletonComponent
+import com.dhkim.testing.FakeLocationRepository
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
@@ -39,35 +25,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = HiltTestApplication::class)
-@HiltAndroidTest
-@UninstallModules(LocationModule::class, LocationApiModule::class)
 class SearchScreenTest {
-
-    @Module
-    @InstallIn(SingletonComponent::class)
-    abstract class FakeTimeCapsuleModule {
-
-        @Binds
-        @Singleton
-        abstract fun bindLocationRepository(locationRepositoryImpl: LocationRepositoryImpl): LocationRepository
-
-        @Binds
-        @Singleton
-        abstract fun bindLocationRemoteDataSource(locationRemoteDataSource: FakeLocationRemoteDataSource): com.dhkim.location.data.dataSource.remote.LocationRemoteDataSource
-
-        @Binds
-        @Singleton
-        abstract fun bindFakeLocationApi(fakeLocationApi: FakeLocationApi): com.dhkim.location.data.dataSource.remote.LocationApi
-    }
-
-    @get:Rule
-    var hiltRule = HiltAndroidRule(this)
 
     @get:Rule
     var mainDispatcherRule = MainDispatcherRule()
@@ -75,14 +35,12 @@ class SearchScreenTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-    @Inject
-    lateinit var getNearPlacesByKeywordUseCase: GetNearPlacesByKeywordUseCase
+    private val getNearPlacesByKeywordUseCase = GetNearPlacesByKeywordUseCase(locationRepository = FakeLocationRepository())
 
     private lateinit var viewModel: SearchViewModel
 
     @Before
     fun setup() {
-        hiltRule.inject()
         val savedStateHandle = SavedStateHandle().apply {
             set("lat", "37.572389")
             set("lng", "126.9769117")
@@ -115,34 +73,28 @@ class SearchScreenTest {
 
         composeRule.waitUntilExists(hasTestTag("searchResult"), timeoutMillis = 3_000L)
 
-        val documents = mutableListOf<PlaceDocument>().apply {
+        val documents = mutableListOf<Place>().apply {
             repeat(15) {
                 add(
-                    PlaceDocument(
-                        address_name = "서울시 강남구$it",
-                        category_group_code = "code$it",
-                        category_group_name = "group$it",
-                        category_name = "categoryName$it",
+                    Place(
+                        address = "서울시 강남구$it",
+                        category = "categoryName$it",
                         distance = "$it",
                         id = "placeId$it",
                         phone = "010-1234-1234",
-                        place_name = "장소$it",
-                        place_url = "url$it",
-                        road_address_name = "강남로$it",
-                        x = "34.3455",
-                        y = "123.4233"
+                        name = if (it == 2) "롯데타워" else "장소$it",
+                        url = "url$it",
+                        lat = "34.3455",
+                        lng = "123.4233"
                     )
                 )
             }
-        }.map {
-            it.toPlace()
         }
 
-        val isContain = documents.map {
-            places.contains(it)
-        }.firstOrNull { !it }
+        val isContain = places.map { it.name }.contains("롯데타워")
 
-        assertEquals(isContain, null)
+        assertEquals(places, documents)
+        assertEquals(isContain, true)
     }
 }
 
