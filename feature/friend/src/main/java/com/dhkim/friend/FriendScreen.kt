@@ -2,6 +2,7 @@
 
 package com.dhkim.friend
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -32,9 +33,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -72,12 +75,14 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.Popup
 import com.dhkim.ui.onStartCollect
 import com.dhkim.user.domain.model.Friend
 import com.dhkim.user.domain.model.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -414,7 +419,7 @@ fun FriendScreen(
                 indicator = { tabPositions ->
                     TabRowDefaults.Indicator(
                         modifier = Modifier.tabIndicatorOffset(tabPositions[currentTab]),
-                        color = colorResource(id = R.color.primary)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             ) {
@@ -431,9 +436,9 @@ fun FriendScreen(
                         },
                         text = {
                             if (currentTab == index) {
-                                Text(text = title, fontWeight = FontWeight.Bold)
+                                Text(text = title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                             } else {
-                                Text(text = title)
+                                Text(text = title, color = MaterialTheme.colorScheme.primary)
                             }
                         },
                     )
@@ -676,7 +681,7 @@ fun BottomSheetScreen(
                     modifier = Modifier
                         .fillMaxSize(),
                     colors = androidx.compose.material3.TextFieldDefaults.textFieldColors(
-                        containerColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.background,
                         focusedIndicatorColor = Color.Transparent,
                     )
                 )
@@ -758,30 +763,6 @@ fun BottomSheetScreen(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SearchScreenPreview() {
-    BottomSheetScreen(FriendUiState(), onAction = {})
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun FriendScreenPreview() {
-    FriendListScreen(
-        uiState = FriendUiState(
-            myInfo = User(
-                id = "홍길동",
-                profileImage = "0"
-            )
-        ),
-        showInfoBottomSheet = {},
-        showAddFriendBottomSheet = { },
-        onFriendLongClick = {}
-    ) {
-
     }
 }
 
@@ -1054,6 +1035,87 @@ fun FriendItem(
                     .align(Alignment.CenterVertically)
                     .padding(start = 5.dp)
             )
+        }
+    }
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun FriendScreenDarkPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            FriendScreen(
+                uiState = FriendUiState(
+                    isLoading = false,
+                    myInfo = User(
+                        id = "홍길동",
+                        profileImage = "0"
+                    )
+                ),
+                sideEffect = { flowOf() },
+                onAction = {},
+                onNavigateToAddTimeCapsule = {},
+                onNavigateToChangeInfo = {},
+                onBack = {  },
+                showPopup = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FriendScreenPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            FriendScreen(
+                uiState = FriendUiState(
+                    isLoading = false,
+                    myInfo = User(
+                        id = "홍길동",
+                        profileImage = "0"
+                    )
+                ),
+                sideEffect = { flowOf() },
+                onAction = {},
+                onNavigateToAddTimeCapsule = {},
+                onNavigateToChangeInfo = {},
+                onBack = {  },
+                showPopup = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SearchScreenDarkPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            BottomSheetScreen(FriendUiState(), onAction = {})
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SearchScreenPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            BottomSheetScreen(FriendUiState(), onAction = {})
         }
     }
 }

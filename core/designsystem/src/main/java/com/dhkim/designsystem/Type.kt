@@ -1,4 +1,4 @@
-package com.dhkim.home.ui.theme
+package com.dhkim.designsystem
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

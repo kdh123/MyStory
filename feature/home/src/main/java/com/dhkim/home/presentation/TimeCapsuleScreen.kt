@@ -4,6 +4,7 @@ package com.dhkim.home.presentation
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -34,7 +35,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -63,6 +67,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
 import com.dhkim.common.DistanceManager
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.home.R
 import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.DefaultBackground
@@ -225,7 +230,7 @@ fun TimeCapsuleScreen(
                         .align(Alignment.CenterVertically)
                 )
 
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_notification_black),
                     contentDescription = null,
                     modifier = Modifier
@@ -238,7 +243,7 @@ fun TimeCapsuleScreen(
                         }
                 )
 
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_setting_black),
                     contentDescription = null,
                     modifier = Modifier
@@ -472,12 +477,6 @@ private fun LoadingScreen() {
                 )
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoadingScreenPreview() {
-    LoadingScreen()
 }
 
 @Composable
@@ -717,73 +716,6 @@ private fun UnopenedTimeCapsules(
     }
 }
 
-
-@OptIn(ExperimentalPermissionsApi::class)
-@Preview(showBackground = true)
-@Composable
-private fun TimeCapsuleScreenPreview() {
-    val unOpenedList = mutableListOf<TimeCapsule>()
-    val openedList = mutableListOf<TimeCapsule>()
-
-    repeat(10) {
-        if (it % 2 == 0) {
-            openedList.add(
-                TimeCapsule(
-                    id = "$it",
-                    date = "2024-06-28",
-                    openDate = "2024-06-28",
-                    images = listOf("")
-                )
-            )
-            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", images = listOf("")))
-        } else if (it % 3 == 0) {
-            openedList.add(
-                TimeCapsule(
-                    id = "$it",
-                    date = "2024-06-28",
-                    openDate = "2024-06-28",
-                    images = listOf(""),
-                    isOpened = true
-                )
-            )
-        } else {
-            openedList.add(
-                TimeCapsule(
-                    id = "$it",
-                    date = "2024-06-28",
-                    openDate = "2024-06-28",
-                    checkLocation = true,
-                    images = listOf("")
-                )
-            )
-            unOpenedList.add(
-                TimeCapsule(
-                    id = "$it",
-                    openDate = "2099-12-24",
-                    checkLocation = true,
-                    images = listOf("")
-                )
-            )
-        }
-    }
-
-    TimeCapsuleScreen(
-        uiState = TimeCapsuleUiState(isLoading = false, timeCapsules = (unOpenedList + openedList).toItems(spaceId = 100).toImmutableList()),
-        sideEffect = { flowOf() },
-        permissionState = DefaultPermissionState(),
-        requestPermission = {},
-        onDeleteTimeCapsule = { _, _ -> },
-        onNavigateToAdd = { },
-        onNavigateToOpen = { _, _ -> },
-        onNavigateToDetail = { _, _ -> },
-        onNavigateToNotification = { },
-        onNavigateToSetting = { },
-        onNavigateToProfile = { },
-        onNavigateToMore = { },
-        showPopup = {}
-    )
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OpenedBox(
@@ -1019,4 +951,154 @@ class DefaultPermissionState : PermissionState {
     override fun launchPermissionRequest() {
 
     }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun TimeCapsuleScreenDarkPreview() {
+    val unOpenedList = mutableListOf<TimeCapsule>()
+    val openedList = mutableListOf<TimeCapsule>()
+
+    repeat(10) {
+        if (it % 2 == 0) {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf("")
+                )
+            )
+            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", images = listOf("")))
+        } else if (it % 3 == 0) {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf(""),
+                    isOpened = true
+                )
+            )
+        } else {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
+            unOpenedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    openDate = "2099-12-24",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
+        }
+    }
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TimeCapsuleScreen(
+                uiState = TimeCapsuleUiState(isLoading = false, timeCapsules = (unOpenedList + openedList).toItems(spaceId = 100).toImmutableList()),
+                sideEffect = { flowOf() },
+                permissionState = DefaultPermissionState(),
+                requestPermission = {},
+                onDeleteTimeCapsule = { _, _ -> },
+                onNavigateToAdd = { },
+                onNavigateToOpen = { _, _ -> },
+                onNavigateToDetail = { _, _ -> },
+                onNavigateToNotification = { },
+                onNavigateToSetting = { },
+                onNavigateToProfile = { },
+                onNavigateToMore = { },
+                showPopup = {}
+            )
+        }
+    }
+}
+
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview(showBackground = true)
+@Composable
+private fun TimeCapsuleScreenPreview() {
+    val unOpenedList = mutableListOf<TimeCapsule>()
+    val openedList = mutableListOf<TimeCapsule>()
+
+    repeat(10) {
+        if (it % 2 == 0) {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf("")
+                )
+            )
+            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", images = listOf("")))
+        } else if (it % 3 == 0) {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf(""),
+                    isOpened = true
+                )
+            )
+        } else {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
+            unOpenedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    openDate = "2099-12-24",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
+        }
+    }
+
+    TimeCapsuleScreen(
+        uiState = TimeCapsuleUiState(isLoading = false, timeCapsules = (unOpenedList + openedList).toItems(spaceId = 100).toImmutableList()),
+        sideEffect = { flowOf() },
+        permissionState = DefaultPermissionState(),
+        requestPermission = {},
+        onDeleteTimeCapsule = { _, _ -> },
+        onNavigateToAdd = { },
+        onNavigateToOpen = { _, _ -> },
+        onNavigateToDetail = { _, _ -> },
+        onNavigateToNotification = { },
+        onNavigateToSetting = { },
+        onNavigateToProfile = { },
+        onNavigateToMore = { },
+        showPopup = {}
+    )
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun LoadingScreenPreview() {
+    LoadingScreen()
 }

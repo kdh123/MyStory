@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
     implementation(project(":core:user"))
+    implementation(project(":core:designsystem"))
     implementation(project(":feature:friend"))
     implementation(project(":feature:location"))
     implementation(project(":feature:setting"))

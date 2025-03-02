@@ -10,6 +10,7 @@ package com.dhkim.home.presentation.add
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -18,10 +19,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,10 +49,13 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -85,6 +89,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.dhcamera.camera.DhCamera
 import com.dhkim.dhcamera.model.BackgroundText
 import com.dhkim.dhcamera.model.FontElement
@@ -359,10 +364,11 @@ fun AddTimeCapsuleScreen(
                 )
                 Column {
                     SwitchMenuItem(
-                        resId = if (uiState.checkLocation) {
-                            R.drawable.ic_location_primary
+                        resId = R.drawable.ic_location_primary,
+                        iconTint = if (uiState.checkLocation) {
+                            MaterialTheme.colorScheme.primary
                         } else {
-                            R.drawable.ic_location_black
+                            MaterialTheme.colorScheme.secondary
                         },
                         title = "위치 체크",
                         subTitle = "개봉할 수 있는 위치를 지정합니다.",
@@ -388,10 +394,11 @@ fun AddTimeCapsuleScreen(
                         color = colorResource(id = R.color.light_gray)
                     )
                     MenuItem(
-                        resId = if (uiState.openDate.isNotEmpty()) {
-                            R.drawable.ic_calender_primary
+                        resId = R.drawable.ic_calender_primary,
+                        iconTint = if (uiState.openDate.isNotEmpty()) {
+                            MaterialTheme.colorScheme.primary
                         } else {
-                            R.drawable.ic_calender_black
+                            MaterialTheme.colorScheme.secondary
                         },
                         title = uiState.openDate.ifEmpty { "개봉 날짜" },
                         subTitle = "지정한 날짜 이후에 개봉이 가능합니다.",
@@ -407,10 +414,11 @@ fun AddTimeCapsuleScreen(
                     )
 
                     SwitchMenuItem(
-                        resId = if (uiState.isShare) {
-                            R.drawable.ic_smile_blue
+                        resId = R.drawable.ic_smile_blue,
+                        iconTint = if (uiState.isShare) {
+                            MaterialTheme.colorScheme.primary
                         } else {
-                            R.drawable.ic_face_black
+                            MaterialTheme.colorScheme.secondary
                         },
                         title = "친구와 공유하기",
                         subTitle = "사진은 친구에게 공유되지 않습니다.",
@@ -626,7 +634,7 @@ private fun SharedFriendItem(
 private fun SaveButton(modifier: Modifier, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.primary)),
-        shape = RoundedCornerShape(30.dp),
+        shape = RoundedCornerShape(10.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
@@ -723,6 +731,7 @@ fun Calender(
 private fun SwitchMenuItem(
     resId: Int,
     title: String,
+    iconTint: Color = MaterialTheme.colorScheme.primary,
     subTitle: String = "",
     isChecked: Boolean,
     onClick: (Boolean) -> Unit
@@ -732,9 +741,10 @@ private fun SwitchMenuItem(
             .padding(horizontal = 15.dp, vertical = 5.dp)
             .fillMaxWidth()
     ) {
-        Image(
+        Icon(
             painter = painterResource(id = resId),
             contentDescription = null,
+            tint = iconTint,
             modifier = Modifier
                 .padding(top = 3.dp)
         )
@@ -778,6 +788,7 @@ private fun SwitchMenuItem(
 @Composable
 private fun MenuItem(
     resId: Int,
+    iconTint: Color = MaterialTheme.colorScheme.primary,
     title: String,
     subTitle: String = "",
     modifier: Modifier = Modifier,
@@ -790,7 +801,7 @@ private fun MenuItem(
             .wrapContentHeight()
             .fillMaxWidth()
     ) {
-        Image(
+        Icon(
             painter = painterResource(
                 id = if (resId == -1) {
                     R.drawable.ic_map_black
@@ -798,6 +809,7 @@ private fun MenuItem(
                     resId
                 }
             ),
+            tint = iconTint,
             contentDescription = null,
             modifier = Modifier
                 .padding(top = 3.dp)
@@ -830,7 +842,7 @@ private fun MenuItem(
                 )
             }
         }
-        Image(
+        Icon(
             painter = painterResource(id = R.drawable.ic_right_primary),
             contentDescription = null,
             modifier = Modifier
@@ -879,13 +891,15 @@ private fun ImageListView(
     }
 }
 
-
-
 @Composable
 private fun ImageView(imageUrl: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     OutlinedCard(
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(id = R.color.white),
+            containerColor = if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.surfaceContainer
+            } else {
+                Color.White
+            },
             contentColor = colorResource(id = R.color.light_gray)
         ),
         elevation = CardDefaults.elevatedCardElevation(10.dp),
@@ -923,14 +937,13 @@ private fun ContentsView(
                 color = colorResource(id = R.color.gray),
                 shape = RoundedCornerShape(10.dp)
             )
-            .background(color = colorResource(id = R.color.white))
     ) {
         TextField(
             label = {
                 Text(text = "내용을 입력해주세요.")
             },
             colors = textFieldColors(
-                containerColor = colorResource(id = R.color.white),
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
@@ -939,26 +952,9 @@ private fun ContentsView(
                 onAction(AddTimeCapsuleAction.Typing(it))
             },
             modifier = Modifier
-                .padding(5.dp)
                 .fillMaxSize()
         )
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-private fun AddTimeCapsuleScreenPreview() {
-    AddTimeCapsuleScreen(
-        uiState = AddTimeCapsuleUiState(),
-        sideEffect = { flowOf() },
-        onAction = {},
-        imageUrl = "imageUrl2",
-        friendId = "",
-        onBack = { },
-        requestLocationPermission = {},
-        permissionState = DefaultPermissionState()
-    )
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -970,5 +966,57 @@ class DefaultPermissionState : PermissionState {
 
     override fun launchPermissionRequest() {
 
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun AddTimeCapsuleScreenDarkPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            AddTimeCapsuleScreen(
+                uiState = AddTimeCapsuleUiState(
+                    placeName = "강남",
+                    checkLocation = true,
+                    openDate = "2025-08-12"
+                ),
+                sideEffect = { flowOf() },
+                onAction = {},
+                imageUrl = "imageUrl2",
+                friendId = "",
+                onBack = { },
+                requestLocationPermission = {},
+                permissionState = DefaultPermissionState()
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddTimeCapsuleScreenPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            AddTimeCapsuleScreen(
+                uiState = AddTimeCapsuleUiState(
+                    placeName = "강남",
+                    checkLocation = true,
+                    openDate = "2025-08-12"
+                ),
+                sideEffect = { flowOf() },
+                onAction = {},
+                imageUrl = "imageUrl2",
+                friendId = "",
+                onBack = { },
+                requestLocationPermission = {},
+                permissionState = DefaultPermissionState()
+            )
+        }
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -20,8 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.compose.NavHost
@@ -64,10 +63,10 @@ fun MainScreen(
             ) {
                 if (isBottomNavShow) {
                     NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight(align = Alignment.Bottom),
-                        containerColor = colorResource(id = R.color.white)
                     ) {
                         appState.bottomItems.forEach { screen ->
                             val isSelected = screen.route == appState.currentDestination
@@ -90,13 +89,13 @@ fun MainScreen(
                                         Icon(
                                             painterResource(id = screen.selected),
                                             contentDescription = null,
-                                            tint = Color.Unspecified
+                                            tint = MaterialTheme.colorScheme.primary
                                         )
                                     } else {
                                         Icon(
                                             painterResource(id = screen.unSelected),
                                             contentDescription = null,
-                                            tint = Color.Unspecified
+                                            tint = MaterialTheme.colorScheme.secondary
                                         )
                                     }
                                 },
@@ -212,9 +211,7 @@ sealed class Screen(
     val title: String, val selected: Int, val unSelected: Int, val route: String
 ) {
     data object Map : Screen("홈", R.drawable.ic_map_primary, R.drawable.ic_map_black, MAP_ROUTE)
-    data object AddTimeCapsule :
-        Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, ADD_TIME_CAPSULE_ROUTE)
-
+    data object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, ADD_TIME_CAPSULE_ROUTE)
     data object TimeCapsule :
         Screen(
             "타임캡슐",
@@ -223,8 +220,7 @@ sealed class Screen(
             TIME_CAPSULE_MAIN_ROUTE
         )
 
-    data object Friend :
-        Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, FRIEND_MAIN_ROUTE)
+    data object Friend : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, FRIEND_MAIN_ROUTE)
 
     data object Trip :
         Screen("여행", R.drawable.ic_trip_primary, R.drawable.ic_trip_black, TRIP_MAIN_ROUTE)

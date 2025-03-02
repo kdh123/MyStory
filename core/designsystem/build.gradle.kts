@@ -1,12 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.kapt)
 }
 
 android {
-    namespace = "com.dhkim.setting"
+    namespace = "com.dhkim.designsystem"
     compileSdk = 34
 
     defaultConfig {
@@ -39,20 +37,10 @@ android {
 
 dependencies {
 
-    implementation(project(":core:datastore"))
-    implementation(project(":core:setting"))
-    implementation(project(":core:designsystem"))
-
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)
-
-    implementation(libs.hilt)
-    kapt(libs.androidx.hilt.compiler)
-    kapt(libs.hilt.compiler)
-
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+    //implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
