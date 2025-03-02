@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.location.Address
 import android.location.Geocoder
 import android.media.ExifInterface
@@ -15,7 +16,6 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -41,8 +41,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,6 +70,7 @@ import com.dhkim.common.DateUtil
 import com.dhkim.trip.R
 import com.dhkim.core.trip.domain.model.TripImage
 import com.dhkim.core.trip.domain.model.TripType
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.WarningDialog
 import com.dhkim.ui.noRippleClick
@@ -97,22 +100,11 @@ fun TripDetailScreen(
 ) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
-    var showPermissionDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showMenuBottom by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showDeletePopup by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showImageMenuPopup by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var selectedImageId by rememberSaveable {
-        mutableStateOf("")
-    }
-
+    var showPermissionDialog by rememberSaveable { mutableStateOf(false) }
+    var showMenuBottom by rememberSaveable { mutableStateOf(false) }
+    var showDeletePopup by rememberSaveable { mutableStateOf(false) }
+    var showImageMenuPopup by rememberSaveable { mutableStateOf(false) }
+    var selectedImageId by rememberSaveable { mutableStateOf("") }
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { state ->
@@ -282,15 +274,13 @@ fun TripDetailScreen(
                             onBack()
                         }
                 )
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_option_black),
                     contentDescription = null,
                     modifier = Modifier
                         .padding(10.dp)
                         .align(Alignment.CenterEnd)
-                        .clickable {
-                            showMenuBottom = true
-                        }
+                        .clickable { showMenuBottom = true }
                 )
             }
         }
@@ -373,10 +363,8 @@ private fun MenuItem(
             modifier = modifier
                 .padding(10.dp)
         ) {
-            Image(
-                painter = painterResource(
-                    id = resId
-                ),
+            Icon(
+                painter = painterResource(id = resId),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(end = 10.dp)
@@ -654,38 +642,6 @@ private fun getAddress(context: Context, lat: Double, lng: Double): String {
     } ?: ""
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun TripDetailScreenPreview() {
-    val images = mutableListOf<com.dhkim.core.trip.domain.model.TripImage>().apply {
-        repeat(10) {
-            add(
-                com.dhkim.core.trip.domain.model.TripImage(
-                    id = "$it"
-                )
-            )
-        }
-    }
-
-    val uiState = TripDetailUiState(
-        title = "서울, 경기 여행",
-        type = com.dhkim.core.trip.domain.model.TripType.Family.desc,
-        startDate = "2024-03-03",
-        endDate = "2024-03-10",
-        images = images.toImmutableList()
-    )
-
-    TripDetailScreen(
-        tripId = "",
-        uiState = uiState,
-        sideEffect = flowOf(),
-        onAction = {},
-        onNavigateToImageDetail = { },
-        onNavigateToSchedule = {},
-        onBack = {}
-    )
-}
-
 fun Int.toMonth(): String {
     return when (this) {
         1 -> "Jan"
@@ -700,5 +656,76 @@ fun Int.toMonth(): String {
         10 -> "Oct"
         11 -> "Nov"
         else -> "Dec"
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TripDetailScreenDarkPreview() {
+    val images = mutableListOf<TripImage>().apply {
+        repeat(10) {
+            add(TripImage(id = "$it"))
+        }
+    }
+
+    val uiState = TripDetailUiState(
+        title = "서울, 경기 여행",
+        type = TripType.Family.desc,
+        startDate = "2024-03-03",
+        endDate = "2024-03-10",
+        images = images.toImmutableList()
+    )
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripDetailScreen(
+                tripId = "",
+                uiState = uiState,
+                sideEffect = flowOf(),
+                onAction = {},
+                onNavigateToImageDetail = { },
+                onNavigateToSchedule = {},
+                onBack = {}
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun TripDetailScreenPreview() {
+    val images = mutableListOf<TripImage>().apply {
+        repeat(10) {
+            add(TripImage(id = "$it"))
+        }
+    }
+
+    val uiState = TripDetailUiState(
+        title = "서울, 경기 여행",
+        type = TripType.Family.desc,
+        startDate = "2024-03-03",
+        endDate = "2024-03-10",
+        images = images.toImmutableList()
+    )
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripDetailScreen(
+                tripId = "",
+                uiState = uiState,
+                sideEffect = flowOf(),
+                onAction = {},
+                onNavigateToImageDetail = { },
+                onNavigateToSchedule = {},
+                onBack = {}
+            )
+        }
     }
 }

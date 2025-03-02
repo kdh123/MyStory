@@ -1,5 +1,6 @@
 package com.dhkim.trip.presentation.tripHome
 
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,7 +22,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,11 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dhkim.trip.R
 import com.dhkim.core.trip.domain.model.Trip
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.ui.Popup
 import com.dhkim.ui.noRippleClick
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import java.util.UUID
 
@@ -142,10 +145,8 @@ private fun AddTripScheduleLayout(
         modifier = Modifier
             .clip(RoundedCornerShape(10.dp))
             .fillMaxWidth()
-            .background(color = colorResource(id = R.color.light_gray))
-            .clickable {
-                onNavigateToSchedule()
-            }
+            .background(color = MaterialTheme.colorScheme.secondaryContainer)
+            .clickable { onNavigateToSchedule() }
     ) {
         Row(
             modifier = Modifier
@@ -236,14 +237,6 @@ private fun EmptyTripScheduleLayout(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun AddTripScheduleLayoutPreview() {
-    EmptyTripScheduleLayout(
-        onNavigateToSchedule = {}
-    )
 }
 
 @Composable
@@ -362,7 +355,85 @@ fun TripScheduleItem(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun AddTripScheduleLayoutDarkPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+
+            EmptyTripScheduleLayout(
+                onNavigateToSchedule = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun AddTripScheduleLayoutPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+
+            EmptyTripScheduleLayout(
+                onNavigateToSchedule = {}
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TripScreenDarkPreview() {
+    val trips = mutableListOf<Trip>().apply {
+        repeat(5) {
+            add(
+                Trip(
+                    id = "id$it",
+                    startDate = "2024-05-30",
+                    endDate = "2024-06-10",
+                    places = if (it % 2 == 0) {
+                        listOf("프랑스", "독일")
+                    } else {
+                        listOf("서울", "부산")
+                    },
+                    images = listOf(),
+                    videos = listOf(),
+                    isDomestic = it % 2 != 0
+                )
+            )
+        }
+    }.toImmutableList()
+
+    val items = mutableListOf<TripItem>()
+    items.add(TripItem(id = "${UUID.randomUUID()}", data = "다음 여행"))
+    items.addAll(trips.map { TripItem(id = it.id, data = it) })
+
+    val uiState = TripUiState(isLoading = false, trips = items.toImmutableList())
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripScreen(
+                uiState = uiState,
+                onNavigateToSchedule = {},
+                onNavigateToDetail = {},
+                onAction = {},
+                showPopup = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun TripScreenPreview() {
     val trips = mutableListOf<Trip>().apply {
@@ -391,11 +462,18 @@ private fun TripScreenPreview() {
 
     val uiState = TripUiState(isLoading = false, trips = items.toImmutableList())
 
-    TripScreen(
-        uiState = uiState,
-        onNavigateToSchedule = {},
-        onNavigateToDetail = {},
-        onAction = {},
-        showPopup = {}
-    )
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripScreen(
+                uiState = uiState,
+                onNavigateToSchedule = {},
+                onNavigateToDetail = {},
+                onAction = {},
+                showPopup = {}
+            )
+        }
+    }
 }

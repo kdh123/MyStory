@@ -15,11 +15,12 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = Pink80,
     surface = Color.Black,
     surfaceContainer = Color.Black,
-    secondaryContainer = Color.LightGray
+    secondaryContainer = Color.DarkGray
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Primary,
+    onPrimary = Color.White,
     secondary = PurpleGrey40,
     tertiary = Pink40,
     surfaceContainer = Color.White,

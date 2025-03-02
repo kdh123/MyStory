@@ -1,12 +1,14 @@
 package com.dhkim.trip.presentation.schedule
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +28,9 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -56,10 +60,12 @@ import com.dhkim.common.DateUtil
 import com.dhkim.core.trip.domain.model.TripPlace
 import com.dhkim.core.trip.domain.model.TripType
 import com.dhkim.core.trip.domain.model.toTripType
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.trip.R
 import com.dhkim.ui.noRippleClick
 import com.dhkim.ui.onStartCollect
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -250,18 +256,6 @@ fun Calender(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun TripScheduleScreenPreview() {
-    TripScheduleScreen(
-        isEdit = false,
-        uiState = TripScheduleUiState(),
-        sideEffect = MutableSharedFlow(),
-        onAction = {},
-        onBack = {}
-    )
-}
-
 @Composable
 private fun TripTypeScreen(
     uiState: TripScheduleUiState,
@@ -335,9 +329,13 @@ fun TripTypeItem(
     Text(
         text = desc,
         color = if (isSelected) {
-            colorResource(id = R.color.primary)
+            MaterialTheme.colorScheme.onPrimary
         } else {
-            colorResource(id = R.color.black)
+            if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                Color.Black
+            }
         },
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
@@ -345,33 +343,17 @@ fun TripTypeItem(
             .padding(vertical = 8.dp)
             .clip(RoundedCornerShape(10.dp))
             .fillMaxWidth()
-            .run {
-                if (isSelected) {
-                    border(
-                        width = 1.dp,
-                        color = colorResource(id = R.color.primary),
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                } else {
-                    this
-                }
-            }
+            .border(
+                width = 1.dp,
+                color = colorResource(id = R.color.primary),
+                shape = RoundedCornerShape(10.dp)
+            )
             .background(
-                color = if (isSelected) colorResource(id = R.color.white) else colorResource(id = R.color.light_gray)
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer
             )
             .padding(vertical = 14.dp)
             .noRippleClick { onAction(TripScheduleAction.UpdateType(index.toTripType())) }
             .testTag("tripType$index")
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TripTypeScreenPreview() {
-    TripTypeScreen(
-        uiState = TripScheduleUiState(),
-        onAction = {},
-        onMoveToNextPage = {}
     )
 }
 
@@ -456,26 +438,28 @@ fun TripPlaceTypes(isDomestic: Boolean, onClick: (Int) -> Unit) {
     Row {
         Text(
             text = "국내",
-            color = if (isDomestic) colorResource(id = R.color.primary) else colorResource(id = R.color.black),
+            color = if (isDomestic) {
+                MaterialTheme.colorScheme.onPrimary
+            } else {
+                if (isSystemInDarkTheme()) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    Color.Black
+                }
+            },
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(top = 10.dp, end = 10.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(
-                    color = colorResource(id = if (isDomestic) R.color.white else R.color.light_gray)
+                .border(
+                    width = 1.dp,
+                    color = colorResource(id = R.color.primary),
+                    shape = RoundedCornerShape(10.dp)
                 )
-                .run {
-                    if (isDomestic) {
-                        border(
-                            width = 1.dp,
-                            color = colorResource(id = R.color.primary),
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                    } else {
-                        this
-                    }
-                }
+                .background(
+                    color = if (isDomestic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer
+                )
                 .padding(horizontal = 10.dp, vertical = 8.dp)
                 .noRippleClick { onClick(0) }
                 .testTag("domestic")
@@ -484,35 +468,27 @@ fun TripPlaceTypes(isDomestic: Boolean, onClick: (Int) -> Unit) {
         Text(
             text = "해외",
             color = if (!isDomestic) {
-                colorResource(id = R.color.primary)
+                MaterialTheme.colorScheme.onPrimary
             } else {
-                colorResource(id = R.color.black)
+                if (isSystemInDarkTheme()) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    Color.Black
+                }
             },
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             modifier = Modifier
                 .padding(top = 10.dp, end = 10.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(
-                    color = colorResource(
-                        id = if (!isDomestic) {
-                            R.color.white
-                        } else {
-                            R.color.light_gray
-                        }
-                    )
+                .border(
+                    width = 1.dp,
+                    color = colorResource(id = R.color.primary),
+                    shape = RoundedCornerShape(10.dp)
                 )
-                .run {
-                    if (!isDomestic) {
-                        border(
-                            width = 1.dp,
-                            color = colorResource(id = R.color.primary),
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                    } else {
-                        this
-                    }
-                }
+                .background(
+                    color = if (!isDomestic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer
+                )
                 .padding(horizontal = 10.dp, vertical = 8.dp)
                 .noRippleClick {
                     onClick(1)
@@ -627,37 +603,28 @@ fun PlaceItem(
         Text(
             text = "선택",
             color = if (isSelected) {
-                colorResource(id = R.color.primary)
+                MaterialTheme.colorScheme.onPrimary
             } else {
-                colorResource(id = R.color.black)
+                if (isSystemInDarkTheme()) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    Color.Black
+                }
             },
             modifier = Modifier
                 .clip(RoundedCornerShape(20.dp))
-                .background(
-                    color = colorResource(
-                        id = if (isSelected) {
-                            R.color.white
-                        } else {
-                            R.color.light_gray
-                        }
-                    )
+                .border(
+                    width = 1.dp,
+                    color = colorResource(id = R.color.primary),
+                    shape = RoundedCornerShape(20.dp)
                 )
-                .run {
-                    if (isSelected) {
-                        border(
-                            width = 1.dp,
-                            color = colorResource(id = R.color.primary),
-                            shape = RoundedCornerShape(20.dp)
-                        )
-                    } else {
-                        this
-                    }
-                }
+                .background(
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer
+                )
                 .align(Alignment.CenterVertically)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .noRippleClick {
-                    val entries =
-                        if (isDomestic) TripPlace.DomesticPlace.entries else TripPlace.AbroadPlace.entries
+                    val entries = if (isDomestic) TripPlace.DomesticPlace.entries else TripPlace.AbroadPlace.entries
                     onAction(TripScheduleAction.UpdatePlaces(entries[index]))
                 }
                 .testTag(placeName)
@@ -853,7 +820,7 @@ fun StartDate(
         color = if (startDate.isEmpty()) {
             colorResource(id = R.color.gray)
         } else {
-            colorResource(id = R.color.black)
+            MaterialTheme.colorScheme.onBackground
         },
         modifier = modifier
             .noRippleClick(onClick = onClick)
@@ -871,36 +838,169 @@ fun EndDate(
         color = if (endDate.isEmpty()) {
             colorResource(id = R.color.gray)
         } else {
-            colorResource(id = R.color.black)
+            MaterialTheme.colorScheme.onBackground
         },
         modifier = modifier
             .noRippleClick(onClick = onClick)
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun TripDateScreenPreview() {
-    TripDateScreen(
-        isEdit = false,
-        startDate = "",
-        endDate = "",
-        onAction = {},
-        onMoveToPage = {},
-        onShowStartDateDialog = {},
-        onShowEndDateDialog = {}
-    )
+private fun TripScheduleScreenDarkPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripScheduleScreen(
+                isEdit = false,
+                uiState = TripScheduleUiState(),
+                sideEffect = MutableSharedFlow(),
+                onAction = {},
+                onBack = {}
+            )
+        }
+    }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun TripScheduleScreenPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripScheduleScreen(
+                isEdit = false,
+                uiState = TripScheduleUiState(),
+                sideEffect = MutableSharedFlow(),
+                onAction = {},
+                onBack = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TripTypeScreenDarkPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripTypeScreen(
+                uiState = TripScheduleUiState(),
+                onAction = {},
+                onMoveToNextPage = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun TripTypeScreenPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripTypeScreen(
+                uiState = TripScheduleUiState(),
+                onAction = {},
+                onMoveToNextPage = {}
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TripDateScreenDarkPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripDateScreen(
+                isEdit = false,
+                startDate = "2025-08-31",
+                endDate = "",
+                onAction = {},
+                onMoveToPage = {},
+                onShowStartDateDialog = {},
+                onShowEndDateDialog = {}
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun TripDateScreenPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripDateScreen(
+                isEdit = false,
+                startDate = "2025-08-31",
+                endDate = "",
+                onAction = {},
+                onMoveToPage = {},
+                onShowStartDateDialog = {},
+                onShowEndDateDialog = {}
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TripPlaceScreenDarkPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripPlaceScreen(
+                uiState = TripScheduleUiState(
+                    startDate = "2024-07-03",
+                    endDate = "2024-08-04",
+                    tripPlaces = persistentListOf(TripPlace.DomesticPlace.Gyeongi)
+                ),
+                onAction = {},
+                onMoveToPage = {}
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun TripPlaceScreenPreview() {
-    TripPlaceScreen(
-        uiState = TripScheduleUiState(
-            startDate = "2024-07-03",
-            endDate = "2024-08-04"
-        ),
-        onAction = {},
-        onMoveToPage = {}
-    )
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripPlaceScreen(
+                uiState = TripScheduleUiState(
+                    startDate = "2024-07-03",
+                    endDate = "2024-08-04",
+                    tripPlaces = persistentListOf(TripPlace.DomesticPlace.Gyeongi)
+                ),
+                onAction = {},
+                onMoveToPage = {}
+            )
+        }
+    }
 }

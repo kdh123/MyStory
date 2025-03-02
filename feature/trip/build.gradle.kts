@@ -52,10 +52,11 @@ dependencies {
     implementation(project(":core:trip"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
-    implementation(project(":feature:setting"))
-    implementation(project(":feature:location"))
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":feature:setting"))
+    implementation(project(":feature:location"))
     testImplementation(project(":core:testing"))
 
     implementation(libs.androidx.core.ktx)
