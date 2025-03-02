@@ -7,6 +7,7 @@ package com.dhkim.map.presentation
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.res.Configuration
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -39,7 +40,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
@@ -64,6 +67,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.location.domain.model.Category
 import com.dhkim.location.domain.model.Place
 import com.dhkim.map.R
@@ -154,7 +158,7 @@ fun MapScreen(
                 )
             }
         },
-        containerColor = colorResource(id = R.color.white)
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) { padding ->
         Box(
             modifier = Modifier
@@ -215,7 +219,7 @@ fun MapScreen(
                 BottomPlace(
                     place = it,
                     modifier = Modifier
-                        .background(color = colorResource(id = R.color.white))
+                        .background(color = MaterialTheme.colorScheme.surfaceContainer)
                         .align(Alignment.BottomCenter),
                     onTimeCapsuleClick = { place ->
                         onNavigateToAddScreen(place)
@@ -293,7 +297,7 @@ fun BottomPlace(
                 Text(
                     text = place.phone,
                     fontSize = 12.sp,
-                    color = colorResource(id = R.color.primary),
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
             }
@@ -320,39 +324,6 @@ fun BottomPlace(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun BottomPlacePreview() {
-    val place = Place(
-        id = "",
-        name = "스타벅스",
-        lat = "",
-        lng = "",
-        address = "인천시 미추홀구 주안동 인천시 미추홀구 주안동 인천시 미추홀구 주안동",
-        category = "카페",
-        distance = "300",
-        phone = "010-1234-1234",
-        url = "https://www.naver.com"
-    )
-    BottomPlace(place = place, modifier = Modifier) {
-
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SearchBarColorsPreview() {
-    SearchBar(
-        query = "관광명소",
-        lat = 34.4,
-        lng = 35.5,
-        showClose = false,
-        onAction = { _ -> },
-        onNavigateToSearch = { _, _ -> },
-        onInitSavedState = {}
-    )
 }
 
 @Composable
@@ -499,11 +470,7 @@ fun Category.resId(): Int {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun CategoryChipPreview() {
-    CategoryChip(category = Category.Cafe, isSelected = true) {}
-}
+
 
 @Composable
 fun PlaceList(
@@ -588,10 +555,24 @@ fun PlaceItem(place: Place, onAction: ((MapAction) -> Unit)? = null, onHide: () 
             Text(
                 text = place.phone,
                 fontSize = 12.sp,
-                color = colorResource(id = R.color.primary),
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
         }
+    }
+}
+
+
+
+@OptIn(ExperimentalPermissionsApi::class)
+class DefaultPermissionState : PermissionState {
+    override val permission: String
+        get() = ""
+    override val status: PermissionStatus
+        get() = PermissionStatus.Granted
+
+    override fun launchPermissionRequest() {
+
     }
 }
 
@@ -620,14 +601,53 @@ private fun MapScreenPreView() {
     )
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
-class DefaultPermissionState : PermissionState {
-    override val permission: String
-        get() = ""
-    override val status: PermissionStatus
-        get() = PermissionStatus.Granted
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun BottomPlaceDarkPreview() {
+    val place = Place(
+        id = "",
+        name = "스타벅스",
+        lat = "",
+        lng = "",
+        address = "인천시 미추홀구 주안동 인천시 미추홀구 주안동 인천시 미추홀구 주안동",
+        category = "카페",
+        distance = "300",
+        phone = "010-1234-1234",
+        url = "https://www.naver.com"
+    )
+    MyStoryTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background
+        ) {
+            BottomPlace(place = place, modifier = Modifier) {
 
-    override fun launchPermissionRequest() {
+            }
+        }
+    }
+}
 
+@Preview(showBackground = true)
+@Composable
+private fun BottomPlacePreview() {
+    val place = Place(
+        id = "",
+        name = "스타벅스",
+        lat = "",
+        lng = "",
+        address = "인천시 미추홀구 주안동 인천시 미추홀구 주안동 인천시 미추홀구 주안동",
+        category = "카페",
+        distance = "300",
+        phone = "010-1234-1234",
+        url = "https://www.naver.com"
+    )
+
+    MyStoryTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background
+        ) {
+            BottomPlace(place = place, modifier = Modifier) {
+
+            }
+        }
     }
 }
