@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -42,7 +43,7 @@ fun SettingScreen(
             Row(
                 modifier = Modifier
             ) {
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_back_black),
                     contentDescription = null,
                     modifier = Modifier

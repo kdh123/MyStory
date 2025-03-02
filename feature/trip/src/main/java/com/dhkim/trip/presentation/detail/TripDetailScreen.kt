@@ -40,6 +40,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -271,7 +272,7 @@ fun TripDetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_back_black),
                     contentDescription = null,
                     modifier = Modifier

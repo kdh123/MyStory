@@ -72,7 +72,7 @@ fun ChangeFriendInfoScreen(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_back_black),
                     contentDescription = null,
                     modifier = Modifier
