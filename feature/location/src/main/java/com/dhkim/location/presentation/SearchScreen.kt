@@ -35,11 +35,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -104,7 +102,10 @@ fun SearchBar(query: String, onQuery: (String) -> Unit) {
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         label = {
-            Text(text = "장소 검색")
+            Text(
+                text = "장소 검색",
+                style = MyStoryTheme.typography.labelMedium
+            )
         },
         singleLine = true,
         modifier = Modifier
@@ -165,16 +166,14 @@ fun Place(place: Place, onBack: (Place) -> Unit) {
         ) {
             Text(
                 text = place.name,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
+                style = MyStoryTheme.typography.bodyLargeBold,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Text(
-                maxLines = 1,
                 text = place.category,
-                overflow = TextOverflow.Ellipsis,
-                color = Color.Gray,
-                fontSize = 12.sp,
+                style = MyStoryTheme.typography.bodySmallGray,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
@@ -184,19 +183,18 @@ fun Place(place: Place, onBack: (Place) -> Unit) {
         ) {
             Text(
                 text = place.distance,
+                style = MyStoryTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Text(
                 text = place.address,
-                color = Color.Gray,
-                fontSize = 12.sp
+                style = MyStoryTheme.typography.bodySmallGray
             )
         }
         if (place.phone.isNotEmpty()) {
             Text(
                 text = place.phone,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.primary,
+                style = MyStoryTheme.typography.bodySmallPrimary,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
         }

@@ -78,7 +78,7 @@ internal val Typography = MyStoryTypography(
         letterSpacing = 0.1.sp,
     ),
     labelLarge = SansSerifStyle.copy(
-        fontSize = 14.sp,
+        fontSize = 16.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
     ),
@@ -107,7 +107,7 @@ internal val Typography = MyStoryTypography(
         fontSize = 18.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
-        color = Color.Gray
+        color = Gray
     ),
     bodyLargeBlack = SansSerifStyle.copy(
         fontSize = 18.sp,
@@ -134,11 +134,17 @@ internal val Typography = MyStoryTypography(
         lineHeight = 20.sp,
         letterSpacing = 0.25.sp,
     ),
+    bodyMediumBlack = SansSerifStyle.copy(
+        fontSize = 16.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.25.sp,
+        color = Color.Black
+    ),
     bodyMediumGray = SansSerifStyle.copy(
         fontSize = 16.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.25.sp,
-        color = Color.Gray
+        color = Gray
     ),
     bodyMediumBold = SansSerifStyle.copy(
         fontSize = 16.sp,
@@ -158,18 +164,24 @@ internal val Typography = MyStoryTypography(
         lineHeight = 16.sp,
         letterSpacing = 0.4.sp,
     ),
+    bodySmallGray = SansSerifStyle.copy(
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.4.sp,
+        color = Gray
+    ),
+    bodySmallPrimary = SansSerifStyle.copy(
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.4.sp,
+        color = Primary
+    ),
     bodySmallBold = SansSerifStyle.copy(
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.4.sp,
         fontWeight = FontWeight.Bold
     ),
-    bodySmallGray = SansSerifStyle.copy(
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.4.sp,
-        color = Color.Gray
-    )
 )
 
 val LocalTypography = staticCompositionLocalOf {
@@ -193,12 +205,14 @@ val LocalTypography = staticCompositionLocalOf {
         bodyLargeGrayBold = SansSerifStyle,
         bodyLargeWhiteBold = SansSerifStyle,
         bodyMedium = SansSerifStyle,
+        bodyMediumBlack = SansSerifStyle,
         bodyMediumGray = SansSerifStyle,
         bodyMediumBold = SansSerifStyle,
         bodyMediumWhiteBold = SansSerifStyle,
         bodySmall = SansSerifStyle,
-        bodySmallBold = SansSerifStyle,
         bodySmallGray = SansSerifStyle,
+        bodySmallPrimary = SansSerifStyle,
+        bodySmallBold = SansSerifStyle,
         labelLarge = SansSerifStyle,
         labelMedium = SansSerifStyle,
         labelSmall = SansSerifStyle,
@@ -226,12 +240,14 @@ data class MyStoryTypography(
     val bodyLargeGrayBold: TextStyle,
     val bodyLargeWhiteBold: TextStyle,
     val bodyMedium: TextStyle,
+    val bodyMediumBlack: TextStyle,
     val bodyMediumGray: TextStyle,
     val bodyMediumBold: TextStyle,
     val bodyMediumWhiteBold: TextStyle,
     val bodySmall: TextStyle,
-    val bodySmallBold: TextStyle,
     val bodySmallGray: TextStyle,
+    val bodySmallPrimary: TextStyle,
+    val bodySmallBold: TextStyle,
     val labelLarge: TextStyle,
     val labelMedium: TextStyle,
     val labelSmall: TextStyle

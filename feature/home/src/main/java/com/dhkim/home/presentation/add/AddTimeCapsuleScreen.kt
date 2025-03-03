@@ -946,7 +946,7 @@ private fun ContentsView(
             label = {
                 Text(
                     text = "내용을 입력해주세요.",
-                    style = MyStoryTheme.typography.bodyMedium
+                    style = MyStoryTheme.typography.labelSmall
                 )
             },
             colors = textFieldColors(

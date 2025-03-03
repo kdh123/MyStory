@@ -57,11 +57,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -264,16 +262,14 @@ fun BottomPlace(
             ) {
                 Text(
                     text = place.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MyStoryTheme.typography.bodyLargeBold,
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
                 Text(
+                    text = place.category,
+                    style = MyStoryTheme.typography.bodySmallGray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    text = place.category,
-                    color = Color.Gray,
-                    fontSize = 12.sp,
                 )
             }
 
@@ -283,21 +279,20 @@ fun BottomPlace(
             ) {
                 Text(
                     text = place.distance,
+                    style = MyStoryTheme.typography.bodyMedium,
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
                 Text(
+                    text = place.address,
+                    style = MyStoryTheme.typography.bodySmallGray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    text = place.address,
-                    color = Color.Gray,
-                    fontSize = 12.sp,
                 )
             }
             if (place.phone.isNotEmpty()) {
                 Text(
                     text = place.phone,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary,
+                    style = MyStoryTheme.typography.bodySmallPrimary,
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
             }
@@ -362,15 +357,14 @@ fun SearchBar(
                     .padding(10.dp)
             ) {
                 Text(
+                    text = query.ifEmpty { "추억을 남기려는 장소를 검색하세요" },
+                    style = if (query.isEmpty()) {
+                        MyStoryTheme.typography.bodyMediumGray
+                    } else {
+                        MyStoryTheme.typography.bodyMediumBlack
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    text = query.ifEmpty { "추억을 남기려는 장소를 검색하세요" },
-                    fontSize = 16.sp,
-                    color = if (query.isEmpty()) {
-                        colorResource(id = R.color.gray)
-                    } else {
-                        colorResource(id = R.color.black)
-                    },
                     modifier = Modifier
                         .padding(vertical = 3.dp)
                         .width(0.dp)
@@ -445,6 +439,7 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
             )
             Text(
                 text = category.type,
+                style = MyStoryTheme.typography.labelLarge,
                 modifier = Modifier
                     .padding(top = 3.dp, bottom = 3.dp, start = 3.dp)
                     .align(Alignment.CenterVertically)
@@ -469,7 +464,6 @@ fun Category.resId(): Int {
         else -> com.dhkim.location.R.drawable.ic_time_primary
     }
 }
-
 
 
 @Composable
@@ -524,16 +518,14 @@ fun PlaceItem(place: Place, onAction: ((MapAction) -> Unit)? = null, onHide: () 
         ) {
             Text(
                 text = place.name,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
+                style = MyStoryTheme.typography.bodyLargeBold,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Text(
-                maxLines = 1,
                 text = place.category,
+                style = MyStoryTheme.typography.bodySmallGray,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.Gray,
-                fontSize = 12.sp,
             )
         }
 
@@ -543,25 +535,23 @@ fun PlaceItem(place: Place, onAction: ((MapAction) -> Unit)? = null, onHide: () 
         ) {
             Text(
                 text = place.distance,
+                style = MyStoryTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Text(
                 text = place.address,
-                color = Color.Gray,
-                fontSize = 12.sp
+                style = MyStoryTheme.typography.bodySmallGray,
             )
         }
         if (place.phone.isNotEmpty()) {
             Text(
                 text = place.phone,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.primary,
+                style = MyStoryTheme.typography.bodySmallPrimary,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
         }
     }
 }
-
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -576,29 +566,68 @@ class DefaultPermissionState : PermissionState {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun MapScreenDarkPreView() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            MapScreen(
+                uiState = MapUiState(),
+                sideEffect = { flowOf() },
+                onAction = {},
+                locationPermissionState = DefaultPermissionState(),
+                onNavigateToSearch = { _, _ -> },
+                onNavigateToAddScreen = {},
+                onHideBottomNav = {},
+                onInitSavedState = {},
+                requestPermission = {},
+                naverMap = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Color.LightGray)
+                    ) {
+
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun MapScreenPreView() {
-    MapScreen(
-        uiState = MapUiState(),
-        sideEffect = { flowOf() },
-        onAction = {},
-        locationPermissionState = DefaultPermissionState(),
-        onNavigateToSearch = { _, _ -> },
-        onNavigateToAddScreen = {},
-        onHideBottomNav = {},
-        onInitSavedState = {},
-        requestPermission = {},
-        naverMap = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color.LightGray)
-            ) {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            MapScreen(
+                uiState = MapUiState(),
+                sideEffect = { flowOf() },
+                onAction = {},
+                locationPermissionState = DefaultPermissionState(),
+                onNavigateToSearch = { _, _ -> },
+                onNavigateToAddScreen = {},
+                onHideBottomNav = {},
+                onInitSavedState = {},
+                requestPermission = {},
+                naverMap = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Color.LightGray)
+                    ) {
 
-            }
+                    }
+                }
+            )
         }
-    )
+    }
 }
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
