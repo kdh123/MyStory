@@ -45,10 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.home.R
@@ -136,8 +134,8 @@ fun TimeCapsuleDetailScreen(
                             .padding(end = 10.dp)
                     )
                     Text(
-                        fontSize = 18.sp,
-                        text = "삭제"
+                        text = "삭제",
+                        style = MyStoryTheme.typography.bodyLarge
                     )
                 }
             }
@@ -259,7 +257,7 @@ fun TimeCapsuleDetailScreen(
 
             Text(
                 text = uiState.timeCapsule.content,
-                fontSize = 18.sp,
+                style = MyStoryTheme.typography.bodyLarge,
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 30.dp)
             )
@@ -309,10 +307,10 @@ fun MenuItem(title: String, icon: @Composable (() -> Unit)? = null) {
 
         Text(
             text = title,
+            style = MyStoryTheme.typography.bodyLarge,
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.CenterVertically),
-            fontSize = 18.sp
         )
     }
 }
@@ -326,13 +324,8 @@ fun TimeCapsulePager(
 ) {
     val timeCapsule = uiState.timeCapsule
     val images: List<String> = timeCapsule.images
-    val pagerState = rememberPagerState(pageCount = {
-        images.size
-    })
-
-    var currentPage by remember {
-        mutableIntStateOf(1)
-    }
+    val pagerState = rememberPagerState(pageCount = { images.size })
+    var currentPage by remember { mutableIntStateOf(1) }
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -361,13 +354,13 @@ fun TimeCapsulePager(
             }
             Text(
                 text = "$currentPage / ${images.size}",
+                style = MyStoryTheme.typography.bodyLargeBlack,
                 modifier = Modifier
                     .padding(10.dp)
                     .align(Alignment.BottomEnd)
                     .clip(RoundedCornerShape(10.dp))
                     .background(color = colorResource(id = R.color.transparent_gray))
                     .padding(10.dp),
-                color = colorResource(id = R.color.black)
             )
         } else {
             DefaultBackground(
@@ -377,8 +370,7 @@ fun TimeCapsulePager(
             ) {
                 Text(
                     color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
+                    style = MyStoryTheme.typography.bodyLargeBold,
                     text = "사진이 존재하지 않습니다.",
                     modifier = Modifier
                         .align(Alignment.Center)

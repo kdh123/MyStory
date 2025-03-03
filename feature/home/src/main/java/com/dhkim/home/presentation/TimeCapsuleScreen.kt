@@ -280,8 +280,7 @@ fun TimeCapsuleScreen(
                                 ) {
                                     Text(
                                         text = it.data as? String ?: "",
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.Bold,
+                                        style = MyStoryTheme.typography.headlineSmallBold,
                                         modifier = Modifier
                                             .width(0.dp)
                                             .weight(1f)
@@ -947,10 +946,7 @@ class DefaultPermissionState : PermissionState {
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
-@Preview(
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun TimeCapsuleScreenDarkPreview() {
     val unOpenedList = mutableListOf<TimeCapsule>()
@@ -1024,7 +1020,7 @@ private fun TimeCapsuleScreenDarkPreview() {
 
 
 @OptIn(ExperimentalPermissionsApi::class)
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun TimeCapsuleScreenPreview() {
     val unOpenedList = mutableListOf<TimeCapsule>()
@@ -1072,23 +1068,29 @@ private fun TimeCapsuleScreenPreview() {
         }
     }
 
-    TimeCapsuleScreen(
-        uiState = TimeCapsuleUiState(isLoading = false, timeCapsules = (unOpenedList + openedList).toItems(spaceId = 100).toImmutableList()),
-        sideEffect = { flowOf() },
-        permissionState = DefaultPermissionState(),
-        requestPermission = {},
-        onDeleteTimeCapsule = { _, _ -> },
-        onNavigateToAdd = { },
-        onNavigateToOpen = { _, _ -> },
-        onNavigateToDetail = { _, _ -> },
-        onNavigateToNotification = { },
-        onNavigateToSetting = { },
-        onNavigateToProfile = { },
-        onNavigateToMore = { },
-        showPopup = {}
-    )
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TimeCapsuleScreen(
+                uiState = TimeCapsuleUiState(isLoading = false, timeCapsules = (unOpenedList + openedList).toItems(spaceId = 100).toImmutableList()),
+                sideEffect = { flowOf() },
+                permissionState = DefaultPermissionState(),
+                requestPermission = {},
+                onDeleteTimeCapsule = { _, _ -> },
+                onNavigateToAdd = { },
+                onNavigateToOpen = { _, _ -> },
+                onNavigateToDetail = { _, _ -> },
+                onNavigateToNotification = { },
+                onNavigateToSetting = { },
+                onNavigateToProfile = { },
+                onNavigateToMore = { },
+                showPopup = {}
+            )
+        }
+    }
 }
-
 
 @Preview(showBackground = true)
 @Composable

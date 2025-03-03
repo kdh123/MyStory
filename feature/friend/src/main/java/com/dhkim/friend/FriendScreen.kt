@@ -100,26 +100,14 @@ fun FriendScreen(
     val context = LocalContext.current
     var currentTab by rememberSaveable { mutableIntStateOf(0) }
     val titles = listOf("친구", "요청")
-    val pagerState = rememberPagerState(pageCount = {
-        2
-    })
+    val pagerState = rememberPagerState(pageCount = { 2 })
     val scope = rememberCoroutineScope()
-    var selectedFriend: Friend? by remember {
-        mutableStateOf(null)
-    }
+    var selectedFriend: Friend? by remember { mutableStateOf(null) }
     val focusManager = LocalFocusManager.current
-    var showFriendMenuDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showPendingFriendMenuDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showInfoBottomSheet by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showFriendsBottomSheet by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var showFriendMenuDialog by rememberSaveable { mutableStateOf(false) }
+    var showPendingFriendMenuDialog by rememberSaveable { mutableStateOf(false) }
+    var showInfoBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showFriendsBottomSheet by rememberSaveable { mutableStateOf(false) }
     val infoBottomSheetState = rememberModalBottomSheetState()
 
     lifecycle.onStartCollect(sideEffect()) {
@@ -175,15 +163,15 @@ fun FriendScreen(
                         .padding(20.dp)
                 ) {
                     Text(
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
                         text = selectedFriend!!.nickname,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MyStoryTheme.typography.bodyLargeBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "삭제",
+                        style = MyStoryTheme.typography.bodyLarge,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
@@ -209,6 +197,7 @@ fun FriendScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "정보 변경",
+                        style = MyStoryTheme.typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
@@ -239,15 +228,13 @@ fun FriendScreen(
                         .padding(20.dp)
                 ) {
                     Text(
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
                         text = "메뉴",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MyStoryTheme.typography.bodyLargeBold,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "삭제",
+                        style = MyStoryTheme.typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
@@ -298,10 +285,9 @@ fun FriendScreen(
                         ShareTimeCapsuleAnim()
 
                         Text(
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp,
                             text = "개인 코드 생성하고 \n 친구와 타임캡슐 공유하자!",
+                            style = MyStoryTheme.typography.headlineSmallBold,
+                            textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .padding(10.dp)
                                 .align(Alignment.CenterHorizontally)
@@ -362,12 +348,10 @@ fun FriendScreen(
                                 } else {
                                     "개인 코드 생성하기"
                                 },
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (uiState.isCreatingCode) {
-                                    colorResource(id = R.color.gray)
+                                style = if (uiState.isCreatingCode) {
+                                    MyStoryTheme.typography.bodyLargeGrayBold
                                 } else {
-                                    Color.White
+                                    MyStoryTheme.typography.bodyLargeWhiteBold
                                 },
                                 modifier = Modifier
                                     .padding(start = 10.dp)
@@ -406,11 +390,11 @@ fun FriendScreen(
                             }
                         },
                         text = {
-                            if (currentTab == index) {
-                                Text(text = title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                            } else {
-                                Text(text = title, color = MaterialTheme.colorScheme.secondary)
-                            }
+                            Text(
+                                text = title,
+                                style = MyStoryTheme.typography.bodyMediumBold,
+                                color = if (currentTab == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                            )
                         },
                     )
                 }
@@ -474,8 +458,7 @@ fun FriendScreen(
                     ) {
                         Text(
                             text = selectedFriend!!.nickname,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
+                            style = MyStoryTheme.typography.bodyLargeBold,
                             modifier = Modifier
                                 .padding(10.dp)
                         )
@@ -574,6 +557,7 @@ private fun MenuItem(
             )
             Text(
                 text = title,
+                style = MyStoryTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -644,7 +628,10 @@ fun BottomSheetScreen(
                     singleLine = true,
                     value = uiState.searchResult.query,
                     label = {
-                        Text(text = "친구 코드 입력")
+                        Text(
+                            text = "친구 코드 입력",
+                            style = MyStoryTheme.typography.bodyMedium
+                        )
                     },
                     onValueChange = {
                         onAction(FriendAction.Query(it))
@@ -683,6 +670,7 @@ fun BottomSheetScreen(
             if (uiState.searchResult.userId == null) {
                 Text(
                     text = "사용자를 찾을 수 없습니다.",
+                    style = MyStoryTheme.typography.bodyMedium,
                     modifier = Modifier
                         .padding(10.dp)
                 )
@@ -701,12 +689,14 @@ fun BottomSheetScreen(
                             .padding(10.dp)
                             .align(Alignment.CenterVertically)
                     ) {
-                        Text(text = "$userId")
+                        Text(
+                            text = "$userId",
+                            style = MyStoryTheme.typography.bodyLarge
+                        )
                         if (friendMetaInfoText.isNotEmpty()) {
                             Text(
                                 text = friendMetaInfoText,
-                                fontSize = 12.sp,
-                                color = colorResource(id = R.color.gray)
+                                style = MyStoryTheme.typography.bodySmallGray,
                             )
                         }
                     }
@@ -750,6 +740,7 @@ fun RequestScreen(uiState: FriendUiState, onClick: (Friend) -> Unit) {
     } else {
         Text(
             text = "요청 받은 친구가 없습니다.",
+            style = MyStoryTheme.typography.bodyMedium,
             modifier = Modifier
                 .padding(10.dp)
                 .fillMaxSize(),
@@ -773,7 +764,7 @@ fun FriendListScreen(
         Column {
             Text(
                 text = "나",
-                color = colorResource(id = R.color.gray),
+                style = MyStoryTheme.typography.bodyMediumGray,
                 modifier = Modifier
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp)
             )
@@ -781,9 +772,7 @@ fun FriendListScreen(
                 friend = Friend(id = uiState.myInfo.id),
                 isMe = true,
                 profileImage = uiState.myInfo.profileImage.toInt(),
-                onClick = {
-                    showInfoBottomSheet(it)
-                },
+                onClick = { showInfoBottomSheet(it) },
                 onLongClick = onFriendLongClick
             )
         }
@@ -839,7 +828,7 @@ fun RequestList(
     ) {
         Text(
             text = title,
-            color = colorResource(id = R.color.gray),
+            style = MyStoryTheme.typography.bodyMediumGray,
             modifier = Modifier
                 .padding(10.dp)
         )
@@ -878,7 +867,7 @@ fun FriendList(
         Column {
             Text(
                 text = title,
-                color = colorResource(id = R.color.gray),
+                style = MyStoryTheme.typography.bodyMediumGray,
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
             )
@@ -927,7 +916,7 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
         )
         Text(
             text = friend.id,
-            fontSize = 18.sp,
+            style = MyStoryTheme.typography.bodyLarge,
             modifier = Modifier
                 .width(0.dp)
                 .weight(1f)
@@ -1000,6 +989,7 @@ fun FriendItem(
             )
             Text(
                 text = friend.nickname,
+                style = MyStoryTheme.typography.bodyMedium,
                 modifier = Modifier
                     .width(0.dp)
                     .weight(1f)

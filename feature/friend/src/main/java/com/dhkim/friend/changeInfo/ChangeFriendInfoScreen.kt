@@ -101,7 +101,7 @@ fun ChangeFriendInfoScreen(
         ) {
             Text(
                 text = "닉네임",
-                fontSize = 12.sp,
+                style = MyStoryTheme.typography.bodySmall,
                 modifier = Modifier
                     .padding(bottom = 10.dp)
             )
@@ -123,6 +123,7 @@ fun ChangeFriendInfoScreen(
             )
             Text(
                 text = "개인 코드 : ${uiState.friend.id}",
+                style = MyStoryTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(top = 10.dp)
             )

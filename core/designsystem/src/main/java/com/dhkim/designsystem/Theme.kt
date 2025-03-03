@@ -2,14 +2,19 @@ package com.dhkim.designsystem
 
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextStyle
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
@@ -40,6 +45,16 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+object MyStoryTheme {
+    val colors: ColorScheme
+        @Composable
+        get() = MaterialTheme.colorScheme
+    val typography: MyStoryTypography
+        @Composable
+        get() = LocalTypography.current
+}
+
+
 @Composable
 fun MyStoryTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -61,9 +76,13 @@ fun MyStoryTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalTypography provides Typography
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            //typography = Typography,
+            content = content
+        )
+    }
 }
