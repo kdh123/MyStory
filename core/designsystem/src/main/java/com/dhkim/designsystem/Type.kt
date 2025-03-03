@@ -119,12 +119,12 @@ internal val Typography = MyStoryTypography(
         fontWeight = FontWeight.Bold
     ),
     labelMedium = SansSerifStyle.copy(
-        fontSize = 12.sp,
+        fontSize = 14.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,
     ),
     labelSmall = SansSerifStyle.copy(
-        fontSize = 11.sp,
+        fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,
     ),

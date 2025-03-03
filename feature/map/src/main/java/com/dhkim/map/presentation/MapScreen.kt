@@ -398,7 +398,7 @@ fun SearchBar(
 fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val color = if (isSelected) {
-        colorResource(id = R.color.primary)
+        MaterialTheme.colorScheme.primary
     } else {
         colorResource(id = R.color.white)
     }
@@ -410,9 +410,7 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
         border = BorderStroke(1.dp, color = color),
         modifier = Modifier
             .height(45.dp)
-            .clip(
-                shape = RoundedCornerShape(10.dp)
-            )
+            .clip(shape = RoundedCornerShape(10.dp))
             .padding(bottom = 5.dp)
             .clickable(
                 interactionSource = interactionSource,
@@ -439,7 +437,8 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
             )
             Text(
                 text = category.type,
-                style = MyStoryTheme.typography.labelLarge,
+                style = MyStoryTheme.typography.labelMedium,
+                color = Color.Black,
                 modifier = Modifier
                     .padding(top = 3.dp, bottom = 3.dp, start = 3.dp)
                     .align(Alignment.CenterVertically)
