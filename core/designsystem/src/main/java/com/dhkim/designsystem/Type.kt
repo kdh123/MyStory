@@ -1,7 +1,5 @@
 package com.dhkim.designsystem
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
@@ -88,19 +86,37 @@ internal val Typography = MyStoryTypography(
         letterSpacing = 0.sp,
     ),
     titleMedium = SansSerifStyle.copy(
-        fontSize = 16.sp,
+        fontSize = 18.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp,
     ),
+    titleMediumBold = SansSerifStyle.copy(
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.15.sp,
+        fontWeight = FontWeight.Bold
+    ),
     titleSmall = SansSerifStyle.copy(
-        fontSize = 14.sp,
+        fontSize = 16.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
+    ),
+    titleSmallBold = SansSerifStyle.copy(
+        fontSize = 16.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.1.sp,
+        fontWeight = FontWeight.Bold
     ),
     labelLarge = SansSerifStyle.copy(
         fontSize = 16.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
+    ),
+    labelLargeBold = SansSerifStyle.copy(
+        fontSize = 16.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.1.sp,
+        fontWeight = FontWeight.Bold
     ),
     labelMedium = SansSerifStyle.copy(
         fontSize = 12.sp,
@@ -226,7 +242,9 @@ val LocalTypography = staticCompositionLocalOf {
         headlineSmallBold = SansSerifStyle,
         titleLarge = SansSerifStyle,
         titleMedium = SansSerifStyle,
+        titleMediumBold = SansSerifStyle,
         titleSmall = SansSerifStyle,
+        titleSmallBold = SansSerifStyle,
         bodyLarge = SansSerifStyle,
         bodyLargeBlack = SansSerifStyle,
         bodyLargeWhite = SansSerifStyle,
@@ -244,6 +262,7 @@ val LocalTypography = staticCompositionLocalOf {
         bodySmallPrimary = SansSerifStyle,
         bodySmallBold = SansSerifStyle,
         labelLarge = SansSerifStyle,
+        labelLargeBold = SansSerifStyle,
         labelMedium = SansSerifStyle,
         labelSmall = SansSerifStyle,
     )
@@ -265,7 +284,9 @@ data class MyStoryTypography(
     val headlineSmallBold: TextStyle,
     val titleLarge: TextStyle,
     val titleMedium: TextStyle,
+    val titleMediumBold: TextStyle,
     val titleSmall: TextStyle,
+    val titleSmallBold: TextStyle,
     val bodyLarge: TextStyle,
     val bodyLargeBlack: TextStyle,
     val bodyLargeWhite: TextStyle,
@@ -283,6 +304,7 @@ data class MyStoryTypography(
     val bodySmallPrimary: TextStyle,
     val bodySmallBold: TextStyle,
     val labelLarge: TextStyle,
+    val labelLargeBold: TextStyle,
     val labelMedium: TextStyle,
     val labelSmall: TextStyle
 )

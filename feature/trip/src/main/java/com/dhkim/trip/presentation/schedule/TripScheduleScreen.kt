@@ -8,7 +8,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,15 +45,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
 import com.dhkim.core.trip.domain.model.TripPlace
@@ -119,6 +115,7 @@ fun TripScheduleScreen(
             )
             Text(
                 text = "$currentPage / 3",
+                style = MyStoryTheme.typography.labelLarge,
                 modifier = Modifier
                     .padding(top = 8.dp)
                     .align(Alignment.End)
@@ -243,12 +240,18 @@ fun Calender(
                     }
                 }
             ) {
-                Text(text = "확인")
+                Text(
+                    text = "확인",
+                    style = MyStoryTheme.typography.bodyLarge,
+                )
             }
         },
         dismissButton = {
             Button(onClick = { onDismiss() }) {
-                Text(text = "취소")
+                Text(
+                    text = "취소",
+                    style = MyStoryTheme.typography.bodyLarge,
+                )
             }
         }
     ) {
@@ -269,8 +272,7 @@ private fun TripTypeScreen(
     ) {
         Text(
             text = "어떤 여행을 계획하고 있나요?",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
+            style = MyStoryTheme.typography.bodyMediumBold
         )
 
         LazyColumn(
@@ -305,14 +307,13 @@ private fun TripTypeScreen(
 fun TripTypeNextButton(onNextClick: () -> Unit) {
     Text(
         text = "다음",
-        fontSize = 16.sp,
-        color = Color.White,
-        fontWeight = FontWeight.Bold,
+        style = MyStoryTheme.typography.labelLargeBold,
+        color = MaterialTheme.colorScheme.onPrimary,
         textAlign = TextAlign.Center,
         modifier = Modifier
             .clip(RoundedCornerShape(10.dp))
             .fillMaxWidth()
-            .background(color = colorResource(id = R.color.primary))
+            .background(color = MaterialTheme.colorScheme.primary)
             .padding(10.dp)
             .noRippleClick(onClick = onNextClick)
             .testTag("tripTypeNextBtn")
@@ -328,16 +329,12 @@ fun TripTypeItem(
 ) {
     Text(
         text = desc,
+        style = MyStoryTheme.typography.labelLargeBold,
         color = if (isSelected) {
             MaterialTheme.colorScheme.onPrimary
         } else {
-            if (isSystemInDarkTheme()) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                Color.Black
-            }
+            MaterialTheme.colorScheme.onSurface
         },
-        fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
         modifier = Modifier
             .padding(vertical = 8.dp)
@@ -349,7 +346,11 @@ fun TripTypeItem(
                 shape = RoundedCornerShape(10.dp)
             )
             .background(
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer
+                color = if (isSelected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainer
+                }
             )
             .padding(vertical = 14.dp)
             .noRippleClick { onAction(TripScheduleAction.UpdateType(index.toTripType())) }
@@ -379,8 +380,7 @@ private fun TripPlaceScreen(
     ) {
         Text(
             text = "여행하려는 장소가 어디인가요?",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
+            style = MyStoryTheme.typography.bodyMediumBold
         )
 
         TripPlaceTypes(
@@ -438,17 +438,12 @@ fun TripPlaceTypes(isDomestic: Boolean, onClick: (Int) -> Unit) {
     Row {
         Text(
             text = "국내",
+            style = MyStoryTheme.typography.labelLargeBold,
             color = if (isDomestic) {
                 MaterialTheme.colorScheme.onPrimary
             } else {
-                if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    Color.Black
-                }
+                MaterialTheme.colorScheme.onSurface
             },
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(top = 10.dp, end = 10.dp)
                 .clip(RoundedCornerShape(10.dp))
@@ -458,7 +453,11 @@ fun TripPlaceTypes(isDomestic: Boolean, onClick: (Int) -> Unit) {
                     shape = RoundedCornerShape(10.dp)
                 )
                 .background(
-                    color = if (isDomestic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer
+                    color = if (isDomestic) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainer
+                    }
                 )
                 .padding(horizontal = 10.dp, vertical = 8.dp)
                 .noRippleClick { onClick(0) }
@@ -467,17 +466,12 @@ fun TripPlaceTypes(isDomestic: Boolean, onClick: (Int) -> Unit) {
 
         Text(
             text = "해외",
+            style = MyStoryTheme.typography.labelLargeBold,
             color = if (!isDomestic) {
                 MaterialTheme.colorScheme.onPrimary
             } else {
-                if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    Color.Black
-                }
+                MaterialTheme.colorScheme.onSurface
             },
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
             modifier = Modifier
                 .padding(top = 10.dp, end = 10.dp)
                 .clip(RoundedCornerShape(10.dp))
@@ -487,12 +481,14 @@ fun TripPlaceTypes(isDomestic: Boolean, onClick: (Int) -> Unit) {
                     shape = RoundedCornerShape(10.dp)
                 )
                 .background(
-                    color = if (!isDomestic) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer
+                    color = if (!isDomestic) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainer
+                    }
                 )
                 .padding(horizontal = 10.dp, vertical = 8.dp)
-                .noRippleClick {
-                    onClick(1)
-                }
+                .noRippleClick { onClick(1) }
                 .testTag("abroad")
         )
     }
@@ -519,15 +515,14 @@ fun TripPlaceBottom(
     Column {
         Text(
             text = "이전",
-            fontSize = 16.sp,
-            color = colorResource(id = R.color.white),
-            fontWeight = FontWeight.Bold,
+            style = MyStoryTheme.typography.labelLargeBold,
+            color = MaterialTheme.colorScheme.onPrimary,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .padding(bottom = 10.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .fillMaxWidth()
-                .background(color = colorResource(id = R.color.primary))
+                .background(color = MaterialTheme.colorScheme.primary)
                 .padding(10.dp)
                 .noRippleClick(onClick = onPrevClick)
                 .testTag("tripPlacePrevBtn")
@@ -535,9 +530,8 @@ fun TripPlaceBottom(
 
         Text(
             text = "다음",
-            fontSize = 16.sp,
+            style = MyStoryTheme.typography.labelLargeBold,
             color = textColor,
-            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .clip(RoundedCornerShape(10.dp))
@@ -591,8 +585,7 @@ fun PlaceItem(
     Row {
         Text(
             text = placeName,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            style = MyStoryTheme.typography.bodyMediumBold,
             modifier = Modifier
                 .padding(vertical = 10.dp)
                 .width(0.dp)
@@ -602,14 +595,11 @@ fun PlaceItem(
 
         Text(
             text = "선택",
+            style = MyStoryTheme.typography.labelLargeBold,
             color = if (isSelected) {
                 MaterialTheme.colorScheme.onPrimary
             } else {
-                if (isSystemInDarkTheme()) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    Color.Black
-                }
+                MaterialTheme.colorScheme.onSurface
             },
             modifier = Modifier
                 .clip(RoundedCornerShape(20.dp))
@@ -619,7 +609,11 @@ fun PlaceItem(
                     shape = RoundedCornerShape(20.dp)
                 )
                 .background(
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainer
+                    color = if (isSelected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainer
+                    }
                 )
                 .align(Alignment.CenterVertically)
                 .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -680,8 +674,7 @@ private fun TripDateScreen(
     ) {
         Text(
             text = "여행 일정이 어떻게 되나요?",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            style = MyStoryTheme.typography.bodyMediumBold,
             modifier = Modifier
                 .padding(bottom = 10.dp)
         )
@@ -709,8 +702,7 @@ private fun TripDateScreen(
 
                 Text(
                     text = " - ",
-                    color = colorResource(id = R.color.gray),
-                    fontSize = 16.sp,
+                    style = MyStoryTheme.typography.bodyMediumGray,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                 )
@@ -779,15 +771,14 @@ fun SelectTripDate(
     Column {
         Text(
             text = "이전",
-            fontSize = 16.sp,
-            color = colorResource(id = R.color.white),
-            fontWeight = FontWeight.Bold,
+            style = MyStoryTheme.typography.labelLargeBold,
+            color = MaterialTheme.colorScheme.onPrimary,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .padding(bottom = 10.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .fillMaxWidth()
-                .background(color = colorResource(id = R.color.primary))
+                .background(color = MaterialTheme.colorScheme.primary)
                 .padding(10.dp)
                 .noRippleClick(onClick = onPrevClick)
                 .testTag("tripPlacePrevBtn")
@@ -795,9 +786,8 @@ fun SelectTripDate(
 
         Text(
             text = "완료",
-            fontSize = 16.sp,
+            style = MyStoryTheme.typography.labelLargeBold,
             color = textColor,
-            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .clip(RoundedCornerShape(10.dp))
@@ -817,6 +807,7 @@ fun StartDate(
 ) {
     Text(
         text = startDate.ifEmpty { "시작일" },
+        style = MyStoryTheme.typography.labelLarge,
         color = if (startDate.isEmpty()) {
             colorResource(id = R.color.gray)
         } else {
@@ -835,6 +826,7 @@ fun EndDate(
 ) {
     Text(
         text = endDate.ifEmpty { "종료일" },
+        style = MyStoryTheme.typography.labelLarge,
         color = if (endDate.isEmpty()) {
             colorResource(id = R.color.gray)
         } else {

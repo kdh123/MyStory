@@ -31,12 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.dhkim.trip.R
 import com.dhkim.core.trip.domain.model.Trip
 import com.dhkim.designsystem.MyStoryTheme
@@ -72,10 +70,9 @@ fun TripScreen(
                     ) {
                         Text(
                             text = "여행",
+                            style = MyStoryTheme.typography.titleMediumBold,
                             modifier = Modifier
-                                .align(Alignment.Center),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
+                                .align(Alignment.Center)
                         )
                     }
                 }
@@ -170,10 +167,12 @@ private fun AddTripScheduleLayout(
             ) {
                 Text(
                     text = "여행 일정 만들기",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    style = MyStoryTheme.typography.labelLargeBold,
                 )
-                Text(text = "새로운 여행을 떠나볼까요?")
+                Text(
+                    text = "새로운 여행을 떠나볼까요?",
+                    style = MyStoryTheme.typography.bodyMedium,
+                )
             }
         }
     }
@@ -201,34 +200,31 @@ private fun EmptyTripScheduleLayout(
             )
             Text(
                 text = "여행을 계획하고 있나요?",
+                style = MyStoryTheme.typography.titleSmallBold,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
                 modifier = Modifier
                     .padding(vertical = 10.dp)
                     .align(Alignment.CenterHorizontally)
             )
             Text(
                 text = "새로운 여행 일정을 등록해보세요",
+                style = MyStoryTheme.typography.bodyMediumGray,
                 textAlign = TextAlign.Center,
-                color = colorResource(id = R.color.gray),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             )
             Text(
                 text = "일정 만들기",
-                color = colorResource(id = R.color.white),
-                fontWeight = FontWeight.Bold,
+                style = MyStoryTheme.typography.labelLargeBold,
+                color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(top = 10.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(color = colorResource(id = R.color.primary))
+                    .background(color = MaterialTheme.colorScheme.primary)
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 10.dp, horizontal = 16.dp)
-                    .noRippleClick {
-                        onNavigateToSchedule()
-                    }
+                    .noRippleClick { onNavigateToSchedule() }
             )
         }
     }
@@ -241,18 +237,14 @@ fun TripSchedules(
     showDeleteDialog: (String) -> Unit,
     onNavigateToDetail: (String) -> Unit,
 ) {
-    if (items.isEmpty()) {
-        return
-    }
+    if (items.isEmpty()) return
 
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(items = items, key = {
-            it.id
-        }) {
+        items(items = items, key = { it.id }) {
             TripScheduleItem(
                 item = it,
                 showDeleteDialog = showDeleteDialog,
@@ -273,8 +265,7 @@ fun TripScheduleItem(
         is String -> {
             Text(
                 text = item.data,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
+                style = MyStoryTheme.typography.bodyMediumBold,
                 modifier = Modifier
                     .padding(top = 10.dp)
             )
@@ -299,12 +290,8 @@ fun TripScheduleItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .combinedClickable(
-                        onLongClick = {
-                            showDeleteDialog(tripSchedule.id)
-                        },
-                        onClick = {
-                            onNavigateToDetail(tripSchedule.id)
-                        }
+                        onLongClick = { showDeleteDialog(tripSchedule.id) },
+                        onClick = { onNavigateToDetail(tripSchedule.id) }
                     )
             ) {
                 GlideImage(
@@ -332,8 +319,7 @@ fun TripScheduleItem(
                     title.append(" 여행")
                     Text(
                         text = "$title",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                        style = MyStoryTheme.typography.bodyMediumBold,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 2,
                         modifier = Modifier
@@ -341,6 +327,7 @@ fun TripScheduleItem(
                     )
                     Text(
                         text = "${tripSchedule.startDate} - ${tripSchedule.endDate}",
+                        style = MyStoryTheme.typography.bodyMedium,
                         modifier = Modifier
                             .padding(start = 10.dp, top = 6.dp)
                     )
