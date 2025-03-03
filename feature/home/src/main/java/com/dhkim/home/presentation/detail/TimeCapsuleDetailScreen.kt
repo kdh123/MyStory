@@ -1,6 +1,7 @@
 package com.dhkim.home.presentation.detail
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,8 +24,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.home.R
 import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.DefaultBackground
@@ -176,7 +180,20 @@ fun TimeCapsuleDetailScreen(
                 else -> R.drawable.ic_smile_violet
             }
 
-            MenuItem(resId = profileResId, title = "작성자 : ${uiState.writer}")
+            MenuItem(
+                title = "작성자 : ${uiState.writer}",
+                icon = {
+                    Image(
+                        painter = painterResource(id = profileResId),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .width(24.dp)
+                            .height(24.dp)
+                    )
+                }
+            )
+
             Divider(
                 color = colorResource(id = R.color.light_gray),
                 modifier = Modifier
@@ -184,7 +201,21 @@ fun TimeCapsuleDetailScreen(
                     .padding(horizontal = 20.dp)
                     .height(1.dp)
             )
-            MenuItem(resId = R.drawable.ic_calender_black, title = uiState.timeCapsule.date)
+
+            MenuItem(
+                title = "작성자 : ${uiState.timeCapsule.date}",
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_calender_black),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .width(24.dp)
+                            .height(24.dp)
+                    )
+                }
+            )
+
             Divider(
                 color = colorResource(id = R.color.light_gray),
                 modifier = Modifier
@@ -203,7 +234,19 @@ fun TimeCapsuleDetailScreen(
                     }
                 }
 
-                MenuItem(resId = R.drawable.ic_people_black, title = "$sharedFriendsText")
+                MenuItem(
+                    title = "작성자 : $sharedFriendsText",
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_people_black),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(end = 10.dp)
+                                .width(24.dp)
+                                .height(24.dp)
+                        )
+                    }
+                )
 
                 Divider(
                     color = colorResource(id = R.color.light_gray),
@@ -230,7 +273,20 @@ fun TimeCapsuleDetailScreen(
             )
 
             if (uiState.timeCapsule.checkLocation || !uiState.timeCapsule.isReceived) {
-                MenuItem(resId = R.drawable.ic_location_black, title = uiState.timeCapsule.address)
+                MenuItem(
+                    title = "작성자 : ${uiState.timeCapsule.address}",
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_location_black),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(end = 10.dp)
+                                .width(24.dp)
+                                .height(24.dp)
+                        )
+                    }
+                )
+
                 naverMap()
             }
         }
@@ -238,22 +294,17 @@ fun TimeCapsuleDetailScreen(
 }
 
 @Composable
-fun MenuItem(resId: Int, title: String) {
+fun MenuItem(title: String, icon: @Composable (() -> Unit)? = null) {
     Row(
         modifier = Modifier
             .padding(vertical = 30.dp, horizontal = 20.dp)
             .fillMaxWidth()
     ) {
-        if (resId != 0) {
-            Image(
-                painter = painterResource(id = resId),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 10.dp)
-                    .width(24.dp)
-                    .height(24.dp)
-                    .align(Alignment.CenterVertically)
-            )
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+        ) {
+            icon?.invoke()
         }
 
         Text(
@@ -342,15 +393,13 @@ fun TimeCapsulePager(
                 .height(38.dp)
                 .background(color = Color.White)
         ) {
-            Icon(
+            Image(
                 painter = painterResource(id = R.drawable.ic_back_black),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(10.dp)
                     .fillMaxSize()
-                    .clickable {
-                        onBack()
-                    }
+                    .clickable { onBack() }
             )
         }
 
@@ -377,7 +426,44 @@ fun TimeCapsulePager(
     }
 }
 
-@Preview
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TimeCapsuleDetailScreenDarkPreview() {
+    val timeCapsule = TimeCapsule(
+        address = "서울시 강남구 압구정동",
+        date = "2024-07-29",
+        content = "안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 ",
+        checkLocation = true
+    )
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TimeCapsuleDetailScreen(
+                uiState = TimeCapsuleDetailUiState(isLoading = false, timeCapsule = timeCapsule),
+                sideEffect = { flowOf() },
+                onAction = {},
+                enableScroll = true,
+                onNavigateToImageDetail = { _, _ -> },
+                showPopup = {},
+                onBack = {},
+                naverMap = {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 15.dp, end = 15.dp, bottom = 15.dp)
+                            .fillMaxWidth()
+                            .aspectRatio(1.3f)
+                            .background(color = Color.Blue)
+                    )
+                },
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun TimeCapsuleDetailScreenPreview() {
     val timeCapsule = TimeCapsule(
@@ -386,22 +472,30 @@ private fun TimeCapsuleDetailScreenPreview() {
         content = "안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 안녕하세요 ",
         checkLocation = true
     )
-    TimeCapsuleDetailScreen(
-        uiState = TimeCapsuleDetailUiState(isLoading = false, timeCapsule = timeCapsule),
-        sideEffect = { flowOf() },
-        onAction = {},
-        enableScroll = true,
-        onNavigateToImageDetail = { _, _ -> },
-        showPopup = {},
-        onBack = {},
-        naverMap = {
-            Box(
-                modifier = Modifier
-                    .padding(start = 15.dp, end = 15.dp, bottom = 15.dp)
-                    .fillMaxWidth()
-                    .aspectRatio(1.3f)
-                    .background(color = Color.Blue)
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TimeCapsuleDetailScreen(
+                uiState = TimeCapsuleDetailUiState(isLoading = false, timeCapsule = timeCapsule),
+                sideEffect = { flowOf() },
+                onAction = {},
+                enableScroll = true,
+                onNavigateToImageDetail = { _, _ -> },
+                showPopup = {},
+                onBack = {},
+                naverMap = {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 15.dp, end = 15.dp, bottom = 15.dp)
+                            .fillMaxWidth()
+                            .aspectRatio(1.3f)
+                            .background(color = Color.Blue)
+                    )
+                },
             )
-        },
-    )
+        }
+    }
 }

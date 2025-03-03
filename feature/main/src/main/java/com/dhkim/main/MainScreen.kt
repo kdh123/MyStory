@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.compose.NavHost
@@ -85,19 +86,11 @@ fun MainScreen(
 
                             NavigationBarItem(
                                 icon = {
-                                    if (isSelected) {
-                                        Icon(
-                                            painterResource(id = screen.selected),
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                    } else {
-                                        Icon(
-                                            painterResource(id = screen.unSelected),
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.secondary
-                                        )
-                                    }
+                                    Icon(
+                                        painterResource(id = screen.iconResId),
+                                        contentDescription = null,
+                                        tint = if (isSelected) colorResource(id = R.color.primary) else MaterialTheme.colorScheme.secondary
+                                    )
                                 },
                                 selected = isSelected,
                                 onClick = onBottomClick
@@ -206,22 +199,10 @@ fun MainScreen(
     }
 }
 
-
-sealed class Screen(
-    val title: String, val selected: Int, val unSelected: Int, val route: String
-) {
-    data object Map : Screen("홈", R.drawable.ic_map_primary, R.drawable.ic_map_black, MAP_ROUTE)
-    data object AddTimeCapsule : Screen("추가", R.drawable.ic_add_primary, R.drawable.ic_add_black, ADD_TIME_CAPSULE_ROUTE)
-    data object TimeCapsule :
-        Screen(
-            "타임캡슐",
-            R.drawable.ic_home_primary,
-            R.drawable.ic_home_black,
-            TIME_CAPSULE_MAIN_ROUTE
-        )
-
-    data object Friend : Screen("프로필", R.drawable.ic_profile_primary, R.drawable.ic_profile_black, FRIEND_MAIN_ROUTE)
-
-    data object Trip :
-        Screen("여행", R.drawable.ic_trip_primary, R.drawable.ic_trip_black, TRIP_MAIN_ROUTE)
+sealed class Screen(val iconResId: Int, val route: String) {
+    data object TimeCapsule : Screen(R.drawable.ic_home_primary, TIME_CAPSULE_MAIN_ROUTE)
+    data object Map : Screen(R.drawable.ic_map_primary, MAP_ROUTE)
+    data object AddTimeCapsule : Screen(R.drawable.ic_add_primary, ADD_TIME_CAPSULE_ROUTE)
+    data object Trip : Screen(R.drawable.ic_trip_primary, TRIP_MAIN_ROUTE)
+    data object Friend : Screen(R.drawable.ic_profile_primary, FRIEND_MAIN_ROUTE)
 }

@@ -243,10 +243,6 @@ fun AddTimeCapsuleScreen(
                             .alpha(0f)
                     )
                 }
-                Divider(
-                    thickness = 1.dp,
-                    color = colorResource(id = R.color.light_gray)
-                )
             }
         }
     ) {
@@ -391,8 +387,11 @@ fun AddTimeCapsuleScreen(
 
                     Divider(
                         thickness = 1.dp,
-                        color = colorResource(id = R.color.light_gray)
+                        color = colorResource(id = R.color.light_gray),
+                        modifier = Modifier
+                            .padding(horizontal = 15.dp)
                     )
+
                     MenuItem(
                         resId = R.drawable.ic_calender_primary,
                         iconTint = if (uiState.openDate.isNotEmpty()) {
@@ -410,7 +409,9 @@ fun AddTimeCapsuleScreen(
 
                     Divider(
                         thickness = 1.dp,
-                        color = colorResource(id = R.color.light_gray)
+                        color = colorResource(id = R.color.light_gray),
+                        modifier = Modifier
+                            .padding(horizontal = 15.dp)
                     )
 
                     SwitchMenuItem(

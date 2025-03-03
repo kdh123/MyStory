@@ -31,7 +31,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -276,35 +275,7 @@ fun FriendScreen(
     }
 
     Scaffold(
-        modifier = modifier,
-        topBar = {
-            Column {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .width(0.dp)
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Text(
-                            text = "친구",
-                            modifier = Modifier
-                                .align(Alignment.Center),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        )
-                    }
-                }
-                Divider(
-                    thickness = 1.dp,
-                    color = colorResource(id = R.color.light_gray)
-                )
-            }
-        }
+        modifier = modifier
     ) {
         if (uiState.myInfo.id.isEmpty()) {
             Box(
@@ -438,7 +409,7 @@ fun FriendScreen(
                             if (currentTab == index) {
                                 Text(text = title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                             } else {
-                                Text(text = title, color = MaterialTheme.colorScheme.primary)
+                                Text(text = title, color = MaterialTheme.colorScheme.secondary)
                             }
                         },
                     )
@@ -1060,7 +1031,7 @@ private fun FriendScreenDarkPreview() {
                 onAction = {},
                 onNavigateToAddTimeCapsule = {},
                 onNavigateToChangeInfo = {},
-                onBack = {  },
+                onBack = { },
                 showPopup = {}
             )
         }
@@ -1087,7 +1058,7 @@ private fun FriendScreenPreview() {
                 onAction = {},
                 onNavigateToAddTimeCapsule = {},
                 onNavigateToChangeInfo = {},
-                onBack = {  },
+                onBack = {},
                 showPopup = {}
             )
         }

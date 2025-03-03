@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -80,10 +79,6 @@ fun TripScreen(
                         )
                     }
                 }
-                Divider(
-                    thickness = 1.dp,
-                    color = colorResource(id = R.color.light_gray)
-                )
             }
         }
     ) { paddingValues ->

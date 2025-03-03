@@ -270,9 +270,7 @@ fun TimeCapsuleScreen(
                     modifier = modifier
                         .testTag("timeCapsuleItems")
                 ) {
-                    items(uiState.timeCapsules, key = {
-                        it.id
-                    }) {
+                    items(uiState.timeCapsules, key = { it.id }) {
                         when (it.type) {
                             TimeCapsuleType.Title -> {
                                 val title = it.data as? String ?: ""
@@ -291,8 +289,7 @@ fun TimeCapsuleScreen(
                                     )
 
                                     if (title == "나의 이야기") {
-                                        val interactionSource =
-                                            remember { MutableInteractionSource() }
+                                        val interactionSource = remember { MutableInteractionSource() }
                                         Text(
                                             text = "더보기",
                                             modifier = Modifier
@@ -925,13 +922,9 @@ private fun LockTimeCapsule(
                 }
             }
             Text(
+                text = if (timeCapsule.isReceived) "친구" else "나",
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
-                text = if (timeCapsule.isReceived) {
-                    "친구"
-                } else {
-                    "나"
-                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = Color.White)
