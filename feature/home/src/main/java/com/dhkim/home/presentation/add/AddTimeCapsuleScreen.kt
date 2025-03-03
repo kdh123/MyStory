@@ -81,12 +81,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
 import com.dhkim.designsystem.MyStoryTheme
@@ -228,10 +226,9 @@ fun AddTimeCapsuleScreen(
                     ) {
                         Text(
                             text = "새 타임캡슐",
+                            style = MyStoryTheme.typography.bodyLargeBold,
                             modifier = Modifier
                                 .align(Alignment.Center),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
                         )
                     }
 
@@ -497,8 +494,9 @@ private fun SharedFriendList(
         }
     } else {
         Text(
-            textAlign = TextAlign.Center,
             text = "친구가 존재하지 않습니다.",
+            style = MyStoryTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
             modifier = modifier
                 .padding(bottom = 50.dp)
                 .fillMaxWidth()
@@ -620,11 +618,11 @@ private fun SharedFriendItem(
         )
 
         Text(
-            fontSize = 16.sp,
+            text = sharedFriend.nickname,
+            style = MyStoryTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            text = sharedFriend.nickname,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
         )
@@ -645,9 +643,7 @@ private fun SaveButton(modifier: Modifier, onClick: () -> Unit) {
     ) {
         Text(
             text = "저장",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
+            style = MyStoryTheme.typography.bodyLargeWhiteBold,
             modifier = Modifier
                 .padding(15.dp)
                 .align(Alignment.CenterHorizontally)
@@ -680,6 +676,7 @@ fun BottomMenuItem(resId: Int, title: String, onClick: () -> Unit) {
         )
         Text(
             text = title,
+            style = MyStoryTheme.typography.bodyMedium,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
         )
@@ -713,14 +710,20 @@ fun Calender(
                     }
                 }
             ) {
-                Text(text = "확인")
+                Text(
+                    text = "확인",
+                    style = MyStoryTheme.typography.bodyMedium
+                )
             }
         },
         dismissButton = {
             Button(onClick = {
                 onDismiss()
             }) {
-                Text(text = "취소")
+                Text(
+                    text = "취소",
+                    style = MyStoryTheme.typography.bodyMedium
+                )
             }
         }
     ) {
@@ -758,12 +761,12 @@ private fun SwitchMenuItem(
         ) {
             Text(
                 text = title,
-                fontSize = 18.sp,
+                style = MyStoryTheme.typography.bodyLarge
             )
             if (subTitle.isNotEmpty()) {
                 Text(
                     text = subTitle,
-                    fontSize = 14.sp,
+                    style = MyStoryTheme.typography.bodyMedium,
                     color = colorResource(id = R.color.gray)
                 )
             }
@@ -831,14 +834,14 @@ private fun MenuItem(
         ) {
             Text(
                 text = title,
-                fontSize = 18.sp,
+                style = MyStoryTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             if (subTitle.isNotEmpty()) {
                 Text(
                     text = subTitle,
-                    fontSize = 14.sp,
+                    style = MyStoryTheme.typography.bodyMedium,
                     color = colorResource(id = R.color.gray)
                 )
             }
@@ -941,7 +944,10 @@ private fun ContentsView(
     ) {
         TextField(
             label = {
-                Text(text = "내용을 입력해주세요.")
+                Text(
+                    text = "내용을 입력해주세요.",
+                    style = MyStoryTheme.typography.bodyMedium
+                )
             },
             colors = textFieldColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -949,9 +955,7 @@ private fun ContentsView(
                 unfocusedIndicatorColor = Color.Transparent
             ),
             value = content,
-            onValueChange = {
-                onAction(AddTimeCapsuleAction.Typing(it))
-            },
+            onValueChange = { onAction(AddTimeCapsuleAction.Typing(it)) },
             modifier = Modifier
                 .fillMaxSize()
         )

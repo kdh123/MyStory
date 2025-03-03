@@ -57,12 +57,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
@@ -146,12 +144,12 @@ fun TimeCapsuleScreen(
                 ) {
                     Text(
                         text = "메뉴",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MyStoryTheme.typography.bodyLargeBold,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "삭제",
+                        style = MyStoryTheme.typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
@@ -219,9 +217,8 @@ fun TimeCapsuleScreen(
         topBar = {
             Row {
                 Text(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
                     text = "타임캡슐",
+                    style = MyStoryTheme.typography.headlineSmallBold,
                     modifier = Modifier
                         .padding(start = 10.dp)
                         .alpha(0f)
@@ -291,6 +288,7 @@ fun TimeCapsuleScreen(
                                         val interactionSource = remember { MutableInteractionSource() }
                                         Text(
                                             text = "더보기",
+                                            style = MyStoryTheme.typography.labelMedium,
                                             modifier = Modifier
                                                 .align(Alignment.CenterVertically)
                                                 .border(
@@ -313,9 +311,9 @@ fun TimeCapsuleScreen(
                             TimeCapsuleType.SubTitle -> {
                                 Text(
                                     text = it.data as? String ?: "",
+                                    style = MyStoryTheme.typography.bodyMediumGray,
                                     modifier = Modifier
                                         .padding(horizontal = 20.dp),
-                                    color = colorResource(id = R.color.gray)
                                 )
                             }
 
@@ -493,10 +491,8 @@ private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
                     .clickable(onClick = onNavigateToProfile)
             ) {
                 Text(
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
                     text = "친구 추가",
+                    style = MyStoryTheme.typography.bodyLargeWhiteBold,
                     modifier = Modifier
                         .align(Alignment.Center)
                 )
@@ -587,12 +583,14 @@ fun LocationDialog(
             ) {
                 Text(
                     text = desc,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    style = MyStoryTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 )
                 if (timeCapsule.isReceived && timeCapsule.sender.isNotEmpty()) {
                     Text(
-                        fontWeight = FontWeight.Bold,
                         text = "공유한 친구 : ${timeCapsule.host.nickname}",
+                        style = MyStoryTheme.typography.bodyMediumBold,
                         modifier = Modifier
                             .padding(start = 16.dp, end = 16.dp, top = 10.dp)
                     )
@@ -600,8 +598,8 @@ fun LocationDialog(
 
                 if (timeCapsule.checkLocation) {
                     Text(
-                        fontWeight = FontWeight.Bold,
                         text = timeCapsule.address,
+                        style = MyStoryTheme.typography.bodyMediumBold,
                         modifier = Modifier
                             .padding(horizontal = 16.dp, vertical = 10.dp)
                     )
@@ -639,7 +637,10 @@ fun LocationDialog(
                             .padding(horizontal = 10.dp)
                             .fillMaxWidth(),
                     ) {
-                        Text("확인")
+                        Text(
+                            text = "확인",
+                            style = MyStoryTheme.typography.bodyMedium
+                        )
                     }
                 }
             }
@@ -753,10 +754,8 @@ fun OpenedBox(
                             .aspectRatio(0.8f)
                     ) {
                         Text(
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
                             text = "사진이 존재하지 않습니다.",
+                            style = MyStoryTheme.typography.bodyLargeWhiteBold,
                             modifier = Modifier
                                 .align(Alignment.Center)
                         )
@@ -764,23 +763,17 @@ fun OpenedBox(
                 }
 
                 Text(
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    fontSize = 16.sp,
                     text = timeCapsule.date,
+                    style = MyStoryTheme.typography.bodyMediumWhiteBold,
                     modifier = Modifier
                         .padding(bottom = 10.dp)
                         .align(Alignment.BottomCenter)
                 )
             }
             Text(
+                text = if (timeCapsule.isReceived) "친구" else "나",
+                style = MyStoryTheme.typography.bodyMediumBold,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                text = if (timeCapsule.isReceived) {
-                    "친구"
-                } else {
-                    "나"
-                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = Color.White)
@@ -877,21 +870,18 @@ private fun LockTimeCapsule(
 
                 if (canOpen) {
                     Text(
-                        fontSize = 18.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
                         text = "개봉 하기",
+                        style = MyStoryTheme.typography.bodyLargeWhiteBold,
                         modifier = Modifier
                             .padding(10.dp)
                             .align(Alignment.Center)
                     )
                 } else {
                     Text(
+                        text = "D - ${DateUtil.getDateGap(timeCapsule.openDate)}",
+                        style = MyStoryTheme.typography.bodyMediumWhiteBold,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        text = "D - ${DateUtil.getDateGap(timeCapsule.openDate)}",
                         modifier = Modifier
                             .padding(10.dp)
                             .align(Alignment.TopCenter)
@@ -909,11 +899,10 @@ private fun LockTimeCapsule(
 
                 if (timeCapsule.checkLocation) {
                     Text(
+                        text = timeCapsule.placeName,
+                        style = MyStoryTheme.typography.bodyMediumWhiteBold,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        text = timeCapsule.placeName,
                         modifier = Modifier
                             .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
                             .align(Alignment.BottomCenter)
@@ -922,8 +911,8 @@ private fun LockTimeCapsule(
             }
             Text(
                 text = if (timeCapsule.isReceived) "친구" else "나",
+                style = MyStoryTheme.typography.bodyMediumBold,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = Color.White)

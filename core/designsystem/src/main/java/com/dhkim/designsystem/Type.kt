@@ -146,6 +146,13 @@ internal val Typography = MyStoryTypography(
         letterSpacing = 0.25.sp,
         fontWeight = FontWeight.Bold
     ),
+    bodyMediumWhiteBold = SansSerifStyle.copy(
+        fontSize = 16.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.25.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.White
+    ),
     bodySmall = SansSerifStyle.copy(
         fontSize = 12.sp,
         lineHeight = 16.sp,
@@ -188,6 +195,7 @@ val LocalTypography = staticCompositionLocalOf {
         bodyMedium = SansSerifStyle,
         bodyMediumGray = SansSerifStyle,
         bodyMediumBold = SansSerifStyle,
+        bodyMediumWhiteBold = SansSerifStyle,
         bodySmall = SansSerifStyle,
         bodySmallBold = SansSerifStyle,
         bodySmallGray = SansSerifStyle,
@@ -220,6 +228,7 @@ data class MyStoryTypography(
     val bodyMedium: TextStyle,
     val bodyMediumGray: TextStyle,
     val bodyMediumBold: TextStyle,
+    val bodyMediumWhiteBold: TextStyle,
     val bodySmall: TextStyle,
     val bodySmallBold: TextStyle,
     val bodySmallGray: TextStyle,

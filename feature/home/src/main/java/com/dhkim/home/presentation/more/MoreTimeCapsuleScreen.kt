@@ -1,7 +1,6 @@
 package com.dhkim.home.presentation.more
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,15 +21,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.home.R
-import com.dhkim.home.presentation.TimeCapsuleItem
 import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.DefaultBackground
 import com.skydoves.landscapist.glide.GlideImage
@@ -93,10 +89,9 @@ fun MoreTimeCapsuleScreen(
                                 }
                         ) {
                             Text(
-                                textAlign = TextAlign.Center,
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
                                 text = "사진이 존재하지 않습니다.",
+                                style = MyStoryTheme.typography.bodyMediumWhiteBold,
+                                textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .align(Alignment.Center)
                             )
