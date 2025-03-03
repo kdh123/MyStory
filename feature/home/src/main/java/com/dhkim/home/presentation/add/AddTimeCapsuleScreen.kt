@@ -365,10 +365,9 @@ fun AddTimeCapsuleScreen(
                         },
                         title = "위치 체크",
                         subTitle = "개봉할 수 있는 위치를 지정합니다.",
-                        isChecked = uiState.checkLocation
-                    ) {
-                        onAction(AddTimeCapsuleAction.SetCheckLocation(it))
-                    }
+                        isChecked = uiState.checkLocation,
+                        onClick = { onAction(AddTimeCapsuleAction.SetCheckLocation(it)) }
+                    )
                     if (uiState.checkLocation) {
                         MenuItem(
                             resId = -1,
@@ -376,9 +375,7 @@ fun AddTimeCapsuleScreen(
                             subTitle = "지정한 위치 근처에서 개봉할 수 있습니다.",
                             modifier = Modifier
                                 .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 0.dp),
-                            onClick = {
-                                showLocationBottomSheet = true
-                            }
+                            onClick = { showLocationBottomSheet = true }
                         )
                     }
 
@@ -774,9 +771,7 @@ private fun SwitchMenuItem(
 
         Switch(
             checked = isChecked,
-            onCheckedChange = {
-                onClick(it)
-            },
+            onCheckedChange = { onClick(it) },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = colorResource(id = R.color.primary),
                 checkedTrackColor = colorResource(id = R.color.teal_200),

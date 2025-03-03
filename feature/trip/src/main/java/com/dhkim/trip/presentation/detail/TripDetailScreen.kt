@@ -58,7 +58,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,10 +66,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
-import com.dhkim.trip.R
 import com.dhkim.core.trip.domain.model.TripImage
 import com.dhkim.core.trip.domain.model.TripType
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.trip.R
 import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.WarningDialog
 import com.dhkim.ui.noRippleClick
@@ -138,24 +137,19 @@ fun TripDetailScreen(
                         .padding(20.dp)
                 ) {
                     Text(
+                        text = "메뉴",
+                        style = MyStoryTheme.typography.bodyLargeBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        text = "메뉴",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "삭제",
+                        style = MyStoryTheme.typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                onAction(
-                                    TripDetailAction.DeleteImage(
-                                        tripId = tripId,
-                                        imageId = selectedImageId
-                                    )
-                                )
+                                onAction(TripDetailAction.DeleteImage(tripId = tripId, imageId = selectedImageId))
                                 selectedImageId = ""
                                 showImageMenuPopup = false
                             }
@@ -178,9 +172,7 @@ fun TripDetailScreen(
                 }
                 context.startActivity(intent)
             },
-            onDismissRequest = {
-                showPermissionDialog = false
-            }
+            onDismissRequest = { showPermissionDialog = false }
         )
     }
 
@@ -371,6 +363,7 @@ private fun MenuItem(
             )
             Text(
                 text = title,
+                style = MyStoryTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -384,13 +377,10 @@ private fun TripInfo(uiState: TripDetailUiState) {
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp)
     ) {
-        Row(
-
-        ) {
+        Row {
             Text(
-                text = uiState.title ?: "",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+                text = uiState.title,
+                style = MyStoryTheme.typography.headlineSmallBold,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
                 modifier = Modifier
@@ -400,14 +390,13 @@ private fun TripInfo(uiState: TripDetailUiState) {
 
         Text(
             text = "${uiState.startDate} - ${uiState.endDate}",
-            color = colorResource(id = R.color.gray),
+            style = MyStoryTheme.typography.bodyMediumGray,
             modifier = Modifier
                 .padding(bottom = 5.dp)
         )
         Text(
             text = uiState.type,
-            color = colorResource(id = R.color.gray),
-            modifier = Modifier
+            style = MyStoryTheme.typography.bodyMediumGray,
         )
     }
 }
@@ -446,31 +435,30 @@ private fun DateHeader(
                                 colorResource(id = R.color.primary)
                             } else {
                                 colorResource(id = R.color.white)
+                                MaterialTheme.colorScheme.secondaryContainer
                             }
                         )
                 ) {
                     Text(
-                        textAlign = TextAlign.Center,
                         text = date.date.third,
-                        fontSize = 48.sp,
-                        color = if (index == uiState.selectedIndex) {
-                            colorResource(id = R.color.white)
+                        style = if (index == uiState.selectedIndex) {
+                            MyStoryTheme.typography.displayMediumWhite
                         } else {
-                            colorResource(id = R.color.gray)
+                            MyStoryTheme.typography.displayMediumGray
                         },
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                     )
 
                     Text(
-                        textAlign = TextAlign.Center,
                         text = date.date.second.toInt().toMonth(),
-                        fontSize = 20.sp,
-                        color = if (index == uiState.selectedIndex) {
-                            colorResource(id = R.color.white)
+                        style = if (index == uiState.selectedIndex) {
+                            MyStoryTheme.typography.bodyLargeWhite
                         } else {
-                            colorResource(id = R.color.gray)
+                            MyStoryTheme.typography.bodyLargeGray
                         },
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                     )
@@ -490,7 +478,7 @@ private fun TripDetails(
     if (!uiState.endDate.isNullOrEmpty() && DateUtil.isBefore(uiState.endDate)) {
         Text(
             text = "여행이 끝난 후 여행 기간 중에 찍었던 사진이 노출됩니다.",
-            color = colorResource(id = R.color.gray),
+            style = MyStoryTheme.typography.bodyMediumGray,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -499,14 +487,12 @@ private fun TripDetails(
         return
     }
 
-    if (uiState.images == null) {
-        return
-    }
+    if (uiState.images == null) return
 
     if (uiState.images.isEmpty()) {
         Text(
             text = "이 날 찍었던 사진이 존재하지 않습니다.",
-            color = colorResource(id = R.color.gray),
+            style = MyStoryTheme.typography.bodyMediumGray,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -523,9 +509,7 @@ private fun TripDetails(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        items(items = uiState.images, key = {
-            it.id
-        }) {
+        items(items = uiState.images, key = { it.id }) {
             GlideImage(
                 previewPlaceholder = painterResource(id = R.drawable.ic_launcher_background),
                 imageModel = { it.imageUrl },
@@ -673,6 +657,7 @@ private fun TripDetailScreenDarkPreview() {
         type = TripType.Family.desc,
         startDate = "2024-03-03",
         endDate = "2024-03-10",
+        selectedIndex = 0,
         images = images.toImmutableList()
     )
 
@@ -709,6 +694,7 @@ private fun TripDetailScreenPreview() {
         type = TripType.Family.desc,
         startDate = "2024-03-03",
         endDate = "2024-03-10",
+        selectedIndex = 0,
         images = images.toImmutableList()
     )
 

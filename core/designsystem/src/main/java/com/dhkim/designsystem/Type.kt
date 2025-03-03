@@ -1,5 +1,7 @@
 package com.dhkim.designsystem
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
@@ -20,9 +22,27 @@ internal val Typography = MyStoryTypography(
         letterSpacing = (-0.25).sp,
     ),
     displayMedium = SansSerifStyle.copy(
-        fontSize = 45.sp,
+        fontSize = 48.sp,
         lineHeight = 52.sp,
         letterSpacing = 0.sp,
+    ),
+    displayMediumPrimary = SansSerifStyle.copy(
+        fontSize = 48.sp,
+        lineHeight = 52.sp,
+        letterSpacing = 0.sp,
+        color = Primary
+    ),
+    displayMediumGray = SansSerifStyle.copy(
+        fontSize = 48.sp,
+        lineHeight = 52.sp,
+        letterSpacing = 0.sp,
+        color = Gray
+    ),
+    displayMediumWhite = SansSerifStyle.copy(
+        fontSize = 48.sp,
+        lineHeight = 52.sp,
+        letterSpacing = 0.sp,
+        color = Color.White
     ),
     displaySmall = SansSerifStyle.copy(
         fontSize = 36.sp,
@@ -115,6 +135,12 @@ internal val Typography = MyStoryTypography(
         letterSpacing = 0.5.sp,
         color = Color.Black
     ),
+    bodyLargeWhite = SansSerifStyle.copy(
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp,
+        color = Color.White
+    ),
     bodyLargeGrayBold = SansSerifStyle.copy(
         fontSize = 18.sp,
         lineHeight = 24.sp,
@@ -188,6 +214,9 @@ val LocalTypography = staticCompositionLocalOf {
     MyStoryTypography(
         displayLarge = SansSerifStyle,
         displayMedium = SansSerifStyle,
+        displayMediumPrimary = SansSerifStyle,
+        displayMediumGray = SansSerifStyle,
+        displayMediumWhite = SansSerifStyle,
         displaySmall = SansSerifStyle,
         headlineLarge = SansSerifStyle,
         headlineLargeBold = SansSerifStyle,
@@ -200,6 +229,7 @@ val LocalTypography = staticCompositionLocalOf {
         titleSmall = SansSerifStyle,
         bodyLarge = SansSerifStyle,
         bodyLargeBlack = SansSerifStyle,
+        bodyLargeWhite = SansSerifStyle,
         bodyLargeGray = SansSerifStyle,
         bodyLargeBold = SansSerifStyle,
         bodyLargeGrayBold = SansSerifStyle,
@@ -223,6 +253,9 @@ val LocalTypography = staticCompositionLocalOf {
 data class MyStoryTypography(
     val displayLarge: TextStyle,
     val displayMedium: TextStyle,
+    val displayMediumPrimary: TextStyle,
+    val displayMediumGray: TextStyle,
+    val displayMediumWhite: TextStyle,
     val displaySmall: TextStyle,
     val headlineLarge: TextStyle,
     val headlineLargeBold: TextStyle,
@@ -235,6 +268,7 @@ data class MyStoryTypography(
     val titleSmall: TextStyle,
     val bodyLarge: TextStyle,
     val bodyLargeBlack: TextStyle,
+    val bodyLargeWhite: TextStyle,
     val bodyLargeGray: TextStyle,
     val bodyLargeBold: TextStyle,
     val bodyLargeGrayBold: TextStyle,

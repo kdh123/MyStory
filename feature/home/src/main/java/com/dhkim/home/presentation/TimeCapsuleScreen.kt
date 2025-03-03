@@ -115,15 +115,9 @@ fun TimeCapsuleScreen(
 ) {
     val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
-    var selectedTimeCapsule by remember {
-        mutableStateOf(TimeCapsule())
-    }
-    var showLocationDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showMenuDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var selectedTimeCapsule by remember { mutableStateOf(TimeCapsule()) }
+    var showLocationDialog by rememberSaveable { mutableStateOf(false) }
+    var showMenuDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showMenuDialog) {
         Dialog(
@@ -183,9 +177,7 @@ fun TimeCapsuleScreen(
     if (showLocationDialog) {
         LocationDialog(
             timeCapsule = selectedTimeCapsule,
-            onDismissRequest = {
-                showLocationDialog = false
-            }
+            onDismissRequest = { showLocationDialog = false }
         )
     }
 
@@ -507,9 +499,7 @@ private fun OpenedTimeCapsules(
     onLongClick: (TimeCapsule) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit
 ) {
-    if (timeCapsules.isEmpty()) {
-        return
-    }
+    if (timeCapsules.isEmpty()) return
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -639,7 +629,8 @@ fun LocationDialog(
                     ) {
                         Text(
                             text = "확인",
-                            style = MyStoryTheme.typography.bodyMedium
+                            style = MyStoryTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
@@ -657,9 +648,7 @@ private fun OpenableTimeCapsules(
     onShowOpenDialog: (TimeCapsule) -> Unit,
     onLongClick: (TimeCapsule) -> Unit
 ) {
-    if (timeCapsules.isEmpty()) {
-        return
-    }
+    if (timeCapsules.isEmpty()) return
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),

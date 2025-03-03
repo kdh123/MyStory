@@ -127,7 +127,7 @@ fun TimeCapsuleDetailScreen(
                             )
                         }
                 ) {
-                    Image(
+                    Icon(
                         painter = painterResource(id = R.drawable.ic_delete_black),
                         contentDescription = null,
                         modifier = Modifier
