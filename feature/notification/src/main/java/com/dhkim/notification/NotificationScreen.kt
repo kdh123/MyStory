@@ -23,13 +23,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.story.domain.model.ReceivedTimeCapsule
 
@@ -65,8 +63,9 @@ fun NotificationScreen(
                 }
             } else {
                 Text(
-                    textAlign = TextAlign.Center,
                     text = "알림이 존재하지 않습니다.",
+                    style = MyStoryTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp)
@@ -106,17 +105,17 @@ fun NotificationItem(
         ) {
             Row {
                 Text(
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
                     text = "${timeCapsule.sender}님이 타임캡슐을 공유하였습니다.",
-                    fontSize = 14.sp,
+                    style = MyStoryTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                 )
             }
             Text(
-                color = colorResource(id = R.color.gray),
                 text = timeCapsule.date,
+                style = MyStoryTheme.typography.bodyMediumGray,
                 modifier = Modifier
                     .padding(top = 5.dp)
             )

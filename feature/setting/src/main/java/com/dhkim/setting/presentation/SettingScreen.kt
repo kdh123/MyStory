@@ -28,7 +28,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.setting.R
 
@@ -71,7 +70,7 @@ fun SettingScreen(
             ) {
                 Text(
                     text = "알림",
-                    fontSize = 18.sp,
+                    style = MyStoryTheme.typography.titleMedium,
                     modifier = Modifier
                         .width(0.dp)
                         .weight(1f)
@@ -79,9 +78,7 @@ fun SettingScreen(
                 )
                 Switch(
                     checked = uiState.isNotificationChecked,
-                    onCheckedChange = {
-                        onNotificationChanged(it)
-                    },
+                    onCheckedChange = { onNotificationChanged(it) },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = colorResource(id = R.color.primary),
                         checkedTrackColor = colorResource(id = R.color.teal_200),
@@ -108,7 +105,7 @@ fun SettingScreen(
             ) {
                 Text(
                     text = "개인 정보 처리 방침",
-                    fontSize = 18.sp,
+                    style = MyStoryTheme.typography.titleMedium,
                     modifier = Modifier
                         .width(0.dp)
                         .weight(1f)
