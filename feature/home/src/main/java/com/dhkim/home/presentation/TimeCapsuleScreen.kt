@@ -120,58 +120,36 @@ fun TimeCapsuleScreen(
     var showMenuDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showMenuDialog) {
-        Dialog(
+        MenuDialog(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            onDeleteClick = {
+                showMenuDialog = false
+                val desc = if (selectedTimeCapsule.sharedFriends.isNotEmpty() && !selectedTimeCapsule.isReceived) {
+                    "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
+                } else {
+                    "정말 삭제하겠습니까?"
+                }
+
+                showPopup(
+                    Popup.Warning(
+                        title = "삭제",
+                        desc = desc,
+                        onPositiveClick = {
+                            onDeleteTimeCapsule(
+                                selectedTimeCapsule.id,
+                                selectedTimeCapsule.isReceived
+                            )
+                        }
+                    )
+                )
+            },
             onDismissRequest = {
                 selectedTimeCapsule = TimeCapsule()
                 showMenuDialog = false
             }
-        ) {
-            Card(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                shape = RoundedCornerShape(16.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(20.dp)
-                ) {
-                    Text(
-                        text = "메뉴",
-                        style = MyStoryTheme.typography.bodyLargeBold,
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = "삭제",
-                        style = MyStoryTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                showMenuDialog = false
-                                val desc =
-                                    if (selectedTimeCapsule.sharedFriends.isNotEmpty() && !selectedTimeCapsule.isReceived) {
-                                        "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
-                                    } else {
-                                        "정말 삭제하겠습니까?"
-                                    }
-
-                                showPopup(
-                                    Popup.Warning(
-                                        title = "삭제",
-                                        desc = desc,
-                                        onPositiveClick = {
-                                            onDeleteTimeCapsule(
-                                                selectedTimeCapsule.id,
-                                                selectedTimeCapsule.isReceived
-                                            )
-                                        }
-                                    )
-                                )
-                            }
-                    )
-                }
-            }
-        }
+        )
     }
 
     if (showLocationDialog) {
@@ -522,6 +500,41 @@ private fun OpenedTimeCapsules(
     }
 }
 
+@Composable
+fun MenuDialog(
+    modifier: Modifier,
+    onDeleteClick: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest
+    ) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+            ) {
+                Text(
+                    text = "메뉴",
+                    style = MyStoryTheme.typography.bodyLargeBold,
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "삭제",
+                    style = MyStoryTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onDeleteClick)
+                )
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalNaverMapApi::class)
 @Composable
