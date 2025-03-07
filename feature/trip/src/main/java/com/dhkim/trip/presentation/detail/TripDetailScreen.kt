@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.location.Address
 import android.location.Geocoder
 import android.media.ExifInterface
@@ -15,7 +16,6 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -40,8 +40,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,7 +58,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,9 +66,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
-import com.dhkim.trip.R
 import com.dhkim.core.trip.domain.model.TripImage
 import com.dhkim.core.trip.domain.model.TripType
+import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.trip.R
 import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.WarningDialog
 import com.dhkim.ui.noRippleClick
@@ -96,22 +99,11 @@ fun TripDetailScreen(
 ) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
-    var showPermissionDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showMenuBottom by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showDeletePopup by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showImageMenuPopup by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var selectedImageId by rememberSaveable {
-        mutableStateOf("")
-    }
-
+    var showPermissionDialog by rememberSaveable { mutableStateOf(false) }
+    var showMenuBottom by rememberSaveable { mutableStateOf(false) }
+    var showDeletePopup by rememberSaveable { mutableStateOf(false) }
+    var showImageMenuPopup by rememberSaveable { mutableStateOf(false) }
+    var selectedImageId by rememberSaveable { mutableStateOf("") }
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { state ->
@@ -145,24 +137,19 @@ fun TripDetailScreen(
                         .padding(20.dp)
                 ) {
                     Text(
+                        text = "메뉴",
+                        style = MyStoryTheme.typography.bodyLargeBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        text = "메뉴",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "삭제",
+                        style = MyStoryTheme.typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                onAction(
-                                    TripDetailAction.DeleteImage(
-                                        tripId = tripId,
-                                        imageId = selectedImageId
-                                    )
-                                )
+                                onAction(TripDetailAction.DeleteImage(tripId = tripId, imageId = selectedImageId))
                                 selectedImageId = ""
                                 showImageMenuPopup = false
                             }
@@ -185,9 +172,7 @@ fun TripDetailScreen(
                 }
                 context.startActivity(intent)
             },
-            onDismissRequest = {
-                showPermissionDialog = false
-            }
+            onDismissRequest = { showPermissionDialog = false }
         )
     }
 
@@ -271,7 +256,7 @@ fun TripDetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_back_black),
                     contentDescription = null,
                     modifier = Modifier
@@ -281,15 +266,13 @@ fun TripDetailScreen(
                             onBack()
                         }
                 )
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_option_black),
                     contentDescription = null,
                     modifier = Modifier
                         .padding(10.dp)
                         .align(Alignment.CenterEnd)
-                        .clickable {
-                            showMenuBottom = true
-                        }
+                        .clickable { showMenuBottom = true }
                 )
             }
         }
@@ -372,16 +355,15 @@ private fun MenuItem(
             modifier = modifier
                 .padding(10.dp)
         ) {
-            Image(
-                painter = painterResource(
-                    id = resId
-                ),
+            Icon(
+                painter = painterResource(id = resId),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(end = 10.dp)
             )
             Text(
                 text = title,
+                style = MyStoryTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -395,13 +377,10 @@ private fun TripInfo(uiState: TripDetailUiState) {
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp)
     ) {
-        Row(
-
-        ) {
+        Row {
             Text(
-                text = uiState.title ?: "",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+                text = uiState.title,
+                style = MyStoryTheme.typography.headlineSmallBold,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
                 modifier = Modifier
@@ -411,14 +390,13 @@ private fun TripInfo(uiState: TripDetailUiState) {
 
         Text(
             text = "${uiState.startDate} - ${uiState.endDate}",
-            color = colorResource(id = R.color.gray),
+            style = MyStoryTheme.typography.bodyMediumGray,
             modifier = Modifier
                 .padding(bottom = 5.dp)
         )
         Text(
             text = uiState.type,
-            color = colorResource(id = R.color.gray),
-            modifier = Modifier
+            style = MyStoryTheme.typography.bodyMediumGray,
         )
     }
 }
@@ -457,31 +435,30 @@ private fun DateHeader(
                                 colorResource(id = R.color.primary)
                             } else {
                                 colorResource(id = R.color.white)
+                                MaterialTheme.colorScheme.secondaryContainer
                             }
                         )
                 ) {
                     Text(
-                        textAlign = TextAlign.Center,
                         text = date.date.third,
-                        fontSize = 48.sp,
-                        color = if (index == uiState.selectedIndex) {
-                            colorResource(id = R.color.white)
+                        style = if (index == uiState.selectedIndex) {
+                            MyStoryTheme.typography.displayMediumWhite
                         } else {
-                            colorResource(id = R.color.gray)
+                            MyStoryTheme.typography.displayMediumGray
                         },
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                     )
 
                     Text(
-                        textAlign = TextAlign.Center,
                         text = date.date.second.toInt().toMonth(),
-                        fontSize = 20.sp,
-                        color = if (index == uiState.selectedIndex) {
-                            colorResource(id = R.color.white)
+                        style = if (index == uiState.selectedIndex) {
+                            MyStoryTheme.typography.bodyLargeWhite
                         } else {
-                            colorResource(id = R.color.gray)
+                            MyStoryTheme.typography.bodyLargeGray
                         },
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                     )
@@ -501,7 +478,7 @@ private fun TripDetails(
     if (!uiState.endDate.isNullOrEmpty() && DateUtil.isBefore(uiState.endDate)) {
         Text(
             text = "여행이 끝난 후 여행 기간 중에 찍었던 사진이 노출됩니다.",
-            color = colorResource(id = R.color.gray),
+            style = MyStoryTheme.typography.bodyMediumGray,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -510,14 +487,12 @@ private fun TripDetails(
         return
     }
 
-    if (uiState.images == null) {
-        return
-    }
+    if (uiState.images == null) return
 
     if (uiState.images.isEmpty()) {
         Text(
             text = "이 날 찍었던 사진이 존재하지 않습니다.",
-            color = colorResource(id = R.color.gray),
+            style = MyStoryTheme.typography.bodyMediumGray,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 10.dp)
@@ -534,9 +509,7 @@ private fun TripDetails(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        items(items = uiState.images, key = {
-            it.id
-        }) {
+        items(items = uiState.images, key = { it.id }) {
             GlideImage(
                 previewPlaceholder = painterResource(id = R.drawable.ic_launcher_background),
                 imageModel = { it.imageUrl },
@@ -653,38 +626,6 @@ private fun getAddress(context: Context, lat: Double, lng: Double): String {
     } ?: ""
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun TripDetailScreenPreview() {
-    val images = mutableListOf<com.dhkim.core.trip.domain.model.TripImage>().apply {
-        repeat(10) {
-            add(
-                com.dhkim.core.trip.domain.model.TripImage(
-                    id = "$it"
-                )
-            )
-        }
-    }
-
-    val uiState = TripDetailUiState(
-        title = "서울, 경기 여행",
-        type = com.dhkim.core.trip.domain.model.TripType.Family.desc,
-        startDate = "2024-03-03",
-        endDate = "2024-03-10",
-        images = images.toImmutableList()
-    )
-
-    TripDetailScreen(
-        tripId = "",
-        uiState = uiState,
-        sideEffect = flowOf(),
-        onAction = {},
-        onNavigateToImageDetail = { },
-        onNavigateToSchedule = {},
-        onBack = {}
-    )
-}
-
 fun Int.toMonth(): String {
     return when (this) {
         1 -> "Jan"
@@ -699,5 +640,78 @@ fun Int.toMonth(): String {
         10 -> "Oct"
         11 -> "Nov"
         else -> "Dec"
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TripDetailScreenDarkPreview() {
+    val images = mutableListOf<TripImage>().apply {
+        repeat(10) {
+            add(TripImage(id = "$it"))
+        }
+    }
+
+    val uiState = TripDetailUiState(
+        title = "서울, 경기 여행",
+        type = TripType.Family.desc,
+        startDate = "2024-03-03",
+        endDate = "2024-03-10",
+        selectedIndex = 0,
+        images = images.toImmutableList()
+    )
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripDetailScreen(
+                tripId = "",
+                uiState = uiState,
+                sideEffect = flowOf(),
+                onAction = {},
+                onNavigateToImageDetail = { },
+                onNavigateToSchedule = {},
+                onBack = {}
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun TripDetailScreenPreview() {
+    val images = mutableListOf<TripImage>().apply {
+        repeat(10) {
+            add(TripImage(id = "$it"))
+        }
+    }
+
+    val uiState = TripDetailUiState(
+        title = "서울, 경기 여행",
+        type = TripType.Family.desc,
+        startDate = "2024-03-03",
+        endDate = "2024-03-10",
+        selectedIndex = 0,
+        images = images.toImmutableList()
+    )
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TripDetailScreen(
+                tripId = "",
+                uiState = uiState,
+                sideEffect = flowOf(),
+                onAction = {},
+                onNavigateToImageDetail = { },
+                onNavigateToSchedule = {},
+                onBack = {}
+            )
+        }
     }
 }

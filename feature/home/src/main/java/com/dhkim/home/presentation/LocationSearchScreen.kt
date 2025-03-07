@@ -2,6 +2,7 @@
 
 package com.dhkim.home.presentation
 
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -37,6 +40,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.home.R
 import com.dhkim.home.presentation.add.AddTimeCapsuleAction
 import com.dhkim.home.presentation.add.AddTimeCapsuleUiState
@@ -74,16 +78,6 @@ fun LocationSearchScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun LocationSearchScreenPreview() {
-    LocationSearchScreen(
-        uiState = AddTimeCapsuleUiState(),
-        onAction = {}
-    )
-}
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(query: String, onAction: (AddTimeCapsuleAction) -> Unit) {
@@ -95,10 +89,10 @@ fun SearchBar(query: String, onAction: (AddTimeCapsuleAction) -> Unit) {
             onAction(AddTimeCapsuleAction.Query(it))
         },
         colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = colorResource(id = R.color.primary),
-            disabledTextColor = colorResource(id = R.color.primary),
-            disabledIndicatorColor = colorResource(id = R.color.primary),
-            containerColor = Color.White
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            disabledTextColor = MaterialTheme.colorScheme.primary,
+            disabledIndicatorColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         label = {
             Text(text = "장소 검색")
@@ -189,8 +183,40 @@ fun Place(place: Place, onAction: (AddTimeCapsuleAction) -> Unit) {
             Text(
                 text = place.phone,
                 fontSize = 12.sp,
-                color = colorResource(id = R.color.primary),
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = 10.dp)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun LocationSearchScreenDarkPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            LocationSearchScreen(
+                uiState = AddTimeCapsuleUiState(),
+                onAction = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun LocationSearchScreenPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            LocationSearchScreen(
+                uiState = AddTimeCapsuleUiState(),
+                onAction = {}
             )
         }
     }

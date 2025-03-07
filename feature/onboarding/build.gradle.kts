@@ -43,8 +43,9 @@ dependencies {
 
     implementation(project(":core:common"))
     implementation(project(":core:user"))
-    implementation(project(":feature:main"))
     implementation(project(":core:ui"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":feature:main"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)

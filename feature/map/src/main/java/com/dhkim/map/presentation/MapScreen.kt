@@ -7,6 +7,7 @@ package com.dhkim.map.presentation
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.res.Configuration
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -39,7 +40,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
@@ -54,16 +57,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.location.domain.model.Category
 import com.dhkim.location.domain.model.Place
 import com.dhkim.map.R
@@ -74,7 +76,6 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
-import com.naver.maps.map.compose.ExperimentalNaverMapApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -87,7 +88,6 @@ fun MapScreen(
     sideEffect: () -> Flow<MapSideEffect>,
     onAction: (MapAction) -> Unit,
     locationPermissionState: PermissionState,
-    place: () -> Place?,
     onNavigateToSearch: (Double, Double) -> Unit,
     onNavigateToAddScreen: (Place) -> Unit,
     onHideBottomNav: (Place?) -> Unit,
@@ -131,10 +131,6 @@ fun MapScreen(
         onHideBottomNav(uiState.selectedPlace)
     }
 
-    LaunchedEffect(place()?.id) {
-        place()?.let(MapAction::SelectPlace)
-    }
-
     if (!locationPermissionState.status.isGranted && locationPermissionState.status.shouldShowRationale) {
         // Show rationale if needed
     } else {
@@ -160,7 +156,7 @@ fun MapScreen(
                 )
             }
         },
-        containerColor = colorResource(id = R.color.white)
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) { padding ->
         Box(
             modifier = Modifier
@@ -221,7 +217,7 @@ fun MapScreen(
                 BottomPlace(
                     place = it,
                     modifier = Modifier
-                        .background(color = colorResource(id = R.color.white))
+                        .background(color = MaterialTheme.colorScheme.surfaceContainer)
                         .align(Alignment.BottomCenter),
                     onTimeCapsuleClick = { place ->
                         onNavigateToAddScreen(place)
@@ -266,16 +262,14 @@ fun BottomPlace(
             ) {
                 Text(
                     text = place.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MyStoryTheme.typography.bodyLargeBold,
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
                 Text(
+                    text = place.category,
+                    style = MyStoryTheme.typography.bodySmallGray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    text = place.category,
-                    color = Color.Gray,
-                    fontSize = 12.sp,
                 )
             }
 
@@ -285,21 +279,20 @@ fun BottomPlace(
             ) {
                 Text(
                     text = place.distance,
+                    style = MyStoryTheme.typography.bodyMedium,
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
                 Text(
+                    text = place.address,
+                    style = MyStoryTheme.typography.bodySmallGray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    text = place.address,
-                    color = Color.Gray,
-                    fontSize = 12.sp,
                 )
             }
             if (place.phone.isNotEmpty()) {
                 Text(
                     text = place.phone,
-                    fontSize = 12.sp,
-                    color = colorResource(id = R.color.primary),
+                    style = MyStoryTheme.typography.bodySmallPrimary,
                     modifier = Modifier.padding(horizontal = 10.dp)
                 )
             }
@@ -326,39 +319,6 @@ fun BottomPlace(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun BottomPlacePreview() {
-    val place = Place(
-        id = "",
-        name = "스타벅스",
-        lat = "",
-        lng = "",
-        address = "인천시 미추홀구 주안동 인천시 미추홀구 주안동 인천시 미추홀구 주안동",
-        category = "카페",
-        distance = "300",
-        phone = "010-1234-1234",
-        url = "https://www.naver.com"
-    )
-    BottomPlace(place = place, modifier = Modifier) {
-
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SearchBarColorsPreview() {
-    SearchBar(
-        query = "관광명소",
-        lat = 34.4,
-        lng = 35.5,
-        showClose = false,
-        onAction = { _ -> },
-        onNavigateToSearch = { _, _ -> },
-        onInitSavedState = {}
-    )
 }
 
 @Composable
@@ -397,15 +357,14 @@ fun SearchBar(
                     .padding(10.dp)
             ) {
                 Text(
+                    text = query.ifEmpty { "추억을 남기려는 장소를 검색하세요" },
+                    style = if (query.isEmpty()) {
+                        MyStoryTheme.typography.bodyMediumGray
+                    } else {
+                        MyStoryTheme.typography.bodyMediumBlack
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    text = query.ifEmpty { "추억을 남기려는 장소를 검색하세요" },
-                    fontSize = 16.sp,
-                    color = if (query.isEmpty()) {
-                        colorResource(id = R.color.gray)
-                    } else {
-                        colorResource(id = R.color.black)
-                    },
                     modifier = Modifier
                         .padding(vertical = 3.dp)
                         .width(0.dp)
@@ -439,7 +398,7 @@ fun SearchBar(
 fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val color = if (isSelected) {
-        colorResource(id = R.color.primary)
+        MaterialTheme.colorScheme.primary
     } else {
         colorResource(id = R.color.white)
     }
@@ -451,9 +410,7 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
         border = BorderStroke(1.dp, color = color),
         modifier = Modifier
             .height(45.dp)
-            .clip(
-                shape = RoundedCornerShape(10.dp)
-            )
+            .clip(shape = RoundedCornerShape(10.dp))
             .padding(bottom = 5.dp)
             .clickable(
                 interactionSource = interactionSource,
@@ -480,6 +437,8 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: (Category) ->
             )
             Text(
                 text = category.type,
+                style = MyStoryTheme.typography.labelMedium,
+                color = Color.Black,
                 modifier = Modifier
                     .padding(top = 3.dp, bottom = 3.dp, start = 3.dp)
                     .align(Alignment.CenterVertically)
@@ -505,11 +464,6 @@ fun Category.resId(): Int {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun CategoryChipPreview() {
-    CategoryChip(category = Category.Cafe, isSelected = true) {}
-}
 
 @Composable
 fun PlaceList(
@@ -563,16 +517,14 @@ fun PlaceItem(place: Place, onAction: ((MapAction) -> Unit)? = null, onHide: () 
         ) {
             Text(
                 text = place.name,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
+                style = MyStoryTheme.typography.bodyLargeBold,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Text(
-                maxLines = 1,
                 text = place.category,
+                style = MyStoryTheme.typography.bodySmallGray,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.Gray,
-                fontSize = 12.sp,
             )
         }
 
@@ -582,50 +534,24 @@ fun PlaceItem(place: Place, onAction: ((MapAction) -> Unit)? = null, onHide: () 
         ) {
             Text(
                 text = place.distance,
+                style = MyStoryTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Text(
                 text = place.address,
-                color = Color.Gray,
-                fontSize = 12.sp
+                style = MyStoryTheme.typography.bodySmallGray,
             )
         }
         if (place.phone.isNotEmpty()) {
             Text(
                 text = place.phone,
-                fontSize = 12.sp,
-                color = colorResource(id = R.color.primary),
+                style = MyStoryTheme.typography.bodySmallPrimary,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun MapScreenPreView() {
-    MapScreen(
-        uiState = MapUiState(),
-        sideEffect = { flowOf() },
-        onAction = {},
-        locationPermissionState = DefaultPermissionState(),
-        place = { null },
-        onNavigateToSearch = { _, _ -> },
-        onNavigateToAddScreen = {},
-        onHideBottomNav = {},
-        onInitSavedState = {},
-        requestPermission = {},
-        naverMap = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color.LightGray)
-            ) {
-
-            }
-        }
-    )
-}
 
 @OptIn(ExperimentalPermissionsApi::class)
 class DefaultPermissionState : PermissionState {
@@ -636,5 +562,120 @@ class DefaultPermissionState : PermissionState {
 
     override fun launchPermissionRequest() {
 
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun MapScreenDarkPreView() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            MapScreen(
+                uiState = MapUiState(),
+                sideEffect = { flowOf() },
+                onAction = {},
+                locationPermissionState = DefaultPermissionState(),
+                onNavigateToSearch = { _, _ -> },
+                onNavigateToAddScreen = {},
+                onHideBottomNav = {},
+                onInitSavedState = {},
+                requestPermission = {},
+                naverMap = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Color.LightGray)
+                    ) {
+
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun MapScreenPreView() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            MapScreen(
+                uiState = MapUiState(),
+                sideEffect = { flowOf() },
+                onAction = {},
+                locationPermissionState = DefaultPermissionState(),
+                onNavigateToSearch = { _, _ -> },
+                onNavigateToAddScreen = {},
+                onHideBottomNav = {},
+                onInitSavedState = {},
+                requestPermission = {},
+                naverMap = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Color.LightGray)
+                    ) {
+
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun BottomPlaceDarkPreview() {
+    val place = Place(
+        id = "",
+        name = "스타벅스",
+        lat = "",
+        lng = "",
+        address = "인천시 미추홀구 주안동 인천시 미추홀구 주안동 인천시 미추홀구 주안동",
+        category = "카페",
+        distance = "300",
+        phone = "010-1234-1234",
+        url = "https://www.naver.com"
+    )
+    MyStoryTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background
+        ) {
+            BottomPlace(place = place, modifier = Modifier) {
+
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BottomPlacePreview() {
+    val place = Place(
+        id = "",
+        name = "스타벅스",
+        lat = "",
+        lng = "",
+        address = "인천시 미추홀구 주안동 인천시 미추홀구 주안동 인천시 미추홀구 주안동",
+        category = "카페",
+        distance = "300",
+        phone = "010-1234-1234",
+        url = "https://www.naver.com"
+    )
+
+    MyStoryTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background
+        ) {
+            BottomPlace(place = place, modifier = Modifier) {
+
+            }
+        }
     }
 }

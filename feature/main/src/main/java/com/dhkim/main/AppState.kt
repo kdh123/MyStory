@@ -138,11 +138,7 @@ class AppState(
 internal fun rememberMyStoryAppState(
     navController: NavHostController = rememberNavController(),
 ): AppState {
-    return remember(
-        navController,
-    ) {
-        AppState(
-            navController = navController
-        )
+    return remember(navController) {
+        AppState(navController = navController)
     }
 }

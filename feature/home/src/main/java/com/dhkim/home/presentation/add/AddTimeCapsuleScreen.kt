@@ -10,6 +10,7 @@ package com.dhkim.home.presentation.add
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -18,10 +19,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,10 +49,13 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -77,14 +81,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.dhcamera.camera.DhCamera
 import com.dhkim.dhcamera.model.BackgroundText
 import com.dhkim.dhcamera.model.FontElement
@@ -206,7 +209,7 @@ fun AddTimeCapsuleScreen(
                         .fillMaxWidth()
                         .padding(10.dp)
                 ) {
-                    Image(
+                    Icon(
                         painter = painterResource(id = R.drawable.ic_back_black),
                         contentDescription = null,
                         modifier = Modifier
@@ -223,10 +226,9 @@ fun AddTimeCapsuleScreen(
                     ) {
                         Text(
                             text = "새 타임캡슐",
+                            style = MyStoryTheme.typography.bodyLargeBold,
                             modifier = Modifier
                                 .align(Alignment.Center),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
                         )
                     }
 
@@ -238,10 +240,6 @@ fun AddTimeCapsuleScreen(
                             .alpha(0f)
                     )
                 }
-                Divider(
-                    thickness = 1.dp,
-                    color = colorResource(id = R.color.light_gray)
-                )
             }
         }
     ) {
@@ -359,17 +357,17 @@ fun AddTimeCapsuleScreen(
                 )
                 Column {
                     SwitchMenuItem(
-                        resId = if (uiState.checkLocation) {
-                            R.drawable.ic_location_primary
+                        resId = R.drawable.ic_location_primary,
+                        iconTint = if (uiState.checkLocation) {
+                            MaterialTheme.colorScheme.primary
                         } else {
-                            R.drawable.ic_location_black
+                            MaterialTheme.colorScheme.secondary
                         },
                         title = "위치 체크",
                         subTitle = "개봉할 수 있는 위치를 지정합니다.",
-                        isChecked = uiState.checkLocation
-                    ) {
-                        onAction(AddTimeCapsuleAction.SetCheckLocation(it))
-                    }
+                        isChecked = uiState.checkLocation,
+                        onClick = { onAction(AddTimeCapsuleAction.SetCheckLocation(it)) }
+                    )
                     if (uiState.checkLocation) {
                         MenuItem(
                             resId = -1,
@@ -377,21 +375,23 @@ fun AddTimeCapsuleScreen(
                             subTitle = "지정한 위치 근처에서 개봉할 수 있습니다.",
                             modifier = Modifier
                                 .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 0.dp),
-                            onClick = {
-                                showLocationBottomSheet = true
-                            }
+                            onClick = { showLocationBottomSheet = true }
                         )
                     }
 
                     Divider(
                         thickness = 1.dp,
-                        color = colorResource(id = R.color.light_gray)
+                        color = colorResource(id = R.color.light_gray),
+                        modifier = Modifier
+                            .padding(horizontal = 15.dp)
                     )
+
                     MenuItem(
-                        resId = if (uiState.openDate.isNotEmpty()) {
-                            R.drawable.ic_calender_primary
+                        resId = R.drawable.ic_calender_primary,
+                        iconTint = if (uiState.openDate.isNotEmpty()) {
+                            MaterialTheme.colorScheme.primary
                         } else {
-                            R.drawable.ic_calender_black
+                            MaterialTheme.colorScheme.secondary
                         },
                         title = uiState.openDate.ifEmpty { "개봉 날짜" },
                         subTitle = "지정한 날짜 이후에 개봉이 가능합니다.",
@@ -403,14 +403,17 @@ fun AddTimeCapsuleScreen(
 
                     Divider(
                         thickness = 1.dp,
-                        color = colorResource(id = R.color.light_gray)
+                        color = colorResource(id = R.color.light_gray),
+                        modifier = Modifier
+                            .padding(horizontal = 15.dp)
                     )
 
                     SwitchMenuItem(
-                        resId = if (uiState.isShare) {
-                            R.drawable.ic_smile_blue
+                        resId = R.drawable.ic_smile_blue,
+                        iconTint = if (uiState.isShare) {
+                            MaterialTheme.colorScheme.primary
                         } else {
-                            R.drawable.ic_face_black
+                            MaterialTheme.colorScheme.secondary
                         },
                         title = "친구와 공유하기",
                         subTitle = "사진은 친구에게 공유되지 않습니다.",
@@ -488,8 +491,9 @@ private fun SharedFriendList(
         }
     } else {
         Text(
-            textAlign = TextAlign.Center,
             text = "친구가 존재하지 않습니다.",
+            style = MyStoryTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
             modifier = modifier
                 .padding(bottom = 50.dp)
                 .fillMaxWidth()
@@ -611,11 +615,11 @@ private fun SharedFriendItem(
         )
 
         Text(
-            fontSize = 16.sp,
+            text = sharedFriend.nickname,
+            style = MyStoryTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            text = sharedFriend.nickname,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
         )
@@ -626,7 +630,7 @@ private fun SharedFriendItem(
 private fun SaveButton(modifier: Modifier, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.primary)),
-        shape = RoundedCornerShape(30.dp),
+        shape = RoundedCornerShape(10.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
@@ -636,9 +640,7 @@ private fun SaveButton(modifier: Modifier, onClick: () -> Unit) {
     ) {
         Text(
             text = "저장",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
+            style = MyStoryTheme.typography.bodyLargeWhiteBold,
             modifier = Modifier
                 .padding(15.dp)
                 .align(Alignment.CenterHorizontally)
@@ -671,6 +673,7 @@ fun BottomMenuItem(resId: Int, title: String, onClick: () -> Unit) {
         )
         Text(
             text = title,
+            style = MyStoryTheme.typography.bodyMedium,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
         )
@@ -704,14 +707,20 @@ fun Calender(
                     }
                 }
             ) {
-                Text(text = "확인")
+                Text(
+                    text = "확인",
+                    style = MyStoryTheme.typography.bodyMedium
+                )
             }
         },
         dismissButton = {
             Button(onClick = {
                 onDismiss()
             }) {
-                Text(text = "취소")
+                Text(
+                    text = "취소",
+                    style = MyStoryTheme.typography.bodyMedium
+                )
             }
         }
     ) {
@@ -723,6 +732,7 @@ fun Calender(
 private fun SwitchMenuItem(
     resId: Int,
     title: String,
+    iconTint: Color = MaterialTheme.colorScheme.primary,
     subTitle: String = "",
     isChecked: Boolean,
     onClick: (Boolean) -> Unit
@@ -732,9 +742,10 @@ private fun SwitchMenuItem(
             .padding(horizontal = 15.dp, vertical = 5.dp)
             .fillMaxWidth()
     ) {
-        Image(
+        Icon(
             painter = painterResource(id = resId),
             contentDescription = null,
+            tint = iconTint,
             modifier = Modifier
                 .padding(top = 3.dp)
         )
@@ -747,12 +758,12 @@ private fun SwitchMenuItem(
         ) {
             Text(
                 text = title,
-                fontSize = 18.sp,
+                style = MyStoryTheme.typography.bodyLarge
             )
             if (subTitle.isNotEmpty()) {
                 Text(
                     text = subTitle,
-                    fontSize = 14.sp,
+                    style = MyStoryTheme.typography.bodyMedium,
                     color = colorResource(id = R.color.gray)
                 )
             }
@@ -760,9 +771,7 @@ private fun SwitchMenuItem(
 
         Switch(
             checked = isChecked,
-            onCheckedChange = {
-                onClick(it)
-            },
+            onCheckedChange = { onClick(it) },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = colorResource(id = R.color.primary),
                 checkedTrackColor = colorResource(id = R.color.teal_200),
@@ -778,6 +787,7 @@ private fun SwitchMenuItem(
 @Composable
 private fun MenuItem(
     resId: Int,
+    iconTint: Color = MaterialTheme.colorScheme.primary,
     title: String,
     subTitle: String = "",
     modifier: Modifier = Modifier,
@@ -790,7 +800,7 @@ private fun MenuItem(
             .wrapContentHeight()
             .fillMaxWidth()
     ) {
-        Image(
+        Icon(
             painter = painterResource(
                 id = if (resId == -1) {
                     R.drawable.ic_map_black
@@ -798,6 +808,7 @@ private fun MenuItem(
                     resId
                 }
             ),
+            tint = iconTint,
             contentDescription = null,
             modifier = Modifier
                 .padding(top = 3.dp)
@@ -818,19 +829,19 @@ private fun MenuItem(
         ) {
             Text(
                 text = title,
-                fontSize = 18.sp,
+                style = MyStoryTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             if (subTitle.isNotEmpty()) {
                 Text(
                     text = subTitle,
-                    fontSize = 14.sp,
+                    style = MyStoryTheme.typography.bodyMedium,
                     color = colorResource(id = R.color.gray)
                 )
             }
         }
-        Image(
+        Icon(
             painter = painterResource(id = R.drawable.ic_right_primary),
             contentDescription = null,
             modifier = Modifier
@@ -879,13 +890,15 @@ private fun ImageListView(
     }
 }
 
-
-
 @Composable
 private fun ImageView(imageUrl: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     OutlinedCard(
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(id = R.color.white),
+            containerColor = if (isSystemInDarkTheme()) {
+                MaterialTheme.colorScheme.surfaceContainer
+            } else {
+                Color.White
+            },
             contentColor = colorResource(id = R.color.light_gray)
         ),
         elevation = CardDefaults.elevatedCardElevation(10.dp),
@@ -923,42 +936,25 @@ private fun ContentsView(
                 color = colorResource(id = R.color.gray),
                 shape = RoundedCornerShape(10.dp)
             )
-            .background(color = colorResource(id = R.color.white))
     ) {
         TextField(
             label = {
-                Text(text = "내용을 입력해주세요.")
+                Text(
+                    text = "내용을 입력해주세요.",
+                    style = MyStoryTheme.typography.labelMedium
+                )
             },
             colors = textFieldColors(
-                containerColor = colorResource(id = R.color.white),
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
             value = content,
-            onValueChange = {
-                onAction(AddTimeCapsuleAction.Typing(it))
-            },
+            onValueChange = { onAction(AddTimeCapsuleAction.Typing(it)) },
             modifier = Modifier
-                .padding(5.dp)
                 .fillMaxSize()
         )
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-private fun AddTimeCapsuleScreenPreview() {
-    AddTimeCapsuleScreen(
-        uiState = AddTimeCapsuleUiState(),
-        sideEffect = { flowOf() },
-        onAction = {},
-        imageUrl = "imageUrl2",
-        friendId = "",
-        onBack = { },
-        requestLocationPermission = {},
-        permissionState = DefaultPermissionState()
-    )
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -970,5 +966,57 @@ class DefaultPermissionState : PermissionState {
 
     override fun launchPermissionRequest() {
 
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun AddTimeCapsuleScreenDarkPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            AddTimeCapsuleScreen(
+                uiState = AddTimeCapsuleUiState(
+                    placeName = "강남",
+                    checkLocation = true,
+                    openDate = "2025-08-12"
+                ),
+                sideEffect = { flowOf() },
+                onAction = {},
+                imageUrl = "imageUrl2",
+                friendId = "",
+                onBack = { },
+                requestLocationPermission = {},
+                permissionState = DefaultPermissionState()
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddTimeCapsuleScreenPreview() {
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            AddTimeCapsuleScreen(
+                uiState = AddTimeCapsuleUiState(
+                    placeName = "강남",
+                    checkLocation = true,
+                    openDate = "2025-08-12"
+                ),
+                sideEffect = { flowOf() },
+                onAction = {},
+                imageUrl = "imageUrl2",
+                friendId = "",
+                onBack = { },
+                requestLocationPermission = {},
+                permissionState = DefaultPermissionState()
+            )
+        }
     }
 }

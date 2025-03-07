@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import com.dhkim.designsystem.MyStoryTheme
 
 @Composable
 fun WarningDialog(
@@ -26,20 +27,27 @@ fun WarningDialog(
             )
         },
         title = {
-            Text(text = dialogTitle)
+            Text(
+                text = dialogTitle,
+                style = MyStoryTheme.typography.titleLarge
+            )
         },
         text = {
-            Text(text = dialogText)
+            Text(
+                text = dialogText,
+                style = MyStoryTheme.typography.bodyMedium
+            )
         },
-        onDismissRequest = {
-            onDismissRequest()
-        },
+        onDismissRequest = { onDismissRequest() },
         confirmButton = {
             if (choice) {
                 TextButton(
                     onClick = onConfirmation
                 ) {
-                    Text(positiveText)
+                    Text(
+                        text = positiveText,
+                        style = MyStoryTheme.typography.labelLarge
+                    )
                 }
             }
         },
@@ -47,11 +55,10 @@ fun WarningDialog(
             TextButton(
                 onClick = onDismissRequest
             ) {
-                if (choice) {
-                    Text(negativeText)
-                } else {
-                    Text("확인")
-                }
+                Text(
+                    text = if (choice) negativeText else "확인",
+                    style = MyStoryTheme.typography.labelLarge
+                )
             }
         }
     )

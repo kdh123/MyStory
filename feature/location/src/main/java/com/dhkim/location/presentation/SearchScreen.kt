@@ -2,6 +2,7 @@
 
 package com.dhkim.location.presentation
 
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -32,17 +35,16 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.location.R
 import com.dhkim.location.domain.model.Place
 import kotlinx.coroutines.android.awaitFrame
@@ -83,18 +85,6 @@ fun SearchScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun SearchScreenPreview() {
-    val result = MutableStateFlow<PagingData<Place>>(PagingData.empty())
-
-    SearchScreen(
-        uiState = SearchUiState(),
-        searchResult = result.collectAsLazyPagingItems(),
-        onQuery = {},
-        onBack = {}
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,10 +99,13 @@ fun SearchBar(query: String, onQuery: (String) -> Unit) {
         colors = TextFieldDefaults.textFieldColors(
             disabledTextColor = colorResource(id = R.color.primary),
             disabledIndicatorColor = colorResource(id = R.color.primary),
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         label = {
-            Text(text = "장소 검색")
+            Text(
+                text = "장소 검색",
+                style = MyStoryTheme.typography.labelMedium
+            )
         },
         singleLine = true,
         modifier = Modifier
@@ -173,16 +166,14 @@ fun Place(place: Place, onBack: (Place) -> Unit) {
         ) {
             Text(
                 text = place.name,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
+                style = MyStoryTheme.typography.bodyLargeBold,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Text(
-                maxLines = 1,
                 text = place.category,
-                overflow = TextOverflow.Ellipsis,
-                color = Color.Gray,
-                fontSize = 12.sp,
+                style = MyStoryTheme.typography.bodySmallGray,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
@@ -192,20 +183,59 @@ fun Place(place: Place, onBack: (Place) -> Unit) {
         ) {
             Text(
                 text = place.distance,
+                style = MyStoryTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Text(
                 text = place.address,
-                color = Color.Gray,
-                fontSize = 12.sp
+                style = MyStoryTheme.typography.bodySmallGray
             )
         }
         if (place.phone.isNotEmpty()) {
             Text(
                 text = place.phone,
-                fontSize = 12.sp,
-                color = colorResource(id = R.color.primary),
+                style = MyStoryTheme.typography.bodySmallPrimary,
                 modifier = Modifier.padding(horizontal = 10.dp)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SearchScreenDarkPreview() {
+    val result = MutableStateFlow<PagingData<Place>>(PagingData.empty())
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            SearchScreen(
+                uiState = SearchUiState(),
+                searchResult = result.collectAsLazyPagingItems(),
+                onQuery = {},
+                onBack = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun SearchScreenPreview() {
+    val result = MutableStateFlow<PagingData<Place>>(PagingData.empty())
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            SearchScreen(
+                uiState = SearchUiState(),
+                searchResult = result.collectAsLazyPagingItems(),
+                onQuery = {},
+                onBack = {}
             )
         }
     }

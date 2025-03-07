@@ -42,6 +42,7 @@ dependencies {
 
     implementation(project(":core:story"))
     implementation(project(":core:common"))
+    implementation(project(":core:designsystem"))
 
     implementation(libs.bundles.androidx.compose.main)
     implementation(libs.bundles.androidx.compose.side)

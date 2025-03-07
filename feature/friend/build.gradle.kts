@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
     implementation(project(":core:user"))
+    implementation(project(":core:designsystem"))
     implementation(project(":feature:home"))
     testImplementation(project(":core:database"))
     testImplementation(project(":core:testing"))

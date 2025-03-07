@@ -1,6 +1,9 @@
-package com.dhkim.home.ui.theme
+package com.dhkim.designsystem
 
 import androidx.compose.ui.graphics.Color
+
+val Primary = Color(0xFF3C5AFA)
+val Gray = Color(0xFFC3C3C3)
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)

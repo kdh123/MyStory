@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dhkim.designsystem.MyStoryTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,14 +32,16 @@ class MainActivity : ComponentActivity() {
             val showGuide by viewModel.showGuide.collectAsStateWithLifecycle(initialValue = false)
             val currentPopup by viewModel.currentPopup.collectAsStateWithLifecycle()
 
-            MainScreen(
-                appState = rememberMyStoryAppState(),
-                showGuide = showGuide,
-                onCloseGuide = viewModel::closeGuideDialog,
-                onNeverShowGuideAgain = viewModel::neverShowGuideAgain,
-                currentPopup = currentPopup,
-                showPopup = viewModel::showPopup
-            )
+            MyStoryTheme {
+                MainScreen(
+                    appState = rememberMyStoryAppState(),
+                    showGuide = showGuide,
+                    onCloseGuide = viewModel::closeGuideDialog,
+                    onNeverShowGuideAgain = viewModel::neverShowGuideAgain,
+                    currentPopup = currentPopup,
+                    showPopup = viewModel::showPopup
+                )
+            }
         }
 
         requestPermission()

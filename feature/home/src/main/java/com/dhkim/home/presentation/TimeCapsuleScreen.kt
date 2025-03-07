@@ -4,6 +4,7 @@ package com.dhkim.home.presentation
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -34,7 +35,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -53,16 +57,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
 import com.dhkim.common.DistanceManager
+import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.home.R
 import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.DefaultBackground
@@ -112,77 +115,47 @@ fun TimeCapsuleScreen(
 ) {
     val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
-    var selectedTimeCapsule by remember {
-        mutableStateOf(TimeCapsule())
-    }
-    var showLocationDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showMenuDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var selectedTimeCapsule by remember { mutableStateOf(TimeCapsule()) }
+    var showLocationDialog by rememberSaveable { mutableStateOf(false) }
+    var showMenuDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showMenuDialog) {
-        Dialog(
+        MenuDialog(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            onDeleteClick = {
+                showMenuDialog = false
+                val desc = if (selectedTimeCapsule.sharedFriends.isNotEmpty() && !selectedTimeCapsule.isReceived) {
+                    "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
+                } else {
+                    "정말 삭제하겠습니까?"
+                }
+
+                showPopup(
+                    Popup.Warning(
+                        title = "삭제",
+                        desc = desc,
+                        onPositiveClick = {
+                            onDeleteTimeCapsule(
+                                selectedTimeCapsule.id,
+                                selectedTimeCapsule.isReceived
+                            )
+                        }
+                    )
+                )
+            },
             onDismissRequest = {
                 selectedTimeCapsule = TimeCapsule()
                 showMenuDialog = false
             }
-        ) {
-            Card(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                shape = RoundedCornerShape(16.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(20.dp)
-                ) {
-                    Text(
-                        text = "메뉴",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = "삭제",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                showMenuDialog = false
-                                val desc =
-                                    if (selectedTimeCapsule.sharedFriends.isNotEmpty() && !selectedTimeCapsule.isReceived) {
-                                        "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
-                                    } else {
-                                        "정말 삭제하겠습니까?"
-                                    }
-
-                                showPopup(
-                                    Popup.Warning(
-                                        title = "삭제",
-                                        desc = desc,
-                                        onPositiveClick = {
-                                            onDeleteTimeCapsule(
-                                                selectedTimeCapsule.id,
-                                                selectedTimeCapsule.isReceived
-                                            )
-                                        }
-                                    )
-                                )
-                            }
-                    )
-                }
-            }
-        }
+        )
     }
 
     if (showLocationDialog) {
         LocationDialog(
             timeCapsule = selectedTimeCapsule,
-            onDismissRequest = {
-                showLocationDialog = false
-            }
+            onDismissRequest = { showLocationDialog = false }
         )
     }
 
@@ -214,9 +187,8 @@ fun TimeCapsuleScreen(
         topBar = {
             Row {
                 Text(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
                     text = "타임캡슐",
+                    style = MyStoryTheme.typography.headlineSmallBold,
                     modifier = Modifier
                         .padding(start = 10.dp)
                         .alpha(0f)
@@ -225,7 +197,7 @@ fun TimeCapsuleScreen(
                         .align(Alignment.CenterVertically)
                 )
 
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_notification_black),
                     contentDescription = null,
                     modifier = Modifier
@@ -238,7 +210,7 @@ fun TimeCapsuleScreen(
                         }
                 )
 
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_setting_black),
                     contentDescription = null,
                     modifier = Modifier
@@ -265,9 +237,7 @@ fun TimeCapsuleScreen(
                     modifier = modifier
                         .testTag("timeCapsuleItems")
                 ) {
-                    items(uiState.timeCapsules, key = {
-                        it.id
-                    }) {
+                    items(uiState.timeCapsules, key = { it.id }) {
                         when (it.type) {
                             TimeCapsuleType.Title -> {
                                 val title = it.data as? String ?: ""
@@ -277,8 +247,7 @@ fun TimeCapsuleScreen(
                                 ) {
                                     Text(
                                         text = it.data as? String ?: "",
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.Bold,
+                                        style = MyStoryTheme.typography.headlineSmallBold,
                                         modifier = Modifier
                                             .width(0.dp)
                                             .weight(1f)
@@ -286,10 +255,10 @@ fun TimeCapsuleScreen(
                                     )
 
                                     if (title == "나의 이야기") {
-                                        val interactionSource =
-                                            remember { MutableInteractionSource() }
+                                        val interactionSource = remember { MutableInteractionSource() }
                                         Text(
                                             text = "더보기",
+                                            style = MyStoryTheme.typography.labelMedium,
                                             modifier = Modifier
                                                 .align(Alignment.CenterVertically)
                                                 .border(
@@ -312,9 +281,9 @@ fun TimeCapsuleScreen(
                             TimeCapsuleType.SubTitle -> {
                                 Text(
                                     text = it.data as? String ?: "",
+                                    style = MyStoryTheme.typography.bodyMediumGray,
                                     modifier = Modifier
                                         .padding(horizontal = 20.dp),
-                                    color = colorResource(id = R.color.gray)
                                 )
                             }
 
@@ -474,12 +443,6 @@ private fun LoadingScreen() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun LoadingScreenPreview() {
-    LoadingScreen()
-}
-
 @Composable
 private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
     Card(
@@ -498,10 +461,8 @@ private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
                     .clickable(onClick = onNavigateToProfile)
             ) {
                 Text(
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
                     text = "친구 추가",
+                    style = MyStoryTheme.typography.bodyLargeWhiteBold,
                     modifier = Modifier
                         .align(Alignment.Center)
                 )
@@ -516,9 +477,7 @@ private fun OpenedTimeCapsules(
     onLongClick: (TimeCapsule) -> Unit,
     onNavigateToDetail: (timeCapsuleId: String, isReceived: Boolean) -> Unit
 ) {
-    if (timeCapsules.isEmpty()) {
-        return
-    }
+    if (timeCapsules.isEmpty()) return
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -541,6 +500,41 @@ private fun OpenedTimeCapsules(
     }
 }
 
+@Composable
+fun MenuDialog(
+    modifier: Modifier,
+    onDeleteClick: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest
+    ) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+            ) {
+                Text(
+                    text = "메뉴",
+                    style = MyStoryTheme.typography.bodyLargeBold,
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "삭제",
+                    style = MyStoryTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onDeleteClick)
+                )
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalNaverMapApi::class)
 @Composable
@@ -592,12 +586,14 @@ fun LocationDialog(
             ) {
                 Text(
                     text = desc,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    style = MyStoryTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 )
                 if (timeCapsule.isReceived && timeCapsule.sender.isNotEmpty()) {
                     Text(
-                        fontWeight = FontWeight.Bold,
                         text = "공유한 친구 : ${timeCapsule.host.nickname}",
+                        style = MyStoryTheme.typography.bodyMediumBold,
                         modifier = Modifier
                             .padding(start = 16.dp, end = 16.dp, top = 10.dp)
                     )
@@ -605,8 +601,8 @@ fun LocationDialog(
 
                 if (timeCapsule.checkLocation) {
                     Text(
-                        fontWeight = FontWeight.Bold,
                         text = timeCapsule.address,
+                        style = MyStoryTheme.typography.bodyMediumBold,
                         modifier = Modifier
                             .padding(horizontal = 16.dp, vertical = 10.dp)
                     )
@@ -644,7 +640,11 @@ fun LocationDialog(
                             .padding(horizontal = 10.dp)
                             .fillMaxWidth(),
                     ) {
-                        Text("확인")
+                        Text(
+                            text = "확인",
+                            style = MyStoryTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
                     }
                 }
             }
@@ -661,9 +661,7 @@ private fun OpenableTimeCapsules(
     onShowOpenDialog: (TimeCapsule) -> Unit,
     onLongClick: (TimeCapsule) -> Unit
 ) {
-    if (timeCapsules.isEmpty()) {
-        return
-    }
+    if (timeCapsules.isEmpty()) return
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -717,73 +715,6 @@ private fun UnopenedTimeCapsules(
     }
 }
 
-
-@OptIn(ExperimentalPermissionsApi::class)
-@Preview(showBackground = true)
-@Composable
-private fun TimeCapsuleScreenPreview() {
-    val unOpenedList = mutableListOf<TimeCapsule>()
-    val openedList = mutableListOf<TimeCapsule>()
-
-    repeat(10) {
-        if (it % 2 == 0) {
-            openedList.add(
-                TimeCapsule(
-                    id = "$it",
-                    date = "2024-06-28",
-                    openDate = "2024-06-28",
-                    images = listOf("")
-                )
-            )
-            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", images = listOf("")))
-        } else if (it % 3 == 0) {
-            openedList.add(
-                TimeCapsule(
-                    id = "$it",
-                    date = "2024-06-28",
-                    openDate = "2024-06-28",
-                    images = listOf(""),
-                    isOpened = true
-                )
-            )
-        } else {
-            openedList.add(
-                TimeCapsule(
-                    id = "$it",
-                    date = "2024-06-28",
-                    openDate = "2024-06-28",
-                    checkLocation = true,
-                    images = listOf("")
-                )
-            )
-            unOpenedList.add(
-                TimeCapsule(
-                    id = "$it",
-                    openDate = "2099-12-24",
-                    checkLocation = true,
-                    images = listOf("")
-                )
-            )
-        }
-    }
-
-    TimeCapsuleScreen(
-        uiState = TimeCapsuleUiState(isLoading = false, timeCapsules = (unOpenedList + openedList).toItems(spaceId = 100).toImmutableList()),
-        sideEffect = { flowOf() },
-        permissionState = DefaultPermissionState(),
-        requestPermission = {},
-        onDeleteTimeCapsule = { _, _ -> },
-        onNavigateToAdd = { },
-        onNavigateToOpen = { _, _ -> },
-        onNavigateToDetail = { _, _ -> },
-        onNavigateToNotification = { },
-        onNavigateToSetting = { },
-        onNavigateToProfile = { },
-        onNavigateToMore = { },
-        showPopup = {}
-    )
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OpenedBox(
@@ -825,10 +756,8 @@ fun OpenedBox(
                             .aspectRatio(0.8f)
                     ) {
                         Text(
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
                             text = "사진이 존재하지 않습니다.",
+                            style = MyStoryTheme.typography.bodyLargeWhiteBold,
                             modifier = Modifier
                                 .align(Alignment.Center)
                         )
@@ -836,23 +765,17 @@ fun OpenedBox(
                 }
 
                 Text(
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    fontSize = 16.sp,
                     text = timeCapsule.date,
+                    style = MyStoryTheme.typography.bodyMediumWhiteBold,
                     modifier = Modifier
                         .padding(bottom = 10.dp)
                         .align(Alignment.BottomCenter)
                 )
             }
             Text(
+                text = if (timeCapsule.isReceived) "친구" else "나",
+                style = MyStoryTheme.typography.bodyMediumBold,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                text = if (timeCapsule.isReceived) {
-                    "친구"
-                } else {
-                    "나"
-                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = Color.White)
@@ -949,21 +872,18 @@ private fun LockTimeCapsule(
 
                 if (canOpen) {
                     Text(
-                        fontSize = 18.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
                         text = "개봉 하기",
+                        style = MyStoryTheme.typography.bodyLargeWhiteBold,
                         modifier = Modifier
                             .padding(10.dp)
                             .align(Alignment.Center)
                     )
                 } else {
                     Text(
+                        text = "D - ${DateUtil.getDateGap(timeCapsule.openDate)}",
+                        style = MyStoryTheme.typography.bodyMediumWhiteBold,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        text = "D - ${DateUtil.getDateGap(timeCapsule.openDate)}",
                         modifier = Modifier
                             .padding(10.dp)
                             .align(Alignment.TopCenter)
@@ -981,11 +901,10 @@ private fun LockTimeCapsule(
 
                 if (timeCapsule.checkLocation) {
                     Text(
+                        text = timeCapsule.placeName,
+                        style = MyStoryTheme.typography.bodyMediumWhiteBold,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        text = timeCapsule.placeName,
                         modifier = Modifier
                             .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
                             .align(Alignment.BottomCenter)
@@ -993,13 +912,9 @@ private fun LockTimeCapsule(
                 }
             }
             Text(
+                text = if (timeCapsule.isReceived) "친구" else "나",
+                style = MyStoryTheme.typography.bodyMediumBold,
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                text = if (timeCapsule.isReceived) {
-                    "친구"
-                } else {
-                    "나"
-                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = Color.White)
@@ -1019,4 +934,157 @@ class DefaultPermissionState : PermissionState {
     override fun launchPermissionRequest() {
 
     }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TimeCapsuleScreenDarkPreview() {
+    val unOpenedList = mutableListOf<TimeCapsule>()
+    val openedList = mutableListOf<TimeCapsule>()
+
+    repeat(10) {
+        if (it % 2 == 0) {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf("")
+                )
+            )
+            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", images = listOf("")))
+        } else if (it % 3 == 0) {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf(""),
+                    isOpened = true
+                )
+            )
+        } else {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
+            unOpenedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    openDate = "2099-12-24",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
+        }
+    }
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TimeCapsuleScreen(
+                uiState = TimeCapsuleUiState(isLoading = false, timeCapsules = (unOpenedList + openedList).toItems(spaceId = 100).toImmutableList()),
+                sideEffect = { flowOf() },
+                permissionState = DefaultPermissionState(),
+                requestPermission = {},
+                onDeleteTimeCapsule = { _, _ -> },
+                onNavigateToAdd = { },
+                onNavigateToOpen = { _, _ -> },
+                onNavigateToDetail = { _, _ -> },
+                onNavigateToNotification = { },
+                onNavigateToSetting = { },
+                onNavigateToProfile = { },
+                onNavigateToMore = { },
+                showPopup = {}
+            )
+        }
+    }
+}
+
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun TimeCapsuleScreenPreview() {
+    val unOpenedList = mutableListOf<TimeCapsule>()
+    val openedList = mutableListOf<TimeCapsule>()
+
+    repeat(10) {
+        if (it % 2 == 0) {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf("")
+                )
+            )
+            unOpenedList.add(TimeCapsule(id = "$it", openDate = "2024-06-28", images = listOf("")))
+        } else if (it % 3 == 0) {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    images = listOf(""),
+                    isOpened = true
+                )
+            )
+        } else {
+            openedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    date = "2024-06-28",
+                    openDate = "2024-06-28",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
+            unOpenedList.add(
+                TimeCapsule(
+                    id = "$it",
+                    openDate = "2099-12-24",
+                    checkLocation = true,
+                    images = listOf("")
+                )
+            )
+        }
+    }
+
+    MyStoryTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TimeCapsuleScreen(
+                uiState = TimeCapsuleUiState(isLoading = false, timeCapsules = (unOpenedList + openedList).toItems(spaceId = 100).toImmutableList()),
+                sideEffect = { flowOf() },
+                permissionState = DefaultPermissionState(),
+                requestPermission = {},
+                onDeleteTimeCapsule = { _, _ -> },
+                onNavigateToAdd = { },
+                onNavigateToOpen = { _, _ -> },
+                onNavigateToDetail = { _, _ -> },
+                onNavigateToNotification = { },
+                onNavigateToSetting = { },
+                onNavigateToProfile = { },
+                onNavigateToMore = { },
+                showPopup = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoadingScreenPreview() {
+    LoadingScreen()
 }
