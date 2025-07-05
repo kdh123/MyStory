@@ -5,9 +5,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -116,7 +120,15 @@ fun MainScreen(
 
         NavHost(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(
+                    top = WindowInsets.statusBars
+                        .asPaddingValues()
+                        .calculateTopPadding(),
+                    bottom = WindowInsets.navigationBars
+                        .asPaddingValues()
+                        .calculateBottomPadding()
+                ),
             navController = appState.navController,
             startDestination = TIME_CAPSULE_MAIN_ROUTE
         ) {
@@ -133,7 +145,6 @@ fun MainScreen(
                 showPopup = showPopup,
                 onBack = appState.navController::navigateUp,
                 modifier = Modifier
-                    .padding(bottom = innerPadding.calculateBottomPadding())
             )
             mapScreen(
                 onNavigateToSearch = appState::navigateToSearch,

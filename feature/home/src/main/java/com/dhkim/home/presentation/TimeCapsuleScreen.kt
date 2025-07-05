@@ -22,10 +22,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -449,7 +452,12 @@ private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
         elevation = CardDefaults.cardElevation(10.dp),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
-            .padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
+            .padding(
+                top = 10.dp,
+                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 20.dp,
+                start = 20.dp,
+                end = 20.dp
+            )
             .width(260.dp)
             .height(360.dp)
             .padding(bottom = 10.dp, end = 10.dp)
