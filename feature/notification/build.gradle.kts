@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.dhkim.notification"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 26
