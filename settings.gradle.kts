@@ -8,7 +8,7 @@ pluginManagement {
             }
         }
         maven {
-            url = uri("https://naver.jfrog.io/artifactory/maven/")
+            url = uri("https://repository.map.naver.com/archive/maven")
         }
         mavenCentral()
         gradlePluginPortal()
@@ -20,7 +20,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {
-            url = uri("https://naver.jfrog.io/artifactory/maven/")
+            url = uri("https://repository.map.naver.com/archive/maven")
         }
         maven("https://jitpack.io")
     }

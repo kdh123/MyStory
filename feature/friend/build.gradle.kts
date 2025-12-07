@@ -2,8 +2,9 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.google.service)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -60,16 +61,16 @@ dependencies {
     implementation(platform(libs.google.firebase.bom))
 
     implementation(libs.hilt)
-    kapt(libs.androidx.hilt.compiler)
-    kapt(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     //test
     testImplementation(libs.bundles.test)
-    kaptTest(libs.hilt.compiler)
+    kspTest(libs.hilt.compiler)
     testAnnotationProcessor(libs.hilt.compiler)
     androidTestImplementation(libs.bundles.androidx.ui.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    kaptAndroidTest(libs.hilt.compiler)
+    kspAndroidTest(libs.hilt.compiler)
     androidTestAnnotationProcessor(libs.hilt.compiler)
     debugImplementation(libs.bundles.debug.ui.test)
 

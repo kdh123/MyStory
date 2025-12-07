@@ -6,9 +6,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.google.service)
     alias(libs.plugins.baselineprofile)
+    alias(libs.plugins.compose.compiler)
 }
 
 val localProperties = Properties().apply {
@@ -109,6 +110,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.hilt)
-    kapt(libs.androidx.hilt.compiler)
-    kapt(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
+    ksp(libs.hilt.compiler)
 }
