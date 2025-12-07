@@ -1,6 +1,6 @@
 [versions]
-agp = "8.4.1"
-kotlin = "1.9.0"
+agp = "8.10.0"
+kotlin = "2.0.20"
 coreKtx = "1.10.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -13,11 +13,11 @@ composeFlowState = "2.6.0-beta01"
 composeHilt = "1.0.0"
 composeNavigation = "2.5.3"
 composeGlide = "2.3.6"
-hilt = "2.48"
+hilt = "2.51.1"
 room = "2.5.0"
 naverMap = "3.16.0"
 naverMapLocation = "21.0.1"
-naverMapCompose = "1.4.1"
+naverMapCompose = "1.6.0"
 retrofit = "2.9.0"
 okhttp = "4.11.0"
 permission = "0.35.1-alpha"
@@ -49,7 +49,7 @@ coroutineTest = "1.8.1"
 collectionImmutable = "0.3.7"
 uiTooling = "1.6.8"
 dhcamera = "1.0.0-alpha05"
-ksp = "1.8.10-1.0.9"
+ksp = "2.0.21-1.0.27"
 uiautomator = "2.2.0"
 benchmarkMacroJunit4 = "1.2.3"
 baselineprofile = "1.2.3"
@@ -267,4 +267,5 @@ google-service = { id = "com.google.gms.google-services", version.ref = "googleS
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 android-test = { id = "com.android.test", version.ref = "agp" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 

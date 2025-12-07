@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
 }
 
 val localProperties = Properties().apply {
@@ -55,16 +55,16 @@ dependencies {
     implementation(libs.bundles.retrofit)
 
     implementation(libs.hilt)
-    kapt(libs.androidx.hilt.compiler)
-    kapt(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     //test
     testImplementation(libs.bundles.androidx.paging3)
     testImplementation(libs.androidx.paging.testing)
     testImplementation(libs.bundles.test)
-    kaptTest(libs.hilt.compiler)
+    kspTest(libs.hilt.compiler)
     testAnnotationProcessor(libs.hilt.compiler)
-    kaptAndroidTest(libs.hilt.compiler)
+    kspAndroidTest(libs.hilt.compiler)
     androidTestAnnotationProcessor(libs.hilt.compiler)
 
     implementation(libs.androidx.core.ktx)

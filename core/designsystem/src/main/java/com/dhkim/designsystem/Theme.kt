@@ -65,7 +65,7 @@ fun MyStoryTheme(
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.background.toArgb() // here change the color
             window.navigationBarColor = colorScheme.background.toArgb() // here change the color
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+//            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
