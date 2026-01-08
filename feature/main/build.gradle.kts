@@ -69,7 +69,6 @@ dependencies {
     implementation(libs.bundles.androidx.workManager)
     implementation(libs.bundles.firebase)
     implementation(platform(libs.google.firebase.bom))
-    implementation(libs.bundles.androidx.workManager)
 
     implementation(libs.hilt)
     ksp(libs.androidx.hilt.compiler)

@@ -75,10 +75,6 @@ class FakeUserRemoteDataSource : UserRemoteDataSource {
         return flowOf(true)
     }
 
-    override fun updateFcmToken(userId: String, uuid: String): Flow<isSuccessful> {
-        return flowOf(true)
-    }
-
     override suspend fun registerPush(uuid: String, fcmToken: String): CommonResult<Int> {
         return CommonResult.Success(0)
     }

@@ -910,7 +910,7 @@ fun RequestItem(friend: Friend, onClick: (Friend) -> Unit) {
             .padding(10.dp)
     ) {
         Image(
-            painter = painterResource(id = friend.profileImage.toInt()),
+            painter = painterResource(id = R.drawable.ic_smile_blue),
             contentDescription = null,
             modifier = Modifier.align(Alignment.CenterVertically)
         )

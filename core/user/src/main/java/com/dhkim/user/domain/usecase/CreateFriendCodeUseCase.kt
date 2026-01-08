@@ -36,7 +36,6 @@ class CreateFriendCodeUseCase @Inject constructor(
                         updateUserId(userId = userId)
                         updateProfileImage(profileImage = "$profileImage")
                         updateUuid(uuid = uuid)
-                        updateFcmToken(fcmToken = fcmToken)
                     }
                     emit(true)
                 }

@@ -32,8 +32,8 @@ android {
         applicationId = "com.dhkim.timecapsule"
         minSdk = 26
         targetSdk = 35
-        versionCode = 17
-        versionName = "1.0.9"
+        versionCode = 18
+        versionName = "1.0.10"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

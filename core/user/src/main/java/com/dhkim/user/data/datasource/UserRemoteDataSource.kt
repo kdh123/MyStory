@@ -30,7 +30,5 @@ interface UserRemoteDataSource {
 
     fun addRequest(myId: String, myProfileImage: String, userId: String): Flow<isSuccessful>
 
-    fun updateFcmToken(userId: String, uuid: String): Flow<isSuccessful>
-
     suspend fun registerPush(uuid: String, fcmToken: String): CommonResult<Int>
 }

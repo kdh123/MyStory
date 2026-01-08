@@ -206,19 +206,6 @@ internal class UserRemoteDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun updateFcmToken(userId: String, uuid: String): Flow<isSuccessful> {
-        return callbackFlow {
-            database.child("users").child(userId).child("uuid").setValue(uuid)
-                .addOnSuccessListener {
-                    trySend(true)
-                }
-                .addOnFailureListener {
-                    trySend(false)
-                }
-            awaitClose()
-        }
-    }
-
     override suspend fun registerPush(uuid: String, fcmToken: String): CommonResult<Int> {
         return try {
             val deviceId = UUID.randomUUID().toString()
