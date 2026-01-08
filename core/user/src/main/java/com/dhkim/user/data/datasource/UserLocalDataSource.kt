@@ -16,6 +16,4 @@ interface UserLocalDataSource {
     suspend fun updateProfileImage(profileImage: String)
     suspend fun getUuid(): String
     suspend fun updateUuid(uuid: String)
-    suspend fun getFcmToken(): String
-    suspend fun updateFcmToken(fcmToken: String)
 }

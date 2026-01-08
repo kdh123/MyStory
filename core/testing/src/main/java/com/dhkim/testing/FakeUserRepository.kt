@@ -95,18 +95,6 @@ class FakeUserRepository(
         localDataSource.updateUserId(userId)
     }
 
-    override suspend fun getFcmToken(): String {
-        return localDataSource.getFcmToken()
-    }
-
-    override suspend fun updateFcmToken(fcmToken: String) {
-        localDataSource.updateFcmToken(fcmToken)
-    }
-
-    override suspend fun updateLocalFcmToken(fcmToken: String) {
-        localDataSource.updateFcmToken(fcmToken = fcmToken)
-    }
-
     override suspend fun getProfileImage(): Int {
         return localDataSource.getProfileImage()
     }
@@ -121,18 +109,6 @@ class FakeUserRepository(
 
     override suspend fun updateUuid(uuid: String) {
         localDataSource.updateUuid(uuid)
-    }
-
-    override suspend fun updateRemoteFcmToken(fcmToken: String) {
-        val userId = getMyId()
-        remoteDataSource.updateFcmToken(userId, fcmToken).catch { }
-            .collect { isSuccessful ->
-                if (isSuccessful) {
-                    updateLocalFcmToken(fcmToken)
-                } else {
-                    updateLocalFcmToken("")
-                }
-            }
     }
 
     override suspend fun registerPush(uuid: String, fcmToken: String): isSuccessful {

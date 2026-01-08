@@ -24,13 +24,9 @@ interface UserRepository {
     fun acceptFriend(userId: String, userProfileImage: String, userUuid: String): Flow<isSuccessful>
 
     suspend fun updateUserId(userId: String)
-    suspend fun getFcmToken(): String
-    suspend fun updateFcmToken(fcmToken: String)
-    suspend fun updateLocalFcmToken(fcmToken: String)
     suspend fun getProfileImage(): Int
     suspend fun updateProfileImage(profileImage: String)
     suspend fun getMyUuid(): String
     suspend fun updateUuid(uuid: String)
-    suspend fun updateRemoteFcmToken(fcmToken: String)
     suspend fun registerPush(uuid: String, fcmToken: String): isSuccessful
 }

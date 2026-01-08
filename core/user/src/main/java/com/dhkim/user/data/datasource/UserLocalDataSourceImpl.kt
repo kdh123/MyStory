@@ -20,7 +20,6 @@ internal class UserLocalDataSourceImpl @Inject constructor(
 
     private val PREF_KEY_USER_ID = stringPreferencesKey("userId")
     private val PREF_KEY_USER_PROFILE_IMAGE = intPreferencesKey("userProfileImage")
-    private val PREF_KEY_FCM_TOKEN = stringPreferencesKey("fcmToken")
     private val PREF_KEY_UUID = stringPreferencesKey("uuid")
 
     private val friendService = db.friendDao()
@@ -81,19 +80,6 @@ internal class UserLocalDataSourceImpl @Inject constructor(
     override suspend fun updateUuid(uuid: String) {
         dataStore.edit { settings ->
             settings[PREF_KEY_UUID] = uuid
-        }
-    }
-
-    override suspend fun getFcmToken(): String {
-        return dataStore.data
-            .map { preferences ->
-                preferences[PREF_KEY_FCM_TOKEN] ?: ""
-            }.first()
-    }
-
-    override suspend fun updateFcmToken(fcmToken: String) {
-        dataStore.edit { settings ->
-            settings[PREF_KEY_FCM_TOKEN] = fcmToken
         }
     }
 }

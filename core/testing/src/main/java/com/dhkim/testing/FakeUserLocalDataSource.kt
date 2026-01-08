@@ -72,12 +72,4 @@ class FakeUserLocalDataSource : UserLocalDataSource {
     override suspend fun updateUuid(uuid: String) {
         myInfo = myInfo.copy(uuid = uuid)
     }
-
-    override suspend fun getFcmToken(): String {
-        return fcmToken
-    }
-
-    override suspend fun updateFcmToken(fcmToken: String) {
-        this.fcmToken = fcmToken
-    }
 }
