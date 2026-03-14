@@ -53,10 +53,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
-import com.dhkim.core.trip.domain.model.TripPlace
-import com.dhkim.core.trip.domain.model.TripType
-import com.dhkim.core.trip.domain.model.toTripType
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.TripPlace
+import com.dhkim.domain.model.TripType
+import com.dhkim.domain.model.toTripType
 import com.dhkim.trip.R
 import com.dhkim.ui.noRippleClick
 import com.dhkim.ui.onStartCollect

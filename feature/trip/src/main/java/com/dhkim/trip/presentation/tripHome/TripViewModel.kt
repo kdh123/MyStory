@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.common.onetimeRestartableStateIn
-import com.dhkim.core.trip.domain.model.Trip
-import com.dhkim.core.trip.domain.usecase.DeleteTripUseCase
-import com.dhkim.core.trip.domain.usecase.GetAllTripsUseCase
+import com.dhkim.domain.model.Trip
+import com.dhkim.domain.usecase.DeleteTripUseCase
+import com.dhkim.domain.usecase.GetAllTripsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher

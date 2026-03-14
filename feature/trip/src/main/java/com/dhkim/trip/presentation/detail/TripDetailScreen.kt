@@ -65,9 +65,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
-import com.dhkim.core.trip.domain.model.TripImage
-import com.dhkim.core.trip.domain.model.TripType
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.TripImage
+import com.dhkim.domain.model.TripType
 import com.dhkim.trip.R
 import com.dhkim.ui.ShimmerBrush
 import com.dhkim.ui.WarningDialog
@@ -535,8 +535,8 @@ suspend fun getImagesFromDateRange(
     context: Context,
     startDate: String,
     endDate: String
-): List<com.dhkim.core.trip.domain.model.TripImage> {
-    val tripDetails = mutableListOf<com.dhkim.core.trip.domain.model.TripImage>()
+): List<TripImage> {
+    val tripDetails = mutableListOf<TripImage>()
     val startMillis = DateUtil.dateToMills2(startDate)
     val endMillis = DateUtil.dateToMills2(endDate)
     val projection = arrayOf(
@@ -572,7 +572,7 @@ suspend fun getImagesFromDateRange(
                 )
                 val location = getImageLocation(context, uri)
                 tripDetails.add(
-                    com.dhkim.core.trip.domain.model.TripImage(
+                    TripImage(
                         id = "${System.currentTimeMillis()}",
                         date = date,
                         lat = location?.first ?: 0.0,

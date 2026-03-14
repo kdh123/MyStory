@@ -35,9 +35,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.dhkim.trip.R
-import com.dhkim.core.trip.domain.model.Trip
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.Trip
+import com.dhkim.trip.R
 import com.dhkim.ui.Popup
 import com.dhkim.ui.noRippleClick
 import com.skydoves.landscapist.glide.GlideImage

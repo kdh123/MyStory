@@ -36,7 +36,8 @@ dependencies {
     implementation(project(":core:domain:domain-story"))
     implementation(project(":core:data:data-story"))
     implementation(project(":core:location"))
-    implementation(project(":core:trip"))
+    implementation(project(":core:domain:domain-trip"))
+    implementation(project(":core:data:data-trip"))
     implementation(project(":core:common-v2"))
     implementation(project(":core:database"))
 

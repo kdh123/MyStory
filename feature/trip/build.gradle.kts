@@ -50,7 +50,7 @@ android {
 
 dependencies {
 
-    implementation(project(":core:trip"))
+    implementation(project(":core:domain:domain-trip"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
     implementation(project(":core:common-v2"))
