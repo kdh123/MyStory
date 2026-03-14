@@ -36,8 +36,6 @@ dependencies {
     implementation(project(":core:domain:domain-trip"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
-    //implementation(project(":feature:setting"))
-    //implementation(project(":feature:location"))
     implementation(project(":core:common-v2"))
 
     implementation(libs.androidx.core.ktx)
