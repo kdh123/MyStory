@@ -66,8 +66,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.designsystem.MyStoryTheme
-import com.dhkim.location.domain.model.Category
-import com.dhkim.location.domain.model.Place
+import com.dhkim.domain.model.Category
+import com.dhkim.domain.model.Place
 import com.dhkim.map.R
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.onStartCollect

@@ -48,7 +48,7 @@ dependencies {
 
     implementation(project(":core:setting"))
     implementation(project(":core:domain:domain-story"))
-    implementation(project(":core:location"))
+    implementation(project(":core:domain:domain-location"))
     implementation(project(":core:common-v2"))
     implementation(project(":core:ui"))
     implementation(project(":core:domain:domain-user"))

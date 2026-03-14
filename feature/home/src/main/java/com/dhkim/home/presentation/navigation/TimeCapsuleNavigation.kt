@@ -26,6 +26,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.dhkim.domain.model.Place
 import com.dhkim.home.presentation.TimeCapsuleScreen
 import com.dhkim.home.presentation.TimeCapsuleViewModel
 import com.dhkim.home.presentation.add.AddTimeCapsuleAction
@@ -37,7 +38,6 @@ import com.dhkim.home.presentation.detail.TimeCapsuleDetailViewModel
 import com.dhkim.home.presentation.detail.TimeCapsuleOpenScreen
 import com.dhkim.home.presentation.more.MoreTimeCapsuleScreen
 import com.dhkim.home.presentation.more.MoreTimeCapsuleViewModel
-import com.dhkim.location.domain.model.Place
 import com.dhkim.ui.Popup
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState

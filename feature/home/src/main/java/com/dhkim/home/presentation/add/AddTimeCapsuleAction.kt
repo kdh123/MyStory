@@ -1,6 +1,6 @@
 package com.dhkim.home.presentation.add
 
-import com.dhkim.location.domain.model.Place
+import com.dhkim.domain.model.Place
 
 sealed interface AddTimeCapsuleAction {
 

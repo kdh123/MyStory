@@ -8,12 +8,12 @@ import androidx.paging.cachedIn
 import com.dhkim.common.CommonResult
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
+import com.dhkim.domain.model.Place
 import com.dhkim.domain.model.SharedFriend
+import com.dhkim.domain.usecase.GetAddressUseCase
 import com.dhkim.domain.usecase.GetMyInfoUseCase
+import com.dhkim.domain.usecase.GetPlacesByKeywordUseCase
 import com.dhkim.domain.usecase.SaveMyTimeCapsuleUseCase
-import com.dhkim.location.domain.model.Place
-import com.dhkim.location.domain.usecase.GetAddressUseCase
-import com.dhkim.location.domain.usecase.GetPlacesByKeywordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi

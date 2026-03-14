@@ -45,8 +45,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.Place
 import com.dhkim.location.R
-import com.dhkim.location.domain.model.Place
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.HttpException

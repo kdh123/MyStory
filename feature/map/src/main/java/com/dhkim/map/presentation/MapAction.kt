@@ -1,8 +1,7 @@
 package com.dhkim.map.presentation
 
-import com.dhkim.location.domain.model.Category
-import com.dhkim.location.domain.model.Place
-import com.naver.maps.geometry.LatLng
+import com.dhkim.domain.model.Category
+import com.dhkim.domain.model.Place
 
 sealed interface MapAction {
 

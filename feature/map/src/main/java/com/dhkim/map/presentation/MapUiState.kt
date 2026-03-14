@@ -3,9 +3,8 @@ package com.dhkim.map.presentation
 import androidx.compose.runtime.Stable
 import androidx.paging.PagingData
 import com.dhkim.common.Constants
-import com.dhkim.location.domain.model.Category
-import com.dhkim.location.domain.model.Place
-import com.naver.maps.geometry.LatLng
+import com.dhkim.domain.model.Category
+import com.dhkim.domain.model.Place
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

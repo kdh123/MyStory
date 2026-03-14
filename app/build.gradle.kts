@@ -102,6 +102,8 @@ dependencies {
     implementation(project(":core:data:data-story"))
     implementation(project(":core:domain:domain-trip"))
     implementation(project(":core:data:data-trip"))
+    implementation(project(":core:domain:domain-location"))
+    implementation(project(":core:data:data-location"))
     "baselineProfile"(project(":baselineprofile"))
 
     implementation(libs.bundles.androidx.compose.main)

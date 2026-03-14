@@ -20,7 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.dhkim.location.domain.model.Place
+import com.dhkim.domain.model.Place
 import com.dhkim.map.presentation.MapAction
 import com.dhkim.map.presentation.MapScreen
 import com.dhkim.map.presentation.MapViewModel
