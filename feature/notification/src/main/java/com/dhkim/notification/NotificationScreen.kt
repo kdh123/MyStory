@@ -93,7 +93,7 @@ fun NotificationItem(
             .padding(horizontal = 10.dp)
     ) {
         Image(
-            painter = painterResource(id = profileImage),
+            painter = painterResource(id = R.drawable.ic_smile_blue),
             contentDescription = null,
         )
         Column(

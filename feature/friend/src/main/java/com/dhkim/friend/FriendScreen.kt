@@ -42,7 +42,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -622,25 +622,32 @@ fun BottomSheetScreen(
                     .weight(1f)
                     .fillMaxHeight()
             ) {
-                TextField(
-                    textStyle = TextStyle(fontSize = 12.sp),
-                    singleLine = true,
+                BasicTextField(
                     value = uiState.searchResult.query,
-                    label = {
-                        Text(
-                            text = "친구 코드 입력",
-                            style = MyStoryTheme.typography.bodyMedium
-                        )
-                    },
                     onValueChange = {
                         onAction(FriendAction.Query(it))
                     },
+                    singleLine = true,
+                    textStyle = TextStyle(fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground),
                     modifier = Modifier
-                        .fillMaxSize(),
-                    colors = androidx.compose.material3.TextFieldDefaults.textFieldColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        focusedIndicatorColor = Color.Transparent,
-                    )
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 12.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            if (uiState.searchResult.query.isEmpty()) {
+                                Text(
+                                    text = "친구 코드 입력",
+                                    style = MyStoryTheme.typography.bodyMedium
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
                 )
             }
             Card(
