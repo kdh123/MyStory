@@ -29,7 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dhkim.designsystem.MyStoryTheme
-import com.dhkim.story.domain.model.ReceivedTimeCapsule
+import com.dhkim.domain.model.ReceivedTimeCapsule
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -81,7 +81,7 @@ fun NotificationItem(
     onNavigateToTimeCapsule: () -> Unit
 ) {
     val profileImage = if (LocalInspectionMode.current) {
-        com.dhkim.common.R.drawable.ic_smile_blue
+        R.drawable.ic_smile_blue
     } else {
         timeCapsule.profileImage.toInt()
     }

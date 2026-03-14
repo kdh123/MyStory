@@ -141,7 +141,7 @@ fun NavGraphBuilder.timeCapsuleScreen(
                 if (isGranted) {
                     fusedLocationClient.lastLocation
                         .addOnSuccessListener { location: Location? ->
-                            val currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+                            val currentLocation = Pair(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
                             viewModel.updateCurrentLocation(currentLocation)
                         }
                 }

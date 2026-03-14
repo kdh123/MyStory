@@ -61,7 +61,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,11 +74,11 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.Friend
+import com.dhkim.domain.model.User
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.Popup
 import com.dhkim.ui.onStartCollect
-import com.dhkim.user.domain.model.Friend
-import com.dhkim.user.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch

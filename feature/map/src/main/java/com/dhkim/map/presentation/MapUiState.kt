@@ -17,5 +17,5 @@ data class MapUiState(
     val places: StateFlow<PagingData<Place>> = MutableStateFlow(PagingData.empty()),
     val category: Category = Category.None,
     val selectedPlace: Place? = null,
-    val currentLocation: LatLng = Constants.defaultLocation
+    val currentLocation: Pair<Double, Double> = Constants.defaultLocation
 )

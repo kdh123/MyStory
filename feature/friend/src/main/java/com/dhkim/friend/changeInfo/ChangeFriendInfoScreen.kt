@@ -3,7 +3,6 @@ package com.dhkim.friend.changeInfo
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,12 +24,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.Friend
 import com.dhkim.friend.R
 import com.dhkim.ui.onStartCollect
-import com.dhkim.user.domain.model.Friend
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

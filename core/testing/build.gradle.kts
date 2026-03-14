@@ -31,10 +31,13 @@ android {
 
 dependencies {
 
-    implementation(project(":core:user"))
+    implementation(project(":core:domain:domain-user"))
+    implementation(project(":core:data:data-user"))
+    implementation(project(":core:domain:domain-story"))
+    implementation(project(":core:data:data-story"))
     implementation(project(":core:location"))
     implementation(project(":core:trip"))
-    implementation(project(":core:common"))
+    implementation(project(":core:common-v2"))
     implementation(project(":core:database"))
 
     implementation(libs.androidx.core.ktx)

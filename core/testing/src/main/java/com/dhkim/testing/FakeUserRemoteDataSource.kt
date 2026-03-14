@@ -1,10 +1,9 @@
 package com.dhkim.testing
 
 import com.dhkim.common.CommonResult
-import com.dhkim.user.data.datasource.UserRemoteDataSource
-import com.dhkim.user.data.datasource.isSuccessful
-import com.dhkim.user.domain.model.Friend
-import com.dhkim.user.domain.model.User
+import com.dhkim.data.datasource.UserRemoteDataSource
+import com.dhkim.domain.model.Friend
+import com.dhkim.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -37,7 +36,7 @@ class FakeUserRemoteDataSource : UserRemoteDataSource {
         return flowOf(CommonResult.Success(User()))
     }
 
-    override fun updateUser(user: User): Flow<isSuccessful> {
+    override fun updateUser(user: User): Flow<Boolean> {
         return flowOf(true)
     }
 
@@ -48,30 +47,30 @@ class FakeUserRemoteDataSource : UserRemoteDataSource {
         userId: String,
         userProfileImage: String,
         userUuid: String
-    ): Flow<isSuccessful> {
+    ): Flow<Boolean> {
         val friendIndex = friends.indexOfFirst { it.id == userId }
         val updateFriend = friends.find { it.id == userId }?.copy(isPending = false) ?: return flowOf(false)
         friends[friendIndex] = updateFriend
         return flowOf(true)
     }
 
-    override fun addFriend(myId: String, myProfileImage: String, myUuid: String, userId: String, userProfileImage: String): Flow<isSuccessful> {
+    override fun addFriend(myId: String, myProfileImage: String, myUuid: String, userId: String, userProfileImage: String): Flow<Boolean> {
         friends.add(Friend(id = userId, profileImage = userProfileImage))
         return flowOf(true)
     }
 
-    override fun deleteFriend(myId: String, userId: String): Flow<isSuccessful> {
+    override fun deleteFriend(myId: String, userId: String): Flow<Boolean> {
         friends.removeIf { it.id == userId }
         return flowOf(true)
     }
 
-    override fun updateFriend(myId: String, friend: Friend): Flow<isSuccessful> {
+    override fun updateFriend(myId: String, friend: Friend): Flow<Boolean> {
         val friendIndex = friends.indexOfFirst { it.id == friend.id }
         friends[friendIndex] = friend
         return flowOf(true)
     }
 
-    override fun addRequest(myId: String, myProfileImage: String, userId: String): Flow<isSuccessful> {
+    override fun addRequest(myId: String, myProfileImage: String, userId: String): Flow<Boolean> {
         return flowOf(true)
     }
 

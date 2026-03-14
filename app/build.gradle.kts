@@ -95,7 +95,11 @@ android {
 dependencies {
     implementation(project(":feature:main"))
     implementation(project(":feature:onboarding"))
-    implementation(project(":core:common"))
+    implementation(project(":core:common-v2"))
+    implementation(project(":core:domain:domain-user"))
+    implementation(project(":core:data:data-user"))
+    implementation(project(":core:domain:domain-story"))
+    implementation(project(":core:data:data-story"))
     "baselineProfile"(project(":baselineprofile"))
 
     implementation(libs.bundles.androidx.compose.main)

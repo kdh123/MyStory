@@ -26,8 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.TimeCapsule
 import com.dhkim.home.R
-import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.DefaultBackground
 import com.skydoves.landscapist.glide.GlideImage
 

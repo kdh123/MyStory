@@ -42,8 +42,8 @@ android {
 
 dependencies {
 
-    implementation(project(":core:common"))
-    implementation(project(":core:user"))
+    implementation(project(":core:common-v2"))
+    implementation(project(":core:domain:domain-user"))
     implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))
     implementation(project(":feature:main"))

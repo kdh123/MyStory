@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.common.onetimeRestartableStateIn
-import com.dhkim.core.trip.domain.repository.TripRepository
 import com.dhkim.core.trip.domain.model.Trip
 import com.dhkim.core.trip.domain.usecase.DeleteTripUseCase
 import com.dhkim.core.trip.domain.usecase.GetAllTripsUseCase

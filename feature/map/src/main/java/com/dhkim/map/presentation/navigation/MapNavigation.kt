@@ -65,7 +65,7 @@ fun NavGraphBuilder.mapScreen(
             if (isGranted) {
                 fusedLocationClient.lastLocation
                     .addOnSuccessListener { location: Location? ->
-                        val currentLocation = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
+                        val currentLocation = Pair(location?.latitude ?: 0.0, location?.longitude ?: 0.0)
                         viewModel.onAction(MapAction.UpdateCurrentLocation(currentLocation))
                     }
             }
@@ -100,7 +100,7 @@ fun NavGraphBuilder.mapScreen(
             }
 
             else -> {
-                uiState.currentLocation
+                LatLng(uiState.currentLocation.first, uiState.currentLocation.second)
             }
         }
 

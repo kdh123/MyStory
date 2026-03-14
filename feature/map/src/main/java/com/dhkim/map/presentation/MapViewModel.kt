@@ -56,7 +56,7 @@ internal class MapViewModel @Inject constructor(
         }
     }
 
-    private fun updateCurrentLocation(location: LatLng) {
+    private fun updateCurrentLocation(location: Pair<Double, Double>) {
         _uiState.update { it.copy(currentLocation = location) }
     }
 

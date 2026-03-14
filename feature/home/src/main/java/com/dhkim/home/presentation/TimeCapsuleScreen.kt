@@ -69,8 +69,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.common.DateUtil
 import com.dhkim.common.DistanceManager
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.TimeCapsule
 import com.dhkim.home.R
-import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.DefaultBackground
 import com.dhkim.ui.Popup
 import com.dhkim.ui.ShimmerBrush
@@ -294,8 +294,8 @@ fun TimeCapsuleScreen(
                                 OpenableTimeCapsules(
                                     timeCapsules = (it.data as? List<TimeCapsule>
                                         ?: listOf()).toImmutableList(),
-                                    currentLat = uiState.currentLocation.latitude,
-                                    currentLng = uiState.currentLocation.longitude,
+                                    currentLat = uiState.currentLocation.first,
+                                    currentLng = uiState.currentLocation.second,
                                     onShowLocationDialog = {
                                         if (!permissionState.status.isGranted) {
                                             showPopup(

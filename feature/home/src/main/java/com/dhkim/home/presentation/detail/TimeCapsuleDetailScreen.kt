@@ -49,8 +49,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.TimeCapsule
 import com.dhkim.home.R
-import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.DefaultBackground
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.Popup

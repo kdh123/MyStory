@@ -8,13 +8,12 @@ import androidx.paging.cachedIn
 import com.dhkim.common.CommonResult
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
+import com.dhkim.domain.model.SharedFriend
+import com.dhkim.domain.usecase.GetMyInfoUseCase
+import com.dhkim.domain.usecase.SaveMyTimeCapsuleUseCase
 import com.dhkim.location.domain.model.Place
 import com.dhkim.location.domain.usecase.GetAddressUseCase
 import com.dhkim.location.domain.usecase.GetPlacesByKeywordUseCase
-import com.dhkim.story.domain.model.SharedFriend
-import com.dhkim.story.domain.usecase.SaveMyTimeCapsuleUseCase
-import com.dhkim.user.domain.model.UserId
-import com.dhkim.user.domain.usecase.GetMyInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -241,7 +240,7 @@ class AddTimeCapsuleViewModel @Inject constructor(
         }
     }
 
-    private fun checkSharedFriend(userId: UserId) {
+    private fun checkSharedFriend(userId: String) {
         val sharedFriends = _uiState.value.sharedFriends.map {
             if (it.userId == userId) it.copy(isChecked = !it.isChecked) else it
         }

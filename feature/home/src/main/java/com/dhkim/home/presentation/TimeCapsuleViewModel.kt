@@ -8,10 +8,9 @@ import com.dhkim.common.Dispatcher
 import com.dhkim.common.RestartableStateFlow
 import com.dhkim.common.TimeCapsuleDispatchers
 import com.dhkim.common.onetimeRestartableStateIn
-import com.dhkim.story.domain.model.TimeCapsule
-import com.dhkim.story.domain.usecase.DeleteTimeCapsuleUseCase
-import com.dhkim.story.domain.usecase.GetAllTimeCapsuleUseCase
-import com.naver.maps.geometry.LatLng
+import com.dhkim.domain.model.TimeCapsule
+import com.dhkim.domain.usecase.DeleteTimeCapsuleUseCase
+import com.dhkim.domain.usecase.GetAllTimeCapsuleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -56,7 +55,7 @@ internal class TimeCapsuleViewModel @Inject constructor(
         }
     }
 
-    internal fun updateCurrentLocation(location: LatLng) {
+    internal fun updateCurrentLocation(location: Pair<Double, Double>) {
         currentLocation.update { location }
     }
 }

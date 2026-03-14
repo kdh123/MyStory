@@ -170,8 +170,8 @@ fun MapScreen(
             Column(modifier = Modifier.wrapContentWidth()) {
                 SearchBar(
                     query = uiState.query,
-                    lat = uiState.currentLocation.latitude,
-                    lng = uiState.currentLocation.longitude,
+                    lat = uiState.currentLocation.first,
+                    lng = uiState.currentLocation.second,
                     showClose = uiState.category != Category.None || uiState.selectedPlace != null,
                     onAction = onAction,
                     onNavigateToSearch = onNavigateToSearch,
@@ -196,16 +196,16 @@ fun MapScreen(
                                 onAction(
                                     MapAction.SearchPlacesByCategory(
                                         category = it,
-                                        lat = "${uiState.currentLocation.latitude}",
-                                        lng = "${uiState.currentLocation.longitude}"
+                                        lat = "${uiState.currentLocation.first}",
+                                        lng = "${uiState.currentLocation.second}"
                                     )
                                 )
                             } else {
                                 onAction(
                                     MapAction.SearchPlacesByKeyword(
                                         query = category.type,
-                                        lat = "${uiState.currentLocation.latitude}",
-                                        lng = "${uiState.currentLocation.longitude}"
+                                        lat = "${uiState.currentLocation.first}",
+                                        lng = "${uiState.currentLocation.second}"
                                     )
                                 )
                             }

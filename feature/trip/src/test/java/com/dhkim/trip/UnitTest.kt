@@ -1,8 +1,6 @@
 package com.dhkim.trip
 
 import com.dhkim.common.DateUtil
-import com.dhkim.core.trip.domain.model.TripPlace
-import com.dhkim.core.trip.domain.model.TripType
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 

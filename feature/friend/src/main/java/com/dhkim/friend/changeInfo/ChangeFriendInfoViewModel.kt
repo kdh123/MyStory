@@ -4,9 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dhkim.common.Dispatcher
 import com.dhkim.common.TimeCapsuleDispatchers
-import com.dhkim.user.domain.model.Friend
-import com.dhkim.user.domain.repository.UserRepository
-import com.dhkim.user.domain.usecase.UpdateFriendInfoUseCase
+import com.dhkim.domain.model.Friend
+import com.dhkim.domain.usecase.UpdateFriendInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
