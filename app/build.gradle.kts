@@ -104,6 +104,8 @@ dependencies {
     implementation(project(":core:data:data-trip"))
     implementation(project(":core:domain:domain-location"))
     implementation(project(":core:data:data-location"))
+    implementation(project(":core:domain:domain-setting"))
+    implementation(project(":core:data:data-setting"))
     "baselineProfile"(project(":baselineprofile"))
 
     implementation(libs.bundles.androidx.compose.main)

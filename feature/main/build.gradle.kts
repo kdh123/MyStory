@@ -46,7 +46,7 @@ android {
 
 dependencies {
 
-    implementation(project(":core:setting"))
+    implementation(project(":core:domain:domain-setting"))
     implementation(project(":core:domain:domain-story"))
     implementation(project(":core:domain:domain-location"))
     implementation(project(":core:common-v2"))

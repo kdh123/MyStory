@@ -7,9 +7,9 @@ import com.dhkim.common.DateUtil
 import com.dhkim.domain.model.DeleteTimeCapsule
 import com.dhkim.domain.model.ReceivedTimeCapsule
 import com.dhkim.domain.model.SharedTimeCapsule
+import com.dhkim.domain.repository.SettingRepository
 import com.dhkim.domain.repository.TimeCapsuleRepository
 import com.dhkim.ui.NotificationManager
-import com.dhkim.setting.domain.repository.SettingRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson

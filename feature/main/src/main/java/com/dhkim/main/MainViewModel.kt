@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.dhkim.domain.usecase.GetGuideSettingUseCase
+import com.dhkim.domain.usecase.UpdateGuideSettingUseCase
 import com.dhkim.main.work.CheckOpenableTimeCapsuleWorker
-import com.dhkim.setting.domain.usecase.GetGuideSettingUseCase
-import com.dhkim.setting.domain.usecase.UpdateGuideSettingUseCase
 import com.dhkim.ui.Popup
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
