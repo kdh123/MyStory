@@ -26,14 +26,14 @@ android {
     }
 
     namespace = "com.dhkim.timecapsule"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.dhkim.timecapsule"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 18
-        versionName = "1.0.10"
+        targetSdk = 36
+        versionCode = 19
+        versionName = "1.0.11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

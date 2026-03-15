@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.dhkim.testing"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26

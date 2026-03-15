@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.dhkim.data.trip"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
