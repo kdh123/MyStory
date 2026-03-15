@@ -41,6 +41,7 @@ fun SettingScreen(
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName
 
     Scaffold(
         topBar = {
@@ -93,25 +94,25 @@ fun SettingScreen(
 
             Divider()
 
-            Row(
-                modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .clickable {
-                        val browserIntent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://sites.google.com/view/mystorytimecapsule/")
-                        )
-                        context.startActivity(browserIntent)
-                    }
-            ) {
-                Text(
-                    text = stringResource(R.string.setting_privacy_policy),
-                    style = MyStoryTheme.typography.titleMedium,
+            if (!versionName.isNullOrEmpty()) {
+                Row(
                     modifier = Modifier
-                        .width(0.dp)
-                        .weight(1f)
-                        .align(Alignment.CenterVertically)
-                )
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.setting_version),
+                        style = MyStoryTheme.typography.titleMedium,
+                        modifier = Modifier
+                            .width(0.dp)
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    )
+                    Text(
+                        text = versionName,
+                        style = MyStoryTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
             }
         }
     }
