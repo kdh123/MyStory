@@ -44,7 +44,7 @@ android {
 
 dependencies {
 
-    implementation(project(":core:common-v2"))
+    implementation(project(":core:common"))
     implementation(project(":core:network"))
     implementation(project(":core:domain:domain-location"))
 

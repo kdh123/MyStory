@@ -58,7 +58,7 @@ dependencies {
     implementation(project(":core:work"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
-    implementation(project(":core:common-v2"))
+    implementation(project(":core:common"))
     implementation(project(":core:domain:domain-user"))
     implementation(project(":core:ui"))
     implementation(project(":core:domain:domain-story"))

@@ -95,7 +95,7 @@ android {
 dependencies {
     implementation(project(":feature:main"))
     implementation(project(":feature:onboarding"))
-    implementation(project(":core:common-v2"))
+    implementation(project(":core:common"))
     implementation(project(":core:domain:domain-user"))
     implementation(project(":core:data:data-user"))
     implementation(project(":core:domain:domain-story"))

@@ -13,8 +13,8 @@ kotlin {
     }
 }
 dependencies {
-    implementation(project(":core:common-v2"))
 
+    implementation(project(":core:common"))
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.hilt.core)
     ksp(libs.hilt.compiler)

@@ -42,7 +42,7 @@ android {
 dependencies {
 
     implementation(project(":core:domain:domain-story"))
-    implementation(project(":core:common-v2"))
+    implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
 
     implementation(libs.bundles.androidx.compose.main)

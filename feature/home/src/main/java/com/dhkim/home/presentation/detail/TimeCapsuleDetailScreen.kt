@@ -272,7 +272,7 @@ fun TimeCapsuleDetailScreen(
 
             if (uiState.timeCapsule.checkLocation || !uiState.timeCapsule.isReceived) {
                 MenuItem(
-                    title = "작성자 : ${uiState.timeCapsule.address}",
+                    title = "위치 : ${uiState.timeCapsule.address}",
                     icon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_location_black),

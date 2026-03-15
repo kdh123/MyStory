@@ -53,7 +53,7 @@ dependencies {
     implementation(project(":core:domain:domain-trip"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
-    implementation(project(":core:common-v2"))
+    implementation(project(":core:common"))
     implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))
     implementation(project(":feature:setting"))

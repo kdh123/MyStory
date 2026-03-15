@@ -39,7 +39,7 @@ dependencies {
     implementation(project(":core:data:data-location"))
     implementation(project(":core:domain:domain-trip"))
     implementation(project(":core:data:data-trip"))
-    implementation(project(":core:common-v2"))
+    implementation(project(":core:common"))
     implementation(project(":core:database"))
 
     implementation(libs.androidx.core.ktx)

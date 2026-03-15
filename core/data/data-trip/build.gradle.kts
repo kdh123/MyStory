@@ -36,7 +36,7 @@ dependencies {
     implementation(project(":core:domain:domain-trip"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
-    implementation(project(":core:common-v2"))
+    implementation(project(":core:common"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
