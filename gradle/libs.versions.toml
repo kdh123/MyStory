@@ -37,9 +37,9 @@ googleService = "4.4.2"
 dataStore = "1.0.0"
 fcm = "23.2.1"
 composeAnimation = "1.6.0"
-workManager = "2.7.1"
-hiltWorkManager = "1.0.0"
-hiltCompiler = "1.0.0"
+workManager = "2.9.1"
+hiltWorkManager = "1.2.0"
+hiltCompiler = "1.2.0"
 jetbrainsKotlinJvm = "1.9.0"
 gson = "2.8.6"
 composeFoundation = "1.7.0-alpha02"
@@ -55,6 +55,7 @@ benchmarkMacroJunit4 = "1.2.3"
 baselineprofile = "1.2.3"
 profileinstaller = "1.4.1"
 turbine = "1.2.0"
+kotlinxCoroutines = "1.10.2"
 
 [libraries]
 dhcamera = { module = "com.github.kdh123:DhCamera", version.ref = "dhcamera" }
@@ -62,6 +63,7 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "roboletri
 coroutine-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutineTest" }
 
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
+hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWorkManager" }
 androidx-work = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
 
@@ -135,6 +137,7 @@ androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchm
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }
 
 app-cash-turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 
 
 [bundles]

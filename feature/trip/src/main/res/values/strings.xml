@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="trip_title">여행</string>
+    <string name="trip_create_schedule">여행 일정 만들기</string>
+    <string name="trip_new_journey">새로운 여행을 떠나볼까요?</string>
+    <string name="trip_planning">여행을 계획하고 있나요?</string>
+    <string name="trip_register_schedule">새로운 여행 일정을 등록해보세요</string>
+    <string name="trip_make_schedule">일정 만들기</string>
+    <string name="trip_delete_schedule_title">일정 삭제</string>
+    <string name="trip_delete_confirm">정말 삭제하겠습니까?</string>
+    <string name="trip_menu">메뉴</string>
+    <string name="trip_edit">수정</string>
+    <string name="trip_delete">삭제</string>
+    <string name="trip_storage_permission_title">저장소 권한 요청</string>
+    <string name="trip_storage_permission_desc">이미지를 불러오기 위해서 저장소 권한을 허용해주세요.</string>
+    <string name="trip_delete_title">삭제</string>
+    <string name="trip_after_trip_photo_notice">여행이 끝난 후 여행 기간 중에 찍었던 사진이 노출됩니다.</string>
+    <string name="trip_no_photo_on_this_day">이 날 찍었던 사진이 존재하지 않습니다.</string>
+    <string name="trip_type_question">어떤 여행을 계획하고 있나요?</string>
+    <string name="trip_next">다음</string>
+    <string name="trip_place_question">여행하려는 장소가 어디인가요?</string>
+    <string name="trip_domestic">국내</string>
+    <string name="trip_abroad">해외</string>
+    <string name="trip_prev">이전</string>
+    <string name="trip_date_question">여행 일정이 어떻게 되나요?</string>
+    <string name="trip_complete">완료</string>
+    <string name="trip_start_date">시작일</string>
+    <string name="trip_end_date">종료일</string>
+    <string name="trip_select">선택</string>
+    <string name="trip_confirm">확인</string>
+    <string name="trip_cancel">취소</string>
+    <string name="trip_date_before_end_error">여행 종료 날짜 이전으로 설정해주세요.</string>
+    <string name="trip_date_after_start_error">여행 시작 날짜 이후로 설정해주세요.</string>
+</resources>

@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dhkim.designsystem.MyStoryTheme
@@ -40,6 +41,7 @@ fun SettingScreen(
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName
 
     Scaffold(
         topBar = {
@@ -69,7 +71,7 @@ fun SettingScreen(
                     .padding(vertical = 10.dp)
             ) {
                 Text(
-                    text = "알림",
+                    text = stringResource(R.string.setting_notification),
                     style = MyStoryTheme.typography.titleMedium,
                     modifier = Modifier
                         .width(0.dp)
@@ -92,25 +94,25 @@ fun SettingScreen(
 
             Divider()
 
-            Row(
-                modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .clickable {
-                        val browserIntent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://sites.google.com/view/mystorytimecapsule/")
-                        )
-                        context.startActivity(browserIntent)
-                    }
-            ) {
-                Text(
-                    text = "개인 정보 처리 방침",
-                    style = MyStoryTheme.typography.titleMedium,
+            if (!versionName.isNullOrEmpty()) {
+                Row(
                     modifier = Modifier
-                        .width(0.dp)
-                        .weight(1f)
-                        .align(Alignment.CenterVertically)
-                )
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.setting_version),
+                        style = MyStoryTheme.typography.titleMedium,
+                        modifier = Modifier
+                            .width(0.dp)
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    )
+                    Text(
+                        text = versionName,
+                        style = MyStoryTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
             }
         }
     }

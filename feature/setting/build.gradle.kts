@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.dhkim.setting"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
@@ -41,7 +41,7 @@ android {
 dependencies {
 
     implementation(project(":core:datastore"))
-    implementation(project(":core:setting"))
+    implementation(project(":core:domain:domain-setting"))
     implementation(project(":core:designsystem"))
 
     implementation(libs.bundles.androidx.compose.main)

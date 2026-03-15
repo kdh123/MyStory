@@ -15,7 +15,7 @@ val localProperties = Properties().apply {
 
 android {
     namespace = "com.dhkim.home"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
@@ -59,10 +59,10 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:database"))
     implementation(project(":core:common"))
-    implementation(project(":core:user"))
+    implementation(project(":core:domain:domain-user"))
     implementation(project(":core:ui"))
-    implementation(project(":core:story"))
-    implementation(project(":core:location"))
+    implementation(project(":core:domain:domain-story"))
+    implementation(project(":core:domain:domain-location"))
     implementation(project(":core:designsystem"))
     implementation(project(":feature:setting"))
     implementation(project(":feature:location"))

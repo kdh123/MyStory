@@ -1,8 +1,8 @@
 package com.dhkim.testing
 
+import com.dhkim.data.datasource.UserLocalDataSource
 import com.dhkim.database.entity.FriendEntity
-import com.dhkim.user.data.datasource.UserLocalDataSource
-import com.dhkim.user.domain.model.User
+import com.dhkim.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

@@ -26,14 +26,14 @@ android {
     }
 
     namespace = "com.dhkim.timecapsule"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.dhkim.timecapsule"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 18
-        versionName = "1.0.10"
+        targetSdk = 36
+        versionCode = 19
+        versionName = "1.0.11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -96,6 +96,16 @@ dependencies {
     implementation(project(":feature:main"))
     implementation(project(":feature:onboarding"))
     implementation(project(":core:common"))
+    implementation(project(":core:domain:domain-user"))
+    implementation(project(":core:data:data-user"))
+    implementation(project(":core:domain:domain-story"))
+    implementation(project(":core:data:data-story"))
+    implementation(project(":core:domain:domain-trip"))
+    implementation(project(":core:data:data-trip"))
+    implementation(project(":core:domain:domain-location"))
+    implementation(project(":core:data:data-location"))
+    implementation(project(":core:domain:domain-setting"))
+    implementation(project(":core:data:data-setting"))
     "baselineProfile"(project(":baselineprofile"))
 
     implementation(libs.bundles.androidx.compose.main)

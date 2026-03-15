@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.dhkim.testing"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
@@ -31,9 +31,14 @@ android {
 
 dependencies {
 
-    implementation(project(":core:user"))
-    implementation(project(":core:location"))
-    implementation(project(":core:trip"))
+    implementation(project(":core:domain:domain-user"))
+    implementation(project(":core:data:data-user"))
+    implementation(project(":core:domain:domain-story"))
+    implementation(project(":core:data:data-story"))
+    implementation(project(":core:domain:domain-location"))
+    implementation(project(":core:data:data-location"))
+    implementation(project(":core:domain:domain-trip"))
+    implementation(project(":core:data:data-trip"))
     implementation(project(":core:common"))
     implementation(project(":core:database"))
 

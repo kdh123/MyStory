@@ -81,6 +81,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -91,9 +92,9 @@ import com.dhkim.designsystem.MyStoryTheme
 import com.dhkim.dhcamera.camera.DhCamera
 import com.dhkim.dhcamera.model.BackgroundText
 import com.dhkim.dhcamera.model.FontElement
+import com.dhkim.domain.model.SharedFriend
 import com.dhkim.home.R
 import com.dhkim.home.presentation.LocationSearchScreen
-import com.dhkim.story.domain.model.SharedFriend
 import com.dhkim.ui.onStartCollect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -225,7 +226,7 @@ fun AddTimeCapsuleScreen(
                             .align(Alignment.CenterVertically)
                     ) {
                         Text(
-                            text = "새 타임캡슐",
+                            text = stringResource(R.string.home_new_capsule),
                             style = MyStoryTheme.typography.bodyLargeBold,
                             modifier = Modifier
                                 .align(Alignment.Center),
@@ -291,7 +292,7 @@ fun AddTimeCapsuleScreen(
                 ) {
                     BottomMenuItem(
                         resId = R.drawable.ic_camera_graphic,
-                        title = "카메라",
+                        title = stringResource(R.string.home_camera),
                         onClick = {
                             showImagePickBottomSheet = false
                             startCamera(
@@ -303,7 +304,7 @@ fun AddTimeCapsuleScreen(
                     )
                     BottomMenuItem(
                         resId = R.drawable.ic_picture_graphic,
-                        title = "갤러리",
+                        title = stringResource(R.string.home_gallery),
                         onClick = {
                             showImagePickBottomSheet = false
                             launcher.launch(
@@ -363,16 +364,16 @@ fun AddTimeCapsuleScreen(
                         } else {
                             MaterialTheme.colorScheme.secondary
                         },
-                        title = "위치 체크",
-                        subTitle = "개봉할 수 있는 위치를 지정합니다.",
+                        title = stringResource(R.string.home_location_check),
+                        subTitle = stringResource(R.string.home_location_check_desc),
                         isChecked = uiState.checkLocation,
                         onClick = { onAction(AddTimeCapsuleAction.SetCheckLocation(it)) }
                     )
                     if (uiState.checkLocation) {
                         MenuItem(
                             resId = -1,
-                            title = uiState.placeName.ifEmpty { "알 수 없음" },
-                            subTitle = "지정한 위치 근처에서 개봉할 수 있습니다.",
+                            title = uiState.placeName.ifEmpty { stringResource(R.string.home_unknown_location) },
+                            subTitle = stringResource(R.string.home_near_location_desc),
                             modifier = Modifier
                                 .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 0.dp),
                             onClick = { showLocationBottomSheet = true }
@@ -393,8 +394,8 @@ fun AddTimeCapsuleScreen(
                         } else {
                             MaterialTheme.colorScheme.secondary
                         },
-                        title = uiState.openDate.ifEmpty { "개봉 날짜" },
-                        subTitle = "지정한 날짜 이후에 개봉이 가능합니다.",
+                        title = uiState.openDate.ifEmpty { stringResource(R.string.home_open_date) },
+                        subTitle = stringResource(R.string.home_open_date_desc),
                         modifier = Modifier
                             .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 15.dp),
                     ) {
@@ -415,8 +416,8 @@ fun AddTimeCapsuleScreen(
                         } else {
                             MaterialTheme.colorScheme.secondary
                         },
-                        title = "친구와 공유하기",
-                        subTitle = "사진은 친구에게 공유되지 않습니다.",
+                        title = stringResource(R.string.home_share_with_friend),
+                        subTitle = stringResource(R.string.home_share_no_photo),
                         isChecked = uiState.isShare
                     ) {
                         onAction(AddTimeCapsuleAction.SetCheckShare(it))
@@ -439,8 +440,8 @@ fun AddTimeCapsuleScreen(
 
                         MenuItem(
                             resId = -1,
-                            title = title.toString().ifEmpty { title.append("친구 목록").toString() },
-                            subTitle = "서로 승낙한 친구에게만 공유할 수 있습니다.",
+                            title = title.toString().ifEmpty { title.append(stringResource(R.string.home_friend_list)).toString() },
+                            subTitle = stringResource(R.string.home_share_only_mutual),
                             modifier = Modifier
                                 .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 0.dp),
                         ) {
@@ -491,7 +492,7 @@ private fun SharedFriendList(
         }
     } else {
         Text(
-            text = "친구가 존재하지 않습니다.",
+            text = stringResource(R.string.home_no_friends),
             style = MyStoryTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             modifier = modifier
@@ -639,7 +640,7 @@ private fun SaveButton(modifier: Modifier, onClick: () -> Unit) {
         }
     ) {
         Text(
-            text = "저장",
+            text = stringResource(R.string.home_save),
             style = MyStoryTheme.typography.bodyLargeWhiteBold,
             modifier = Modifier
                 .padding(15.dp)
@@ -708,7 +709,7 @@ fun Calender(
                 }
             ) {
                 Text(
-                    text = "확인",
+                    text = stringResource(R.string.home_confirm_button),
                     style = MyStoryTheme.typography.bodyMedium
                 )
             }
@@ -718,7 +719,7 @@ fun Calender(
                 onDismiss()
             }) {
                 Text(
-                    text = "취소",
+                    text = stringResource(R.string.home_cancel_button),
                     style = MyStoryTheme.typography.bodyMedium
                 )
             }
@@ -940,7 +941,7 @@ private fun ContentsView(
         TextField(
             label = {
                 Text(
-                    text = "내용을 입력해주세요.",
+                    text = stringResource(R.string.home_content_hint),
                     style = MyStoryTheme.typography.labelMedium
                 )
             },

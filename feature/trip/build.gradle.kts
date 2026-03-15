@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.dhkim.trip"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
@@ -50,7 +50,7 @@ android {
 
 dependencies {
 
-    implementation(project(":core:trip"))
+    implementation(project(":core:domain:domain-trip"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
     implementation(project(":core:common"))

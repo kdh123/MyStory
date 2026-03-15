@@ -35,14 +35,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.dhkim.domain.model.TimeCapsule
 import com.dhkim.home.R
-import com.dhkim.story.domain.model.TimeCapsule
 import com.dhkim.ui.drawAnimatedBorder
 import com.dhkim.ui.onStartCollect
 import com.skydoves.landscapist.glide.GlideImage
@@ -153,7 +154,7 @@ fun LoadedScreen(uiState: TimeCapsuleDetailUiState, onNavigateToDetail: (String,
             Text(
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                text = "건너뛰기",
+                text = stringResource(R.string.home_skip),
                 modifier = Modifier
                     .padding(20.dp)
                     .clip(RoundedCornerShape(20.dp))
@@ -284,7 +285,7 @@ fun LoadingScreen(countDownNumber: Int) {
                 )
             }
             Text(
-                text = "과거로 돌아가는 중",
+                text = stringResource(R.string.home_going_back_in_time),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 10.dp)

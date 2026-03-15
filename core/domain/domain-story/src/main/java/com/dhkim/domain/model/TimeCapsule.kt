@@ -1,0 +1,28 @@
+package com.dhkim.domain.model
+
+import com.dhkim.common.Constants
+
+data class Host(
+    val id: String = "",
+    val nickname: String = id,
+    val profileImage: String = "0"
+)
+
+data class TimeCapsule(
+    val id: String = "",
+    val host: Host = Host(),
+    val date: String = "",
+    val openDate: String = "",
+    val lat: String = "${Constants.defaultLocation.first}",
+    val lng: String = "${Constants.defaultLocation.second}",
+    val placeName: String = "",
+    val address: String = "",
+    val content: String = "",
+    val images: List<String> = listOf(),
+    val videos: List<String> = listOf(),
+    val checkLocation: Boolean = false,
+    val isOpened: Boolean = false,
+    val sharedFriends: List<String> = listOf(),
+    val isReceived: Boolean = false,
+    val sender: String = ""
+)

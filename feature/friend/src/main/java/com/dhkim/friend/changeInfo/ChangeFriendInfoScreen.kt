@@ -3,7 +3,6 @@ package com.dhkim.friend.changeInfo
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,14 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.Friend
 import com.dhkim.friend.R
 import com.dhkim.ui.onStartCollect
-import com.dhkim.user.domain.model.Friend
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -100,7 +99,7 @@ fun ChangeFriendInfoScreen(
                 .padding(start = 10.dp, end = 10.dp, top = it.calculateTopPadding())
         ) {
             Text(
-                text = "닉네임",
+                text = stringResource(R.string.friend_nickname),
                 style = MyStoryTheme.typography.bodySmall,
                 modifier = Modifier
                     .padding(bottom = 10.dp)
@@ -122,7 +121,7 @@ fun ChangeFriendInfoScreen(
                     .padding(top = 5.dp)
             )
             Text(
-                text = "개인 코드 : ${uiState.friend.id}",
+                text = stringResource(R.string.friend_personal_code, uiState.friend.id),
                 style = MyStoryTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(top = 10.dp)

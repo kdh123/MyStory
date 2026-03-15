@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,8 +67,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.dhkim.designsystem.MyStoryTheme
-import com.dhkim.location.domain.model.Category
-import com.dhkim.location.domain.model.Place
+import com.dhkim.domain.model.Category
+import com.dhkim.domain.model.Place
 import com.dhkim.map.R
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.onStartCollect
@@ -170,8 +171,8 @@ fun MapScreen(
             Column(modifier = Modifier.wrapContentWidth()) {
                 SearchBar(
                     query = uiState.query,
-                    lat = uiState.currentLocation.latitude,
-                    lng = uiState.currentLocation.longitude,
+                    lat = uiState.currentLocation.first,
+                    lng = uiState.currentLocation.second,
                     showClose = uiState.category != Category.None || uiState.selectedPlace != null,
                     onAction = onAction,
                     onNavigateToSearch = onNavigateToSearch,
@@ -196,16 +197,16 @@ fun MapScreen(
                                 onAction(
                                     MapAction.SearchPlacesByCategory(
                                         category = it,
-                                        lat = "${uiState.currentLocation.latitude}",
-                                        lng = "${uiState.currentLocation.longitude}"
+                                        lat = "${uiState.currentLocation.first}",
+                                        lng = "${uiState.currentLocation.second}"
                                     )
                                 )
                             } else {
                                 onAction(
                                     MapAction.SearchPlacesByKeyword(
                                         query = category.type,
-                                        lat = "${uiState.currentLocation.latitude}",
-                                        lng = "${uiState.currentLocation.longitude}"
+                                        lat = "${uiState.currentLocation.first}",
+                                        lng = "${uiState.currentLocation.second}"
                                     )
                                 )
                             }
@@ -357,7 +358,7 @@ fun SearchBar(
                     .padding(10.dp)
             ) {
                 Text(
-                    text = query.ifEmpty { "추억을 남기려는 장소를 검색하세요" },
+                    text = query.ifEmpty { stringResource(R.string.map_search_hint) },
                     style = if (query.isEmpty()) {
                         MyStoryTheme.typography.bodyMediumGray
                     } else {

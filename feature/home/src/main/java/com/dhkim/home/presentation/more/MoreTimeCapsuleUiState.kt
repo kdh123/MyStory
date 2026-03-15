@@ -1,7 +1,7 @@
 package com.dhkim.home.presentation.more
 
 import androidx.compose.runtime.Stable
-import com.dhkim.story.domain.model.TimeCapsule
+import com.dhkim.domain.model.TimeCapsule
 
 @Stable
 data class MoreTimeCapsuleUiState(

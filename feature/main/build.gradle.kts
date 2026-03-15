@@ -13,7 +13,7 @@ android {
     }
 
     namespace = "com.dhkim.main"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
@@ -46,12 +46,12 @@ android {
 
 dependencies {
 
-    implementation(project(":core:setting"))
-    implementation(project(":core:story"))
-    implementation(project(":core:location"))
+    implementation(project(":core:domain:domain-setting"))
+    implementation(project(":core:domain:domain-story"))
+    implementation(project(":core:domain:domain-location"))
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
-    implementation(project(":core:user"))
+    implementation(project(":core:domain:domain-user"))
     implementation(project(":core:designsystem"))
     implementation(project(":feature:friend"))
     implementation(project(":feature:location"))

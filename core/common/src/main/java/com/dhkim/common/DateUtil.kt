@@ -1,6 +1,5 @@
 package com.dhkim.common
 
-import android.annotation.SuppressLint
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -8,13 +7,11 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-@SuppressLint("SimpleDateFormat")
 object DateUtil {
 
     private val sdf = SimpleDateFormat("yyyy-MM-dd")
     private val sdf2 = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
 
-    @SuppressLint("SimpleDateFormat")
     fun millsToDate(mills: Long): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd")
         val date = sdf.format(Timestamp(mills))
@@ -22,7 +19,6 @@ object DateUtil {
         return date
     }
 
-    @SuppressLint("SimpleDateFormat")
     fun dateToMills(date: String): Long {
         val realDate = try {
             sdf.parse(date)
@@ -33,7 +29,6 @@ object DateUtil {
         return realDate?.time ?: 0L
     }
 
-    @SuppressLint("SimpleDateFormat")
     fun dateToMills2(date: String): Long {
         val realDate = try {
             sdf2.parse(date)

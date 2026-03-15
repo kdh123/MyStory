@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.dhkim.onboarding"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
@@ -43,7 +43,7 @@ android {
 dependencies {
 
     implementation(project(":core:common"))
-    implementation(project(":core:user"))
+    implementation(project(":core:domain:domain-user"))
     implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))
     implementation(project(":feature:main"))

@@ -1,7 +1,8 @@
 package com.dhkim.home.data
 
 import com.dhkim.database.entity.MyTimeCapsuleEntity
-import com.dhkim.story.data.dataSource.toMyTimeCapsule
+import com.dhkim.domain.model.MyTimeCapsule
+import com.dhkim.testing.FakeTimeCapsuleRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -74,5 +75,23 @@ class TimeCapsuleRepositoryTest {
         timeCapsuleRepository.deleteMyTimeCapsule(id = "id1")
 
         assertEquals(timeCapsuleRepository.getMyAllTimeCapsule().first().size, 9)
+    }
+
+    fun MyTimeCapsuleEntity.toMyTimeCapsule(): MyTimeCapsule {
+        return MyTimeCapsule(
+            id = id,
+            date = date,
+            openDate = openDate,
+            lat = lat,
+            lng = lng,
+            placeName = placeName,
+            address = address,
+            content = content,
+            images = images,
+            videos = videos,
+            checkLocation = checkLocation,
+            isOpened = isOpened,
+            sharedFriends = sharedFriends
+        )
     }
 }

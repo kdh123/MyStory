@@ -8,6 +8,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.dhkim.domain.model.Friend
+import com.dhkim.domain.model.Place
 import com.dhkim.friend.navigation.FRIEND_ROUTE
 import com.dhkim.friend.navigation.navigateToChangeFriendInfo
 import com.dhkim.friend.navigation.navigateToFriend
@@ -19,7 +21,6 @@ import com.dhkim.home.presentation.navigation.navigateToDetailFromOpen
 import com.dhkim.home.presentation.navigation.navigateToImageDetail
 import com.dhkim.home.presentation.navigation.navigateToMore
 import com.dhkim.home.presentation.navigation.navigateToOpenTimeCapsule
-import com.dhkim.location.domain.model.Place
 import com.dhkim.location.presentation.navigation.navigateToSearch
 import com.dhkim.map.presentation.navigation.MAP_ROUTE
 import com.dhkim.notification.navigation.navigateToNotification
@@ -28,7 +29,6 @@ import com.dhkim.trip.presentation.navigation.TRIP_ROUTE
 import com.dhkim.trip.presentation.navigation.navigateToTripDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripImageDetail
 import com.dhkim.trip.presentation.navigation.navigateToTripSchedule
-import com.dhkim.user.domain.model.Friend
 
 @Stable
 class AppState(

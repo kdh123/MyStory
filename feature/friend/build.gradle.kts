@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.dhkim.friend"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
@@ -49,7 +49,7 @@ dependencies {
 
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
-    implementation(project(":core:user"))
+    implementation(project(":core:domain:domain-user"))
     implementation(project(":core:designsystem"))
     implementation(project(":feature:home"))
     testImplementation(project(":core:database"))

@@ -1,13 +1,13 @@
 package com.dhkim.home
 
-import com.dhkim.home.data.FakeTimeCapsuleRepository
+import com.dhkim.domain.model.TimeCapsule
+import com.dhkim.domain.usecase.DeleteTimeCapsuleUseCase
+import com.dhkim.domain.usecase.GetAllTimeCapsuleUseCase
+import com.dhkim.domain.usecase.GetMyInfoUseCase
+import com.dhkim.testing.FakeTimeCapsuleRepository
 import com.dhkim.home.presentation.TimeCapsuleType
 import com.dhkim.home.presentation.TimeCapsuleViewModel
-import com.dhkim.story.domain.model.TimeCapsule
-import com.dhkim.story.domain.usecase.DeleteTimeCapsuleUseCase
-import com.dhkim.story.domain.usecase.GetAllTimeCapsuleUseCase
 import com.dhkim.testing.FakeUserRepository
-import com.dhkim.user.domain.usecase.GetMyInfoUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay

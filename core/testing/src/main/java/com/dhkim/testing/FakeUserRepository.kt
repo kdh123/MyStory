@@ -1,14 +1,13 @@
 package com.dhkim.testing
 
 import com.dhkim.common.CommonResult
-import com.dhkim.user.data.datasource.isSuccessful
-import com.dhkim.user.domain.model.Friend
-import com.dhkim.user.domain.model.LocalFriend
-import com.dhkim.user.domain.model.User
-import com.dhkim.user.domain.model.toLocalFriend
-import com.dhkim.user.domain.repository.UserRepository
+import com.dhkim.data.toLocalFriend
+import com.dhkim.domain.model.Friend
+import com.dhkim.domain.model.LocalFriend
+import com.dhkim.domain.model.User
+import com.dhkim.domain.repository.UserRepository
+import com.dhkim.domain.repository.isSuccessful
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 

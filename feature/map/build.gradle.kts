@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.dhkim.map"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
@@ -49,7 +49,7 @@ dependencies {
 
     implementation(project(":core:ui"))
     implementation(project(":core:common"))
-    implementation(project(":core:location"))
+    implementation(project(":core:domain:domain-location"))
     implementation(project(":core:designsystem"))
     implementation(project(":feature:location"))
     testImplementation(project(":core:testing"))

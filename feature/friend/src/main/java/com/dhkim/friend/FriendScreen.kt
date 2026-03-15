@@ -42,7 +42,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -60,8 +60,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,11 +75,11 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.domain.model.Friend
+import com.dhkim.domain.model.User
 import com.dhkim.ui.LoadingProgressBar
 import com.dhkim.ui.Popup
 import com.dhkim.ui.onStartCollect
-import com.dhkim.user.domain.model.Friend
-import com.dhkim.user.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -99,7 +99,10 @@ fun FriendScreen(
     val lifecycle = LocalLifecycleOwner.current
     val context = LocalContext.current
     var currentTab by rememberSaveable { mutableIntStateOf(0) }
-    val titles = listOf("친구", "요청")
+    val titles = listOf(stringResource(R.string.friend_tab_friends), stringResource(R.string.friend_tab_requests))
+    val strDelete = stringResource(R.string.friend_delete)
+    val strNoticeTitle = stringResource(R.string.friend_notice)
+    val strNoticeDesc = stringResource(R.string.friend_create_code_privacy)
     val pagerState = rememberPagerState(pageCount = { 2 })
     val scope = rememberCoroutineScope()
     var selectedFriend: Friend? by remember { mutableStateOf(null) }
@@ -146,6 +149,7 @@ fun FriendScreen(
     }
 
     if (showFriendMenuDialog && selectedFriend != null) {
+        val strDeleteDesc = stringResource(R.string.friend_delete_desc, selectedFriend!!.nickname)
         Dialog(
             onDismissRequest = {
                 selectedFriend = Friend()
@@ -170,7 +174,7 @@ fun FriendScreen(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = "삭제",
+                        text = stringResource(R.string.friend_delete),
                         style = MyStoryTheme.typography.bodyLarge,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -178,8 +182,8 @@ fun FriendScreen(
                                 showFriendMenuDialog = false
                                 showPopup(
                                     Popup.Warning(
-                                        title = "삭제",
-                                        desc = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedFriend!!.nickname}님을 정말 삭제하시겠습니까?",
+                                        title = strDelete,
+                                        desc = strDeleteDesc,
                                         onPositiveClick = {
                                             onAction(FriendAction.DeleteFriend(selectedFriend!!.id))
                                         },
@@ -196,7 +200,7 @@ fun FriendScreen(
 
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = "정보 변경",
+                        text = stringResource(R.string.friend_info_change),
                         style = MyStoryTheme.typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -211,6 +215,7 @@ fun FriendScreen(
     }
 
     if (showPendingFriendMenuDialog && selectedFriend != null) {
+        val strDeleteDesc = stringResource(R.string.friend_delete_desc, selectedFriend!!.nickname)
         Dialog(
             onDismissRequest = {
                 selectedFriend = Friend()
@@ -228,12 +233,12 @@ fun FriendScreen(
                         .padding(20.dp)
                 ) {
                     Text(
-                        text = "메뉴",
+                        text = stringResource(R.string.friend_menu),
                         style = MyStoryTheme.typography.bodyLargeBold,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = "삭제",
+                        text = stringResource(R.string.friend_delete),
                         style = MyStoryTheme.typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -241,8 +246,8 @@ fun FriendScreen(
                                 showPendingFriendMenuDialog = false
                                 showPopup(
                                     Popup.Warning(
-                                        title = "삭제",
-                                        desc = "삭제하면 상대방 친구 목록에도 내가 삭제됩니다. ${selectedFriend!!.nickname}님을 정말 삭제하시겠습니까?",
+                                        title = strDelete,
+                                        desc = strDeleteDesc,
                                         onPositiveClick = {
                                             onAction(FriendAction.DeleteFriend(selectedFriend!!.id))
                                         },
@@ -285,7 +290,7 @@ fun FriendScreen(
                         ShareTimeCapsuleAnim()
 
                         Text(
-                            text = "개인 코드 생성하고 \n 친구와 타임캡슐 공유하자!",
+                            text = stringResource(R.string.friend_create_code_promo),
                             style = MyStoryTheme.typography.headlineSmallBold,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
@@ -315,8 +320,8 @@ fun FriendScreen(
                                 if (!uiState.isCreatingCode) {
                                     showPopup(
                                         Popup.Warning(
-                                            title = "알림",
-                                            desc = "개인 코드는 타임캡슐 공유 목적 외 다른 목적으로 사용되지 않습니다. 또한 코드 생성시 사용자의 이름, 전화번호, 주소 등 어떠한 개인정보도 사용되지 않습니다.",
+                                            title = strNoticeTitle,
+                                            desc = strNoticeDesc,
                                             onPositiveClick = {
                                                 onAction(FriendAction.CreateFriendCode)
                                             }
@@ -344,9 +349,9 @@ fun FriendScreen(
 
                             Text(
                                 text = if (uiState.isCreatingCode) {
-                                    "개인 코드 생성 중..."
+                                    stringResource(R.string.friend_creating_code)
                                 } else {
-                                    "개인 코드 생성하기"
+                                    stringResource(R.string.friend_create_code)
                                 },
                                 style = if (uiState.isCreatingCode) {
                                     MyStoryTheme.typography.bodyLargeGrayBold
@@ -464,14 +469,14 @@ fun FriendScreen(
                         )
                         MenuItem(
                             resId = R.drawable.ic_time_primary,
-                            title = "타임캡슐 공유",
+                            title = stringResource(R.string.friend_share_time_capsule),
                             onClick = {
                                 onNavigateToAddTimeCapsule(selectedFriend!!.id)
                                 showInfoBottomSheet = false
                             })
                         MenuItem(
                             resId = R.drawable.ic_smile_blue,
-                            title = "정보 변경",
+                            title = stringResource(R.string.friend_info_change),
                             onClick = {
                                 onNavigateToChangeInfo(selectedFriend!!)
                                 showInfoBottomSheet = false
@@ -580,19 +585,19 @@ fun BottomSheetScreen(
 
     val friendMetaInfoText = when {
         uiState.searchResult.isMe -> {
-            "나입니다."
+            stringResource(R.string.friend_meta_me)
         }
 
         isMyFriend -> {
-            "친구로 등록된 사용자입니다."
+            stringResource(R.string.friend_meta_already_friend)
         }
 
         uiState.myInfo.friends.firstOrNull()?.isPending == true && isInMyFriendsOrRequests -> {
-            "내가 친구 요청을 한 사용자입니다."
+            stringResource(R.string.friend_meta_request_sent)
         }
 
         requestIds.contains(userId) -> {
-            "나에게 친구 요청을 한 사용자입니다."
+            stringResource(R.string.friend_meta_request_received)
         }
 
         else -> {
@@ -623,25 +628,32 @@ fun BottomSheetScreen(
                     .weight(1f)
                     .fillMaxHeight()
             ) {
-                TextField(
-                    textStyle = TextStyle(fontSize = 12.sp),
-                    singleLine = true,
+                BasicTextField(
                     value = uiState.searchResult.query,
-                    label = {
-                        Text(
-                            text = "친구 코드 입력",
-                            style = MyStoryTheme.typography.bodyMedium
-                        )
-                    },
                     onValueChange = {
                         onAction(FriendAction.Query(it))
                     },
+                    singleLine = true,
+                    textStyle = TextStyle(fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground),
                     modifier = Modifier
-                        .fillMaxSize(),
-                    colors = androidx.compose.material3.TextFieldDefaults.textFieldColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        focusedIndicatorColor = Color.Transparent,
-                    )
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 12.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            if (uiState.searchResult.query.isEmpty()) {
+                                Text(
+                                    text = stringResource(R.string.friend_code_hint),
+                                    style = MyStoryTheme.typography.bodyMedium
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
                 )
             }
             Card(
@@ -669,7 +681,7 @@ fun BottomSheetScreen(
         uiState.searchResult.run {
             if (uiState.searchResult.userId == null) {
                 Text(
-                    text = "사용자를 찾을 수 없습니다.",
+                    text = stringResource(R.string.friend_user_not_found),
                     style = MyStoryTheme.typography.bodyMedium,
                     modifier = Modifier
                         .padding(10.dp)
@@ -733,13 +745,13 @@ fun RequestScreen(uiState: FriendUiState, onClick: (Friend) -> Unit) {
     if (requests.isNotEmpty()) {
         RequestList(
             friends = requests,
-            title = "나에게 친구 요청한 사용자를 노출합니다.",
+            title = stringResource(R.string.friend_request_users_info),
             onClick = onClick,
             modifier = Modifier.fillMaxSize()
         )
     } else {
         Text(
-            text = "요청 받은 친구가 없습니다.",
+            text = stringResource(R.string.friend_no_requests),
             style = MyStoryTheme.typography.bodyMedium,
             modifier = Modifier
                 .padding(10.dp)
@@ -763,7 +775,7 @@ fun FriendListScreen(
     ) {
         Column {
             Text(
-                text = "나",
+                text = stringResource(R.string.friend_me),
                 style = MyStoryTheme.typography.bodyMediumGray,
                 modifier = Modifier
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp)
@@ -800,7 +812,7 @@ fun FriendListScreen(
         FriendList(
             uiState = uiState,
             isFriend = true,
-            title = "서로 승낙한 친구",
+            title = stringResource(R.string.friend_mutual_friends),
             modifier = Modifier.fillMaxWidth(),
             onClick = showInfoBottomSheet,
             onLongClick = onFriendLongClick
@@ -808,7 +820,7 @@ fun FriendListScreen(
         FriendList(
             uiState = uiState,
             isFriend = false,
-            title = "내가 요청한 친구",
+            title = stringResource(R.string.friend_pending_friends),
             modifier = Modifier.fillMaxSize(),
             onLongClick = onPendingFriendLongClick
         )

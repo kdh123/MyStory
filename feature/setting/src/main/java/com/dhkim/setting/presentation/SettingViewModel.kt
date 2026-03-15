@@ -2,8 +2,8 @@ package com.dhkim.setting.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dhkim.setting.domain.usecase.GetNotificationSettingUseCase
-import com.dhkim.setting.domain.usecase.UpdateNotificationSettingUseCase
+import com.dhkim.domain.usecase.GetNotificationSettingUseCase
+import com.dhkim.domain.usecase.UpdateNotificationSettingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map

@@ -10,5 +10,5 @@ import kotlinx.collections.immutable.persistentListOf
 data class TimeCapsuleUiState(
     val isLoading: Boolean = true,
     val timeCapsules: ImmutableList<TimeCapsuleItem> = persistentListOf(),
-    val currentLocation: LatLng = Constants.defaultLocation
+    val currentLocation: Pair<Double, Double> = Constants.defaultLocation
 )
