@@ -33,7 +33,6 @@ internal class UserRemoteDataSourceImpl @Inject constructor(
             val userListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val data = dataSnapshot.value as? Map<*, *>
-                    Log.e("data212", "data2 : $data")
                     val friends = (data?.get("friends") as? Map<*, *>)?.values
                     val requests = (data?.get("requests") as? Map<*, *>)?.values
 

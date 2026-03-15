@@ -2,12 +2,8 @@ package com.dhkim.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.dhkim.domain.usecase.GetGuideSettingUseCase
 import com.dhkim.domain.usecase.UpdateGuideSettingUseCase
-import com.dhkim.main.work.CheckOpenableTimeCapsuleWorker
 import com.dhkim.ui.Popup
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,16 +11,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-
-const val CHECK_OPENABLE_TIME_CAPSULE_WORK_NAME = "checkOpenableTimeCapsuleWork"
 
 @HiltViewModel
 internal class MainViewModel @Inject constructor(
     private val getGuideSettingUseCase: GetGuideSettingUseCase,
     private val updateGuideSettingUseCase: UpdateGuideSettingUseCase,
-    private val workManager: WorkManager
 ) : ViewModel() {
 
     private val _showGuide = MutableSharedFlow<Boolean>()
@@ -42,16 +34,6 @@ internal class MainViewModel @Inject constructor(
             val showGuide = getGuideSettingUseCase()
             _showGuide.emit(showGuide)
         }
-
-        val checkOpenableTimeCapsuleWorker = PeriodicWorkRequestBuilder<CheckOpenableTimeCapsuleWorker>(
-            24, TimeUnit.HOURS
-        ).build()
-
-        workManager.enqueueUniquePeriodicWork(
-            CHECK_OPENABLE_TIME_CAPSULE_WORK_NAME,
-            ExistingPeriodicWorkPolicy.KEEP,
-            checkOpenableTimeCapsuleWorker
-        )
     }
 
     fun closeGuideDialog() {

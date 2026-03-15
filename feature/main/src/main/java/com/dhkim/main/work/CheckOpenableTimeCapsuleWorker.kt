@@ -14,7 +14,6 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltWorker
 class CheckOpenableTimeCapsuleWorker @AssistedInject constructor(
@@ -22,16 +21,12 @@ class CheckOpenableTimeCapsuleWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val canOpenTimeCapsuleUseCase: CanOpenTimeCapsuleUseCase,
     private val getNotificationSettingUseCase: GetNotificationSettingUseCase,
+    private val notificationManager: NotificationManager,
 ) : CoroutineWorker(context, params) {
-
-    private val workerContext = context
-
-    @Inject
-    lateinit var notificationManager: NotificationManager
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
-            val intent = Intent(workerContext, MainActivity::class.java).apply {
+            val intent = Intent(applicationContext, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
             val isNotificationSettingOn = getNotificationSettingUseCase().first()

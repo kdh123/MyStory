@@ -11,11 +11,20 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.dhkim.designsystem.MyStoryTheme
+import com.dhkim.main.work.CheckOpenableTimeCapsuleWorker
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var workManager: WorkManager
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -23,6 +32,10 @@ class MainActivity : ComponentActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
+    }
+
+    companion object {
+        const val CHECK_OPENABLE_TIME_CAPSULE_WORK_NAME = "checkOpenableTimeCapsuleWork"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +58,19 @@ class MainActivity : ComponentActivity() {
         }
 
         requestPermission()
+        checkOpenableTimeCapsule()
+    }
+
+    private fun checkOpenableTimeCapsule() {
+        val checkOpenableTimeCapsuleWorker = PeriodicWorkRequestBuilder<CheckOpenableTimeCapsuleWorker>(
+            24, TimeUnit.HOURS
+        ).build()
+
+        workManager.enqueueUniquePeriodicWork(
+            CHECK_OPENABLE_TIME_CAPSULE_WORK_NAME,
+            ExistingPeriodicWorkPolicy.KEEP,
+            checkOpenableTimeCapsuleWorker
+        )
     }
 
     private fun requestPermission() {
@@ -62,19 +88,16 @@ class MainActivity : ComponentActivity() {
         }
 
         permissions.forEach { permission ->
-            if (ContextCompat.checkSelfPermission(this, permission) ==
-                PackageManager.PERMISSION_GRANTED
-            ) {
-                // FCM SDK (and your app) can post notifications.
-            } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
-                // TODO: display an educational UI explaining to the user the features that will be enabled
-                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
-                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
-                //       If the user selects "No thanks," allow the user to continue without notifications.
-                requestPermissionLauncher.launch(permissions)
-            } else {
-                // Directly ask for the permission
-                requestPermissionLauncher.launch(permissions)
+            when {
+                ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED -> Unit
+
+                shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS) -> {
+                    requestPermissionLauncher.launch(permissions)
+                }
+
+                else -> {
+                    requestPermissionLauncher.launch(permissions)
+                }
             }
         }
     }
