@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_empty">알림이 존재하지 않습니다.</string>
+    <string name="notification_shared_capsule">%s님이 타임캡슐을 공유하였습니다.</string>
+</resources>

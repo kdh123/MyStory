@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_time_capsule_title">타임캡슐</string>
+    <string name="home_more">더보기</string>
+    <string name="home_delete">삭제</string>
+    <string name="home_delete_with_friends">이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?</string>
+    <string name="home_delete_confirm">정말 삭제하겠습니까?</string>
+    <string name="home_location_permission_title">위치 권한 요청</string>
+    <string name="home_location_permission_desc">타임캡슐을 개봉하기 위해서 위치 권한을 허용해주세요.</string>
+    <string name="home_open">개봉</string>
+    <string name="home_open_confirm">정말 개봉하겠습니까?</string>
+    <string name="home_menu">메뉴</string>
+    <string name="home_open_date_location_desc">%s 이후에 %s 근처에서 개봉할 수 있습니다.</string>
+    <string name="home_open_date_anywhere_desc">%s 이후에 어디에서나 개봉할 수 있습니다.</string>
+    <string name="home_shared_friend">공유한 친구 : %s</string>
+    <string name="home_confirm">확인</string>
+    <string name="home_invite_friend">친구 추가</string>
+    <string name="home_no_photo">사진이 존재하지 않습니다.</string>
+    <string name="home_friend">친구</string>
+    <string name="home_me">나</string>
+    <string name="home_open_capsule">개봉 하기</string>
+    <string name="home_new_capsule">새 타임캡슐</string>
+    <string name="home_location_check">위치 체크</string>
+    <string name="home_location_check_desc">개봉할 수 있는 위치를 지정합니다.</string>
+    <string name="home_unknown_location">알 수 없음</string>
+    <string name="home_near_location_desc">지정한 위치 근처에서 개봉할 수 있습니다.</string>
+    <string name="home_open_date">개봉 날짜</string>
+    <string name="home_open_date_desc">지정한 날짜 이후에 개봉이 가능합니다.</string>
+    <string name="home_share_with_friend">친구와 공유하기</string>
+    <string name="home_share_no_photo">사진은 친구에게 공유되지 않습니다.</string>
+    <string name="home_friend_list">친구 목록</string>
+    <string name="home_share_only_mutual">서로 승낙한 친구에게만 공유할 수 있습니다.</string>
+    <string name="home_no_friends">친구가 존재하지 않습니다.</string>
+    <string name="home_save">저장</string>
+    <string name="home_camera">카메라</string>
+    <string name="home_gallery">갤러리</string>
+    <string name="home_confirm_button">확인</string>
+    <string name="home_cancel_button">취소</string>
+    <string name="home_content_hint">내용을 입력해주세요.</string>
+    <string name="home_writer">작성자 : %s</string>
+    <string name="home_shared">공유 : %s</string>
+    <string name="home_location">위치 : %s</string>
+    <string name="home_going_back_in_time">과거로 돌아가는 중</string>
+    <string name="home_skip">건너뛰기</string>
+    <string name="home_place_search">장소 검색</string>
+</resources>

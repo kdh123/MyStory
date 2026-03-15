@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -111,14 +112,14 @@ fun TimeCapsuleDetailScreen(
                         .clickable {
                             showOption = false
                             val desc = if (uiState.timeCapsule.sharedFriends.isNotEmpty() && !uiState.timeCapsule.isReceived) {
-                                "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
+                                context.getString(R.string.home_delete_with_friends)
                             } else {
-                                "정말 삭제하겠습니까?"
+                                context.getString(R.string.home_delete_confirm)
                             }
 
                             showPopup(
                                 Popup.Warning(
-                                    title = "삭제",
+                                    title = context.getString(R.string.home_delete),
                                     desc = desc,
                                     onPositiveClick = {
                                         onAction(TimeCapsuleDetailAction.DeleteTimeCapsule)
@@ -134,7 +135,7 @@ fun TimeCapsuleDetailScreen(
                             .padding(end = 10.dp)
                     )
                     Text(
-                        text = "삭제",
+                        text = stringResource(R.string.home_delete),
                         style = MyStoryTheme.typography.bodyLarge
                     )
                 }
@@ -179,7 +180,7 @@ fun TimeCapsuleDetailScreen(
             }
 
             MenuItem(
-                title = "작성자 : ${uiState.writer}",
+                title = stringResource(R.string.home_writer, uiState.writer),
                 icon = {
                     Image(
                         painter = painterResource(id = profileResId),
@@ -201,7 +202,7 @@ fun TimeCapsuleDetailScreen(
             )
 
             MenuItem(
-                title = "작성자 : ${uiState.timeCapsule.date}",
+                title = stringResource(R.string.home_writer, uiState.timeCapsule.date),
                 icon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_calender_black),
@@ -222,18 +223,18 @@ fun TimeCapsuleDetailScreen(
                     .height(1.dp)
             )
             if (uiState.timeCapsule.sharedFriends.isNotEmpty()) {
-                val sharedFriendsText = StringBuilder("공유 : ")
+                val sharedFriendsNames = StringBuilder()
 
                 uiState.timeCapsule.sharedFriends.forEachIndexed { index, s ->
                     if (index < uiState.timeCapsule.sharedFriends.size - 1) {
-                        sharedFriendsText.append("$s, ")
+                        sharedFriendsNames.append("$s, ")
                     } else {
-                        sharedFriendsText.append(s)
+                        sharedFriendsNames.append(s)
                     }
                 }
 
                 MenuItem(
-                    title = "작성자 : $sharedFriendsText",
+                    title = stringResource(R.string.home_shared, sharedFriendsNames),
                     icon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_people_black),
@@ -272,7 +273,7 @@ fun TimeCapsuleDetailScreen(
 
             if (uiState.timeCapsule.checkLocation || !uiState.timeCapsule.isReceived) {
                 MenuItem(
-                    title = "위치 : ${uiState.timeCapsule.address}",
+                    title = stringResource(R.string.home_location, uiState.timeCapsule.address),
                     icon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_location_black),
@@ -371,7 +372,7 @@ fun TimeCapsulePager(
                 Text(
                     color = Color.White,
                     style = MyStoryTheme.typography.bodyLargeBold,
-                    text = "사진이 존재하지 않습니다.",
+                    text = stringResource(R.string.home_no_photo),
                     modifier = Modifier
                         .align(Alignment.Center)
                 )

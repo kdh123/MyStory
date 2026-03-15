@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -357,7 +358,7 @@ fun SearchBar(
                     .padding(10.dp)
             ) {
                 Text(
-                    text = query.ifEmpty { "추억을 남기려는 장소를 검색하세요" },
+                    text = query.ifEmpty { stringResource(R.string.map_search_hint) },
                     style = if (query.isEmpty()) {
                         MyStoryTheme.typography.bodyMediumGray
                     } else {

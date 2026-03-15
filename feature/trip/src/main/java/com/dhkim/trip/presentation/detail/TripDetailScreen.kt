@@ -58,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -136,14 +137,14 @@ fun TripDetailScreen(
                         .padding(20.dp)
                 ) {
                     Text(
-                        text = "메뉴",
+                        text = stringResource(R.string.trip_menu),
                         style = MyStoryTheme.typography.bodyLargeBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = "삭제",
+                        text = stringResource(R.string.trip_delete),
                         style = MyStoryTheme.typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -160,8 +161,8 @@ fun TripDetailScreen(
 
     if (showPermissionDialog) {
         WarningDialog(
-            dialogTitle = "저장소 권한 요청",
-            dialogText = "이미지를 불러오기 위해서 저장소 권한을 허용해주세요.",
+            dialogTitle = stringResource(R.string.trip_storage_permission_title),
+            dialogText = stringResource(R.string.trip_storage_permission_desc),
             onConfirmation = {
                 showPermissionDialog = false
                 val uri = Uri.fromParts("package", context.packageName, null)
@@ -187,7 +188,7 @@ fun TripDetailScreen(
             ) {
                 MenuItem(
                     resId = R.drawable.ic_edit_black,
-                    title = "수정",
+                    title = stringResource(R.string.trip_edit),
                     onClick = {
                         onNavigateToSchedule(tripId)
                         showMenuBottom = false
@@ -196,7 +197,7 @@ fun TripDetailScreen(
 
                 MenuItem(
                     resId = R.drawable.ic_delete_black,
-                    title = "삭제",
+                    title = stringResource(R.string.trip_delete),
                     onClick = {
                         showMenuBottom = false
                         showDeletePopup = true
@@ -208,8 +209,8 @@ fun TripDetailScreen(
 
     if (showDeletePopup) {
         WarningDialog(
-            dialogTitle = "삭제",
-            dialogText = "정말 삭제하겠습니까?",
+            dialogTitle = stringResource(R.string.trip_delete_title),
+            dialogText = stringResource(R.string.trip_delete_confirm),
             onConfirmation = {
                 onAction(TripDetailAction.DeleteTrip(tripId))
                 onBack()
@@ -476,7 +477,7 @@ private fun TripDetails(
 ) {
     if (!uiState.endDate.isNullOrEmpty() && DateUtil.isBefore(uiState.endDate)) {
         Text(
-            text = "여행이 끝난 후 여행 기간 중에 찍었던 사진이 노출됩니다.",
+            text = stringResource(R.string.trip_after_trip_photo_notice),
             style = MyStoryTheme.typography.bodyMediumGray,
             modifier = Modifier
                 .fillMaxWidth()
@@ -490,7 +491,7 @@ private fun TripDetails(
 
     if (uiState.images.isEmpty()) {
         Text(
-            text = "이 날 찍었던 사진이 존재하지 않습니다.",
+            text = stringResource(R.string.trip_no_photo_on_this_day),
             style = MyStoryTheme.typography.bodyMediumGray,
             modifier = Modifier
                 .fillMaxWidth()

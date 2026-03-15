@@ -60,6 +60,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -130,14 +131,14 @@ fun TimeCapsuleScreen(
             onDeleteClick = {
                 showMenuDialog = false
                 val desc = if (selectedTimeCapsule.sharedFriends.isNotEmpty() && !selectedTimeCapsule.isReceived) {
-                    "이 타임캡슐을 공유했던 친구들 디바이스에서도 삭제가 됩니다. 정말 삭제하겠습니까?"
+                    context.getString(R.string.home_delete_with_friends)
                 } else {
-                    "정말 삭제하겠습니까?"
+                    context.getString(R.string.home_delete_confirm)
                 }
 
                 showPopup(
                     Popup.Warning(
-                        title = "삭제",
+                        title = context.getString(R.string.home_delete),
                         desc = desc,
                         onPositiveClick = {
                             onDeleteTimeCapsule(
@@ -190,7 +191,7 @@ fun TimeCapsuleScreen(
         topBar = {
             Row {
                 Text(
-                    text = "타임캡슐",
+                    text = stringResource(R.string.home_time_capsule_title),
                     style = MyStoryTheme.typography.headlineSmallBold,
                     modifier = Modifier
                         .padding(start = 10.dp)
@@ -260,7 +261,7 @@ fun TimeCapsuleScreen(
                                     if (title == "나의 이야기") {
                                         val interactionSource = remember { MutableInteractionSource() }
                                         Text(
-                                            text = "더보기",
+                                            text = stringResource(R.string.home_more),
                                             style = MyStoryTheme.typography.labelMedium,
                                             modifier = Modifier
                                                 .align(Alignment.CenterVertically)
@@ -300,8 +301,8 @@ fun TimeCapsuleScreen(
                                         if (!permissionState.status.isGranted) {
                                             showPopup(
                                                 Popup.Warning(
-                                                    title = "위치 권한 요청",
-                                                    desc = "타임캡슐을 개봉하기 위해서 위치 권한을 허용해주세요.",
+                                                    title = context.getString(R.string.home_location_permission_title),
+                                                    desc = context.getString(R.string.home_location_permission_desc),
                                                     onPositiveClick = {
                                                         val uri = Uri.fromParts("package", context.packageName, null)
                                                         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -320,8 +321,8 @@ fun TimeCapsuleScreen(
                                     onShowOpenDialog = {
                                         showPopup(
                                             Popup.Warning(
-                                                title = "개봉",
-                                                desc = "정말 개봉하겠습니까?",
+                                                title = context.getString(R.string.home_open),
+                                                desc = context.getString(R.string.home_open_confirm),
                                                 onPositiveClick = {
                                                     onNavigateToOpen(it.id, it.isReceived)
                                                 }
@@ -469,7 +470,7 @@ private fun InviteFriendItem(onNavigateToProfile: () -> Unit) {
                     .clickable(onClick = onNavigateToProfile)
             ) {
                 Text(
-                    text = "친구 추가",
+                    text = stringResource(R.string.home_invite_friend),
                     style = MyStoryTheme.typography.bodyLargeWhiteBold,
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -528,12 +529,12 @@ fun MenuDialog(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "메뉴",
+                    text = stringResource(R.string.home_menu),
                     style = MyStoryTheme.typography.bodyLargeBold,
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = "삭제",
+                    text = stringResource(R.string.home_delete),
                     style = MyStoryTheme.typography.bodyMedium,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -576,9 +577,9 @@ fun LocationDialog(
     )
 
     val desc = if (timeCapsule.checkLocation) {
-        "${timeCapsule.openDate} 이후에 ${timeCapsule.placeName} 근처에서 개봉할 수 있습니다."
+        stringResource(R.string.home_open_date_location_desc, timeCapsule.openDate, timeCapsule.placeName)
     } else {
-        "${timeCapsule.openDate} 이후에 어디에서나 개봉할 수 있습니다."
+        stringResource(R.string.home_open_date_anywhere_desc, timeCapsule.openDate)
     }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -600,7 +601,7 @@ fun LocationDialog(
                 )
                 if (timeCapsule.isReceived && timeCapsule.sender.isNotEmpty()) {
                     Text(
-                        text = "공유한 친구 : ${timeCapsule.host.nickname}",
+                        text = stringResource(R.string.home_shared_friend, timeCapsule.host.nickname),
                         style = MyStoryTheme.typography.bodyMediumBold,
                         modifier = Modifier
                             .padding(start = 16.dp, end = 16.dp, top = 10.dp)
@@ -649,7 +650,7 @@ fun LocationDialog(
                             .fillMaxWidth(),
                     ) {
                         Text(
-                            text = "확인",
+                            text = stringResource(R.string.home_confirm),
                             style = MyStoryTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -764,7 +765,7 @@ fun OpenedBox(
                             .aspectRatio(0.8f)
                     ) {
                         Text(
-                            text = "사진이 존재하지 않습니다.",
+                            text = stringResource(R.string.home_no_photo),
                             style = MyStoryTheme.typography.bodyLargeWhiteBold,
                             modifier = Modifier
                                 .align(Alignment.Center)
@@ -781,7 +782,7 @@ fun OpenedBox(
                 )
             }
             Text(
-                text = if (timeCapsule.isReceived) "친구" else "나",
+                text = if (timeCapsule.isReceived) stringResource(R.string.home_friend) else stringResource(R.string.home_me),
                 style = MyStoryTheme.typography.bodyMediumBold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -880,7 +881,7 @@ private fun LockTimeCapsule(
 
                 if (canOpen) {
                     Text(
-                        text = "개봉 하기",
+                        text = stringResource(R.string.home_open_capsule),
                         style = MyStoryTheme.typography.bodyLargeWhiteBold,
                         modifier = Modifier
                             .padding(10.dp)
@@ -920,7 +921,7 @@ private fun LockTimeCapsule(
                 }
             }
             Text(
-                text = if (timeCapsule.isReceived) "친구" else "나",
+                text = if (timeCapsule.isReceived) stringResource(R.string.home_friend) else stringResource(R.string.home_me),
                 style = MyStoryTheme.typography.bodyMediumBold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier

@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +55,8 @@ fun TripScreen(
     onNavigateToDetail: (String) -> Unit,
     showPopup: (Popup) -> Unit
 ) {
+    val tripDeleteScheduleTitle = stringResource(R.string.trip_delete_schedule_title)
+    val tripDeleteConfirm = stringResource(R.string.trip_delete_confirm)
     Scaffold(
         topBar = {
             Column {
@@ -69,7 +72,7 @@ fun TripScreen(
                             .align(Alignment.CenterVertically)
                     ) {
                         Text(
-                            text = "여행",
+                            text = stringResource(R.string.trip_title),
                             style = MyStoryTheme.typography.titleMediumBold,
                             modifier = Modifier
                                 .align(Alignment.Center)
@@ -115,8 +118,8 @@ fun TripScreen(
                 showDeleteDialog = {
                     showPopup(
                         Popup.Warning(
-                            title = "일정 삭제",
-                            desc = "정말 삭제하겠습니까?",
+                            title = tripDeleteScheduleTitle,
+                            desc = tripDeleteConfirm,
                             onPositiveClick = {
                                 onAction(TripAction.DeleteTrip(it))
                             }
@@ -166,11 +169,11 @@ private fun AddTripScheduleLayout(
                     .align(Alignment.CenterVertically)
             ) {
                 Text(
-                    text = "여행 일정 만들기",
+                    text = stringResource(R.string.trip_create_schedule),
                     style = MyStoryTheme.typography.labelLargeBold,
                 )
                 Text(
-                    text = "새로운 여행을 떠나볼까요?",
+                    text = stringResource(R.string.trip_new_journey),
                     style = MyStoryTheme.typography.bodyMedium,
                 )
             }
@@ -199,7 +202,7 @@ private fun EmptyTripScheduleLayout(
                     .align(Alignment.CenterHorizontally)
             )
             Text(
-                text = "여행을 계획하고 있나요?",
+                text = stringResource(R.string.trip_planning),
                 style = MyStoryTheme.typography.titleSmallBold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -207,14 +210,14 @@ private fun EmptyTripScheduleLayout(
                     .align(Alignment.CenterHorizontally)
             )
             Text(
-                text = "새로운 여행 일정을 등록해보세요",
+                text = stringResource(R.string.trip_register_schedule),
                 style = MyStoryTheme.typography.bodyMediumGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             )
             Text(
-                text = "일정 만들기",
+                text = stringResource(R.string.trip_make_schedule),
                 style = MyStoryTheme.typography.labelLargeBold,
                 color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center,

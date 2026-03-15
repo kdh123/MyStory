@@ -27,8 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.compose.NavHost
+import com.dhkim.main.R
 import com.dhkim.friend.navigation.FRIEND_MAIN_ROUTE
 import com.dhkim.friend.navigation.friendScreen
 import com.dhkim.home.presentation.navigation.ADD_TIME_CAPSULE_ROUTE
@@ -107,12 +109,10 @@ fun MainScreen(
     ) { innerPadding ->
         if (showGuide) {
             WarningDialog(
-                dialogTitle = "알림",
-                dialogText = "나의이야기는 사용자의 이름, 전화번호, 주소 등의 어떠한 개인정보도 수집하지 않습니다. " +
-                        "그리고 앱에서 작성한 글, 사진 등은 모두 서버가 아닌 디바이스에 저장되기 때문에 " +
-                        "앱 삭제시 모든 데이터가 삭제될 수 있으니 이 점 유의하시길 바랍니다.",
-                negativeText = "확인",
-                positiveText = "다시 보지 않기",
+                dialogTitle = stringResource(R.string.main_guide_title),
+                dialogText = stringResource(R.string.main_guide_text),
+                negativeText = stringResource(R.string.main_guide_confirm),
+                positiveText = stringResource(R.string.main_guide_never_show),
                 onConfirmation = onNeverShowGuideAgain,
                 onDismissRequest = onCloseGuide
             )

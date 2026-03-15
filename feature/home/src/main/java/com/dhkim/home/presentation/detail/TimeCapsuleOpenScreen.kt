@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -153,7 +154,7 @@ fun LoadedScreen(uiState: TimeCapsuleDetailUiState, onNavigateToDetail: (String,
             Text(
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                text = "건너뛰기",
+                text = stringResource(R.string.home_skip),
                 modifier = Modifier
                     .padding(20.dp)
                     .clip(RoundedCornerShape(20.dp))
@@ -284,7 +285,7 @@ fun LoadingScreen(countDownNumber: Int) {
                 )
             }
             Text(
-                text = "과거로 돌아가는 중",
+                text = stringResource(R.string.home_going_back_in_time),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 10.dp)

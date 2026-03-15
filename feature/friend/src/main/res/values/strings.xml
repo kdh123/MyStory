@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="friend_tab_friends">친구</string>
+    <string name="friend_tab_requests">요청</string>
+    <string name="friend_delete">삭제</string>
+    <string name="friend_delete_desc">삭제하면 상대방 친구 목록에도 내가 삭제됩니다. %s님을 정말 삭제하시겠습니까?</string>
+    <string name="friend_info_change">정보 변경</string>
+    <string name="friend_menu">메뉴</string>
+    <string name="friend_create_code_promo">개인 코드 생성하고 \n 친구와 타임캡슐 공유하자!</string>
+    <string name="friend_notice">알림</string>
+    <string name="friend_create_code_privacy">개인 코드는 타임캡슐 공유 목적 외 다른 목적으로 사용되지 않습니다. 또한 코드 생성시 사용자의 이름, 전화번호, 주소 등 어떠한 개인정보도 사용되지 않습니다.</string>
+    <string name="friend_creating_code">개인 코드 생성 중…</string>
+    <string name="friend_create_code">개인 코드 생성하기</string>
+    <string name="friend_share_time_capsule">타임캡슐 공유</string>
+    <string name="friend_meta_me">나입니다.</string>
+    <string name="friend_meta_already_friend">친구로 등록된 사용자입니다.</string>
+    <string name="friend_meta_request_sent">내가 친구 요청을 한 사용자입니다.</string>
+    <string name="friend_meta_request_received">나에게 친구 요청을 한 사용자입니다.</string>
+    <string name="friend_code_hint">친구 코드 입력</string>
+    <string name="friend_user_not_found">사용자를 찾을 수 없습니다.</string>
+    <string name="friend_me">나</string>
+    <string name="friend_mutual_friends">서로 승낙한 친구</string>
+    <string name="friend_pending_friends">내가 요청한 친구</string>
+    <string name="friend_request_users_info">나에게 친구 요청한 사용자를 노출합니다.</string>
+    <string name="friend_no_requests">요청 받은 친구가 없습니다.</string>
+    <string name="friend_nickname">닉네임</string>
+    <string name="friend_personal_code">개인 코드 : %s</string>
+</resources>

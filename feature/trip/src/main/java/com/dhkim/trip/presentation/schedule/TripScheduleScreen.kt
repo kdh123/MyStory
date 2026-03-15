@@ -48,6 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -227,21 +228,21 @@ fun Calender(
                                 onSave(date)
                                 onDismiss()
                             } else {
-                                Toast.makeText(context, "여행 종료 날짜 이전으로 설정해주세요.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.trip_date_before_end_error), Toast.LENGTH_SHORT).show()
                             }
                         } else {
                             if (uiState.startDate.isEmpty() || DateUtil.isAfter(date, uiState.startDate)) {
                                 onSave(date)
                                 onDismiss()
                             } else {
-                                Toast.makeText(context, "여행 시작 날짜 이후로 설정해주세요.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.trip_date_after_start_error), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
                 }
             ) {
                 Text(
-                    text = "확인",
+                    text = stringResource(R.string.trip_confirm),
                     style = MyStoryTheme.typography.bodyLarge,
                 )
             }
@@ -249,7 +250,7 @@ fun Calender(
         dismissButton = {
             Button(onClick = { onDismiss() }) {
                 Text(
-                    text = "취소",
+                    text = stringResource(R.string.trip_cancel),
                     style = MyStoryTheme.typography.bodyLarge,
                 )
             }
@@ -271,7 +272,7 @@ private fun TripTypeScreen(
             .fillMaxSize()
     ) {
         Text(
-            text = "어떤 여행을 계획하고 있나요?",
+            text = stringResource(R.string.trip_type_question),
             style = MyStoryTheme.typography.bodyMediumBold
         )
 
@@ -306,7 +307,7 @@ private fun TripTypeScreen(
 @Composable
 fun TripTypeNextButton(onNextClick: () -> Unit) {
     Text(
-        text = "다음",
+        text = stringResource(R.string.trip_next),
         style = MyStoryTheme.typography.labelLargeBold,
         color = MaterialTheme.colorScheme.onPrimary,
         textAlign = TextAlign.Center,
@@ -379,7 +380,7 @@ private fun TripPlaceScreen(
             .fillMaxSize()
     ) {
         Text(
-            text = "여행하려는 장소가 어디인가요?",
+            text = stringResource(R.string.trip_place_question),
             style = MyStoryTheme.typography.bodyMediumBold
         )
 
@@ -437,7 +438,7 @@ private fun TripPlaceScreen(
 fun TripPlaceTypes(isDomestic: Boolean, onClick: (Int) -> Unit) {
     Row {
         Text(
-            text = "국내",
+            text = stringResource(R.string.trip_domestic),
             style = MyStoryTheme.typography.labelLargeBold,
             color = if (isDomestic) {
                 MaterialTheme.colorScheme.onPrimary
@@ -465,7 +466,7 @@ fun TripPlaceTypes(isDomestic: Boolean, onClick: (Int) -> Unit) {
         )
 
         Text(
-            text = "해외",
+            text = stringResource(R.string.trip_abroad),
             style = MyStoryTheme.typography.labelLargeBold,
             color = if (!isDomestic) {
                 MaterialTheme.colorScheme.onPrimary
@@ -514,7 +515,7 @@ fun TripPlaceBottom(
 
     Column {
         Text(
-            text = "이전",
+            text = stringResource(R.string.trip_prev),
             style = MyStoryTheme.typography.labelLargeBold,
             color = MaterialTheme.colorScheme.onPrimary,
             textAlign = TextAlign.Center,
@@ -529,7 +530,7 @@ fun TripPlaceBottom(
         )
 
         Text(
-            text = "다음",
+            text = stringResource(R.string.trip_next),
             style = MyStoryTheme.typography.labelLargeBold,
             color = textColor,
             textAlign = TextAlign.Center,
@@ -594,7 +595,7 @@ fun PlaceItem(
         )
 
         Text(
-            text = "선택",
+            text = stringResource(R.string.trip_select),
             style = MyStoryTheme.typography.labelLargeBold,
             color = if (isSelected) {
                 MaterialTheme.colorScheme.onPrimary
@@ -673,7 +674,7 @@ private fun TripDateScreen(
             .fillMaxSize()
     ) {
         Text(
-            text = "여행 일정이 어떻게 되나요?",
+            text = stringResource(R.string.trip_date_question),
             style = MyStoryTheme.typography.bodyMediumBold,
             modifier = Modifier
                 .padding(bottom = 10.dp)
@@ -770,7 +771,7 @@ fun SelectTripDate(
 
     Column {
         Text(
-            text = "이전",
+            text = stringResource(R.string.trip_prev),
             style = MyStoryTheme.typography.labelLargeBold,
             color = MaterialTheme.colorScheme.onPrimary,
             textAlign = TextAlign.Center,
@@ -785,7 +786,7 @@ fun SelectTripDate(
         )
 
         Text(
-            text = "완료",
+            text = stringResource(R.string.trip_complete),
             style = MyStoryTheme.typography.labelLargeBold,
             color = textColor,
             textAlign = TextAlign.Center,
@@ -806,7 +807,7 @@ fun StartDate(
     modifier: Modifier = Modifier
 ) {
     Text(
-        text = startDate.ifEmpty { "시작일" },
+        text = startDate.ifEmpty { stringResource(R.string.trip_start_date) },
         style = MyStoryTheme.typography.labelLarge,
         color = if (startDate.isEmpty()) {
             colorResource(id = R.color.gray)
@@ -825,7 +826,7 @@ fun EndDate(
     modifier: Modifier = Modifier
 ) {
     Text(
-        text = endDate.ifEmpty { "종료일" },
+        text = endDate.ifEmpty { stringResource(R.string.trip_end_date) },
         style = MyStoryTheme.typography.labelLarge,
         color = if (endDate.isEmpty()) {
             colorResource(id = R.color.gray)

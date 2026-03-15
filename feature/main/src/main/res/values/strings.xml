@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">나의이야기</string>
+    <string name="main_guide_title">알림</string>
+    <string name="main_guide_text">나의이야기는 사용자의 이름, 전화번호, 주소 등의 어떠한 개인정보도 수집하지 않습니다. 그리고 앱에서 작성한 글, 사진 등은 모두 서버가 아닌 디바이스에 저장되기 때문에 앱 삭제시 모든 데이터가 삭제될 수 있으니 이 점 유의하시길 바랍니다.</string>
+    <string name="main_guide_confirm">확인</string>
+    <string name="main_guide_never_show">다시 보지 않기</string>
 </resources>

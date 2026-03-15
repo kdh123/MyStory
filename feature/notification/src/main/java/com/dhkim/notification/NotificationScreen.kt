@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,7 +64,7 @@ fun NotificationScreen(
                 }
             } else {
                 Text(
-                    text = "알림이 존재하지 않습니다.",
+                    text = stringResource(R.string.notification_empty),
                     style = MyStoryTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -105,7 +106,7 @@ fun NotificationItem(
         ) {
             Row {
                 Text(
-                    text = "${timeCapsule.sender}님이 타임캡슐을 공유하였습니다.",
+                    text = stringResource(R.string.notification_shared_capsule, timeCapsule.sender),
                     style = MyStoryTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

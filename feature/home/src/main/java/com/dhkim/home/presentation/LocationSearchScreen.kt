@@ -30,6 +30,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -95,7 +96,7 @@ fun SearchBar(query: String, onAction: (AddTimeCapsuleAction) -> Unit) {
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         label = {
-            Text(text = "장소 검색")
+            Text(text = stringResource(R.string.home_place_search))
         },
         singleLine = true,
         modifier = Modifier
